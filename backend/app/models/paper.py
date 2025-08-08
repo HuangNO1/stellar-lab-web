@@ -57,10 +57,19 @@ class PaperAuthor(db.Model):
     member = db.relationship('Member', backref='authored_papers')
     
     def to_dict(self):
-        return {
+        result = {
             'paper_id': self.paper_id,
             'mem_id': self.mem_id,
             'author_order': self.author_order,
-            'is_corresponding': self.is_corresponding,
-            'member': self.member.to_dict() if self.member else None
+            'is_corresponding': self.is_corresponding
         }
+        
+        # 避免循環引用，只返回基本信息
+        if hasattr(self, 'member') and self.member:
+            result['member'] = {
+                'mem_id': self.member.mem_id,
+                'mem_name_zh': self.member.mem_name_zh,
+                'mem_name_en': self.member.mem_name_en
+            }
+        
+        return result

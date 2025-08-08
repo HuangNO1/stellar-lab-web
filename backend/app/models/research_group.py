@@ -20,7 +20,7 @@ class ResearchGroup(db.Model):
     leader = db.relationship('Member', foreign_keys=[mem_id], backref='led_groups')
     
     def to_dict(self):
-        return {
+        result = {
             'research_group_id': self.research_group_id,
             'lab_id': self.lab_id,
             'research_group_name_zh': self.research_group_name_zh,
@@ -28,6 +28,15 @@ class ResearchGroup(db.Model):
             'research_group_desc_zh': self.research_group_desc_zh,
             'research_group_desc_en': self.research_group_desc_en,
             'mem_id': self.mem_id,
-            'enable': self.enable,
-            'leader': self.leader.to_dict() if self.leader else None
+            'enable': self.enable
         }
+        
+        # 避免循環引用，只返回基本信息
+        if hasattr(self, 'leader') and self.leader:
+            result['leader'] = {
+                'mem_id': self.leader.mem_id,
+                'mem_name_zh': self.leader.mem_name_zh,
+                'mem_name_en': self.leader.mem_name_en
+            }
+        
+        return result

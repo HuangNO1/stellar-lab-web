@@ -23,7 +23,11 @@ def create_app(config_name=None):
     jwt.init_app(app)
     CORS(app, origins=app.config['CORS_ORIGINS'])
     
-    # 註冊藍圖
+    # 註冊根路由
+    from app.routes.root import bp as root_bp
+    app.register_blueprint(root_bp)
+    
+    # 註冊API藍圖
     from app.routes.auth import bp as auth_bp
     from app.routes.admin import bp as admin_bp
     from app.routes.lab import bp as lab_bp
@@ -33,6 +37,8 @@ def create_app(config_name=None):
     from app.routes.news import bp as news_bp
     from app.routes.project import bp as project_bp
     from app.routes.media import bp as media_bp
+    from app.routes.edit_record import bp as edit_record_bp
+    from app.routes.swagger_docs import bp as swagger_bp
     
     app.register_blueprint(auth_bp, url_prefix='/api')
     app.register_blueprint(admin_bp, url_prefix='/api')
@@ -43,6 +49,8 @@ def create_app(config_name=None):
     app.register_blueprint(news_bp, url_prefix='/api')
     app.register_blueprint(project_bp, url_prefix='/api')
     app.register_blueprint(media_bp, url_prefix='/api')
+    app.register_blueprint(edit_record_bp, url_prefix='/api')
+    app.register_blueprint(swagger_bp, url_prefix='/api')
     
     # 創建表
     with app.app_context():

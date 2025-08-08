@@ -28,7 +28,7 @@ class Member(db.Model):
     lab = db.relationship('Lab', backref='members')
     
     def to_dict(self):
-        return {
+        result = {
             'mem_id': self.mem_id,
             'mem_avatar_path': self.mem_avatar_path,
             'mem_name_zh': self.mem_name_zh,
@@ -44,6 +44,15 @@ class Member(db.Model):
             'destination_en': self.destination_en,
             'research_group_id': self.research_group_id,
             'lab_id': self.lab_id,
-            'enable': self.enable,
-            'research_group': self.research_group.to_dict() if self.research_group else None
+            'enable': self.enable
         }
+        
+        # 避免循環引用，只返回基本信息
+        if hasattr(self, 'research_group') and self.research_group:
+            result['research_group'] = {
+                'research_group_id': self.research_group.research_group_id,
+                'research_group_name_zh': self.research_group.research_group_name_zh,
+                'research_group_name_en': self.research_group.research_group_name_en
+            }
+        
+        return result

@@ -11,7 +11,7 @@ from datetime import datetime
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import create_app, db
-from app.models import Admin, Lab
+from app.models import Admin, Lab, ResearchGroup, Member, Paper, PaperAuthor, Project, News, EditRecord
 
 def init_database():
     app = create_app()
