@@ -1,0 +1,47 @@
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache
+.pytest_cache
+.hypothesis
+
+.env
+.DS_Store
+.vscode/
+.idea/
+
+# 實例文件夾
+instance/
+
+# 上傳的媒體文件
+media/
+uploads/
+
+# 日誌文件
+logs/
+*.log
+
+# 數據庫文件
+*.db
+*.sqlite
+*.sqlite3
+
+# Flask-Migrate
+migrations/versions/*.pyc
+migrations/__pycache__/

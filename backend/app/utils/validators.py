@@ -1,0 +1,42 @@
+import re
+from datetime import datetime
+
+def validate_email(email):
+    if not email:
+        return True  # 郵箱非必填
+    
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
+
+def validate_admin_name(admin_name):
+    if not admin_name:
+        return False
+    
+    pattern = r'^[A-Za-z0-9_\-]{3,50}$'
+    return re.match(pattern, admin_name) is not None
+
+def validate_date(date_str):
+    if not date_str:
+        return True, None
+    
+    try:
+        date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+        return True, date_obj
+    except ValueError:
+        return False, None
+
+def validate_enum(value, valid_values):
+    if value is None:
+        return True
+    
+    try:
+        int_value = int(value)
+        return int_value in valid_values
+    except (ValueError, TypeError):
+        return False
+
+def validate_string_length(value, max_length):
+    if not value:
+        return True
+    
+    return len(value) <= max_length
