@@ -125,6 +125,136 @@ def swagger_json():
                     }
                 }
             },
+            "/admin/logout": {
+                "post": {
+                    "tags": ["認證"],
+                    "summary": "管理員登出",
+                    "description": "記錄管理員登出操作並進行審計",
+                    "security": [{"Bearer": []}],
+                    "responses": {
+                        "200": {
+                            "description": "登出成功",
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "code": {"type": "integer", "example": 0},
+                                    "message": {"type": "string", "example": "登出成功"}
+                                }
+                            }
+                        },
+                        "401": {"description": "未認證"},
+                        "500": {"description": "登出失敗"}
+                    }
+                }
+            },
+            "/admin/profile": {
+                "get": {
+                    "tags": ["認證"],
+                    "summary": "獲取當前管理員個人信息",
+                    "description": "返回當前登錄管理員的詳細信息",
+                    "security": [{"Bearer": []}],
+                    "responses": {
+                        "200": {
+                            "description": "成功獲取個人信息",
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "code": {"type": "integer", "example": 0},
+                                    "message": {"type": "string", "example": "OK"},
+                                    "data": {
+                                        "type": "object",
+                                        "properties": {
+                                            "admin_id": {"type": "integer"},
+                                            "admin_name": {"type": "string"},
+                                            "enable": {"type": "integer"},
+                                            "created_at": {"type": "string", "format": "date-time"}
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "401": {"description": "未認證"}
+                    }
+                },
+                "put": {
+                    "tags": ["認證"],
+                    "summary": "更新管理員個人信息",
+                    "description": "更新當前登錄管理員的個人信息",
+                    "security": [{"Bearer": []}],
+                    "parameters": [{
+                        "name": "body",
+                        "in": "body",
+                        "required": True,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "additional_fields": {
+                                    "type": "object",
+                                    "description": "可更新的額外字段（根據實際模型定義）"
+                                }
+                            }
+                        }
+                    }],
+                    "responses": {
+                        "200": {
+                            "description": "個人信息更新成功",
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "code": {"type": "integer", "example": 0},
+                                    "message": {"type": "string", "example": "個人信息更新成功"},
+                                    "data": {"type": "object"}
+                                }
+                            }
+                        },
+                        "401": {"description": "未認證"},
+                        "500": {"description": "更新失敗"}
+                    }
+                }
+            },
+            "/admin/change-password": {
+                "post": {
+                    "tags": ["認證"],
+                    "summary": "修改密碼",
+                    "description": "修改當前登錄管理員的密碼",
+                    "security": [{"Bearer": []}],
+                    "parameters": [{
+                        "name": "body",
+                        "in": "body",
+                        "required": True,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "old_password": {
+                                    "type": "string",
+                                    "description": "原密碼",
+                                    "example": "oldpass123"
+                                },
+                                "new_password": {
+                                    "type": "string",
+                                    "description": "新密碼（至少8位）",
+                                    "example": "newpass123"
+                                }
+                            },
+                            "required": ["old_password", "new_password"]
+                        }
+                    }],
+                    "responses": {
+                        "200": {
+                            "description": "密碼修改成功",
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "code": {"type": "integer", "example": 0},
+                                    "message": {"type": "string", "example": "密碼修改成功"}
+                                }
+                            }
+                        },
+                        "400": {"description": "原密碼錯誤或新密碼格式不符合要求"},
+                        "401": {"description": "未認證"}
+                    }
+                }
+            },
             "/lab": {
                 "get": {
                     "tags": ["實驗室"],
