@@ -1,0 +1,74 @@
+# Docker 构建忽略文件
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# 虚拟环境
+venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# 日志文件
+*.log
+logs/
+
+# 数据库文件
+*.db
+*.sqlite
+
+# 媒体文件（在容器中重新创建）
+media/
+
+# Docker 文件
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# 环境配置
+.env*
+
+# 文档
+README.md
+api.md
+
+# 测试
+test_*.py
+*_test.py
+
+# 其他
+.coverage
+.pytest_cache/

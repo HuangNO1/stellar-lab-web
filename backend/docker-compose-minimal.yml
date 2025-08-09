@@ -1,0 +1,71 @@
+services:
+  # MySQL 数据库服务
+  db:
+    image: mysql:8.0
+    container_name: lab_web_db
+    environment:
+      MYSQL_ROOT_PASSWORD: lab_web_root_123
+      MYSQL_DATABASE: lab_web
+      MYSQL_USER: lab_web_user
+      MYSQL_PASSWORD: lab_web_pass_123
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
+    ports:
+      - "3307:3306"  # 改为本地 3307 端口映射到容器 3306 端口
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - lab_web_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-plab_web_root_123"]
+      timeout: 20s
+      retries: 10
+
+  # Flask 后端应用服务
+  app:
+    build: .
+    container_name: lab_web_app
+    environment:
+      # 数据库配置 - 使用 root 用户连接（init_db.py 需要创建数据库的权限）
+      DATABASE_URL: mysql+pymysql://root:lab_web_root_123@db:3306/lab_web?charset=utf8mb4
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+      MYSQL_ROOT_PASSWORD: lab_web_root_123
+      MYSQL_DATABASE: lab_web
+      
+      # Flask 配置
+      FLASK_APP: run.py
+      FLASK_CONFIG: production
+      SECRET_KEY: lab_web_secret_key_change_in_production
+      JWT_SECRET_KEY: lab_web_jwt_secret_change_in_production
+      
+      # 其他配置
+      UPLOAD_FOLDER: /app/media
+      CORS_ORIGINS: "*"
+    ports:
+      - "8000:8000"
+    volumes:
+      - media_data:/app/media
+      - ./logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - lab_web_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+    driver: local
+  media_data:
+    driver: local
+
+networks:
+  lab_web_network:
+    driver: bridge

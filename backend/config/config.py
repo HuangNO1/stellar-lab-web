@@ -29,11 +29,9 @@ class Config:
     MAX_PER_PAGE = 100
     
     # 其他配置
-    CORS_ORIGINS = [
-        'http://localhost:3000', 'http://127.0.0.1:3000',
-        'http://localhost:5000', 'http://127.0.0.1:5000',
-        'http://localhost:8000', 'http://127.0.0.1:8000'
-    ]
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 
+        'http://localhost:3000,http://127.0.0.1:3000,http://localhost:5000,http://127.0.0.1:5000,http://localhost:8000,http://127.0.0.1:8000'
+    ).split(',') if os.environ.get('CORS_ORIGINS') != '*' else '*'
 
 class DevelopmentConfig(Config):
     DEBUG = True
