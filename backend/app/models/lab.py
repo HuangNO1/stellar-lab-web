@@ -6,6 +6,10 @@ class Lab(db.Model):
     
     lab_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     lab_logo_path = db.Column(db.String(500))
+    carousel_img_1 = db.Column(db.String(500))
+    carousel_img_2 = db.Column(db.String(500))
+    carousel_img_3 = db.Column(db.String(500))
+    carousel_img_4 = db.Column(db.String(500))
     lab_zh = db.Column(db.String(500), index=True)  # 添加索引用於實驗室中文名稱搜索
     lab_en = db.Column(db.String(500), index=True)  # 添加索引用於實驗室英文名稱搜索
     lab_desc_zh = db.Column(db.Text)
@@ -22,6 +26,10 @@ class Lab(db.Model):
         return {
             'lab_id': self.lab_id,
             'lab_logo_path': self.lab_logo_path,
+            'carousel_img_1': self.carousel_img_1,
+            'carousel_img_2': self.carousel_img_2,
+            'carousel_img_3': self.carousel_img_3,
+            'carousel_img_4': self.carousel_img_4,
             'lab_zh': self.lab_zh,
             'lab_en': self.lab_en,
             'lab_desc_zh': self.lab_desc_zh,

@@ -92,7 +92,7 @@ gunicorn -w 4 -b 0.0.0.0:8000 run:app
 
 | 模塊 | 功能 | CRUD | 搜索 | 批量操作 |
 |------|------|------|------|----------|
-| 🏢 實驗室管理 | 實驗室基本信息、Logo | ✅ | - | - |
+| 🏢 實驗室管理 | 實驗室基本信息、Logo、輪播圖片 | ✅ | - | - |
 | 👥 課題組管理 | 課題組信息、組長關聯 | ✅ | ✅ | - |
 | 👨‍💼 成員管理 | 教師、學生信息、頭像 | ✅ | ✅ | ✅ |
 | 📄 論文管理 | 論文信息、作者關聯、文件 | ✅ | ✅ | - |
@@ -148,8 +148,8 @@ gunicorn -w 4 -b 0.0.0.0:8000 run:app
 - `PUT /api/admin/profile` - 更新個人信息
 
 ### 實驗室管理
-- `GET /api/lab` - 獲取實驗室信息
-- `PUT /api/lab` - 更新實驗室信息（支持Logo上傳）
+- `GET /api/lab` - 獲取實驗室信息（含輪播圖片）
+- `PUT /api/lab` - 更新實驗室信息（支持Logo及輪播圖片上傳）
 - `DELETE /api/lab` - 刪除實驗室
 
 ### 課題組管理
@@ -273,7 +273,7 @@ gunicorn -w 4 -b 0.0.0.0:8000 run:app
 
 ```
 media/
-├── lab_logo/          # 實驗室Logo
+├── lab_logo/          # 實驗室Logo及輪播圖片
 ├── member_avatar/     # 成員頭像
 ├── paper/            # 論文文件
 └── other/            # 其他文件
@@ -331,6 +331,116 @@ backend/
 
 ```bash
 python test_api.py
+```
+
+## 🐳 Docker 部署
+
+### 快速部署
+
+使用提供的部署腳本快速部署完整的實驗室網頁框架：
+
+```bash
+# 賦予執行權限
+chmod +x deploy.sh
+
+# 啟動所有服務
+./deploy.sh start
+
+# 查看服務狀態
+./deploy.sh status
+
+# 查看服務日誌
+./deploy.sh logs
+
+# 重啟服務
+./deploy.sh restart
+
+# 停止服務
+./deploy.sh stop
+```
+
+### 重新部署最新版本
+
+當你對後端代碼進行了修改（如新增功能、修復bug等），需要重新部署到Docker容器：
+
+#### 方法1: 使用部署腳本（推薦）
+
+```bash
+# 停止現有服務
+./deploy.sh stop
+
+# 重新構建並啟動（會自動構建最新代碼）
+./deploy.sh restart
+```
+
+#### 方法2: 使用Docker Compose命令
+
+```bash
+# 停止並移除現有容器
+docker-compose --project-name lab_web down
+
+# 重新構建鏡像並啟動
+docker-compose --project-name lab_web up --build -d
+
+# 查看服務狀態
+docker-compose --project-name lab_web ps
+```
+
+#### 方法3: 強制重新構建
+
+如果遇到緩存問題，可以強制重新構建：
+
+```bash
+# 停止服務並移除容器
+docker-compose --project-name lab_web down
+
+# 移除舊鏡像
+docker rmi lab_web_app 2>/dev/null || true
+
+# 清理構建緩存
+docker builder prune -f
+
+# 重新構建並啟動
+docker-compose --project-name lab_web up --build -d
+```
+
+### 重要提醒
+
+1. **數據持久化**: 數據庫和媒體文件使用Docker volumes存儲，重新部署不會丟失數據
+2. **數據庫遷移**: 新版本如果包含數據庫schema變更，會在容器啟動時自動執行遷移
+3. **環境變量**: 確保`.env.docker`文件包含所有必要配置
+
+### 服務地址
+
+部署成功後，服務將在以下地址可用：
+
+- **後端API**: http://localhost:8000
+- **API文檔**: http://localhost:8000/api/docs
+- **數據庫管理**: http://localhost:8081
+
+### Docker 環境要求
+
+- Docker 20.0+
+- Docker Compose 1.28+
+- 至少2GB可用內存
+- 至少5GB可用磁盤空間
+
+### 故障排除
+
+如果部署遇到問題：
+
+```bash
+# 查看詳細日誌
+./deploy.sh logs
+
+# 檢查服務狀態
+docker-compose --project-name lab_web ps
+
+# 檢查容器資源使用
+docker stats
+
+# 進入容器調試
+docker exec -it lab_web_app bash
 ```
 
 ## 🚦 部署指南
@@ -451,6 +561,9 @@ A: 由於使用軟刪除，可以定期備份整個數據庫。所有數據都�
 
 ### Q: API 支持版本控制嗎？
 A: 當前版本為 v1，所有接口統一使用 `/api` 前綴。
+
+### Q: 如何重新部署Docker容器？
+A: 使用 `./deploy.sh restart` 重新部署，或使用 `docker-compose --project-name lab_web up --build -d` 強制重新構建。
 
 ### Q: 如何自定義文件存儲路徑？
 A: 修改 `config/config.py` 中的 `UPLOAD_FOLDER` 配置。

@@ -17,6 +17,10 @@ def get_lab():
         default_lab = {
             'lab_id': None,
             'lab_logo_path': None,
+            'carousel_img_1': None,
+            'carousel_img_2': None,
+            'carousel_img_3': None,
+            'carousel_img_4': None,
             'lab_zh': '實驗室',
             'lab_en': 'Laboratory',
             'lab_desc_zh': '請在管理後台設置實驗室信息',
@@ -53,6 +57,29 @@ def update_lab():
                 # 刪除舊logo
                 if old_logo_path and old_logo_path != new_logo_path:
                     delete_file(old_logo_path)
+        
+        # 處理輪播圖片上傳和清除
+        carousel_fields = ['carousel_img_1', 'carousel_img_2', 'carousel_img_3', 'carousel_img_4']
+        for carousel_field in carousel_fields:
+            old_carousel_path = getattr(lab, carousel_field)
+            
+            # 檢查是否要清除圖片
+            clear_param = f'clear_{carousel_field}'
+            if clear_param in request.form and request.form[clear_param].lower() == 'true':
+                setattr(lab, carousel_field, None)
+                if old_carousel_path:
+                    delete_file(old_carousel_path)
+            # 檢查是否有新圖片上傳
+            elif carousel_field in request.files:
+                file = request.files[carousel_field]
+                if file and file.filename:
+                    # 保存新輪播圖片
+                    new_carousel_path = save_file(file, carousel_field, max_size=5*1024*1024)
+                    setattr(lab, carousel_field, new_carousel_path)
+                    
+                    # 刪除舊圖片
+                    if old_carousel_path and old_carousel_path != new_carousel_path:
+                        delete_file(old_carousel_path)
         
         # 更新文本字段
         text_fields = [
@@ -134,6 +161,16 @@ def delete_lab():
         return jsonify(error_response(4000, '該實驗室下仍有有效成員，無法刪除')), 409
     
     try:
+        # 刪除關聯的文件
+        if lab.lab_logo_path:
+            delete_file(lab.lab_logo_path)
+        
+        carousel_fields = ['carousel_img_1', 'carousel_img_2', 'carousel_img_3', 'carousel_img_4']
+        for carousel_field in carousel_fields:
+            carousel_path = getattr(lab, carousel_field)
+            if carousel_path:
+                delete_file(carousel_path)
+        
         # 軟刪除
         lab.enable = 0
         

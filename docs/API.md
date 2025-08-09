@@ -390,6 +390,10 @@ GET /api/lab
   "data": {
     "lab_id": 1,
     "lab_logo_path": "/media/lab_logo/logo.png",
+    "carousel_img_1": "/media/lab_logo/carousel_1.jpg",
+    "carousel_img_2": "/media/lab_logo/carousel_2.jpg",
+    "carousel_img_3": "/media/lab_logo/carousel_3.jpg",
+    "carousel_img_4": "/media/lab_logo/carousel_4.jpg",
     "lab_zh": "智慧計算實驗室",
     "lab_en": "Intelligent Computing Laboratory",
     "lab_desc_zh": "本實驗室專注於人工智慧、機器學習和計算機視覺領域的研究",
@@ -427,6 +431,14 @@ Content-Type: multipart/form-data
 | lab_email | string | - | 實驗室聯繫信箱 | contact@lab.edu.cn |
 | lab_phone | string | - | 實驗室聯絡電話 | +86-10-12345678 |
 | lab_logo | file | - | 實驗室Logo文件 | logo.png |
+| carousel_img_1 | file | - | 輪播圖片1 | carousel1.jpg |
+| carousel_img_2 | file | - | 輪播圖片2 | carousel2.jpg |
+| carousel_img_3 | file | - | 輪播圖片3 | carousel3.jpg |
+| carousel_img_4 | file | - | 輪播圖片4 | carousel4.jpg |
+| clear_carousel_img_1 | string | - | 清除輪播圖片1（值為"true"時清除） | true |
+| clear_carousel_img_2 | string | - | 清除輪播圖片2（值為"true"時清除） | true |
+| clear_carousel_img_3 | string | - | 清除輪播圖片3（值為"true"時清除） | true |
+| clear_carousel_img_4 | string | - | 清除輪播圖片4（值為"true"時清除） | true |
 
 ### 刪除實驗室
 ```
@@ -441,7 +453,9 @@ Authorization: Bearer <token>
 **請求參數**
 無
 
-**注意**: 只有當實驗室下沒有有效課題組和成員時才能刪除
+**注意**: 
+- 只有當實驗室下沒有有效課題組和成員時才能刪除
+- 刪除時會自動清理相關文件，包括logo和輪播圖片
 
 ## 課題組管理
 
@@ -1524,6 +1538,7 @@ GET /api/swagger.json
 
 **儲存路徑**
 - 實驗室Logo: `/media/lab_logo/`
+- 輪播圖片: `/media/lab_logo/` （與Logo同目錄）
 - 成員頭像: `/media/member_avatar/`
 - 論文文件: `/media/paper/`
 - 其他文件: `/media/other/`
