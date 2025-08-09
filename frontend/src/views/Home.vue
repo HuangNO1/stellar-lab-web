@@ -1,77 +1,218 @@
 <template>
   <div class="home">
-    <h1>歡迎來到 Lab Web 應用程式</h1>
-    <p class="description">
-      這是一個使用 Vue 3 + TypeScript + Vite 構建的現代化 Web 應用程式
-    </p>
-    
-    <div class="features">
-      <div class="feature-card">
-        <h3>🚀 現代技術棧</h3>
-        <p>使用 Vue 3 Composition API、TypeScript 和 Vite</p>
+    <n-card class="hero-section">
+      <div class="hero-content">
+        <h1>{{ t('nav.home') }}</h1>
+        <p class="hero-description">
+          {{ labInfo?.lab_desc_zh || labInfo?.lab_desc_en || '歡迎來到我們的實驗室' }}
+        </p>
+        <n-space>
+          <n-button
+            type="primary" 
+            size="large"
+            @click="router.push('/members')"
+          >
+            {{ t('nav.members') }}
+          </n-button>
+          <n-button
+            type="default"
+            size="large"
+            @click="router.push('/papers')"
+          >
+            {{ t('nav.papers') }}
+          </n-button>
+        </n-space>
       </div>
-      
-      <div class="feature-card">
-        <h3>📱 響應式設計</h3>
-        <p>適配各種設備和螢幕尺寸</p>
-      </div>
-      
-      <div class="feature-card">
-        <h3>⚡ 快速開發</h3>
-        <p>熱重載和快速構建體驗</p>
-      </div>
-    </div>
+    </n-card>
+
+    <n-grid :cols="3" :x-gap="24" :y-gap="24" style="margin-top: 24px;">
+      <n-grid-item>
+        <n-card hoverable>
+          <template #header>
+            <n-space align="center">
+              <n-icon size="20" :color="themeVars.primaryColor">
+                <People />
+              </n-icon>
+              {{ t('nav.members') }}
+            </n-space>
+          </template>
+          <n-statistic :value="stats.memberCount" />
+          <template #footer>
+            <n-button text @click="router.push('/members')">
+              查看更多 →
+            </n-button>
+          </template>
+        </n-card>
+      </n-grid-item>
+
+      <n-grid-item>
+        <n-card hoverable>
+          <template #header>
+            <n-space align="center">
+              <n-icon size="20" :color="themeVars.primaryColor">
+                <Document />
+              </n-icon>
+              {{ t('nav.papers') }}
+            </n-space>
+          </template>
+          <n-statistic :value="stats.paperCount" />
+          <template #footer>
+            <n-button text @click="router.push('/papers')">
+              查看更多 →
+            </n-button>
+          </template>
+        </n-card>
+      </n-grid-item>
+
+      <n-grid-item>
+        <n-card hoverable>
+          <template #header>
+            <n-space align="center">
+              <n-icon size="20" :color="themeVars.primaryColor">
+                <Briefcase />
+              </n-icon>
+              {{ t('nav.projects') }}
+            </n-space>
+          </template>
+          <n-statistic :value="stats.projectCount" />
+          <template #footer>
+            <n-button text @click="router.push('/projects')">
+              查看更多 →
+            </n-button>
+          </template>
+        </n-card>
+      </n-grid-item>
+    </n-grid>
+
+    <n-card class="news-section" style="margin-top: 24px;">
+      <template #header>
+        <n-space justify="space-between" align="center">
+          <span>{{ t('nav.news') }}</span>
+          <n-button text @click="router.push('/news')">
+            查看全部 →
+          </n-button>
+        </n-space>
+      </template>
+      <n-list v-if="recentNews.length">
+        <n-list-item v-for="news in recentNews" :key="news.news_id">
+          <n-thing :title="news.news_content_zh || news.news_content_en || '無標題'">
+            <template #description>
+              <n-space>
+                <n-tag size="small" :type="getNewsTypeColor(news.news_type)">
+                  {{ getNewsTypeText(news.news_type) }}
+                </n-tag>
+                <span>{{ formatDate(news.news_date || news.created_at || '') }}</span>
+              </n-space>
+            </template>
+            {{ (news.news_content_zh || news.news_content_en || '').substring(0, 100) }}...
+          </n-thing>
+        </n-list-item>
+      </n-list>
+      <n-empty v-else description="暫無新聞" />
+    </n-card>
   </div>
 </template>
 
 <script setup lang="ts">
-// 首頁組件邏輯
+import { ref } from '@vue/reactivity'
+import { onMounted } from '@vue/runtime-core'
+import { useThemeVars } from 'naive-ui'
+import { useRouter } from 'vue-router'
+import { People, Document, Briefcase } from '@vicons/ionicons5'
+import { useI18n } from 'vue-i18n'
+import type { Lab, News } from '@/types'
+import { labAPI, newsAPI, memberAPI, paperAPI, projectAPI } from '@/utils/api'
+
+const router = useRouter()
+const themeVars = useThemeVars()
+const { t } = useI18n()
+const labInfo = ref<Lab | null>(null)
+const recentNews = ref<News[]>([])
+const stats = ref({
+  memberCount: 0,
+  paperCount: 0,
+  projectCount: 0
+})
+
+const getNewsTypeColor = (type: number) => {
+  const colors: Record<number, string> = {
+    0: 'info',    // 論文
+    1: 'success', // 獎項
+    2: 'warning', // 報告
+    3: 'default'  // 其它
+  }
+  return colors[type] || 'default'
+}
+
+const getNewsTypeText = (type: number) => {
+  const types: Record<number, string> = {
+    0: t('news.paper'),
+    1: t('news.award'),
+    2: t('news.report'),
+    3: t('news.other')
+  }
+  return types[type] || t('news.other')
+}
+
+const formatDate = (dateStr: string) => {
+  return new Date(dateStr).toLocaleDateString('zh-CN')
+}
+
+const loadData = async () => {
+  try {
+    // Load lab info
+    const labResponse = await labAPI.getLab()
+    labInfo.value = labResponse.data
+
+    // Load recent news
+    const newsResponse = await newsAPI.getNews({ page: 1, limit: 5 })
+    recentNews.value = newsResponse.data.data
+
+    // Load statistics
+    const [memberResponse, paperResponse, projectResponse] = await Promise.all([
+      memberAPI.getMembers({ page: 1, limit: 1 }),
+      paperAPI.getPapers({ page: 1, limit: 1 }),
+      projectAPI.getProjects({ page: 1, limit: 1 })
+    ])
+
+    stats.value = {
+      memberCount: memberResponse.data.total,
+      paperCount: paperResponse.data.total,
+      projectCount: projectResponse.data.total
+    }
+  } catch (error) {
+    console.error('Failed to load home data:', error)
+  }
+}
+
+onMounted(() => {
+  loadData()
+})
 </script>
 
 <style scoped>
-.home {
+.hero-section {
   text-align: center;
-  max-width: 800px;
-  margin: 0 auto;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
 }
 
-h1 {
-  color: #2c3e50;
-  margin-bottom: 1rem;
+.hero-section :deep(.n-card__content) {
+  padding: 60px 40px;
 }
 
-.description {
-  font-size: 1.2rem;
-  color: #7f8c8d;
-  margin-bottom: 3rem;
+.hero-content h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+  font-weight: 700;
 }
 
-.features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
-}
-
-.feature-card {
-  background: #f8f9fa;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease;
-}
-
-.feature-card:hover {
-  transform: translateY(-4px);
-}
-
-.feature-card h3 {
-  color: #2c3e50;
-  margin-bottom: 1rem;
-}
-
-.feature-card p {
-  color: #7f8c8d;
-  line-height: 1.6;
+.hero-description {
+  font-size: 18px;
+  margin-bottom: 40px;
+  opacity: 0.9;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 </style>
