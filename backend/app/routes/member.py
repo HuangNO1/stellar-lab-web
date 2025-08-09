@@ -291,3 +291,115 @@ def delete_member(mem_id):
     except Exception as e:
         db.session.rollback()
         return jsonify(error_response(5000, f'刪除失敗: {str(e)}')), 500
+
+@bp.route('/members/batch', methods=['DELETE'])
+@admin_required
+def batch_delete_members():
+    """批量刪除成員"""
+    data = request.get_json()
+    
+    if not data or 'member_ids' not in data:
+        return jsonify(error_response(2000, '缺少member_ids參數')), 400
+    
+    member_ids = data.get('member_ids', [])
+    
+    if not isinstance(member_ids, list) or len(member_ids) == 0:
+        return jsonify(error_response(2000, 'member_ids必須是非空數組')), 400
+    
+    try:
+        # 批量軟刪除
+        updated_count = Member.query.filter(
+            Member.mem_id.in_(member_ids),
+            Member.enable == 1
+        ).update(
+            {'enable': 0},
+            synchronize_session=False
+        )
+        
+        if updated_count == 0:
+            return jsonify(error_response(4000, '沒有找到可刪除的成員')), 404
+        
+        # 記錄操作
+        record = EditRecord(
+            admin_id=g.current_admin.admin_id,
+            edit_type='DELETE',
+            edit_module=2,  # 成員模組
+        )
+        record.set_content({
+            'batch_operation': True,
+            'deleted_member_ids': member_ids,
+            'deleted_count': updated_count
+        })
+        db.session.add(record)
+        
+        db.session.commit()
+        
+        return jsonify(success_response({
+            'deleted_count': updated_count
+        }, f'成功刪除 {updated_count} 個成員'))
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(error_response(5000, f'批量刪除失敗: {str(e)}')), 500
+
+@bp.route('/members/batch', methods=['PUT'])
+@admin_required
+def batch_update_members():
+    """批量更新成員狀態"""
+    data = request.get_json()
+    
+    if not data or 'member_ids' not in data:
+        return jsonify(error_response(2000, '缺少member_ids參數')), 400
+    
+    member_ids = data.get('member_ids', [])
+    updates = data.get('updates', {})
+    
+    if not isinstance(member_ids, list) or len(member_ids) == 0:
+        return jsonify(error_response(2000, 'member_ids必須是非空數組')), 400
+    
+    # 只允許更新某些字段
+    allowed_fields = {'enable', 'mem_type', 'research_group_id'}
+    update_data = {}
+    
+    for field, value in updates.items():
+        if field in allowed_fields:
+            update_data[field] = value
+    
+    if not update_data:
+        return jsonify(error_response(2000, '沒有可更新的字段')), 400
+    
+    try:
+        # 批量更新
+        updated_count = Member.query.filter(
+            Member.mem_id.in_(member_ids)
+        ).update(
+            update_data,
+            synchronize_session=False
+        )
+        
+        if updated_count == 0:
+            return jsonify(error_response(4000, '沒有找到可更新的成員')), 404
+        
+        # 記錄操作
+        record = EditRecord(
+            admin_id=g.current_admin.admin_id,
+            edit_type='UPDATE',
+            edit_module=2,  # 成員模組
+        )
+        record.set_content({
+            'batch_operation': True,
+            'updated_member_ids': member_ids,
+            'updated_fields': update_data,
+            'updated_count': updated_count
+        })
+        db.session.add(record)
+        
+        db.session.commit()
+        
+        return jsonify(success_response({
+            'updated_count': updated_count
+        }, f'成功更新 {updated_count} 個成員'))
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(error_response(5000, f'批量更新失敗: {str(e)}')), 500

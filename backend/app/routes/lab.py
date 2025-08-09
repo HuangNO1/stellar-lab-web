@@ -105,3 +105,33 @@ def update_lab():
     except Exception as e:
         db.session.rollback()
         return jsonify(error_response(5000, f'操作失敗: {str(e)}')), 500
+
+@bp.route('/lab', methods=['DELETE'])
+@admin_required
+def delete_lab():
+    """刪除實驗室信息（軟刪除）"""
+    lab = Lab.query.filter_by(enable=1).first()
+    
+    if not lab:
+        return jsonify(error_response(4000, '實驗室信息不存在')), 404
+    
+    try:
+        # 軟刪除
+        lab.enable = 0
+        
+        # 記錄操作
+        record = EditRecord(
+            admin_id=g.current_admin.admin_id,
+            edit_type='DELETE',
+            edit_module=0,  # 實驗室模組
+        )
+        record.set_content({'deleted_lab_id': lab.lab_id})
+        db.session.add(record)
+        
+        db.session.commit()
+        
+        return jsonify(success_response(None, '實驗室信息刪除成功'))
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(error_response(5000, f'刪除失敗: {str(e)}')), 500

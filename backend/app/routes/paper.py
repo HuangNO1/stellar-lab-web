@@ -200,6 +200,93 @@ def create_paper():
         db.session.rollback()
         return jsonify(error_response(5000, f'創建失敗: {str(e)}')), 500
 
+@bp.route('/papers/<int:paper_id>', methods=['PUT'])
+@admin_required
+def update_paper(paper_id):
+    paper = Paper.query.get_or_404(paper_id)
+    data = request.get_json()
+    
+    try:
+        # 更新論文信息
+        if 'paper_title_zh' in data:
+            paper.paper_title_zh = data['paper_title_zh'].strip()
+        
+        if 'paper_title_en' in data:
+            paper.paper_title_en = data['paper_title_en'].strip()
+        
+        if 'paper_desc_zh' in data:
+            paper.paper_desc_zh = data['paper_desc_zh'].strip() if data['paper_desc_zh'] else None
+        
+        if 'paper_desc_en' in data:
+            paper.paper_desc_en = data['paper_desc_en'].strip() if data['paper_desc_en'] else None
+            
+        if 'paper_venue' in data:
+            paper.paper_venue = data['paper_venue'].strip() if data['paper_venue'] else None
+            
+        if 'paper_type' in data:
+            paper_type = int(data['paper_type'])
+            if paper_type in [0, 1, 2, 3, 4]:
+                paper.paper_type = paper_type
+                
+        if 'paper_accept' in data:
+            paper_accept = int(data['paper_accept'])
+            if paper_accept in [0, 1]:
+                paper.paper_accept = paper_accept
+                
+        if 'paper_date' in data:
+            paper_date = data['paper_date'].strip()
+            if paper_date:
+                valid, date_obj = validate_date(paper_date)
+                if valid and date_obj:
+                    paper.paper_date = date_obj
+                    
+        if 'paper_url' in data:
+            paper.paper_url = data['paper_url'].strip() if data['paper_url'] else None
+            
+        if 'research_group_id' in data:
+            research_group_id = int(data['research_group_id'])
+            if ResearchGroup.query.get(research_group_id):
+                paper.research_group_id = research_group_id
+                
+        # 更新作者
+        if 'authors' in data and isinstance(data['authors'], list):
+            # 刪除舊的作者關係
+            PaperAuthor.query.filter_by(paper_id=paper_id).delete()
+            
+            # 添加新的作者關係
+            for i, author_data in enumerate(data['authors']):
+                if isinstance(author_data, dict) and 'mem_id' in author_data:
+                    mem_id = int(author_data['mem_id'])
+                    is_corresponding = int(author_data.get('is_corresponding', 0))
+                    
+                    if Member.query.get(mem_id):
+                        author = PaperAuthor(
+                            paper_id=paper_id,
+                            mem_id=mem_id,
+                            author_order=i + 1,
+                            is_corresponding=is_corresponding
+                        )
+                        db.session.add(author)
+        
+        # 記錄操作
+        record = EditRecord(
+            admin_id=g.current_admin.admin_id,
+            edit_type='UPDATE',
+            edit_module=4,  # 論文模組
+        )
+        record.set_content(data)
+        db.session.add(record)
+        
+        db.session.commit()
+        
+        # 重新加載論文信息以獲取更新後的作者
+        updated_paper = Paper.query.get(paper_id)
+        return jsonify(success_response(updated_paper.to_dict(), '論文更新成功'))
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(error_response(5000, f'更新失敗: {str(e)}')), 500
+
 @bp.route('/papers/<int:paper_id>', methods=['DELETE'])
 @admin_required
 def delete_paper(paper_id):
