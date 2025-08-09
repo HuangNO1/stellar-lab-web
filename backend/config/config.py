@@ -29,7 +29,11 @@ class Config:
     MAX_PER_PAGE = 100
     
     # 其他配置
-    CORS_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000']
+    CORS_ORIGINS = [
+        'http://localhost:3000', 'http://127.0.0.1:3000',
+        'http://localhost:5000', 'http://127.0.0.1:5000',
+        'http://localhost:8000', 'http://127.0.0.1:8000'
+    ]
 
 class DevelopmentConfig(Config):
     DEBUG = True
@@ -39,7 +43,8 @@ class ProductionConfig(Config):
     
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+        'mysql+pymysql://root:password@localhost/lab_web_test?charset=utf8mb4'
 
 config = {
     'development': DevelopmentConfig,
