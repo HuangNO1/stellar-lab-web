@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, g
 from app import db
-from app.models import Lab, EditRecord
+from app.models import Lab, EditRecord, Member, ResearchGroup
 from app.auth import admin_required
 from app.utils.validators import validate_email, validate_string_length
 from app.utils.helpers import success_response, error_response
@@ -114,6 +114,24 @@ def delete_lab():
     
     if not lab:
         return jsonify(error_response(4000, '實驗室信息不存在')), 404
+    
+    # 檢查是否有有效的課題組
+    active_groups = ResearchGroup.query.filter_by(
+        lab_id=lab.lab_id,
+        enable=1
+    ).count()
+    
+    if active_groups > 0:
+        return jsonify(error_response(4000, '該實驗室下仍有有效課題組，無法刪除')), 409
+    
+    # 檢查是否有有效的成員
+    active_members = Member.query.filter_by(
+        lab_id=lab.lab_id,
+        enable=1
+    ).count()
+    
+    if active_members > 0:
+        return jsonify(error_response(4000, '該實驗室下仍有有效成員，無法刪除')), 409
     
     try:
         # 軟刪除

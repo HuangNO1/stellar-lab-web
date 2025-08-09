@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, g
 from app import db
-from app.models import Member, ResearchGroup, Lab, EditRecord
+from app.models import Member, ResearchGroup, Lab, EditRecord, PaperAuthor, Paper
 from app.auth import admin_required
 from app.utils.validators import validate_email, validate_string_length, validate_enum
 from app.utils.helpers import get_pagination_params, paginate_query, success_response, error_response
@@ -271,6 +271,26 @@ def update_member(mem_id):
 def delete_member(mem_id):
     member = Member.query.get_or_404(mem_id)
     
+    # 檢查是否為課題組組長
+    leader_groups = ResearchGroup.query.filter_by(
+        mem_id=mem_id,
+        enable=1
+    ).count()
+    
+    if leader_groups > 0:
+        return jsonify(error_response(4000, '該成員是課題組組長，無法刪除')), 409
+    
+    # 檢查是否有論文關聯
+    paper_count = db.session.query(PaperAuthor, Paper).join(
+        Paper, PaperAuthor.paper_id == Paper.paper_id
+    ).filter(
+        PaperAuthor.mem_id == mem_id,
+        Paper.enable == 1
+    ).count()
+    
+    if paper_count > 0:
+        return jsonify(error_response(4000, '該成員仍有關聯的有效論文，無法刪除')), 409
+    
     try:
         # 軟刪除
         member.enable = 0
@@ -305,6 +325,32 @@ def batch_delete_members():
     
     if not isinstance(member_ids, list) or len(member_ids) == 0:
         return jsonify(error_response(2000, 'member_ids必須是非空數組')), 400
+    
+    # 檢查是否有成員是課題組組長
+    leaders = ResearchGroup.query.filter(
+        ResearchGroup.mem_id.in_(member_ids),
+        ResearchGroup.enable == 1
+    ).all()
+    
+    if leaders:
+        leader_names = []
+        for group in leaders:
+            member = Member.query.get(group.mem_id)
+            if member:
+                leader_names.append(f"{member.mem_name_zh or member.mem_name_en} (課題組: {group.research_group_name_zh or group.research_group_name_en})")
+        return jsonify(error_response(4000, f'以下成員是課題組組長，無法刪除: {"; ".join(leader_names)}')), 409
+    
+    # 檢查是否有成員還關聯著有效論文
+    members_with_papers = db.session.query(PaperAuthor.mem_id).distinct().join(
+        Paper, PaperAuthor.paper_id == Paper.paper_id
+    ).filter(
+        PaperAuthor.mem_id.in_(member_ids),
+        Paper.enable == 1
+    ).all()
+    
+    if members_with_papers:
+        member_ids_with_papers = [row.mem_id for row in members_with_papers]
+        return jsonify(error_response(4000, f'成員ID {member_ids_with_papers} 仍有關聯的有效論文，無法刪除')), 409
     
     try:
         # 批量軟刪除
