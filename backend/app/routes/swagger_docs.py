@@ -390,6 +390,13 @@ def swagger_json():
                             "type": "string", 
                             "description": "搜索關鍵字",
                             "example": "計算機視覺"
+                        },
+                        {
+                            "name": "lab_id",
+                            "in": "query",
+                            "type": "integer",
+                            "description": "實驗室ID篩選",
+                            "example": 1
                         }
                     ],
                     "responses": {
@@ -433,13 +440,84 @@ def swagger_json():
                                     "example": 1
                                 }
                             },
-                            "required": ["research_group_name_zh", "research_group_name_en"]
+                            "required": ["research_group_name_zh"]
                         }
                     }],
                     "responses": {
                         "201": {"description": "創建成功"},
                         "401": {"description": "未認證"},
                         "400": {"description": "參數錯誤"}
+                    }
+                }
+            },
+            "/research-groups/{group_id}": {
+                "get": {
+                    "tags": ["課題組"],
+                    "summary": "獲取單個課題組詳情", 
+                    "parameters": [{
+                        "name": "group_id",
+                        "in": "path",
+                        "type": "integer",
+                        "required": True,
+                        "description": "課題組ID"
+                    }],
+                    "responses": {
+                        "200": {"description": "成功獲取課題組詳情"},
+                        "404": {"description": "課題組不存在"}
+                    }
+                },
+                "put": {
+                    "tags": ["課題組"],
+                    "summary": "更新課題組信息",
+                    "security": [{"Bearer": []}],
+                    "parameters": [
+                        {
+                            "name": "group_id",
+                            "in": "path",
+                            "type": "integer",
+                            "required": True,
+                            "description": "課題組ID"
+                        },
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "required": True,
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "research_group_name_zh": {"type": "string"},
+                                    "research_group_name_en": {"type": "string"},
+                                    "research_group_desc_zh": {"type": "string"},
+                                    "research_group_desc_en": {"type": "string"},
+                                    "mem_id": {"type": "integer", "description": "組長成員ID"}
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {"description": "更新成功"},
+                        "400": {"description": "參數錯誤"},
+                        "401": {"description": "未認證"},
+                        "404": {"description": "課題組不存在"}
+                    }
+                },
+                "delete": {
+                    "tags": ["課題組"],
+                    "summary": "刪除課題組", 
+                    "description": "注意：只有當課題組下沒有有效成員時才能刪除",
+                    "security": [{"Bearer": []}],
+                    "parameters": [{
+                        "name": "group_id",
+                        "in": "path",
+                        "type": "integer",
+                        "required": True,
+                        "description": "課題組ID"
+                    }],
+                    "responses": {
+                        "200": {"description": "刪除成功"},
+                        "401": {"description": "未認證"},
+                        "404": {"description": "課題組不存在"},
+                        "409": {"description": "該課題組下仍有有效成員，無法刪除"}
                     }
                 }
             },
@@ -1045,10 +1123,155 @@ def swagger_json():
                             "description": "項目狀態 (0=進行中, 1=已完成)",
                             "enum": [0, 1],
                             "example": 0
+                        },
+                        {
+                            "name": "start_date",
+                            "in": "query",
+                            "type": "string",
+                            "format": "date",
+                            "description": "開始日期範圍查詢（開始）",
+                            "example": "2024-01-01"
+                        },
+                        {
+                            "name": "end_date",
+                            "in": "query", 
+                            "type": "string",
+                            "format": "date",
+                            "description": "開始日期範圍查詢（結束）",
+                            "example": "2024-12-31"
                         }
                     ],
                     "responses": {
                         "200": {"description": "成功獲取項目列表"}
+                    }
+                },
+                "post": {
+                    "tags": ["項目"],
+                    "summary": "創建項目",
+                    "security": [{"Bearer": []}],
+                    "parameters": [{
+                        "name": "body",
+                        "in": "body",
+                        "required": True,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "project_name_zh": {
+                                    "type": "string",
+                                    "description": "項目中文名稱",
+                                    "example": "智能交通管理系統"
+                                },
+                                "project_name_en": {
+                                    "type": "string",
+                                    "description": "項目英文名稱",
+                                    "example": "Intelligent Traffic Management System"
+                                },
+                                "project_desc_zh": {
+                                    "type": "string",
+                                    "description": "項目中文描述",
+                                    "example": "基於人工智能的交通信號優化系統"
+                                },
+                                "project_desc_en": {
+                                    "type": "string", 
+                                    "description": "項目英文描述",
+                                    "example": "AI-based traffic signal optimization system"
+                                },
+                                "project_url": {
+                                    "type": "string",
+                                    "description": "項目URL",
+                                    "example": "https://github.com/lab/traffic-system"
+                                },
+                                "project_date_start": {
+                                    "type": "string",
+                                    "format": "date",
+                                    "description": "項目開始日期",
+                                    "example": "2024-01-01"
+                                },
+                                "is_end": {
+                                    "type": "integer",
+                                    "description": "項目狀態 (0=進行中, 1=已完成)",
+                                    "enum": [0, 1],
+                                    "example": 0
+                                }
+                            },
+                            "required": ["project_name_zh"]
+                        }
+                    }],
+                    "responses": {
+                        "201": {"description": "創建成功"},
+                        "400": {"description": "參數錯誤"},
+                        "401": {"description": "未認證"}
+                    }
+                }
+            },
+            "/projects/{project_id}": {
+                "get": {
+                    "tags": ["項目"],
+                    "summary": "獲取單個項目詳情",
+                    "parameters": [{
+                        "name": "project_id",
+                        "in": "path",
+                        "type": "integer",
+                        "required": True,
+                        "description": "項目ID"
+                    }],
+                    "responses": {
+                        "200": {"description": "成功獲取項目詳情"},
+                        "404": {"description": "項目不存在"}
+                    }
+                },
+                "put": {
+                    "tags": ["項目"],
+                    "summary": "更新項目信息",
+                    "security": [{"Bearer": []}],
+                    "parameters": [
+                        {
+                            "name": "project_id",
+                            "in": "path",
+                            "type": "integer",
+                            "required": True,
+                            "description": "項目ID"
+                        },
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "required": True,
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "project_name_zh": {"type": "string"},
+                                    "project_name_en": {"type": "string"},
+                                    "project_desc_zh": {"type": "string"},
+                                    "project_desc_en": {"type": "string"},
+                                    "project_url": {"type": "string"},
+                                    "project_date_start": {"type": "string", "format": "date"},
+                                    "is_end": {"type": "integer", "enum": [0, 1]}
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {"description": "更新成功"},
+                        "400": {"description": "參數錯誤"},
+                        "401": {"description": "未認證"},
+                        "404": {"description": "項目不存在"}
+                    }
+                },
+                "delete": {
+                    "tags": ["項目"],
+                    "summary": "刪除項目",
+                    "security": [{"Bearer": []}],
+                    "parameters": [{
+                        "name": "project_id",
+                        "in": "path",
+                        "type": "integer",
+                        "required": True,
+                        "description": "項目ID"
+                    }],
+                    "responses": {
+                        "200": {"description": "刪除成功"},
+                        "401": {"description": "未認證"},
+                        "404": {"description": "項目不存在"}
                     }
                 }
             },
