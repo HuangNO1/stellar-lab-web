@@ -51,8 +51,8 @@
       </n-layout-header>
       
       <!-- Main Content Area -->
-      <n-layout class="main-layout" :class="{ 'dark-theme': isDarkMode }">
-        <n-layout-content class="main-content">
+      <n-layout class="main-layout" :class="{ 'dark-theme': isDarkMode, 'is-home': route.name === 'home' }">
+        <n-layout-content class="main-content" :class="{ 'home-content': route.name === 'home' }">
           <router-view />
         </n-layout-content>
       </n-layout>
@@ -60,8 +60,8 @@
   </n-config-provider>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, h, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, h, computed, provide } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { NIcon, darkTheme } from 'naive-ui'
 import type { GlobalTheme } from 'naive-ui'
@@ -80,12 +80,16 @@ import { setLanguage, getTheme, setTheme } from './locales'
 
 const router = useRouter()
 const { t, locale } = useI18n()
+const route = useRoute()
 
 // Theme management
 const isDarkMode = ref(getTheme() === 'dark')
 const currentTheme = computed<GlobalTheme | null>(() => {
   return isDarkMode.value ? darkTheme : null
 })
+
+// Provide theme state to child components
+provide('isDarkMode', isDarkMode)
 
 // Navigation menu
 const activeKey = ref<string>('home')
@@ -258,7 +262,7 @@ html:has(#app.dark-mode) {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 1001; /* 提高z-index確保在輪播上方 */
   padding: 0 !important;
   height: 0;
   background: transparent;
@@ -403,6 +407,14 @@ html:has(#app.dark-mode) {
   max-width: 1200px;
   margin: 0 auto;
   background: transparent;
+}
+
+/* Home page specific styles - remove constraints */
+.main-content.home-content {
+  padding: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  width: 100% !important;
 }
 
 /* Responsive Design */
