@@ -6,22 +6,28 @@ class Member(db.Model):
     
     mem_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     mem_avatar_path = db.Column(db.String(500))
-    mem_name_zh = db.Column(db.String(500))
-    mem_name_en = db.Column(db.String(500))
+    mem_name_zh = db.Column(db.String(500), index=True)  # 添加索引用於姓名搜索
+    mem_name_en = db.Column(db.String(500), index=True)  # 添加索引用於姓名搜索
     mem_desc_zh = db.Column(db.Text)
     mem_desc_en = db.Column(db.Text)
-    mem_email = db.Column(db.String(500))
-    mem_type = db.Column(db.Integer, nullable=False, default=0)  # 0:教師 1:學生 2:校友
-    job_type = db.Column(db.Integer)  # 0:教授 1:副教授 2:講師 3:助理研究員 4:博士後
-    student_type = db.Column(db.Integer)  # 0:博士生 1:碩士生 2:大學生
+    mem_email = db.Column(db.String(500), index=True)  # 添加索引用於郵箱搜索
+    mem_type = db.Column(db.Integer, nullable=False, default=0, index=True)  # 添加索引用於類型篩選
+    job_type = db.Column(db.Integer)
+    student_type = db.Column(db.Integer)
     student_grade = db.Column(db.Integer)
     destination_zh = db.Column(db.String(500))
     destination_en = db.Column(db.String(500))
     research_group_id = db.Column(db.Integer, db.ForeignKey('research_groups.research_group_id'), nullable=False)
     lab_id = db.Column(db.Integer, db.ForeignKey('lab.lab_id'), nullable=False)
-    enable = db.Column(db.Integer, nullable=False, default=1)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    enable = db.Column(db.Integer, nullable=False, default=1, index=True)  # 添加索引用於啟用狀態篩選
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)  # 添加索引用於排序
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # 複合索引
+    __table_args__ = (
+        db.Index('ix_member_enable_type', 'enable', 'mem_type'),  # 用於篩選啟用的特定類型成員
+        db.Index('ix_member_enable_created', 'enable', 'created_at'),  # 用於分頁查詢已啟用成員
+    )
     
     # 關係
     research_group = db.relationship('ResearchGroup', foreign_keys=[research_group_id], backref='members')

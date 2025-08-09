@@ -17,7 +17,7 @@ import pymysql
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import create_app, db
-from app.models import Admin, Lab, ResearchGroup, Member, Paper, PaperAuthor, Project, News
+from app.models import Admin, Lab, ResearchGroup, Member, Paper, PaperAuthor, Project, News, EditRecord
 
 def get_current_environment():
     """獲取當前運行環境"""
@@ -388,7 +388,7 @@ def init_database():
         admin = create_admin_data()
         lab = create_lab_data()
         groups = create_research_groups(lab.lab_id)
-        members = create_members(lab.lab_i, groups)
+        members = create_members(lab.lab_id, groups)
         create_papers(lab.lab_id, groups, members)
         create_news()
         create_projects()

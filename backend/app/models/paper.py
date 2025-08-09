@@ -7,19 +7,26 @@ class Paper(db.Model):
     paper_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     research_group_id = db.Column(db.Integer, db.ForeignKey('research_groups.research_group_id'))
     lab_id = db.Column(db.Integer, db.ForeignKey('lab.lab_id'))
-    paper_date = db.Column(db.Date, nullable=False)
-    paper_title_zh = db.Column(db.String(500))
-    paper_title_en = db.Column(db.String(500))
+    paper_date = db.Column(db.Date, nullable=False, index=True)  # 添加索引用於日期查詢和排序
+    paper_title_zh = db.Column(db.String(500), index=True)  # 添加索引用於標題搜索
+    paper_title_en = db.Column(db.String(500), index=True)  # 添加索引用於標題搜索
     paper_desc_zh = db.Column(db.Text)
     paper_desc_en = db.Column(db.Text)
-    paper_type = db.Column(db.Integer, nullable=False, default=0)  # 0:期刊 1:會議 2:學位 3:專著 4:其它
-    paper_venue = db.Column(db.String(500))
-    paper_accept = db.Column(db.Integer, nullable=False, default=0)
+    paper_type = db.Column(db.Integer, nullable=False, default=0, index=True)  # 添加索引用於類型篩選
+    paper_venue = db.Column(db.String(500), index=True)  # 添加索引用於期刊/會議搜索
+    paper_accept = db.Column(db.Integer, nullable=False, default=0, index=True)  # 添加索引用於接收狀態篩選
     paper_file_path = db.Column(db.String(500))
     paper_url = db.Column(db.String(1000))
-    enable = db.Column(db.Integer, nullable=False, default=1)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    enable = db.Column(db.Integer, nullable=False, default=1, index=True)  # 添加索引用於啟用狀態篩選
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)  # 添加索引用於排序
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # 複合索引
+    __table_args__ = (
+        db.Index('ix_paper_enable_date', 'enable', 'paper_date'),  # 用於查詢已發布論文按日期排序
+        db.Index('ix_paper_enable_type', 'enable', 'paper_type'),  # 用於篩選已發布的特定類型論文
+        db.Index('ix_paper_enable_accept', 'enable', 'paper_accept'),  # 用於篩選已發布的接收狀態論文
+    )
     
     # 關係
     research_group = db.relationship('ResearchGroup', backref='papers')
