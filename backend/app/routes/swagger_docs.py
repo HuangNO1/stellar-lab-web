@@ -453,6 +453,77 @@ def swagger_json():
                     }
                 }
             },
+            "/members/batch": {
+                "delete": {
+                    "tags": ["成員"],
+                    "summary": "批量刪除成員",
+                    "security": [{"Bearer": []}],
+                    "parameters": [{
+                        "name": "body",
+                        "in": "body",
+                        "required": True,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "member_ids": {
+                                    "type": "array",
+                                    "items": {"type": "integer"},
+                                    "description": "要刪除的成員ID列表",
+                                    "example": [1, 2, 3]
+                                }
+                            },
+                            "required": ["member_ids"]
+                        }
+                    }],
+                    "responses": {
+                        "200": {"description": "批量刪除成功"},
+                        "400": {"description": "參數錯誤"},
+                        "401": {"description": "未認證"},
+                        "404": {"description": "沒有找到可刪除的成員"}
+                    }
+                },
+                "put": {
+                    "tags": ["成員"],
+                    "summary": "批量更新成員",
+                    "security": [{"Bearer": []}],
+                    "parameters": [{
+                        "name": "body",
+                        "in": "body",
+                        "required": True,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "member_ids": {
+                                    "type": "array",
+                                    "items": {"type": "integer"},
+                                    "description": "要更新的成員ID列表",
+                                    "example": [1, 2, 3]
+                                },
+                                "updates": {
+                                    "type": "object",
+                                    "description": "要更新的字段",
+                                    "properties": {
+                                        "enable": {"type": "integer", "enum": [0, 1]},
+                                        "mem_type": {"type": "integer", "enum": [0, 1, 2]},
+                                        "research_group_id": {"type": "integer"}
+                                    },
+                                    "example": {
+                                        "enable": 1,
+                                        "mem_type": 0
+                                    }
+                                }
+                            },
+                            "required": ["member_ids", "updates"]
+                        }
+                    }],
+                    "responses": {
+                        "200": {"description": "批量更新成功"},
+                        "400": {"description": "參數錯誤"},
+                        "401": {"description": "未認證"},
+                        "404": {"description": "沒有找到可更新的成員"}
+                    }
+                }
+            },
             "/papers": {
                 "get": {
                     "tags": ["論文"],
@@ -502,6 +573,163 @@ def swagger_json():
                     "responses": {
                         "200": {"description": "成功獲取論文列表"}
                     }
+                },
+                "post": {
+                    "tags": ["論文"],
+                    "summary": "創建論文",
+                    "security": [{"Bearer": []}],
+                    "parameters": [{
+                        "name": "body",
+                        "in": "body",
+                        "required": True,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "paper_title_zh": {
+                                    "type": "string",
+                                    "description": "論文中文標題",
+                                    "example": "基於深度學習的圖像識別研究"
+                                },
+                                "paper_title_en": {
+                                    "type": "string", 
+                                    "description": "論文英文標題",
+                                    "example": "Image Recognition Based on Deep Learning"
+                                },
+                                "paper_desc_zh": {
+                                    "type": "string",
+                                    "description": "論文中文描述",
+                                    "example": "本文提出了一種新的深度學習方法"
+                                },
+                                "paper_desc_en": {
+                                    "type": "string",
+                                    "description": "論文英文描述", 
+                                    "example": "This paper proposes a novel deep learning approach"
+                                },
+                                "paper_venue": {
+                                    "type": "string",
+                                    "description": "發表期刊或會議",
+                                    "example": "CVPR 2024"
+                                },
+                                "paper_type": {
+                                    "type": "integer",
+                                    "description": "論文類型",
+                                    "enum": [0, 1, 2, 3, 4],
+                                    "example": 1
+                                },
+                                "paper_accept": {
+                                    "type": "integer",
+                                    "description": "接收狀態",
+                                    "enum": [0, 1],
+                                    "example": 1
+                                },
+                                "paper_date": {
+                                    "type": "string",
+                                    "format": "date",
+                                    "description": "發表日期",
+                                    "example": "2024-06-15"
+                                },
+                                "authors": {
+                                    "type": "array",
+                                    "description": "作者列表",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "mem_id": {"type": "integer"},
+                                            "is_corresponding": {"type": "integer"}
+                                        }
+                                    }
+                                }
+                            },
+                            "required": ["paper_title_zh", "paper_date"]
+                        }
+                    }],
+                    "responses": {
+                        "201": {"description": "創建成功"},
+                        "400": {"description": "參數錯誤"},
+                        "401": {"description": "未認證"}
+                    }
+                }
+            },
+            "/papers/{paper_id}": {
+                "get": {
+                    "tags": ["論文"],
+                    "summary": "獲取單篇論文詳情",
+                    "parameters": [{
+                        "name": "paper_id",
+                        "in": "path",
+                        "type": "integer",
+                        "required": True,
+                        "description": "論文ID"
+                    }],
+                    "responses": {
+                        "200": {"description": "成功獲取論文詳情"},
+                        "404": {"description": "論文不存在"}
+                    }
+                },
+                "put": {
+                    "tags": ["論文"],
+                    "summary": "更新論文信息",
+                    "security": [{"Bearer": []}],
+                    "parameters": [
+                        {
+                            "name": "paper_id",
+                            "in": "path",
+                            "type": "integer", 
+                            "required": True,
+                            "description": "論文ID"
+                        },
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "required": True,
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "paper_title_zh": {"type": "string"},
+                                    "paper_title_en": {"type": "string"},
+                                    "paper_desc_zh": {"type": "string"},
+                                    "paper_desc_en": {"type": "string"},
+                                    "paper_venue": {"type": "string"},
+                                    "paper_type": {"type": "integer"},
+                                    "paper_accept": {"type": "integer"},
+                                    "paper_date": {"type": "string", "format": "date"},
+                                    "authors": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "mem_id": {"type": "integer"},
+                                                "is_corresponding": {"type": "integer"}
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {"description": "更新成功"},
+                        "400": {"description": "參數錯誤"},
+                        "401": {"description": "未認證"},
+                        "404": {"description": "論文不存在"}
+                    }
+                },
+                "delete": {
+                    "tags": ["論文"],
+                    "summary": "刪除論文",
+                    "security": [{"Bearer": []}],
+                    "parameters": [{
+                        "name": "paper_id",
+                        "in": "path",
+                        "type": "integer",
+                        "required": True,
+                        "description": "論文ID"
+                    }],
+                    "responses": {
+                        "200": {"description": "刪除成功"},
+                        "401": {"description": "未認證"},
+                        "404": {"description": "論文不存在"}
+                    }
                 }
             },
             "/news": {
@@ -537,6 +765,117 @@ def swagger_json():
                     ],
                     "responses": {
                         "200": {"description": "成功獲取新聞列表"}
+                    }
+                },
+                "post": {
+                    "tags": ["新聞"],
+                    "summary": "創建新聞",
+                    "security": [{"Bearer": []}],
+                    "parameters": [{
+                        "name": "body",
+                        "in": "body",
+                        "required": True,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "news_type": {
+                                    "type": "integer",
+                                    "description": "新聞類型 (0=論文發表, 1=獲獎消息, 2=學術活動)",
+                                    "enum": [0, 1, 2],
+                                    "example": 0
+                                },
+                                "news_content_zh": {
+                                    "type": "string",
+                                    "description": "新聞中文內容",
+                                    "example": "我實驗室論文被CVPR 2024錄用"
+                                },
+                                "news_content_en": {
+                                    "type": "string",
+                                    "description": "新聞英文內容",
+                                    "example": "Our lab paper accepted by CVPR 2024"
+                                },
+                                "news_date": {
+                                    "type": "string",
+                                    "format": "date",
+                                    "description": "新聞日期",
+                                    "example": "2024-06-15"
+                                }
+                            },
+                            "required": ["news_type", "news_content_zh", "news_date"]
+                        }
+                    }],
+                    "responses": {
+                        "201": {"description": "創建成功"},
+                        "400": {"description": "參數錯誤"},
+                        "401": {"description": "未認證"}
+                    }
+                }
+            },
+            "/news/{news_id}": {
+                "get": {
+                    "tags": ["新聞"],
+                    "summary": "獲取單條新聞詳情",
+                    "parameters": [{
+                        "name": "news_id",
+                        "in": "path",
+                        "type": "integer",
+                        "required": True,
+                        "description": "新聞ID"
+                    }],
+                    "responses": {
+                        "200": {"description": "成功獲取新聞詳情"},
+                        "404": {"description": "新聞不存在"}
+                    }
+                },
+                "put": {
+                    "tags": ["新聞"],
+                    "summary": "更新新聞",
+                    "security": [{"Bearer": []}],
+                    "parameters": [
+                        {
+                            "name": "news_id",
+                            "in": "path",
+                            "type": "integer",
+                            "required": True,
+                            "description": "新聞ID"
+                        },
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "required": True,
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "news_type": {"type": "integer", "enum": [0, 1, 2]},
+                                    "news_content_zh": {"type": "string"},
+                                    "news_content_en": {"type": "string"},
+                                    "news_date": {"type": "string", "format": "date"}
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {"description": "更新成功"},
+                        "400": {"description": "參數錯誤"},
+                        "401": {"description": "未認證"},
+                        "404": {"description": "新聞不存在"}
+                    }
+                },
+                "delete": {
+                    "tags": ["新聞"],
+                    "summary": "刪除新聞",
+                    "security": [{"Bearer": []}],
+                    "parameters": [{
+                        "name": "news_id",
+                        "in": "path",
+                        "type": "integer",
+                        "required": True,
+                        "description": "新聞ID"
+                    }],
+                    "responses": {
+                        "200": {"description": "刪除成功"},
+                        "401": {"description": "未認證"},
+                        "404": {"description": "新聞不存在"}
                     }
                 }
             },
