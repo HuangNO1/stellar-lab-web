@@ -193,3 +193,16 @@ export interface ProjectQueryParams extends BaseQueryParams {
   sort_by?: string;
   order?: string;
 }
+
+// 搜索過濾器接口（用於搜索組件）
+export interface SearchFilters {
+  q?: string;
+  start_date?: string;
+  end_date?: string;
+  paper_type?: number;
+  paper_accept?: number;
+  news_type?: number;
+  is_end?: number;
+  sort_by?: string;
+  order?: string;
+}

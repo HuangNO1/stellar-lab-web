@@ -136,18 +136,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-
-interface SearchFilters {
-  q?: string;
-  start_date?: string;
-  end_date?: string;
-  paper_type?: number;
-  paper_accept?: number;
-  news_type?: number;
-  is_end?: number;
-  sort_by?: string;
-  order?: string;
-}
+import type { SearchFilters } from '@/types/api';
 
 interface SearchConfig {
   type: 'papers' | 'news' | 'projects';

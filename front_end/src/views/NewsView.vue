@@ -165,7 +165,10 @@ const fetchNews = async (resetPage = false) => {
     const params = {
       page: currentPage.value,
       per_page: currentPageSize.value,
-      ...currentFilters.value
+      q: currentFilters.value.q,
+      news_type: currentFilters.value.news_type,
+      start_date: currentFilters.value.start_date,
+      end_date: currentFilters.value.end_date
     };
 
     // 移除空值

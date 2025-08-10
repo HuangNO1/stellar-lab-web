@@ -248,7 +248,13 @@ const fetchPapers = async (resetPage = false) => {
     const params = {
       page: currentPage.value,
       per_page: currentPageSize.value,
-      ...currentFilters.value
+      q: currentFilters.value.q,
+      paper_type: currentFilters.value.paper_type,
+      paper_accept: currentFilters.value.paper_accept,
+      start_date: currentFilters.value.start_date,
+      end_date: currentFilters.value.end_date,
+      sort_by: currentFilters.value.sort_by,
+      order: currentFilters.value.order
     };
 
     // 移除空值
