@@ -33,9 +33,9 @@
         <h1 style="text-align: center; margin-bottom: 32px; font-size: 28px; font-weight: bold;">{{ $t('researchGroups.title') }}</h1>
         
         <!-- 加載狀態 -->
-        <n-grid v-if="loading" :x-gap="12" :y-gap="8" :cols="3">
-          <n-grid-item v-for="i in 6" :key="i">
-            <div class="card-container">
+        <div v-if="loading" class="research-groups-section">
+          <div class="research-groups-grid">
+            <div v-for="i in 6" :key="i" class="research-card-skeleton">
               <n-card class="research-card">
                 <template #header>
                   <n-skeleton text :repeat="1" />
@@ -51,8 +51,8 @@
                 </template>
               </n-card>
             </div>
-          </n-grid-item>
-        </n-grid>
+          </div>
+        </div>
         
         <!-- 錯誤狀態 -->
         <div v-else-if="error" style="text-align: center; padding: 40px;">
@@ -65,9 +65,9 @@
         </div>
         
         <!-- 課題組列表 -->
-        <n-grid v-else :x-gap="12" :y-gap="8" :cols="3">
-          <n-grid-item v-for="group in researchGroups" :key="group.research_group_id">
-            <div class="card-container">
+        <div v-else class="research-groups-section">
+          <div class="research-groups-grid">
+            <div v-for="group in researchGroups" :key="group.research_group_id" class="card-container">
               <n-card 
                 :title="getCurrentLocale() === 'zh' ? group.research_group_name_zh : group.research_group_name_en" 
                 @click="() => toResearchGroup(group)" 
@@ -89,13 +89,14 @@
                 </template>
               </n-card>
             </div>
-          </n-grid-item>
-        </n-grid>
+          </div>
+        </div>
         
         <!-- 聯繫我們 -->
         <div class="contact-section">
-          <h2>{{ $t('common.contact') }}</h2>
-          <div class="contact-info">
+          <div class="contact-wrapper">
+            <h2>{{ $t('common.contact') }}</h2>
+            <div class="contact-info">
             <div v-if="lab?.lab_address_zh || lab?.lab_address_en" class="contact-item">
               <n-icon size="20" class="contact-icon">
                 <svg viewBox="0 0 24 24">
@@ -124,6 +125,7 @@
         </div>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
@@ -235,8 +237,8 @@ const toResearchGroup = (group: ResearchGroup) => {
 
 /* 內容包裝器 - 控制內容間距 */
 .content-wrapper {
-  padding: 40px 24px;
-  max-width: 1200px;
+  padding: 2.5rem 1.5rem 0;
+  max-width: 75rem;
   margin: 0 auto;
   text-align: center;
 }
@@ -246,9 +248,24 @@ const toResearchGroup = (group: ResearchGroup) => {
   z-index: 1001 !important;
 }
 
+/* Flex 網格布局 - 課題組卡片 */
+.research-groups-section {
+  margin-bottom: 3rem;
+}
+
+.research-groups-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
 /* 卡片容器 - 統一高度 */
 .card-container {
-  height: 100%;
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 22rem;
+  min-width: 18rem;
 }
 
 /* 研究組卡片樣式 */
@@ -256,6 +273,14 @@ const toResearchGroup = (group: ResearchGroup) => {
   height: 100%;
   display: flex;
   flex-direction: column;
+  min-height: 16rem;
+}
+
+.research-card-skeleton {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 22rem;
+  min-width: 18rem;
 }
 
 :deep(.research-card .n-card__content) {
@@ -267,45 +292,50 @@ const toResearchGroup = (group: ResearchGroup) => {
 /* 卡片描述 - 固定高度和文字溢出處理 */
 .card-description {
   flex: 1;
-  min-height: 60px;
-  max-height: 80px;
+  min-height: 3.75rem;
+  max-height: 5rem;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
   line-height: 1.4;
-  margin-bottom: 12px;
+  margin-bottom: 0.75rem;
+  text-align: left;
+  padding: 0 0.5rem;
 }
 
 /* 統一卡片最小高度 */
 :deep(.research-card) {
-  min-height: 200px;
+  min-height: 16rem;
 }
 
 /* 實驗室介紹樣式 */
 .lab-introduction {
-  text-align: center;
-  margin-bottom: 40px;
-  padding: 32px 0;
+  text-align: left;
+  margin-bottom: 2.5rem;
+  padding: 2rem 0;
+  max-width: 50rem;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .lab-title {
   font-size: 2.5rem;
   font-weight: 700;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
   background: linear-gradient(135deg, #1890ff, #722ed1);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  text-align: center;
 }
 
 .lab-description {
   font-size: 1.2rem;
   color: #666;
-  line-height: 1.6;
-  max-width: 800px;
-  margin: 0 auto;
+  line-height: 1.7;
+  text-align: justify;
 }
 
 /* 暗色主題下的實驗室介紹 */
@@ -313,19 +343,30 @@ const toResearchGroup = (group: ResearchGroup) => {
   color: #ccc;
 }
 
-/* 聯繫我們樣式 */
+/* 聯繫我們樣式 - 全屏寬度 */
 .contact-section {
-  margin-top: 48px;
-  padding: 32px 0;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
   background: rgba(24, 144, 255, 0.05);
-  border-radius: 12px;
+  padding: 0;
+  margin-top: 3rem;
+}
+
+.contact-wrapper {
+  max-width: 75rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
   text-align: center;
 }
 
 .contact-section h2 {
   font-size: 1.8rem;
   font-weight: 600;
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
   color: #1890ff;
 }
 
@@ -333,27 +374,27 @@ const toResearchGroup = (group: ResearchGroup) => {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 24px;
-  max-width: 600px;
+  gap: 1.5rem;
+  max-width: 37.5rem;
   margin: 0 auto;
 }
 
 .contact-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   font-size: 1rem;
   color: #666;
   background: white;
-  padding: 12px 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .contact-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-0.125rem);
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.15);
 }
 
 .contact-icon {
@@ -385,14 +426,38 @@ const toResearchGroup = (group: ResearchGroup) => {
 }
 
 /* 響應式設計 */
-@media (max-width: 768px) {
+@media (max-width: 48rem) {
+  .content-wrapper {
+    padding: 2rem 1rem 0;
+  }
+  
+  .lab-introduction {
+    text-align: center;
+  }
+  
   .lab-title {
     font-size: 2rem;
   }
   
   .lab-description {
     font-size: 1rem;
-    padding: 0 16px;
+    padding: 0 1rem;
+    text-align: center;
+  }
+  
+  .research-groups-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .card-container,
+  .research-card-skeleton {
+    max-width: none;
+    width: 100%;
+  }
+  
+  .contact-wrapper {
+    padding: 1.5rem 1rem;
   }
   
   .contact-info {
@@ -402,7 +467,7 @@ const toResearchGroup = (group: ResearchGroup) => {
   
   .contact-item {
     width: 100%;
-    max-width: 300px;
+    max-width: 18.75rem;
     justify-content: center;
   }
 }
