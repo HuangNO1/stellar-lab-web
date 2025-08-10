@@ -1,4 +1,4 @@
-import api from '@/utils/api';
+import axios from 'axios';
 import type { 
   ApiResponse, 
   PaginatedResponse, 
@@ -16,6 +16,44 @@ import type {
   Admin,
   LoginResponse
 } from '@/types/api';
+
+// 創建 axios 實例
+const api = axios.create({
+    baseURL: process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8000/api',
+    timeout: 10000,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
+// 請求攔截器
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
+// 響應攔截器
+api.interceptors.response.use(
+    (response) => {
+        return response.data;
+    },
+    (error) => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem('token');
+            // 可以根據需要跳轉到登錄頁面
+            // window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
+);
 
 /**
  * 實驗室相關 API
