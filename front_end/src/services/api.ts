@@ -29,9 +29,13 @@ const api = axios.create({
 // 請求攔截器
 api.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('token');
+        // 優先使用管理員token
+        const adminToken = localStorage.getItem('admin_token');
+        const userToken = localStorage.getItem('token');
+        
+        const token = adminToken || userToken;
         if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+            config.headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
         }
         return config;
     },
@@ -47,9 +51,16 @@ api.interceptors.response.use(
     },
     (error) => {
         if (error.response?.status === 401) {
+            // 清除所有token
             localStorage.removeItem('token');
-            // 可以根據需要跳轉到登錄頁面
-            // window.location.href = '/login';
+            localStorage.removeItem('admin_token');
+            localStorage.removeItem('admin_info');
+            
+            // 根據當前路徑跳轉
+            const currentPath = window.location.pathname;
+            if (currentPath.startsWith('/admin')) {
+                window.location.href = '/admin/login';
+            }
         }
         return Promise.reject(error);
     }

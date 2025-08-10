@@ -21,7 +21,8 @@ export default {
     contact: '聯繫我們',
     retry: '重試',
     viewDetails: '查看詳情',
-    fetchError: '獲取數據失敗'
+    fetchError: '獲取數據失敗',
+    goBack: '返回'
   },
   defaults: {
     labName: '實驗室',
@@ -130,7 +131,8 @@ export default {
     sortBy: '排序方式',
     default: '默認',
     desc: '降序',
-    asc: '升序'
+    asc: '升序',
+    search: '搜索'
   },
   emptyStates: {
     noMembers: '暫無成員數據',
@@ -145,5 +147,107 @@ export default {
   language: {
     chinese: '中文',
     english: 'English'
+  },
+  admin: {
+    layout: {
+      title: '管理後台',
+      dashboard: '儀表板',
+      languageChanged: '語言已切換'
+    },
+    menu: {
+      dashboard: '儀表板',
+      content: '內容管理',
+      members: '成員管理',
+      groups: '課題組管理',
+      papers: '論文管理',
+      projects: '項目管理',
+      news: '新聞管理',
+      lab: '實驗室管理',
+      system: '系統管理'
+    },
+    login: {
+      title: '管理員登錄',
+      subtitle: '歡迎回到實驗室管理系統',
+      usernamePlaceholder: '請輸入管理員用戶名',
+      passwordPlaceholder: '請輸入管理員密碼',
+      loginButton: '登錄',
+      footer: '實驗室管理系統 v1.0',
+      usernameRequired: '請輸入用戶名',
+      passwordRequired: '請輸入密碼',
+      loginSuccess: '登錄成功',
+      loginFailed: '登錄失敗'
+    },
+    user: {
+      profile: '個人資料',
+      changePassword: '修改密碼',
+      logout: '退出登錄',
+      logoutSuccess: '已安全退出'
+    },
+    dashboard: {
+      totalMembers: '總成員數',
+      totalPapers: '總論文數',
+      totalProjects: '總項目數',
+      totalNews: '總新聞數',
+      quickActions: '快速操作',
+      addMember: '添加成員',
+      addPaper: '添加論文',
+      addProject: '添加項目',
+      addNews: '添加新聞',
+      systemStatus: '系統狀態',
+      apiStatus: 'API服務',
+      databaseStatus: '數據庫',
+      mediaStatus: '媒體服務',
+      online: '在線',
+      normal: '正常',
+      recentActivities: '最近活動',
+      noActivities: '暫無活動記錄',
+      todoList: '待辦事項',
+      reviewPapers: '審核新提交的論文',
+      updateLabInfo: '更新實驗室基本信息',
+      checkNews: '檢查新聞內容'
+    },
+    common: {
+      enabled: '啟用',
+      disabled: '禁用',
+      edit: '編輯',
+      delete: '刪除',
+      confirmDelete: '確認刪除',
+      actions: '操作',
+      comingSoon: '功能開發中',
+      comingSoonDesc: '此功能正在開發中，敬請期待！'
+    },
+    members: {
+      addMember: '添加成員',
+      editMember: '編輯成員',
+      searchPlaceholder: '搜索成員姓名或郵箱...',
+      filterByType: '按類型篩選',
+      filterByGroup: '按課題組篩選',
+      avatar: '頭像',
+      name: '姓名',
+      email: '郵箱',
+      type: '類型',
+      group: '課題組',
+      status: '狀態',
+      fetchError: '獲取成員列表失敗',
+      deleteConfirmText: '確定要刪除這個成員嗎？此操作不可撤銷。',
+      deleteSuccess: '成員刪除成功',
+      deleteError: '刪除成員失敗'
+    },
+    groups: {
+      addGroup: '添加課題組',
+      editGroup: '編輯課題組'
+    },
+    papers: {
+      addPaper: '添加論文',
+      editPaper: '編輯論文'
+    },
+    projects: {
+      addProject: '添加項目',
+      editProject: '編輯項目'
+    },
+    news: {
+      addNews: '添加新聞',
+      editNews: '編輯新聞'
+    }
   }
 }

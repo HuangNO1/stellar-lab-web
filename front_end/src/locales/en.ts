@@ -21,7 +21,8 @@ export default {
     contact: 'Contact Us',
     retry: 'Retry',
     viewDetails: 'View Details',
-    fetchError: 'Failed to fetch data'
+    fetchError: 'Failed to fetch data',
+    goBack: 'Go Back'
   },
   defaults: {
     labName: 'Laboratory',
@@ -130,7 +131,8 @@ export default {
     sortBy: 'Sort By',
     default: 'Default',
     desc: 'Descending',
-    asc: 'Ascending'
+    asc: 'Ascending',
+    search: 'Search'
   },
   emptyStates: {
     noMembers: 'No member data available',
@@ -145,5 +147,107 @@ export default {
   language: {
     chinese: '中文',
     english: 'English'
+  },
+  admin: {
+    layout: {
+      title: 'Admin Panel',
+      dashboard: 'Dashboard',
+      languageChanged: 'Language switched'
+    },
+    menu: {
+      dashboard: 'Dashboard',
+      content: 'Content Management',
+      members: 'Member Management',
+      groups: 'Group Management',
+      papers: 'Paper Management',
+      projects: 'Project Management',
+      news: 'News Management',
+      lab: 'Lab Management',
+      system: 'System Management'
+    },
+    login: {
+      title: 'Admin Login',
+      subtitle: 'Welcome to Lab Management System',
+      usernamePlaceholder: 'Enter admin username',
+      passwordPlaceholder: 'Enter admin password',
+      loginButton: 'Login',
+      footer: 'Lab Management System v1.0',
+      usernameRequired: 'Username is required',
+      passwordRequired: 'Password is required',
+      loginSuccess: 'Login successful',
+      loginFailed: 'Login failed'
+    },
+    user: {
+      profile: 'Profile',
+      changePassword: 'Change Password',
+      logout: 'Logout',
+      logoutSuccess: 'Successfully logged out'
+    },
+    dashboard: {
+      totalMembers: 'Total Members',
+      totalPapers: 'Total Papers',
+      totalProjects: 'Total Projects',
+      totalNews: 'Total News',
+      quickActions: 'Quick Actions',
+      addMember: 'Add Member',
+      addPaper: 'Add Paper',
+      addProject: 'Add Project',
+      addNews: 'Add News',
+      systemStatus: 'System Status',
+      apiStatus: 'API Service',
+      databaseStatus: 'Database',
+      mediaStatus: 'Media Service',
+      online: 'Online',
+      normal: 'Normal',
+      recentActivities: 'Recent Activities',
+      noActivities: 'No recent activities',
+      todoList: 'Todo List',
+      reviewPapers: 'Review submitted papers',
+      updateLabInfo: 'Update lab information',
+      checkNews: 'Check news content'
+    },
+    common: {
+      enabled: 'Enabled',
+      disabled: 'Disabled',
+      edit: 'Edit',
+      delete: 'Delete',
+      confirmDelete: 'Confirm Delete',
+      actions: 'Actions',
+      comingSoon: 'Coming Soon',
+      comingSoonDesc: 'This feature is under development. Stay tuned!'
+    },
+    members: {
+      addMember: 'Add Member',
+      editMember: 'Edit Member',
+      searchPlaceholder: 'Search member name or email...',
+      filterByType: 'Filter by type',
+      filterByGroup: 'Filter by group',
+      avatar: 'Avatar',
+      name: 'Name',
+      email: 'Email',
+      type: 'Type',
+      group: 'Group',
+      status: 'Status',
+      fetchError: 'Failed to fetch members',
+      deleteConfirmText: 'Are you sure you want to delete this member? This action cannot be undone.',
+      deleteSuccess: 'Member deleted successfully',
+      deleteError: 'Failed to delete member'
+    },
+    groups: {
+      addGroup: 'Add Group',
+      editGroup: 'Edit Group'
+    },
+    papers: {
+      addPaper: 'Add Paper',
+      editPaper: 'Edit Paper'
+    },
+    projects: {
+      addProject: 'Add Project',
+      editProject: 'Edit Project'
+    },
+    news: {
+      addNews: 'Add News',
+      editNews: 'Edit News'
+    }
   }
 }
