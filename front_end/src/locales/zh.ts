@@ -17,7 +17,22 @@ export default {
     error: '錯誤',
     success: '成功',
     confirm: '確認',
-    cancel: '取消'
+    cancel: '取消',
+    contact: '聯繫我們',
+    retry: '重試'
+  },
+  defaults: {
+    labName: '實驗室',
+    labDescription: '本實驗室專注於前沿科技研究',
+    labFallbackName: '智慧實驗室',
+    carousel: {
+      alt1: '實驗室輪播圖1',
+      alt2: '實驗室輪播圖2', 
+      alt3: '實驗室輪播圖3',
+      alt4: '實驗室輪播圖4',
+      defaultAlt1: '默認輪播圖1',
+      defaultAlt2: '默認輪播圖2'
+    }
   },
   home: {
     title: '歡迎來到實驗室',

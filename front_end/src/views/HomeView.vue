@@ -3,28 +3,33 @@
     <!-- Full Screen Carousel -->
     <div class="carousel-container">
       <n-carousel autoplay class="full-carousel">
-        <img
-            class="carousel-img"
-            src="https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel1.jpeg"
-        >
-        <img
-            class="carousel-img"
-            src="https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel2.jpeg"
-        >
-        <img
-            class="carousel-img"
-            src="https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel3.jpeg"
-        >
-        <img
-            class="carousel-img"
-            src="https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel4.jpeg"
-        >
+        <img v-if="lab?.carousel_img_1" class="carousel-img" :src="getMediaUrl(lab.carousel_img_1)" :alt="$t('defaults.carousel.alt1')" />
+        <img v-if="lab?.carousel_img_2" class="carousel-img" :src="getMediaUrl(lab.carousel_img_2)" :alt="$t('defaults.carousel.alt2')" />
+        <img v-if="lab?.carousel_img_3" class="carousel-img" :src="getMediaUrl(lab.carousel_img_3)" :alt="$t('defaults.carousel.alt3')" />
+        <img v-if="lab?.carousel_img_4" class="carousel-img" :src="getMediaUrl(lab.carousel_img_4)" :alt="$t('defaults.carousel.alt4')" />
+        <!-- 如果没有轮播图，显示默认图片 -->
+        <img v-if="!hasCarouselImages" 
+             class="carousel-img"
+             src="https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel1.jpeg"
+             :alt="$t('defaults.carousel.defaultAlt1')" />
+        <img v-if="!hasCarouselImages" 
+             class="carousel-img"
+             src="https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel2.jpeg"
+             :alt="$t('defaults.carousel.defaultAlt2')" />
       </n-carousel>
     </div>
     
     <!-- Page Content -->
     <div class="page-content" :class="{ 'dark-theme': isDarkMode }">
       <div class="content-wrapper">
+        <!-- 實驗室介紹 -->
+        <div class="lab-introduction">
+          <h1 class="lab-title">{{ getLabName() }}</h1>
+          <div class="lab-description">
+            {{ getLabDescription() }}
+          </div>
+        </div>
+
         <h1 style="text-align: center; margin-bottom: 32px; font-size: 28px; font-weight: bold;">{{ $t('researchGroups.title') }}</h1>
         
         <!-- 加載狀態 -->
@@ -39,7 +44,7 @@
             {{ error }}
           </n-alert>
           <n-button @click="fetchResearchGroups" type="primary" ghost>
-            重試
+            {{ $t('common.retry') }}
           </n-button>
         </div>
         
@@ -70,23 +75,57 @@
             </div>
           </n-grid-item>
         </n-grid>
+        
+        <!-- 聯繫我們 -->
+        <div class="contact-section">
+          <h2>{{ $t('common.contact') }}</h2>
+          <div class="contact-info">
+            <div v-if="lab?.lab_address_zh || lab?.lab_address_en" class="contact-item">
+              <n-icon size="20" class="contact-icon">
+                <svg viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+              </n-icon>
+              <span>{{ getLabAddress() }}</span>
+            </div>
+            <div v-if="lab?.lab_email" class="contact-item">
+              <n-icon size="20" class="contact-icon">
+                <svg viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+              </n-icon>
+              <span>{{ lab?.lab_email }}</span>
+            </div>
+            <div v-if="lab?.lab_phone" class="contact-item">
+              <n-icon size="20" class="contact-icon">
+                <svg viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                </svg>
+              </n-icon>
+              <span>{{ lab?.lab_phone }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { inject } from 'vue';
+import { inject, computed } from 'vue';
 import { useRouter } from "vue-router";
 import { useI18n } from 'vue-i18n';
 import { useResearchGroupsWithAutoFetch } from '@/composables/useResearchGroups';
-import type { ResearchGroup } from '@/types/api';
+import { getMediaUrl, hasCarouselImages as checkCarouselImages } from '@/utils/media';
+import type { ResearchGroup, Lab } from '@/types/api';
 
 const router = useRouter();
-const { locale } = useI18n();
+const { t, locale } = useI18n();
 
-// 從全域狀態獲取主題
+// 從全域狀態獲取主題和實驗室數據
 const isDarkMode = inject('isDarkMode', false);
+const labRef = inject('lab');
+const lab = computed(() => labRef && typeof labRef === 'object' && 'value' in labRef ? (labRef as { value: Lab | null }).value : null);
 
 // 使用 composable 獲取課題組數據
 const { researchGroups, loading, error, fetchResearchGroups } = useResearchGroupsWithAutoFetch();
@@ -95,6 +134,36 @@ const { researchGroups, loading, error, fetchResearchGroups } = useResearchGroup
 const getCurrentLocale = () => {
   return locale.value;
 };
+
+// 獲取實驗室名稱
+const getLabName = () => {
+  if (!lab.value) return t('defaults.labName');
+  return locale.value === 'zh' 
+    ? (lab.value.lab_zh || t('defaults.labName'))
+    : (lab.value.lab_en || t('defaults.labName'));
+};
+
+// 獲取實驗室描述
+const getLabDescription = () => {
+  if (!lab.value) return t('defaults.labDescription');
+  return locale.value === 'zh' 
+    ? (lab.value.lab_desc_zh || t('defaults.labDescription'))
+    : (lab.value.lab_desc_en || t('defaults.labDescription'));
+};
+
+// 獲取實驗室地址
+const getLabAddress = () => {
+  if (!lab.value) return '';
+  return locale.value === 'zh' 
+    ? (lab.value.lab_address_zh || '')
+    : (lab.value.lab_address_en || '');
+};
+
+
+// 檢查是否有輪播圖
+const hasCarouselImages = computed(() => {
+  return checkCarouselImages(lab.value?.carousel_img_1, lab.value?.carousel_img_2, lab.value?.carousel_img_3, lab.value?.carousel_img_4);
+});
 
 // 跳轉到研究組詳情頁面
 const toResearchGroup = (group: ResearchGroup) => {
@@ -196,6 +265,130 @@ const toResearchGroup = (group: ResearchGroup) => {
 /* 統一卡片最小高度 */
 :deep(.research-card) {
   min-height: 200px;
+}
+
+/* 實驗室介紹樣式 */
+.lab-introduction {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 32px 0;
+}
+
+.lab-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #1890ff, #722ed1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.lab-description {
+  font-size: 1.2rem;
+  color: #666;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* 暗色主題下的實驗室介紹 */
+.dark-theme .lab-description {
+  color: #ccc;
+}
+
+/* 聯繫我們樣式 */
+.contact-section {
+  margin-top: 48px;
+  padding: 32px 0;
+  background: rgba(24, 144, 255, 0.05);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.contact-section h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #1890ff;
+}
+
+.contact-info {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  color: #666;
+  background: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.contact-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.contact-icon {
+  color: #1890ff;
+  flex-shrink: 0;
+}
+
+/* 暗色主題下的聯繫信息 */
+.dark-theme .contact-section {
+  background: rgba(24, 144, 255, 0.1);
+}
+
+.dark-theme .contact-section h2 {
+  color: #70a1ff;
+}
+
+.dark-theme .contact-item {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ccc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .contact-item:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.dark-theme .contact-icon {
+  color: #70a1ff;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .lab-title {
+    font-size: 2rem;
+  }
+  
+  .lab-description {
+    font-size: 1rem;
+    padding: 0 16px;
+  }
+  
+  .contact-info {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .contact-item {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+  }
 }
 
 /* Carousel深度樣式覆蓋 */

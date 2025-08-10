@@ -7,12 +7,13 @@
           <!-- Left side: Logo and Name -->
           <div class="nav-left">
             <div class="logo-container">
-              <n-icon size="26" color="#1890ff">
+              <img v-if="lab?.lab_logo_path" :src="getLabLogoUrl(lab.lab_logo_path)" :alt="$t('defaults.labName')" class="lab-logo" />
+              <n-icon v-else size="26" color="#1890ff">
                 <svg viewBox="0 0 24 24">
                   <path fill="currentColor" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                 </svg>
               </n-icon>
-              <span class="lab-name">實驗室名稱</span>
+              <span class="lab-name">{{ getLabName() }}</span>
             </div>
           </div>
           
@@ -77,10 +78,15 @@ import {
   MoonOutline
 } from '@vicons/ionicons5'
 import { setLanguage, getTheme, setTheme } from './locales'
+import { useLabWithAutoFetch } from '@/composables/useLab'
+import { getLabLogoUrl } from '@/utils/media'
 
 const router = useRouter()
 const { t, locale } = useI18n()
 const route = useRoute()
+
+// 獲取實驗室數據
+const { lab } = useLabWithAutoFetch()
 
 // Theme management
 const isDarkMode = ref(getTheme() === 'dark')
@@ -88,8 +94,9 @@ const currentTheme = computed<GlobalTheme | null>(() => {
   return isDarkMode.value ? darkTheme : null
 })
 
-// Provide theme state to child components
+// Provide theme state and lab data to child components
 provide('isDarkMode', isDarkMode)
+provide('lab', lab)
 
 // Navigation menu
 const activeKey = ref<string>('home')
@@ -175,6 +182,16 @@ const toggleTheme = () => {
   
   console.log('Theme toggled to:', themeValue)
 }
+
+// 獲取實驗室名稱（根據當前語言）
+const getLabName = () => {
+  if (!lab.value) return t('defaults.labName');
+  return locale.value === 'zh' 
+    ? (lab.value.lab_zh || t('defaults.labName'))
+    : (lab.value.lab_en || t('defaults.labName'));
+};
+
+// 移除重複的媒體URL函數，使用工具類
 
 // Initialize
 onMounted(() => {
@@ -320,6 +337,13 @@ html:has(#app.dark-mode) {
   font-weight: 600;
   color: #1890ff;
   white-space: nowrap;
+}
+
+.lab-logo {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  border-radius: 4px;
 }
 
 /* Dark theme styles for lab name */

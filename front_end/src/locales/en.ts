@@ -17,7 +17,22 @@ export default {
     error: 'Error',
     success: 'Success',
     confirm: 'Confirm',
-    cancel: 'Cancel'
+    cancel: 'Cancel',
+    contact: 'Contact Us',
+    retry: 'Retry'
+  },
+  defaults: {
+    labName: 'Laboratory',
+    labDescription: 'Our laboratory focuses on cutting-edge technology research',
+    labFallbackName: 'Smart Laboratory',
+    carousel: {
+      alt1: 'Laboratory Carousel Image 1',
+      alt2: 'Laboratory Carousel Image 2',
+      alt3: 'Laboratory Carousel Image 3', 
+      alt4: 'Laboratory Carousel Image 4',
+      defaultAlt1: 'Default Carousel Image 1',
+      defaultAlt2: 'Default Carousel Image 2'
+    }
   },
   home: {
     title: 'Welcome to Our Lab',
