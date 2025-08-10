@@ -123,11 +123,18 @@ class AdminService(BaseService):
             
             return admin.to_dict(), update_data
         
-        # 執行操作並記錄審計
-        result, update_data = self.execute_with_audit(
-            operation_func=_update_operation,
+        # 先執行更新操作獲取變更詳情
+        result, change_details = _update_operation()
+        
+        # 使用execute_with_audit記錄審計
+        def _audit_operation():
+            return result
+            
+        self.execute_with_audit(
+            operation_func=_audit_operation,
             operation_type='UPDATE',
-            content=update_data
+            content={'admin_id': admin_id, 'changes': change_details},
+            admin_id=current_admin_id
         )
         
         return result

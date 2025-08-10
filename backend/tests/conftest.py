@@ -16,7 +16,9 @@ sys.path.insert(0, str(project_root))
 @pytest.fixture
 def app():
     """創建測試應用實例"""
-    os.environ.setdefault('FLASK_ENV', 'testing')
+    # 在導入之前設置環境變量
+    os.environ['FLASK_ENV'] = 'testing'
+    os.environ['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     
     from app import create_app
     
@@ -27,8 +29,10 @@ def app():
     app.config['WTF_CSRF_ENABLED'] = False
     app.config['JWT_SECRET_KEY'] = 'test-secret-key'
     
+    # 重新初始化數據庫
     with app.app_context():
         from app import db
+        db.drop_all()
         db.create_all()
         yield app
         db.drop_all()

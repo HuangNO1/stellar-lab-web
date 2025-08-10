@@ -41,8 +41,8 @@ class ProductionConfig(Config):
     
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'mysql+pymysql://root:password@localhost/lab_web_test?charset=utf8mb4'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI') or 'sqlite:///:memory:'
+    WTF_CSRF_ENABLED = False
 
 config = {
     'development': DevelopmentConfig,

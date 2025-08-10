@@ -57,7 +57,7 @@ class AuthService(BaseService):
             raise PermissionError('賬戶已被禁用')
         
         # 驗證密碼
-        if not check_password_hash(admin.admin_pass, admin_pass):
+        if not admin.check_password(admin_pass):
             raise PermissionError('密碼錯誤')
         
         def _login_operation():

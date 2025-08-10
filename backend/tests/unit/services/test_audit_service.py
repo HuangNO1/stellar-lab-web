@@ -202,7 +202,7 @@ class TestAuditService:
         }
         
         with patch('app.services.audit_service.EditRecord') as MockEditRecord, \
-             patch('app.services.audit_service.paginate_query') as mock_paginate:
+             patch('app.utils.helpers.paginate_query') as mock_paginate:
             
             mock_paginate.return_value = expected_result
             

@@ -161,6 +161,7 @@ class TestAdminService:
         
         mock_admin = Mock()
         mock_admin.admin_id = admin_id
+        mock_admin.to_dict.return_value = mock_admin_data
         
         with patch('app.services.admin_service.Admin') as MockAdmin, \
              patch.object(admin_service, 'validate_permissions'), \
@@ -168,7 +169,7 @@ class TestAdminService:
              patch.object(admin_service, 'execute_with_audit') as mock_audit:
             
             MockAdmin.query.get.return_value = mock_admin
-            mock_audit.return_value = (mock_admin_data, {})
+            mock_audit.return_value = mock_admin_data  # execute_with_audit 只返回一個值
             
             # Act
             result = admin_service.update_admin(admin_id, update_data, current_admin_id)
