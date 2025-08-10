@@ -144,16 +144,16 @@ const menuOptions = computed(() => [
 
 // Language selector
 const currentLanguage = computed(() => {
-  return locale.value === 'zh' ? '中文' : 'English'
+  return locale.value === 'zh' ? t('language.chinese') : t('language.english')
 })
 
 const languageOptions = [
   {
-    label: '中文',
+    label: t('language.chinese'),
     key: 'zh',
   },
   {
-    label: 'English',
+    label: t('language.english'),
     key: 'en',
   }
 ]

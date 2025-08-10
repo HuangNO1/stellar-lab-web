@@ -19,7 +19,9 @@ export default {
     confirm: '確認',
     cancel: '取消',
     contact: '聯繫我們',
-    retry: '重試'
+    retry: '重試',
+    viewDetails: '查看詳情',
+    fetchError: '獲取數據失敗'
   },
   defaults: {
     labName: '實驗室',
@@ -61,7 +63,14 @@ export default {
   news: {
     title: '實驗室新聞',
     latest: '最新消息',
-    date: '日期'
+    date: '日期',
+    description: '查看實驗室最新動態',
+    type: '類型',
+    empty: '暫無新聞數據',
+    paperPublished: '論文發表',
+    award: '獲獎消息',
+    academic: '學術活動',
+    other: '其他'
   },
   about: {
     title: '關於我們',
@@ -79,12 +88,62 @@ export default {
   papers: {
     title: '論文成果',
     accepted: '已接收',
-    submitted: '投稿中'
+    submitted: '投稿中',
+    description: '查看實驗室發表的學術論文',
+    type: '論文類型',
+    status: '狀態',
+    viewOnline: '在線查看',
+    download: '下載',
+    empty: '暫無論文數據',
+    conference: '會議論文',
+    journal: '期刊論文',
+    patent: '專利',
+    book: '書籍',
+    other: '其他',
+    date: '發表日期',
+    venue: '發表期刊/會議'
   },
   groups: {
     title: '研究課題組',
     leader: '課題組負責人',
     description: '課題組簡介',
     members: '成員列表'
+  },
+  projects: {
+    title: '研究項目',
+    description: '查看實驗室的研究項目',
+    status: '狀態',
+    startDate: '開始日期',
+    viewRepository: '查看代碼庫',
+    empty: '暫無項目數據',
+    ongoing: '進行中',
+    completed: '已完成',
+    name: '項目名稱'
+  },
+  search: {
+    placeholder: '搜索...',
+    advanced: '高級搜索',
+    dateRange: '日期範圍',
+    startDate: '開始日期',
+    endDate: '結束日期',
+    all: '全部',
+    sortBy: '排序方式',
+    default: '默認',
+    desc: '降序',
+    asc: '升序'
+  },
+  emptyStates: {
+    noMembers: '暫無成員數據',
+    noGroupMembers: '該課題組暫無成員',
+    groupNotFound: '未找到該課題組',
+    memberNotFound: '未找到該成員'
+  },
+  errorMessages: {
+    fetchGroupDetail: '獲取課題組詳情失敗',
+    fetchMemberDetail: '獲取成員詳情失敗'
+  },
+  language: {
+    chinese: '中文',
+    english: 'English'
   }
 }

@@ -98,13 +98,13 @@
 
       <!-- 沒有成員 -->
       <div v-else class="empty-members">
-        <n-empty description="該課題組暫無成員" />
+        <n-empty :description="$t('emptyStates.noGroupMembers')" />
       </div>
     </div>
 
     <!-- 沒有找到課題組 -->
     <div v-else class="not-found-state">
-      <n-empty description="未找到該課題組" />
+      <n-empty :description="$t('emptyStates.groupNotFound')" />
     </div>
   </div>
 </template>
@@ -119,7 +119,7 @@ import type { ResearchGroup, Member } from '@/types/api';
 
 const route = useRoute();
 const router = useRouter();
-const { locale } = useI18n();
+const { locale, t } = useI18n();
 const { getMemberAvatar, getMemberPosition } = useMembers();
 
 // 響應式數據
@@ -190,7 +190,7 @@ const fetchGroupDetail = async () => {
     }
   } catch (err) {
     console.error('Failed to fetch group detail:', err);
-    error.value = '獲取課題組詳情失敗';
+    error.value = t('errorMessages.fetchGroupDetail');
   } finally {
     loading.value = false;
   }

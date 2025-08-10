@@ -19,7 +19,9 @@ export default {
     confirm: 'Confirm',
     cancel: 'Cancel',
     contact: 'Contact Us',
-    retry: 'Retry'
+    retry: 'Retry',
+    viewDetails: 'View Details',
+    fetchError: 'Failed to fetch data'
   },
   defaults: {
     labName: 'Laboratory',
@@ -61,7 +63,14 @@ export default {
   news: {
     title: 'Lab News',
     latest: 'Latest News',
-    date: 'Date'
+    date: 'Date',
+    description: 'View the latest updates from our lab',
+    type: 'Type',
+    empty: 'No news available',
+    paperPublished: 'Paper Published',
+    award: 'Award News',
+    academic: 'Academic Activity',
+    other: 'Other'
   },
   about: {
     title: 'About Us',
@@ -79,12 +88,62 @@ export default {
   papers: {
     title: 'Publications',
     accepted: 'Accepted',
-    submitted: 'Submitted'
+    submitted: 'Submitted',
+    description: 'View academic papers published by our lab',
+    type: 'Paper Type',
+    status: 'Status',
+    viewOnline: 'View Online',
+    download: 'Download',
+    empty: 'No papers available',
+    conference: 'Conference Paper',
+    journal: 'Journal Paper',
+    patent: 'Patent',
+    book: 'Book',
+    other: 'Other',
+    date: 'Publication Date',
+    venue: 'Journal/Conference'
   },
   groups: {
     title: 'Research Groups',
     leader: 'Group Leader',
     description: 'Group Description',
     members: 'Members'
+  },
+  projects: {
+    title: 'Research Projects',
+    description: 'View research projects from our lab',
+    status: 'Status',
+    startDate: 'Start Date',
+    viewRepository: 'View Repository',
+    empty: 'No projects available',
+    ongoing: 'Ongoing',
+    completed: 'Completed',
+    name: 'Project Name'
+  },
+  search: {
+    placeholder: 'Search...',
+    advanced: 'Advanced Search',
+    dateRange: 'Date Range',
+    startDate: 'Start Date',
+    endDate: 'End Date',
+    all: 'All',
+    sortBy: 'Sort By',
+    default: 'Default',
+    desc: 'Descending',
+    asc: 'Ascending'
+  },
+  emptyStates: {
+    noMembers: 'No member data available',
+    noGroupMembers: 'No members in this group',
+    groupNotFound: 'Group not found',
+    memberNotFound: 'Member not found'
+  },
+  errorMessages: {
+    fetchGroupDetail: 'Failed to fetch group details',
+    fetchMemberDetail: 'Failed to fetch member details'
+  },
+  language: {
+    chinese: '中文',
+    english: 'English'
   }
 }

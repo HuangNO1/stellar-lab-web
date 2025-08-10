@@ -235,7 +235,7 @@
 
       <!-- 沒有數據 -->
       <div v-if="total === 0" class="empty-state">
-        <n-empty description="暫無成員數據" />
+        <n-empty :description="$t('emptyStates.noMembers')" />
       </div>
     </div>
   </div>

@@ -36,10 +36,9 @@
     <!-- 高級搜索 -->
     <n-collapse-transition :show="showAdvanced">
       <div class="advanced-search">
-        <n-space vertical>
+        <n-form label-placement="left" label-width="80" label-align="left">
           <!-- 日期範圍 -->
-          <n-space align="center" v-if="config.dateRange">
-            <span class="search-label">{{ $t('search.dateRange') }}:</span>
+          <n-form-item :label="$t('search.dateRange')" v-if="config.dateRange">
             <n-date-picker
               v-model:value="dateRange"
               type="daterange"
@@ -48,86 +47,86 @@
               format="yyyy-MM-dd"
               value-format="yyyy-MM-dd"
               clearable
+              style="width: 300px"
             />
-          </n-space>
+          </n-form-item>
 
           <!-- 論文特定篩選 -->
           <template v-if="config.type === 'papers'">
-            <n-space align="center">
-              <span class="search-label">{{ $t('papers.type') }}:</span>
+            <n-form-item :label="$t('papers.type')">
               <n-select
                 v-model:value="localFilters.paper_type"
                 :options="paperTypeOptions"
                 :placeholder="$t('search.all')"
                 clearable
-                style="min-width: 150px"
+                style="width: 200px"
                 @update:value="handleSearch"
               />
-            </n-space>
-            <n-space align="center">
-              <span class="search-label">{{ $t('papers.status') }}:</span>
+            </n-form-item>
+            <n-form-item :label="$t('papers.status')">
               <n-select
                 v-model:value="localFilters.paper_accept"
                 :options="paperStatusOptions"
                 :placeholder="$t('search.all')"
                 clearable
-                style="min-width: 150px"
+                style="width: 200px"
                 @update:value="handleSearch"
               />
-            </n-space>
+            </n-form-item>
           </template>
 
           <!-- 新聞特定篩選 -->
           <template v-if="config.type === 'news'">
-            <n-space align="center">
-              <span class="search-label">{{ $t('news.type') }}:</span>
+            <n-form-item :label="$t('news.type')">
               <n-select
                 v-model:value="localFilters.news_type"
                 :options="newsTypeOptions"
                 :placeholder="$t('search.all')"
                 clearable
-                style="min-width: 150px"
+                style="width: 200px"
                 @update:value="handleSearch"
               />
-            </n-space>
+            </n-form-item>
           </template>
 
           <!-- 項目特定篩選 -->
           <template v-if="config.type === 'projects'">
-            <n-space align="center">
-              <span class="search-label">{{ $t('projects.status') }}:</span>
+            <n-form-item :label="$t('projects.status')">
               <n-select
                 v-model:value="localFilters.is_end"
                 :options="projectStatusOptions"
                 :placeholder="$t('search.all')"
                 clearable
-                style="min-width: 150px"
+                style="width: 200px"
                 @update:value="handleSearch"
               />
-            </n-space>
+            </n-form-item>
           </template>
 
           <!-- 排序 -->
-          <n-space align="center" v-if="config.sorting">
-            <span class="search-label">{{ $t('search.sortBy') }}:</span>
-            <n-select
-              v-model:value="localFilters.sort_by"
-              :options="sortOptions"
-              :placeholder="$t('search.default')"
-              clearable
-              style="min-width: 150px"
-              @update:value="handleSearch"
-            />
-            <n-select
-              v-model:value="localFilters.order"
-              :options="orderOptions"
-              :placeholder="$t('search.desc')"
-              clearable
-              style="min-width: 100px"
-              @update:value="handleSearch"
-            />
-          </n-space>
-        </n-space>
+          <template v-if="config.sorting">
+            <n-form-item :label="$t('search.sortBy')">
+              <n-space>
+                <n-select
+                  v-model:value="localFilters.sort_by"
+                  :options="sortOptions"
+                  :placeholder="$t('search.default')"
+                  clearable
+                  style="width: 200px"
+                  @update:value="handleSearch"
+                />
+                <n-select
+                  v-model:value="localFilters.order"
+                  :options="orderOptions"
+                  :placeholder="$t('search.desc')"
+                  clearable
+                  style="width: 120px"
+                  @update:value="handleSearch"
+                />
+              </n-space>
+            </n-form-item>
+          </template>
+        </n-form>
       </div>
     </n-collapse-transition>
   </div>
@@ -281,17 +280,10 @@ if (localFilters.value.start_date && localFilters.value.end_date) {
 
 .advanced-search {
   background: rgba(24, 144, 255, 0.05);
-  padding: 1rem;
+  padding: 1.5rem;
   border-radius: 0.5rem;
   margin-top: 1rem;
   border: 0.0625rem solid rgba(24, 144, 255, 0.1);
-}
-
-.search-label {
-  font-weight: 500;
-  color: #666;
-  min-width: 4rem;
-  white-space: nowrap;
 }
 
 .text-primary {
@@ -305,21 +297,54 @@ if (localFilters.value.start_date && localFilters.value.end_date) {
   border-color: rgba(112, 161, 255, 0.2);
 }
 
-[data-theme="dark"] .search-label,
-.dark .search-label {
-  color: #ccc;
+/* 表單項樣式 */
+:deep(.n-form-item) {
+  margin-bottom: 1rem;
+}
+
+:deep(.n-form-item:last-child) {
+  margin-bottom: 0;
+}
+
+:deep(.n-form-item-label) {
+  color: #666;
+  font-weight: 500;
+  padding-right: 0.75rem !important;
+}
+
+/* 暗色主題下的標籤顏色 */
+[data-theme="dark"] :deep(.n-form-item-label),
+.dark :deep(.n-form-item-label) {
+  color: #ccc !important;
 }
 
 /* 響應式設計 */
 @media (max-width: 48rem) {
-  .advanced-search .n-space {
-    flex-direction: column;
-    align-items: flex-start !important;
+  .advanced-search {
+    padding: 1rem;
   }
-  
-  .search-label {
-    min-width: auto;
-    margin-bottom: 0.5rem;
+
+  :deep(.n-form) {
+    --n-label-width: 70px;
+  }
+
+  :deep(.n-form-item-label) {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 36rem) {
+  :deep(.n-form) {
+    --n-label-placement: top;
+  }
+
+  :deep(.n-form-item-label) {
+    padding-bottom: 0.5rem !important;
+    padding-right: 0 !important;
+  }
+
+  .advanced-search {
+    padding: 0.75rem;
   }
 }
 </style>

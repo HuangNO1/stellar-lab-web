@@ -125,7 +125,7 @@
 
     <!-- 沒有找到成員 -->
     <div v-else class="not-found-state">
-      <n-empty description="未找到該成員" />
+      <n-empty :description="$t('emptyStates.memberNotFound')" />
     </div>
   </div>
 </template>
@@ -140,7 +140,7 @@ import type { Member, ResearchGroup, Paper } from '@/types/api';
 
 const route = useRoute();
 const router = useRouter();
-const { locale } = useI18n();
+const { locale, t } = useI18n();
 const { getMemberAvatar, getMemberPosition } = useMembers();
 
 // 響應式數據
@@ -218,7 +218,7 @@ const fetchMemberDetail = async () => {
     }
   } catch (err) {
     console.error('Failed to fetch member detail:', err);
-    error.value = '獲取成員詳情失敗';
+    error.value = t('errorMessages.fetchMemberDetail');
   } finally {
     loading.value = false;
   }
