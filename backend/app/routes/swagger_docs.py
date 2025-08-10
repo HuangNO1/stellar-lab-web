@@ -1362,15 +1362,110 @@ def swagger_json():
                                     "data": {
                                         "type": "object",
                                         "properties": {
+                                            "path": {"type": "string", "example": "/media/member_avatar/avatar_20241201.jpg"},
+                                            "url": {"type": "string", "example": "/api/media/serve/member_avatar/avatar_20241201.jpg"},
                                             "filename": {"type": "string", "example": "avatar_20241201.jpg"},
-                                            "url": {"type": "string", "example": "/media/member_avatar/avatar_20241201.jpg"}
+                                            "type": {"type": "string", "example": "member_avatar"}
                                         }
                                     }
                                 }
                             }
                         },
                         "400": {"description": "文件格式不支持或文件過大"},
-                        "401": {"description": "未認證"}
+                        "401": {"description": "未認證"},
+                        "500": {"description": "上傳失敗"}
+                    }
+                }
+            },
+            "/media/serve/{file_path}": {
+                "get": {
+                    "tags": ["媒體"],
+                    "summary": "獲取文件",
+                    "description": "提供靜態文件服務，返回文件內容",
+                    "parameters": [{
+                        "name": "file_path",
+                        "in": "path",
+                        "type": "string",
+                        "required": True,
+                        "description": "文件路徑 (相對於媒體目錄)",
+                        "example": "member_avatar/avatar_001.jpg"
+                    }],
+                    "responses": {
+                        "200": {
+                            "description": "成功返回文件",
+                            "schema": {
+                                "type": "file"
+                            }
+                        },
+                        "404": {"description": "文件不存在"},
+                        "500": {"description": "文件服務錯誤"}
+                    }
+                }
+            },
+            "/media/info/{file_path}": {
+                "get": {
+                    "tags": ["媒體"],
+                    "summary": "獲取文件信息",
+                    "description": "返回文件的詳細信息，包括大小、類型、創建時間等",
+                    "parameters": [{
+                        "name": "file_path",
+                        "in": "path",
+                        "type": "string",
+                        "required": True,
+                        "description": "文件路徑 (可選前綴 /media/)",
+                        "example": "member_avatar/avatar_001.jpg"
+                    }],
+                    "responses": {
+                        "200": {
+                            "description": "成功獲取文件信息",
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "code": {"type": "integer", "example": 0},
+                                    "message": {"type": "string", "example": "OK"},
+                                    "data": {
+                                        "type": "object",
+                                        "properties": {
+                                            "filename": {"type": "string", "example": "avatar_001.jpg"},
+                                            "size": {"type": "integer", "example": 1024000},
+                                            "mime_type": {"type": "string", "example": "image/jpeg"},
+                                            "created_at": {"type": "string", "format": "date-time"},
+                                            "url": {"type": "string", "example": "/api/media/serve/member_avatar/avatar_001.jpg"}
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "404": {"description": "文件不存在"},
+                        "500": {"description": "獲取文件信息失敗"}
+                    }
+                }
+            },
+            "/media/health": {
+                "get": {
+                    "tags": ["媒體"],
+                    "summary": "媒體服務健康檢查",
+                    "description": "檢查媒體服務的健康狀態，包括上傳目錄的可寫性",
+                    "responses": {
+                        "200": {
+                            "description": "服務健康",
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "code": {"type": "integer", "example": 0},
+                                    "message": {"type": "string", "example": "OK"},
+                                    "data": {
+                                        "type": "object",
+                                        "properties": {
+                                            "status": {"type": "string", "example": "healthy"},
+                                            "upload_folder": {"type": "string", "example": "/uploads"},
+                                            "writable": {"type": "boolean", "example": True}
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "500": {"description": "媒體服務不健康"}
                     }
                 }
             }
