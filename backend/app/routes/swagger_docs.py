@@ -353,6 +353,58 @@ def swagger_json():
                             "in": "formData",
                             "type": "file",
                             "description": "實驗室Logo文件"
+                        },
+                        {
+                            "name": "carousel_img_1",
+                            "in": "formData",
+                            "type": "file",
+                            "description": "輪播圖片1 (最多4張)"
+                        },
+                        {
+                            "name": "carousel_img_2", 
+                            "in": "formData",
+                            "type": "file",
+                            "description": "輪播圖片2"
+                        },
+                        {
+                            "name": "carousel_img_3",
+                            "in": "formData",
+                            "type": "file", 
+                            "description": "輪播圖片3"
+                        },
+                        {
+                            "name": "carousel_img_4",
+                            "in": "formData",
+                            "type": "file",
+                            "description": "輪播圖片4"
+                        },
+                        {
+                            "name": "clear_carousel_img_1",
+                            "in": "formData",
+                            "type": "string",
+                            "description": "清除輪播圖片1 (設為 'true' 可清除)",
+                            "enum": ["true", "false"]
+                        },
+                        {
+                            "name": "clear_carousel_img_2",
+                            "in": "formData", 
+                            "type": "string",
+                            "description": "清除輪播圖片2 (設為 'true' 可清除)",
+                            "enum": ["true", "false"]
+                        },
+                        {
+                            "name": "clear_carousel_img_3",
+                            "in": "formData",
+                            "type": "string",
+                            "description": "清除輪播圖片3 (設為 'true' 可清除)",
+                            "enum": ["true", "false"]
+                        },
+                        {
+                            "name": "clear_carousel_img_4",
+                            "in": "formData",
+                            "type": "string", 
+                            "description": "清除輪播圖片4 (設為 'true' 可清除)",
+                            "enum": ["true", "false"]
                         }
                     ],
                     "responses": {
