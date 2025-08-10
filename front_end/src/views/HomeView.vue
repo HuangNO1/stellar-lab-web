@@ -26,7 +26,25 @@
     <div class="page-content" :class="{ 'dark-theme': isDarkMode }">
       <div class="content-wrapper">
         <h1 style="text-align: center; margin-bottom: 32px; font-size: 28px; font-weight: bold;">{{ $t('researchGroups.title') }}</h1>
-        <n-grid :x-gap="12" :y-gap="8" :cols="3">
+        
+        <!-- 加載狀態 -->
+        <div v-if="loading" style="text-align: center; padding: 40px;">
+          <n-spin size="large" />
+          <p style="margin-top: 16px;">{{ $t('common.loading') }}</p>
+        </div>
+        
+        <!-- 錯誤狀態 -->
+        <div v-else-if="error" style="text-align: center; padding: 40px;">
+          <n-alert type="warning" :title="$t('common.error')" style="margin-bottom: 16px;">
+            {{ error }}
+          </n-alert>
+          <n-button @click="fetchResearchGroups" type="primary" ghost>
+            重試
+          </n-button>
+        </div>
+        
+        <!-- 課題組列表 -->
+        <n-grid v-else :x-gap="12" :y-gap="8" :cols="3">
           <n-grid-item v-for="group in researchGroups" :key="group.research_group_id">
             <div class="card-container">
               <n-card 
@@ -37,7 +55,7 @@
               >
                 <template #header-extra>
                   <n-tag size="small" type="info">
-                    {{ getCurrentLocale() === 'zh' ? group.leader.mem_name_zh : group.leader.mem_name_en }}
+                    {{ getCurrentLocale() === 'zh' ? group.leader?.mem_name_zh : group.leader?.mem_name_en }}
                   </n-tag>
                 </template>
                 <div class="card-description">
@@ -58,10 +76,11 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref } from 'vue';
+import { inject } from 'vue';
 import { useRouter } from "vue-router";
 import { useI18n } from 'vue-i18n';
-import { researchGroups as importedResearchGroups, type ResearchGroup } from '../Model/researchGroup';
+import { useResearchGroupsWithAutoFetch } from '@/composables/useResearchGroups';
+import type { ResearchGroup } from '@/types/api';
 
 const router = useRouter();
 const { locale } = useI18n();
@@ -69,8 +88,8 @@ const { locale } = useI18n();
 // 從全域狀態獲取主題
 const isDarkMode = inject('isDarkMode', false);
 
-// 使用導入的研究組數據
-const researchGroups = ref<ResearchGroup[]>(importedResearchGroups);
+// 使用 composable 獲取課題組數據
+const { researchGroups, loading, error, fetchResearchGroups } = useResearchGroupsWithAutoFetch();
 
 // 獲取當前語言
 const getCurrentLocale = () => {

@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // 創建 axios 實例
 const api = axios.create({
-    baseURL: (import.meta as any)?.env?.VITE_API_BASE_URL || '/api',
+    baseURL: process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8000/api',
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',

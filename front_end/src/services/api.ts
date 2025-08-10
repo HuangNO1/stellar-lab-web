@@ -1,0 +1,285 @@
+import api from '@/utils/api';
+import type { 
+  ApiResponse, 
+  PaginatedResponse, 
+  Lab, 
+  ResearchGroup, 
+  ResearchGroupQueryParams,
+  Member, 
+  MemberQueryParams,
+  Paper, 
+  PaperQueryParams,
+  News, 
+  NewsQueryParams,
+  Project, 
+  ProjectQueryParams,
+  Admin,
+  LoginResponse
+} from '@/types/api';
+
+/**
+ * 實驗室相關 API
+ */
+export const labApi = {
+  // 獲取實驗室資訊
+  getLab(): Promise<ApiResponse<Lab>> {
+    return api.get('/lab');
+  },
+  
+  // 更新實驗室資訊
+  updateLab(data: FormData): Promise<ApiResponse<Lab>> {
+    return api.put('/lab', data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+  
+  // 刪除實驗室
+  deleteLab(): Promise<ApiResponse<null>> {
+    return api.delete('/lab');
+  }
+};
+
+/**
+ * 課題組相關 API
+ */
+export const researchGroupApi = {
+  // 獲取課題組列表
+  getResearchGroups(params?: ResearchGroupQueryParams): Promise<ApiResponse<PaginatedResponse<ResearchGroup>>> {
+    return api.get('/research-groups', { params });
+  },
+  
+  // 獲取課題組詳情
+  getResearchGroup(groupId: number): Promise<ApiResponse<ResearchGroup>> {
+    return api.get(`/research-groups/${groupId}`);
+  },
+  
+  // 創建課題組
+  createResearchGroup(data: Partial<ResearchGroup>): Promise<ApiResponse<ResearchGroup>> {
+    return api.post('/research-groups', data);
+  },
+  
+  // 更新課題組
+  updateResearchGroup(groupId: number, data: Partial<ResearchGroup>): Promise<ApiResponse<ResearchGroup>> {
+    return api.put(`/research-groups/${groupId}`, data);
+  },
+  
+  // 刪除課題組
+  deleteResearchGroup(groupId: number): Promise<ApiResponse<null>> {
+    return api.delete(`/research-groups/${groupId}`);
+  }
+};
+
+/**
+ * 成員相關 API
+ */
+export const memberApi = {
+  // 獲取成員列表
+  getMembers(params?: MemberQueryParams): Promise<ApiResponse<PaginatedResponse<Member>>> {
+    return api.get('/members', { params });
+  },
+  
+  // 獲取成員詳情
+  getMember(memberId: number): Promise<ApiResponse<Member>> {
+    return api.get(`/members/${memberId}`);
+  },
+  
+  // 創建成員
+  createMember(data: FormData): Promise<ApiResponse<Member>> {
+    return api.post('/members', data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+  
+  // 更新成員
+  updateMember(memberId: number, data: FormData): Promise<ApiResponse<Member>> {
+    return api.put(`/members/${memberId}`, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+  
+  // 刪除成員
+  deleteMember(memberId: number): Promise<ApiResponse<null>> {
+    return api.delete(`/members/${memberId}`);
+  },
+  
+  // 批量刪除成員
+  deleteMembersBatch(memberIds: number[]): Promise<ApiResponse<null>> {
+    return api.delete('/members/batch', { data: { member_ids: memberIds } });
+  },
+  
+  // 批量更新成員
+  updateMembersBatch(memberIds: number[], updates: Partial<Member>): Promise<ApiResponse<null>> {
+    return api.put('/members/batch', { member_ids: memberIds, updates });
+  }
+};
+
+/**
+ * 論文相關 API
+ */
+export const paperApi = {
+  // 獲取論文列表
+  getPapers(params?: PaperQueryParams): Promise<ApiResponse<PaginatedResponse<Paper>>> {
+    return api.get('/papers', { params });
+  },
+  
+  // 獲取論文詳情
+  getPaper(paperId: number): Promise<ApiResponse<Paper>> {
+    return api.get(`/papers/${paperId}`);
+  },
+  
+  // 創建論文
+  createPaper(data: FormData): Promise<ApiResponse<Paper>> {
+    return api.post('/papers', data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+  
+  // 更新論文
+  updatePaper(paperId: number, data: Partial<Paper>): Promise<ApiResponse<Paper>> {
+    return api.put(`/papers/${paperId}`, data);
+  },
+  
+  // 刪除論文
+  deletePaper(paperId: number): Promise<ApiResponse<null>> {
+    return api.delete(`/papers/${paperId}`);
+  }
+};
+
+/**
+ * 新聞相關 API
+ */
+export const newsApi = {
+  // 獲取新聞列表
+  getNews(params?: NewsQueryParams): Promise<ApiResponse<PaginatedResponse<News>>> {
+    return api.get('/news', { params });
+  },
+  
+  // 獲取新聞詳情
+  getNewsItem(newsId: number): Promise<ApiResponse<News>> {
+    return api.get(`/news/${newsId}`);
+  },
+  
+  // 創建新聞
+  createNews(data: Partial<News>): Promise<ApiResponse<News>> {
+    return api.post('/news', data);
+  },
+  
+  // 更新新聞
+  updateNews(newsId: number, data: Partial<News>): Promise<ApiResponse<News>> {
+    return api.put(`/news/${newsId}`, data);
+  },
+  
+  // 刪除新聞
+  deleteNews(newsId: number): Promise<ApiResponse<null>> {
+    return api.delete(`/news/${newsId}`);
+  }
+};
+
+/**
+ * 項目相關 API
+ */
+export const projectApi = {
+  // 獲取項目列表
+  getProjects(params?: ProjectQueryParams): Promise<ApiResponse<PaginatedResponse<Project>>> {
+    return api.get('/projects', { params });
+  },
+  
+  // 獲取項目詳情
+  getProject(projectId: number): Promise<ApiResponse<Project>> {
+    return api.get(`/projects/${projectId}`);
+  },
+  
+  // 創建項目
+  createProject(data: Partial<Project>): Promise<ApiResponse<Project>> {
+    return api.post('/projects', data);
+  },
+  
+  // 更新項目
+  updateProject(projectId: number, data: Partial<Project>): Promise<ApiResponse<Project>> {
+    return api.put(`/projects/${projectId}`, data);
+  },
+  
+  // 刪除項目
+  deleteProject(projectId: number): Promise<ApiResponse<null>> {
+    return api.delete(`/projects/${projectId}`);
+  }
+};
+
+/**
+ * 認證相關 API
+ */
+export const authApi = {
+  // 管理員登錄
+  login(adminName: string, adminPass: string): Promise<ApiResponse<LoginResponse>> {
+    return api.post('/admin/login', { admin_name: adminName, admin_pass: adminPass });
+  },
+  
+  // 管理員登出
+  logout(): Promise<ApiResponse<null>> {
+    return api.post('/admin/logout');
+  },
+  
+  // 修改密碼
+  changePassword(oldPassword: string, newPassword: string): Promise<ApiResponse<null>> {
+    return api.post('/admin/change-password', { 
+      old_password: oldPassword, 
+      new_password: newPassword 
+    });
+  },
+  
+  // 獲取個人資訊
+  getProfile(): Promise<ApiResponse<Admin>> {
+    return api.get('/admin/profile');
+  },
+  
+  // 更新個人資訊
+  updateProfile(data: Partial<Admin>): Promise<ApiResponse<Admin>> {
+    return api.put('/admin/profile', data);
+  }
+};
+
+/**
+ * 媒體文件相關 API
+ */
+export const mediaApi = {
+  // 上傳文件
+  uploadFile(file: File, type: 'lab_logo' | 'member_avatar' | 'paper' | 'other'): Promise<ApiResponse<{ filename: string; url: string }>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', type);
+    
+    return api.post('/media/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+  
+  // 獲取文件資訊
+  getFileInfo(filePath: string): Promise<ApiResponse<{ filename: string; size: number; mime_type: string; created_at: string; url: string }>> {
+    return api.get(`/media/info/${filePath}`);
+  },
+  
+  // 健康檢查
+  healthCheck(): Promise<ApiResponse<{ status: string; upload_path: string; disk_space: string }>> {
+    return api.get('/media/health');
+  }
+};
+
+/**
+ * 系統相關 API
+ */
+export const systemApi = {
+  // 健康檢查
+  healthCheck(): Promise<ApiResponse<{ status: string; timestamp: string; version: string }>> {
+    return api.get('/health');
+  }
+};
