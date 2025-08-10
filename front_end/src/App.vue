@@ -428,7 +428,7 @@ html:has(#app.dark-mode) {
   padding: 24px;
   min-height: calc(100vh - 4.5rem);
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px; /* 增加最大寬度 */
   margin: 0 auto;
   background: transparent;
 }
