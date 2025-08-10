@@ -42,7 +42,11 @@ def create_app(config_name=None):
     from app.routes.project import bp as project_bp
     from app.routes.media import bp as media_bp
     from app.routes.edit_record import bp as edit_record_bp
-    from app.routes.swagger_docs import bp as swagger_bp
+    # 舊的手工維護 Swagger 系統（1600+ 行代碼）
+    # from app.routes.swagger_docs import bp as swagger_bp
+    
+    # 新的完整版自動化 Swagger 系統（包含所有48+接口）
+    from app.routes.swagger_complete import bp as swagger_bp
     
     app.register_blueprint(auth_bp, url_prefix='/api')
     app.register_blueprint(admin_bp, url_prefix='/api')

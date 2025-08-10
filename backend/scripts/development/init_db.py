@@ -14,7 +14,14 @@ from urllib.parse import urlparse
 import pymysql
 
 # 添加項目根目錄到 Python 路徑
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# 在Docker環境中，當前工作目錄應該已經是項目根目錄
+current_dir = os.path.abspath(os.path.dirname(__file__))
+project_root = os.path.dirname(os.path.dirname(current_dir))  # 向上兩級目錄
+if os.path.exists(os.path.join(project_root, 'app')):
+    sys.path.insert(0, project_root)
+else:
+    # 如果在Docker環境中，嘗試使用當前工作目錄
+    sys.path.insert(0, os.getcwd())
 
 from app import create_app, db
 from app.models import Admin, Lab, ResearchGroup, Member, Paper, PaperAuthor, Project, News, EditRecord
@@ -380,6 +387,32 @@ def init_database():
         print_env_info(app)
         print("-" * 50)
         
+        # 檢查是否需要強制重建
+        force_recreate = os.environ.get('FORCE_RECREATE', '0') == '1'
+        
+        if force_recreate:
+            print("⚠️  強制重建模式：將刪除並重新創建所有表")
+            # 獲取所有表名並逐個刪除
+            try:
+                # 禁用外鍵檢查
+                db.session.execute(db.text("SET FOREIGN_KEY_CHECKS = 0"))
+                
+                # 獲取所有表名
+                tables = db.session.execute(db.text("SHOW TABLES")).fetchall()
+                for table in tables:
+                    table_name = table[0]
+                    db.session.execute(db.text(f"DROP TABLE IF EXISTS `{table_name}`"))
+                    print(f"✓ 已刪除表: {table_name}")
+                
+                # 重新啟用外鍵檢查
+                db.session.execute(db.text("SET FOREIGN_KEY_CHECKS = 1"))
+                db.session.commit()
+                print("✓ 所有舊表已刪除")
+            except Exception as e:
+                print(f"⚠️  清理表時發生錯誤: {e}")
+                # 如果出錯，嘗試回滾並繼續
+                db.session.rollback()
+        
         # 創建所有表
         db.create_all()
         print("✓ 數據庫表創建成功")
@@ -407,6 +440,8 @@ def init_database():
         print("   - 3條新聞")
         print("   - 2個項目")
         print(f"\n🌟 環境: {get_current_environment()}")
+        if force_recreate:
+            print("🌟 強制重建完成 - 所有表結構已更新")
         print("🌟 現在可以啟動應用了！")
 
 if __name__ == '__main__':

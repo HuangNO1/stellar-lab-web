@@ -75,7 +75,7 @@ export FLASK_CONFIG=${FLASK_CONFIG:-production}
 
 # 運行現有的數據庫初始化腳本
 echo "🔧 初始化數據庫和示例數據..."
-cd /app && FORCE_RECREATE=1 python scripts/development/init_db.py
+python scripts/development/init_db.py
 
 if [ $? -eq 0 ]; then
     echo "✅ 數據庫初始化完成"

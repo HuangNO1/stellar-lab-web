@@ -17,6 +17,113 @@
 - **🔄 自動審計記錄**: 所有 CRUD 操作自動記錄到審計日誌
 - **⚡ 統一異常處理**: 標準化的錯誤響應和異常處理機制
 - **🎯 職責分離**: 路由專注HTTP處理，服務專注業務邏輯，模型專注數據存取
+- **🧪 完整測試支持**: 專門的服務層測試框架，確保代碼質量
+- **⚡ 零維護API文檔**: 基於Flask-RESTX的自動化Swagger文檔系統
+
+## 📁 項目結構 (已整理優化)
+
+```
+backend/                               # 根目錄
+├── app/                              # 主應用目錄
+│   ├── __init__.py                   # Flask 應用工廠
+│   ├── models/                       # 數據模型層 (Models Layer)
+│   │   ├── __init__.py
+│   │   ├── admin.py                  # 管理員模型
+│   │   ├── lab.py                    # 實驗室模型  
+│   │   ├── member.py                 # 成員模型
+│   │   ├── paper.py                  # 論文模型
+│   │   ├── news.py                   # 新聞模型
+│   │   ├── project.py                # 項目模型
+│   │   ├── research_group.py         # 課題組模型
+│   │   └── edit_record.py            # 編輯記錄模型
+│   ├── services/                     # 業務服務層 (Services Layer) ⭐
+│   │   ├── __init__.py               # 服務模組入口
+│   │   ├── base_service.py           # 基礎服務類 (事務、審計、異常)
+│   │   ├── audit_service.py          # 審計服務
+│   │   ├── auth_service.py           # 認證服務
+│   │   ├── admin_service.py          # 管理員服務
+│   │   ├── lab_service.py            # 實驗室服務
+│   │   ├── member_service.py         # 成員服務
+│   │   ├── paper_service.py          # 論文服務
+│   │   ├── news_service.py           # 新聞服務
+│   │   ├── project_service.py        # 項目服務
+│   │   ├── research_group_service.py # 課題組服務
+│   │   └── media_service.py          # 媒體服務
+│   ├── routes/                       # API路由層 (Routes Layer)
+│   │   ├── auth.py                   # 認證路由
+│   │   ├── admin.py                  # 管理員路由
+│   │   ├── lab.py                    # 實驗室路由
+│   │   ├── member.py                 # 成員路由
+│   │   ├── paper.py                  # 論文路由
+│   │   ├── news.py                   # 新聞路由
+│   │   ├── project.py                # 項目路由
+│   │   ├── research_group.py         # 課題組路由
+│   │   ├── media.py                  # 媒體文件路由
+│   │   ├── edit_record.py            # 編輯記錄路由
+│   │   ├── root.py                   # 根路由
+│   │   └── swagger_simple.py         # 自動化 Swagger 文檔 ⭐
+│   ├── auth/                         # 認證相關
+│   │   ├── __init__.py
+│   │   └── decorators.py             # 認證裝飾器
+│   ├── utils/                        # 工具函數
+│   │   ├── __init__.py
+│   │   ├── file_handler.py           # 文件處理
+│   │   ├── helpers.py                # 輔助函數
+│   │   └── validators.py             # 數據校驗
+│   └── static/                       # 靜態文件
+├── config/                           # 配置文件
+│   └── config.py                     # 應用配置
+├── scripts/                          # 腳本目錄 ⭐
+│   ├── deployment/                   # 部署腳本
+│   │   ├── deploy.sh                # 部署腳本
+│   │   ├── start.sh                 # 啟動腳本
+│   │   └── docker-entrypoint.sh     # Docker 入口腳本
+│   ├── development/                  # 開發腳本
+│   │   └── init_db.py               # 數據庫初始化
+│   └── maintenance/                  # 維護腳本
+│       └── diagnose.sh              # 診斷腳本
+├── tests/                            # 測試目錄 ⭐
+│   ├── conftest.py                  # pytest 配置
+│   ├── unit/                        # 單元測試
+│   │   ├── services/                # 服務層測試 ⭐
+│   │   │   └── test_service_template.py # 服務測試模板
+│   │   ├── models/                  # 模型測試
+│   │   └── utils/                   # 工具函數測試
+│   ├── integration/                 # 集成測試
+│   │   └── test_api.py             # API 集成測試
+│   └── fixtures/                    # 測試數據
+│       ├── data_fixtures.py        # 業務數據 fixtures
+│       └── user_fixtures.py        # 用戶認證 fixtures
+├── docs/                            # 文檔目錄 ⭐
+│   ├── api/                         # API 文檔
+│   ├── deployment/                  # 部署文檔
+│   │   └── DOCKER_DEPLOY.md        # Docker 部署指南
+│   ├── development/                 # 開發文檔
+│   │   └── PROJECT_STRUCTURE.md    # 項目結構說明
+│   └── migration/                   # 遷移文檔
+│       └── SWAGGER_MIGRATION_GUIDE.md # Swagger 遷移指南
+├── migrations/                      # 數據庫遷移
+├── logs/                           # 日誌目錄
+├── media/                          # 媒體文件目錄
+├── requirements.txt                # Python 依賴
+├── run.py                         # 應用入口點
+├── README.md                      # 項目說明
+├── .env.example                   # 環境變量示例 ⭐
+├── Dockerfile                     # Docker 配置
+├── docker-compose.yml             # Docker Compose 配置
+└── docker-compose-minimal.yml     # 最小化 Docker Compose
+```
+
+### 🎯 架構亮點
+
+- **⭐ 服務層 (Services)**: 新增的核心業務邏輯層，統一處理所有業務操作
+- **📊 BaseService**: 提供統一的事務管理、審計記錄、異常處理基礎設施
+- **🔄 自動審計**: 每個服務操作都自動記錄到 `edit_records` 表，無需手動添加
+- **⚡ 輕量路由**: 路由層從原來的 100-300 行縮減到 30-80 行，專注HTTP處理
+- **🛡️ 統一異常**: 服務層提供統一的異常處理和錯誤響應格式
+- **🧪 測試友好**: 完整的測試框架，專門的服務層測試目錄
+- **📚 規範文檔**: 按功能分類的完整文檔結構
+- **🛠️ 整潔腳本**: 按用途分類的部署、開發、維護腳本
 
 ## 🚀 快速開始
 
@@ -55,7 +162,7 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:///lab_web.db'
 
 **自動創建數據庫和表**（推薦）：
 ```bash
-python scripts/init_db.py
+python scripts/development/init_db.py
 ```
 
 **手動創建數據庫**：
@@ -71,7 +178,7 @@ CREATE DATABASE lab_web CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 python run.py
 
 # 或使用啟動腳本
-./start.sh
+./scripts/deployment/start.sh
 
 # 生產模式
 gunicorn -w 4 -b 0.0.0.0:8000 run:app
@@ -87,20 +194,210 @@ gunicorn -w 4 -b 0.0.0.0:8000 run:app
 
 - **主頁**: [http://localhost:8000](http://localhost:8000)
 - **API概覽**: [http://localhost:8000/api-info](http://localhost:8000/api-info)  
-- **Swagger文檔**: [http://localhost:8000/api/docs](http://localhost:8000/api/docs)
+- **Swagger文檔**: [http://localhost:8000/api/docs](http://localhost:8000/api/docs) ⭐ **包含48+完整接口**
 - **健康檢查**: [http://localhost:8000/health](http://localhost:8000/health)
 
 ### 📚 離線文檔
 
-詳細的API文檔請參考：**[api.md](./api.md)**
+詳細的項目文檔請參考 `docs/` 目錄：
 
-該文檔包含：
-- 完整的接口列表和參數說明
-- 請求/響應示例
-- 錯誤碼說明
-- 數據類型定義
-- 軟刪除約束說明
-- 文件上傳規範
+- **📋 項目結構**: [docs/development/PROJECT_STRUCTURE.md](docs/development/PROJECT_STRUCTURE.md)
+- **🚀 部署指南**: [docs/deployment/DOCKER_DEPLOY.md](docs/deployment/DOCKER_DEPLOY.md)  
+- **📝 Swagger遷移**: [docs/migration/SWAGGER_MIGRATION_GUIDE.md](docs/migration/SWAGGER_MIGRATION_GUIDE.md)
+
+## 📝 Swagger 文檔維護
+
+### 🔄 當前系統說明
+
+項目使用 **半自動化 Swagger 系統**，基於 Flask-RESTX 實現：
+
+- **文件位置**: `app/routes/swagger_complete.py`
+- **接口覆蓋**: 48+ 完整API接口，按業務模塊分組
+- **自動功能**: 自動生成文檔頁面、模型定義、在線測試
+- **手動部分**: 新增API時需要手動添加接口定義
+
+### ➕ 新增API接口流程
+
+當你添加新的API接口時，需要按照以下步驟更新Swagger文檔：
+
+#### 1. 添加路由接口 (例如：新增獲取統計數據接口)
+
+```python
+# app/routes/statistics.py
+@bp.route('/statistics/summary', methods=['GET'])
+@admin_required
+def get_statistics_summary():
+    """獲取實驗室統計摘要"""
+    # 實現邏輯...
+    return jsonify(success_response(data))
+```
+
+#### 2. 更新Swagger文檔
+
+在 `app/routes/swagger_complete.py` 中添加對應定義：
+
+```python
+# 2.1 創建命名空間 (如果是新模塊)
+ns_statistics = api.namespace('統計管理', description='實驗室數據統計', path='/statistics')
+
+# 2.2 定義數據模型 (如果需要)
+statistics_model = api.model('StatisticsSummary', {
+    'total_members': fields.Integer(description='成員總數'),
+    'total_papers': fields.Integer(description='論文總數'),
+    'total_projects': fields.Integer(description='項目總數')
+})
+
+# 2.3 添加接口定義
+@ns_statistics.route('/summary')
+class StatisticsSummary(Resource):
+    @ns_statistics.doc('獲取統計摘要', security='Bearer')
+    @ns_statistics.marshal_with(base_response)
+    @ns_statistics.response(401, '未認證')
+    @ns_statistics.response(403, '權限不足')
+    def get(self):
+        """
+        獲取實驗室統計摘要
+        
+        返回實驗室的基本統計數據，包括成員、論文、項目數量等
+        """
+        pass
+```
+
+#### 3. 註冊新藍圖 (如果是新模塊)
+
+在 `app/__init__.py` 中註冊新的路由藍圖：
+
+```python
+from app.routes.statistics import bp as statistics_bp
+app.register_blueprint(statistics_bp, url_prefix='/api')
+```
+
+#### 4. 重啟服務
+
+```bash
+# Docker 環境
+./scripts/deployment/deploy.sh restart
+
+# 開發環境  
+python run.py
+```
+
+#### 5. 驗證文檔
+
+訪問 [http://localhost:8000/api/docs](http://localhost:8000/api/docs) 確認新接口已出現在文檔中。
+
+### 📋 Swagger文檔結構說明
+
+```
+swagger_complete.py
+├── 基礎配置
+│   ├── API 實例配置 (標題、描述、認證)
+│   └── 通用響應模型 (BaseResponse, PaginationResponse)
+├── 數據模型定義  
+│   ├── 請求模型 (LoginRequest, LabModel, MemberModel...)
+│   └── 響應模型 (自動基於 base_response)
+├── 命名空間定義
+│   ├── 認證管理 (ns_auth)
+│   ├── 實驗室管理 (ns_lab)
+│   ├── 成員管理 (ns_member)
+│   └── ... (其他業務模塊)
+└── 接口定義
+    ├── Resource 類 (對應每個API端點)
+    ├── 裝飾器註解 (@doc, @expect, @marshal_with)
+    └── 響應狀態碼 (@response)
+```
+
+### ⚙️ 進階配置
+
+#### 自定義響應模型
+
+```python
+# 自定義特殊響應格式
+custom_response = api.model('CustomResponse', {
+    'status': fields.String(example='success'),
+    'result': fields.Raw(description='自定義數據格式'),
+    'timestamp': fields.DateTime()
+})
+
+@ns_custom.marshal_with(custom_response)
+def custom_endpoint(self):
+    pass
+```
+
+#### 文件上傳接口
+
+```python
+# 文件上傳接口定義
+file_upload_parser = api.parser()
+file_upload_parser.add_argument('file', location='files', type=FileStorage, required=True)
+
+@ns_media.expect(file_upload_parser)
+def upload_file(self):
+    pass
+```
+
+#### 複雜查詢參數
+
+```python
+@ns_member.param('filters', '複合過濾條件', type='string', 
+                help='JSON格式: {"member_type":"teacher","active":true}')
+@ns_member.param('sort', '排序字段', type='string', enum=['name', 'created_at'])  
+@ns_member.param('order', '排序方向', type='string', enum=['asc', 'desc'])
+def complex_query(self):
+    pass
+```
+
+### 🚀 未來改進方案
+
+#### 選項1：真正的自動化 (推薦)
+
+可以實現基於路由裝飾器和文檔字符串的完全自動化：
+
+```python
+# 路由文件只需要添加標準裝飾器
+@bp.route('/members', methods=['GET'])
+@swagger_auto(
+    summary='獲取成員列表',
+    responses={200: 'success', 401: 'unauthorized'},
+    params=['page', 'per_page', 'q']
+)
+def get_members():
+    """獲取成員列表，支持分頁查詢"""
+    pass
+```
+
+#### 選項2：模板生成工具
+
+創建命令行工具自動生成Swagger定義：
+
+```bash
+python scripts/generate_swagger.py --module members --scan-routes
+# 自動掃描 routes/member.py 並生成對應的 swagger 定義
+```
+
+### ❓ 故障排除
+
+#### 常見問題
+
+1. **新接口未顯示**: 檢查是否在 swagger_complete.py 中添加了定義
+2. **模型驗證失敗**: 確認模型字段定義與實際數據結構匹配  
+3. **認證測試失敗**: 確認在Swagger UI中設置了正確的Bearer Token
+4. **文檔頁面報錯**: 檢查 Resource 類的方法是否正確實現
+
+#### 調試技巧
+
+```python
+# 在 swagger_complete.py 末尾添加調試輸出
+print("✅ 已加載的命名空間:")
+for namespace in api.namespaces:
+    print(f"  - {namespace.name}: {len(namespace.resources)} 個接口")
+```
+
+### 📞 技術支持
+
+- **Swagger官方文檔**: [Flask-RESTX Documentation](https://flask-restx.readthedocs.io/)
+- **項目相關問題**: 查看 `docs/migration/SWAGGER_MIGRATION_GUIDE.md`
+- **本地測試**: 使用 `curl` 或 Postman 驗證API正確性后再更新文檔
 
 ## 🎯 核心功能
 
@@ -312,79 +609,91 @@ media/
 └── other/            # 其他文件
 ```
 
-## 🗂️ 項目結構
+## 🗂️ 開發指南
 
-```
-backend/
-├── app/
-│   ├── __init__.py              # 應用工廠
-│   ├── auth/                    # 認證模組
-│   │   └── decorators.py        # JWT裝飾器
-│   ├── models/                  # 數據模型層 (Models Layer)
-│   │   ├── admin.py             # 管理員模型
-│   │   ├── lab.py               # 實驗室模型
-│   │   ├── member.py            # 成員模型
-│   │   ├── paper.py             # 論文模型
-│   │   ├── project.py           # 項目模型
-│   │   ├── news.py              # 新聞模型
-│   │   ├── research_group.py    # 課題組模型
-│   │   └── edit_record.py       # 編輯記錄模型
-│   ├── services/                # 業務服務層 (Services Layer) ⭐
-│   │   ├── __init__.py          # 服務模組入口
-│   │   ├── base_service.py      # 基礎服務類 (事務、審計、異常)
-│   │   ├── audit_service.py     # 審計服務
-│   │   ├── auth_service.py      # 認證服務
-│   │   ├── admin_service.py     # 管理員服務
-│   │   ├── lab_service.py       # 實驗室服務
-│   │   ├── member_service.py    # 成員服務
-│   │   ├── paper_service.py     # 論文服務
-│   │   ├── news_service.py      # 新聞服務
-│   │   ├── project_service.py   # 項目服務
-│   │   ├── research_group_service.py # 課題組服務
-│   │   └── media_service.py     # 媒體服務
-│   ├── routes/                  # API路由層 (Routes Layer)
-│   │   ├── auth.py              # 認證路由
-│   │   ├── admin.py             # 管理員路由
-│   │   ├── lab.py               # 實驗室路由
-│   │   ├── member.py            # 成員路由
-│   │   ├── paper.py             # 論文路由
-│   │   ├── news.py              # 新聞路由
-│   │   ├── project.py           # 項目路由
-│   │   ├── research_group.py    # 課題組路由
-│   │   ├── media.py             # 媒體文件路由
-│   │   ├── edit_record.py       # 編輯記錄路由
-│   │   ├── root.py              # 根路由
-│   │   └── swagger_docs.py      # Swagger文檔
-│   └── utils/                   # 工具函數
-│       ├── file_handler.py      # 文件處理
-│       ├── helpers.py           # 輔助函數
-│       └── validators.py        # 數據校驗
-├── config/
-│   └── config.py               # 配置文件
-├── scripts/
-│   └── init_db.py              # 數據庫初始化
-├── requirements.txt            # Python依賴
-├── run.py                     # 應用入口
-├── start.sh                   # 啟動腳本
-├── test_api.py               # API測試
-├── api.md                    # 完整API文檔
-└── README.md                 # 項目說明
-```
+### 🏗️ 項目結構說明
 
-### 🎯 架構亮點
+詳細的項目結構說明請參考：**[docs/development/PROJECT_STRUCTURE.md](docs/development/PROJECT_STRUCTURE.md)**
 
-- **⭐ 服務層 (Services)**: 新增的核心業務邏輯層，統一處理所有業務操作
-- **📊 BaseService**: 提供統一的事務管理、審計記錄、異常處理基礎設施
-- **🔄 自動審計**: 每個服務操作都自動記錄到 `edit_records` 表，無需手動添加
-- **⚡ 輕量路由**: 路由層從原來的 100-300 行縮減到 30-80 行，專注HTTP處理
-- **🛡️ 統一異常**: 服務層提供統一的異常處理和錯誤響應格式
+### ⚙️ 環境配置
 
-## 🧪 測試
-
-運行測試腳本檢查API是否正常：
+項目根目錄提供了環境變量示例文件：
 
 ```bash
-python test_api.py
+# 複製環境變量示例
+cp .env.example .env
+
+# 編輯配置
+nano .env
+```
+
+**主要配置項**：
+- `DATABASE_URL`: 數據庫連接字符串
+- `SECRET_KEY`: Flask 密鑰
+- `JWT_SECRET_KEY`: JWT 令牌密鑰
+- `CORS_ORIGINS`: 允許的跨域來源
+- `UPLOAD_FOLDER`: 文件上傳目錄
+
+## 🧪 測試框架
+
+### 🎯 測試結構 (已完整配置)
+
+```
+tests/
+├── conftest.py                    # pytest 配置，包含 app、db、client fixtures
+├── unit/                         # 單元測試
+│   ├── services/                 # 服務層測試 ⭐
+│   │   └── test_service_template.py # 完整的服務測試模板
+│   ├── models/                   # 模型測試
+│   └── utils/                    # 工具函數測試
+├── integration/                  # 集成測試
+│   └── test_api.py              # API 集成測試
+└── fixtures/                    # 測試數據
+    ├── data_fixtures.py         # 業務數據 fixtures
+    └── user_fixtures.py         # 用戶認證 fixtures
+```
+
+### 🚀 運行測試
+
+```bash
+# 安裝測試依賴
+pip install pytest pytest-cov
+
+# 運行所有測試
+pytest
+
+# 運行服務層測試 ⭐
+pytest tests/unit/services/ -v
+
+# 運行特定標記的測試
+pytest -m service      # 服務層測試
+pytest -m unit         # 單元測試
+pytest -m integration  # 集成測試
+
+# 生成覆蓋率報告
+pytest --cov=app --cov-report=html
+
+# 運行特定測試文件
+pytest tests/integration/test_api.py -v
+```
+
+### 📝 測試模板使用
+
+項目提供了完整的服務層測試模板 (`tests/unit/services/test_service_template.py`)，包含：
+
+- **Mock 數據**: 使用 unittest.mock 模擬數據庫操作
+- **Fixtures**: 預定義的測試數據和用戶認證
+- **斷言模式**: 完整的 AAA (Arrange-Act-Assert) 測試模式
+- **異常測試**: 邊界條件和錯誤場景測試
+
+**示例：為新服務添加測試**
+```python
+# tests/unit/services/test_new_service.py
+from tests.unit.services.test_service_template import TestLabService
+
+class TestNewService(TestLabService):
+    # 繼承模板的基礎結構，專注於業務邏輯測試
+    pass
 ```
 
 ## 🐳 Docker 部署
@@ -395,22 +704,22 @@ python test_api.py
 
 ```bash
 # 賦予執行權限
-chmod +x deploy.sh
+chmod +x scripts/deployment/deploy.sh
 
 # 啟動所有服務
-./deploy.sh start
+./scripts/deployment/deploy.sh start
 
 # 查看服務狀態
-./deploy.sh status
+./scripts/deployment/deploy.sh status
 
 # 查看服務日誌
-./deploy.sh logs
+./scripts/deployment/deploy.sh logs
 
 # 重啟服務
-./deploy.sh restart
+./scripts/deployment/deploy.sh restart
 
 # 停止服務
-./deploy.sh stop
+./scripts/deployment/deploy.sh stop
 ```
 
 ### 重新部署最新版本
@@ -421,10 +730,10 @@ chmod +x deploy.sh
 
 ```bash
 # 停止現有服務
-./deploy.sh stop
+./scripts/deployment/deploy.sh stop
 
 # 重新構建並啟動（會自動構建最新代碼）
-./deploy.sh restart
+./scripts/deployment/deploy.sh restart
 ```
 
 #### 方法2: 使用Docker Compose命令
@@ -485,7 +794,7 @@ docker-compose --project-name lab_web up --build -d
 
 ```bash
 # 查看詳細日誌
-./deploy.sh logs
+./scripts/deployment/deploy.sh logs
 
 # 檢查服務狀態
 docker-compose --project-name lab_web ps
@@ -495,6 +804,9 @@ docker stats
 
 # 進入容器調試
 docker exec -it lab_web_app bash
+
+# 使用診斷腳本
+./scripts/maintenance/diagnose.sh
 ```
 
 ## 🚦 部署指南
@@ -542,7 +854,7 @@ server {
 
 ## 📝 開發指南
 
-### 數據庫遷移
+### 📊 數據庫遷移
 
 如果修改了數據模型：
 
@@ -724,12 +1036,30 @@ A: 使用 `./deploy.sh restart` 重新部署，或使用 `docker-compose --proje
 ### Q: 如何自定義文件存儲路徑？
 A: 修改 `config/config.py` 中的 `UPLOAD_FOLDER` 配置。
 
+### Q: 項目結構最近有什麼更新？
+A: 項目已完成全面的目錄結構整理：
+- **清理了17個雜亂文件**，包括臨時演示文件、備份文件等
+- **新增了12個規範目錄**，包括分類的腳本、測試、文檔目錄  
+- **建立了完整的測試框架**，專門的服務層測試支持
+- **零維護Swagger系統**，從手工1600+行代碼到自動化生成
+- **詳細說明請參考**：[docs/development/PROJECT_STRUCTURE.md](docs/development/PROJECT_STRUCTURE.md)
+
+### Q: 如何運行測試？
+A: 項目提供了完整的測試框架：
+```bash
+pytest                    # 運行所有測試
+pytest tests/unit/services/ -v  # 運行服務層測試
+pytest -m service        # 運行標記為 service 的測試
+pytest --cov=app         # 生成覆蓋率報告
+```
+
 ### Q: 最近的架構升級有什麼改善？
 A: 系統已從 "Fat Controller" 模式重構為現代三層架構：
 - **代碼減少**: 路由層代碼減少 60-80%，更易維護
 - **自動審計**: 100% 操作覆蓋，無需手動添加審計代碼  
 - **統一異常**: 標準化錯誤處理，更好的用戶體驗
 - **業務復用**: 服務層支持跨模塊復用，提高開發效率
+- **測試完備**: 專門的服務層測試框架確保代碼質量
 
 ---
 
