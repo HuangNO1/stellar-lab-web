@@ -339,6 +339,7 @@ onMounted(() => {
 <style scoped>
 .paper-view {
   padding: 1.5rem;
+  min-width: 60rem;
   max-width: 87.5rem;
   margin: 0 auto;
 }
@@ -573,6 +574,7 @@ onMounted(() => {
 @media (max-width: 48rem) {
   .paper-view {
     padding: 1rem;
+    min-width: unset;
   }
   
   .page-title {
