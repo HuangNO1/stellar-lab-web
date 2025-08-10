@@ -634,16 +634,21 @@ nano .env
 - `CORS_ORIGINS`: 允許的跨域來源
 - `UPLOAD_FOLDER`: 文件上傳目錄
 
-## 🧪 測試框架
+## 🧪 測試框架 (完整配置)
 
-### 🎯 測試結構 (已完整配置)
+### 🎯 測試結構說明
 
 ```
 tests/
-├── conftest.py                    # pytest 配置，包含 app、db、client fixtures
+├── conftest.py                    # 全局 pytest 配置，包含 app、db、client fixtures
+├── pytest.ini                    # pytest 配置文件，設置測試路徑和選項
 ├── unit/                         # 單元測試
-│   ├── services/                 # 服務層測試 ⭐
-│   │   └── test_service_template.py # 完整的服務測試模板
+│   ├── services/                 # 服務層測試 ⭐⭐⭐
+│   │   ├── conftest.py           # 服務層專用配置（解決 PyCharm 路徑問題）
+│   │   ├── test_auth_service.py  # 認證服務測試（已修復）
+│   │   ├── test_admin_service.py # 管理員服務測試
+│   │   ├── test_lab_service.py   # 實驗室服務測試
+│   │   └── ...                   # 其他服務測試
 │   ├── models/                   # 模型測試
 │   └── utils/                    # 工具函數測試
 ├── integration/                  # 集成測試
@@ -653,17 +658,25 @@ tests/
     └── user_fixtures.py         # 用戶認證 fixtures
 ```
 
-### 🚀 運行測試
+### 🚀 多種運行方式
+
+#### 1. 命令行運行（推薦）
 
 ```bash
 # 安裝測試依賴
-pip install pytest pytest-cov
+pip install pytest pytest-cov pytest-xdist
 
 # 運行所有測試
 pytest
 
 # 運行服務層測試 ⭐
 pytest tests/unit/services/ -v
+
+# 使用腳本運行（提供豐富選項）
+./scripts/development/run_service_tests.sh -a -v    # 運行所有服務測試，詳細輸出
+./scripts/development/run_service_tests.sh -s auth  # 只運行 auth 服務測試
+./scripts/development/run_service_tests.sh -c       # 運行測試並顯示覆蓋率
+./scripts/development/run_service_tests.sh -f       # 並行快速運行
 
 # 運行特定標記的測試
 pytest -m service      # 服務層測試
@@ -672,28 +685,382 @@ pytest -m integration  # 集成測試
 
 # 生成覆蓋率報告
 pytest --cov=app --cov-report=html
-
-# 運行特定測試文件
-pytest tests/integration/test_api.py -v
+pytest tests/unit/services/ --cov=app/services --cov-report=term-missing
 ```
 
-### 📝 測試模板使用
+#### 2. PyCharm 集成運行
 
-項目提供了完整的服務層測試模板 (`tests/unit/services/test_service_template.py`)，包含：
+**✅ 已解決 PyCharm 批量運行問題**：
+- 可以右鍵 `tests/unit/services` 目錄運行所有測試
+- 可以單獨運行每個測試文件
+- 配置了專用的 `conftest.py` 解決路徑和導入問題
 
-- **Mock 數據**: 使用 unittest.mock 模擬數據庫操作
-- **Fixtures**: 預定義的測試數據和用戶認證
-- **斷言模式**: 完整的 AAA (Arrange-Act-Assert) 測試模式
-- **異常測試**: 邊界條件和錯誤場景測試
+#### 3. IDE 其他選項
 
-**示例：為新服務添加測試**
+```bash
+# VS Code
+pytest tests/unit/services/test_auth_service.py::TestAuthService::test_login_success
+
+# 終端直接運行
+cd tests/unit/services && python -m pytest test_auth_service.py -v
+```
+
+### 📝 單元測試編寫規範與注意事項
+
+#### 🎯 測試文件結構規範
+
+每個服務測試文件應遵循以下結構：
+
 ```python
-# tests/unit/services/test_new_service.py
-from tests.unit.services.test_service_template import TestLabService
+"""
+AuthService 測試用例
+測試管理員認證相關的服務層邏輯
+"""
 
-class TestNewService(TestLabService):
-    # 繼承模板的基礎結構，專注於業務邏輯測試
+import pytest
+from unittest.mock import Mock, patch
+from app.services.auth_service import AuthService
+from app.services.base_service import ValidationError, NotFoundError, PermissionError
+
+
+class TestAuthService:
+    """認證服務層測試"""
+    
+    @pytest.fixture
+    def auth_service(self, app):
+        """創建認證服務實例 - 必須使用 app 上下文"""
+        with app.app_context():
+            return AuthService()
+    
+    @pytest.fixture
+    def mock_data(self):
+        """模擬測試數據"""
+        return {
+            'admin_id': 1,
+            'admin_name': 'test_admin'
+        }
+    
+    @pytest.mark.unit
+    @pytest.mark.service
+    def test_success_scenario(self, auth_service, mock_data):
+        """測試成功場景"""
+        # Arrange (準備階段)
+        # Act (執行階段)  
+        # Assert (斷言階段)
+        pass
+```
+
+#### 🔥 關鍵編寫注意事項
+
+##### 1. **Service Fixture 必須使用 App Context**
+
+```python
+# ❌ 錯誤寫法 - 會導致 Flask 上下文錯誤
+@pytest.fixture
+def auth_service(self):
+    return AuthService()
+
+# ✅ 正確寫法 - 使用 app 上下文
+@pytest.fixture
+def auth_service(self, app):
+    with app.app_context():
+        return AuthService()
+```
+
+**原因**: 服務類在初始化時可能需要訪問 Flask 應用配置、數據庫連接等資源。
+
+##### 2. **正確 Mock 實際調用的方法**
+
+```python
+# ❌ 錯誤 - Mock 了不存在的函數
+with patch('app.services.auth_service.check_password_hash') as mock_check:
+    mock_check.return_value = True
+
+# ✅ 正確 - Mock 實際調用的 admin.check_password 方法
+mock_admin.check_password.return_value = True
+```
+
+**重要**: 必須查看實際服務代碼，確認要 mock 的方法名稱和調用方式。
+
+##### 3. **異常測試的正確寫法**
+
+```python
+# ✅ 正確的異常測試
+def test_login_wrong_password(self, auth_service):
+    """測試密碼錯誤場景"""
+    # Arrange
+    mock_admin = Mock()
+    mock_admin.enable = 1
+    mock_admin.check_password.return_value = False  # 密碼驗證失敗
+    
+    with patch('app.services.auth_service.Admin') as MockAdmin:
+        MockAdmin.query.filter_by.return_value.first.return_value = mock_admin
+        
+        # Act & Assert
+        with pytest.raises(PermissionError) as exc_info:
+            auth_service.login('test_user', 'wrong_password')
+        
+        assert '密碼錯誤' in str(exc_info.value)
+        mock_admin.check_password.assert_called_once_with('wrong_password')
+```
+
+##### 4. **Mock 層次結構理解**
+
+```python
+# 理解 Mock 的鏈式調用
+with patch('app.services.auth_service.Admin') as MockAdmin:
+    # MockAdmin 是整個 Admin 類的 Mock
+    # MockAdmin.query 是查詢構建器的 Mock
+    # MockAdmin.query.filter_by() 是過濾後的查詢 Mock  
+    # MockAdmin.query.filter_by().first() 是最終結果的 Mock
+    MockAdmin.query.filter_by.return_value.first.return_value = mock_admin_instance
+```
+
+##### 5. **測試標記的使用**
+
+```python
+@pytest.mark.unit        # 標記為單元測試
+@pytest.mark.service     # 標記為服務層測試
+@pytest.mark.auth        # 標記為認證相關測試（可選）
+def test_method(self):
     pass
+```
+
+**用途**: 可以通過標記選擇性運行測試：`pytest -m "service and auth"`
+
+#### 📋 完整的測試用例模板
+
+```python
+"""
+NewService 測試用例
+描述這個服務的測試目標
+"""
+
+import pytest
+from unittest.mock import Mock, patch
+from app.services.new_service import NewService
+from app.services.base_service import ValidationError, NotFoundError, PermissionError
+
+
+class TestNewService:
+    """新服務測試類"""
+    
+    @pytest.fixture
+    def service(self, app):
+        """創建服務實例 - 必須使用 app 上下文"""
+        with app.app_context():
+            return NewService()
+    
+    @pytest.fixture
+    def valid_data(self):
+        """有效的測試數據"""
+        return {
+            'name': 'Test Item',
+            'description': 'Test Description'
+        }
+    
+    @pytest.fixture  
+    def mock_model_instance(self, valid_data):
+        """模擬模型實例"""
+        mock = Mock()
+        mock.to_dict.return_value = valid_data
+        mock.id = 1
+        return mock
+
+    # 成功場景測試
+    @pytest.mark.unit
+    @pytest.mark.service
+    def test_create_success(self, service, valid_data, mock_model_instance):
+        """測試創建成功場景"""
+        # Arrange
+        with patch.object(service, 'execute_with_audit') as mock_audit:
+            mock_audit.return_value = valid_data
+            
+            # Act
+            result = service.create_item(valid_data)
+            
+            # Assert
+            assert result['name'] == valid_data['name']
+            mock_audit.assert_called_once()
+
+    # 驗證錯誤測試
+    @pytest.mark.unit
+    @pytest.mark.service
+    def test_create_validation_error(self, service):
+        """測試數據驗證失敗"""
+        # Arrange
+        invalid_data = {}  # 缺少必填字段
+        
+        # Act & Assert
+        with pytest.raises(ValidationError) as exc_info:
+            service.create_item(invalid_data)
+        
+        assert '必填字段' in str(exc_info.value)
+
+    # 權限測試
+    @pytest.mark.unit
+    @pytest.mark.service  
+    def test_create_permission_denied(self, service, valid_data):
+        """測試權限不足場景"""
+        # Arrange
+        with patch.object(service, 'validate_permissions') as mock_validate:
+            mock_validate.side_effect = PermissionError('權限不足')
+            
+            # Act & Assert
+            with pytest.raises(PermissionError):
+                service.create_item(valid_data)
+
+    # 邊界條件測試
+    @pytest.mark.unit
+    @pytest.mark.service
+    def test_create_empty_name(self, service):
+        """測試空名稱邊界條件"""
+        # Arrange
+        data = {'name': '', 'description': 'test'}
+        
+        # Act & Assert
+        with pytest.raises(ValidationError):
+            service.create_item(data)
+
+    # Mock 數據庫操作測試
+    @pytest.mark.unit
+    @pytest.mark.service
+    def test_get_by_id_success(self, service, mock_model_instance):
+        """測試按ID查詢成功"""
+        # Arrange
+        with patch('app.services.new_service.NewModel') as MockModel:
+            MockModel.query.get.return_value = mock_model_instance
+            
+            # Act
+            result = service.get_by_id(1)
+            
+            # Assert
+            assert result is not None
+            assert result['id'] == 1
+            MockModel.query.get.assert_called_once_with(1)
+
+    @pytest.mark.unit
+    @pytest.mark.service
+    def test_get_by_id_not_found(self, service):
+        """測試查詢不存在的記錄"""
+        # Arrange
+        with patch('app.services.new_service.NewModel') as MockModel:
+            MockModel.query.get.return_value = None
+            
+            # Act & Assert
+            with pytest.raises(NotFoundError):
+                service.get_by_id(999)
+```
+
+#### ⚠️ 常見錯誤和解決方案
+
+##### 1. **Flask 上下文錯誤**
+```
+RuntimeError: Working outside of application context
+```
+
+**解決**: 確保服務 fixture 使用 `app.app_context()`
+
+##### 2. **Mock 對象調用錯誤**
+```
+AttributeError: Mock object has no attribute 'some_method'
+```
+
+**解決**: 檢查實際服務代碼，確認 mock 的方法名稱正確
+
+##### 3. **導入錯誤**  
+```
+ModuleNotFoundError: No module named 'app'
+```
+
+**解決**: 確保從項目根目錄運行測試，或使用配置好的 PyCharm
+
+##### 4. **測試隔離問題**
+
+**解決**: 使用正確的 fixture 作用域，避免測試之間的狀態污染
+
+##### 5. **數據庫連接問題**
+
+**解決**: 測試使用內存 SQLite，配置在 `conftest.py` 中
+
+#### 🎯 測試覆蓋率目標
+
+- **服務層測試**: 目標 90%+ 代碼覆蓋率
+- **關鍵路徑**: 100% 覆蓋（認證、權限、核心業務邏輯）
+- **異常場景**: 必須測試所有自定義異常類型
+
+```bash
+# 檢查服務層覆蓋率
+pytest tests/unit/services/ --cov=app/services --cov-report=term-missing
+```
+
+#### 📊 測試分類說明
+
+| 測試類型 | 標記 | 用途 | 示例 |
+|---------|------|------|------|
+| 單元測試 | `@pytest.mark.unit` | 測試單個函數/方法 | 服務方法測試 |
+| 集成測試 | `@pytest.mark.integration` | 測試模塊間交互 | API端到端測試 |
+| 服務層測試 | `@pytest.mark.service` | 測試業務邏輯 | 服務類測試 |
+| 慢速測試 | `@pytest.mark.slow` | 耗時較長的測試 | 數據庫操作測試 |
+
+#### 🔧 調試測試技巧
+
+```bash
+# 運行失敗的測試並顯示詳細輸出
+pytest tests/unit/services/test_auth_service.py::TestAuthService::test_login_success -v -s
+
+# 只運行上次失敗的測試
+pytest --lf
+
+# 在第一個失敗後停止
+pytest -x
+
+# 顯示本地變量
+pytest --tb=long
+
+# 進入調試模式  
+pytest --pdb
+```
+
+### 🛠️ 測試工具配置
+
+#### pytest.ini 配置說明
+
+```ini
+[tool:pytest]
+testpaths = tests           # 測試目錄
+python_files = test_*.py    # 測試文件模式
+python_classes = Test*      # 測試類模式  
+python_functions = test_*   # 測試函數模式
+addopts = -v --tb=short     # 默認選項
+markers =                   # 測試標記定義
+    unit: 單元測試
+    service: 服務層測試
+    integration: 集成測試
+```
+
+#### 測試腳本選項
+
+```bash
+# 腳本：./scripts/development/run_service_tests.sh
+Usage: ./run_service_tests.sh [選項]
+
+選項:
+  -h, --help           顯示幫助信息
+  -a, --all           運行所有服務層測試  
+  -s, --service NAME   運行指定服務的測試 (如: auth, admin, lab)
+  -c, --coverage      運行測試並生成覆蓋率報告
+  -v, --verbose       詳細輸出
+  -f, --fast          快速運行 (並行執行)
+  -d, --debug         調試模式 (顯示print輸出)
+  --failed-only       只運行上次失敗的測試
+  --html-report       生成HTML覆蓋率報告
+
+示例:
+  ./run_service_tests.sh -a                # 運行所有服務測試
+  ./run_service_tests.sh -s auth           # 只運行auth服務測試  
+  ./run_service_tests.sh -c -v             # 運行測試並顯示覆蓋率
+  ./run_service_tests.sh -f --html-report  # 並行運行並生成HTML報告
 ```
 
 ## 🐳 Docker 部署
