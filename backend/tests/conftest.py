@@ -16,11 +16,16 @@ sys.path.insert(0, str(project_root))
 @pytest.fixture
 def app():
     """創建測試應用實例"""
+    os.environ.setdefault('FLASK_ENV', 'testing')
+    
     from app import create_app
     
     app = create_app('testing')
-    app.config['TESTING'] = True
+    # Override with SQLite for testing
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    app.config['TESTING'] = True
+    app.config['WTF_CSRF_ENABLED'] = False
+    app.config['JWT_SECRET_KEY'] = 'test-secret-key'
     
     with app.app_context():
         from app import db
