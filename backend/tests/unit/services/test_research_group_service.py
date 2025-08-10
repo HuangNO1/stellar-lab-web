@@ -14,9 +14,10 @@ class TestResearchGroupService:
     """課題組服務層測試"""
     
     @pytest.fixture
-    def research_group_service(self):
+    def research_group_service(self, app):
         """創建課題組服務實例"""
-        return ResearchGroupService()
+        with app.app_context():
+            return ResearchGroupService()
     
     @pytest.fixture
     def mock_group_data(self):

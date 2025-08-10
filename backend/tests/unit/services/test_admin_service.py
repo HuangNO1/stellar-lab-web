@@ -13,9 +13,10 @@ class TestAdminService:
     """管理員服務層測試"""
     
     @pytest.fixture
-    def admin_service(self):
+    def admin_service(self, app):
         """創建管理員服務實例"""
-        return AdminService()
+        with app.app_context():
+            return AdminService()
     
     @pytest.fixture
     def mock_admin_data(self):

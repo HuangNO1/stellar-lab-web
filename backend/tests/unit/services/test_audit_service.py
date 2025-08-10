@@ -12,9 +12,10 @@ class TestAuditService:
     """審計服務層測試"""
     
     @pytest.fixture
-    def audit_service(self):
+    def audit_service(self, app):
         """創建審計服務實例"""
-        return AuditService()
+        with app.app_context():
+            return AuditService()
     
     @pytest.mark.unit
     @pytest.mark.service

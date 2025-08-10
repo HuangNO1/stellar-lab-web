@@ -13,9 +13,10 @@ class TestAuthService:
     """認證服務層測試"""
     
     @pytest.fixture
-    def auth_service(self):
+    def auth_service(self, app):
         """創建認證服務實例"""
-        return AuthService()
+        with app.app_context():
+            return AuthService()
     
     @pytest.fixture
     def mock_admin_data(self):
@@ -39,31 +40,29 @@ class TestAuthService:
         mock_admin.admin_pass = 'hashed_password'
         mock_admin.enable = 1
         mock_admin.is_super = 0
+        mock_admin.check_password.return_value = True  # Mock check_password method
         mock_admin.to_dict.return_value = mock_admin_data
         
         with patch('app.services.auth_service.Admin') as MockAdmin:
             MockAdmin.query.filter_by.return_value.first.return_value = mock_admin
             
-            with patch('app.services.auth_service.check_password_hash') as mock_check:
-                mock_check.return_value = True
+            with patch('app.services.auth_service.jwt.encode') as mock_jwt:
+                mock_jwt.return_value = 'mock_jwt_token'
                 
-                with patch('app.services.auth_service.jwt.encode') as mock_jwt:
-                    mock_jwt.return_value = 'mock_jwt_token'
+                with patch.object(auth_service, 'execute_with_audit') as mock_audit:
+                    mock_audit.return_value = {
+                        'access_token': 'Bearer mock_jwt_token',
+                        'expires_in': 86400,
+                        'admin': mock_admin_data
+                    }
                     
-                    with patch.object(auth_service, 'execute_with_audit') as mock_audit:
-                        mock_audit.return_value = {
-                            'access_token': 'Bearer mock_jwt_token',
-                            'expires_in': 86400,
-                            'admin': mock_admin_data
-                        }
-                        
-                        # Act
-                        result = auth_service.login('test_admin', 'test_password')
-                        
-                        # Assert
-                        assert 'access_token' in result
-                        assert result['admin'] == mock_admin_data
-                        mock_check.assert_called_once_with('hashed_password', 'test_password')
+                    # Act
+                    result = auth_service.login('test_admin', 'test_password')
+                    
+                    # Assert
+                    assert 'access_token' in result
+                    assert result['admin'] == mock_admin_data
+                    mock_admin.check_password.assert_called_once_with('test_password')
     
     @pytest.mark.unit
     @pytest.mark.service
@@ -119,18 +118,17 @@ class TestAuthService:
         mock_admin = Mock()
         mock_admin.enable = 1
         mock_admin.admin_pass = 'hashed_password'
+        mock_admin.check_password.return_value = False  # Mock check_password method
         
         with patch('app.services.auth_service.Admin') as MockAdmin:
             MockAdmin.query.filter_by.return_value.first.return_value = mock_admin
             
-            with patch('app.services.auth_service.check_password_hash') as mock_check:
-                mock_check.return_value = False
-                
-                # Act & Assert
-                with pytest.raises(PermissionError) as exc_info:
-                    auth_service.login('test_user', 'wrong_password')
-                
-                assert '密碼錯誤' in str(exc_info.value)
+            # Act & Assert
+            with pytest.raises(PermissionError) as exc_info:
+                auth_service.login('test_user', 'wrong_password')
+            
+            assert '密碼錯誤' in str(exc_info.value)
+            mock_admin.check_password.assert_called_once_with('wrong_password')
     
     @pytest.mark.unit
     @pytest.mark.service

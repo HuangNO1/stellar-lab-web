@@ -25,9 +25,10 @@ class TestBaseService:
     """基礎服務層測試"""
     
     @pytest.fixture
-    def base_service(self):
+    def base_service(self, app):
         """創建基礎服務實例"""
-        return MockBaseService()
+        with app.app_context():
+            return MockBaseService()
     
     @pytest.mark.unit
     @pytest.mark.service 
