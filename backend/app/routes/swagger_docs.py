@@ -437,6 +437,14 @@ def swagger_json():
                             "maximum": 100
                         },
                         {
+                            "name": "all",
+                            "in": "query",
+                            "type": "string",
+                            "description": "是否獲取所有數據 (設為 'true' 則忽略分頁參數)",
+                            "enum": ["true", "false"],
+                            "default": "false"
+                        },
+                        {
                             "name": "q", 
                             "in": "query", 
                             "type": "string", 
@@ -1466,6 +1474,128 @@ def swagger_json():
                             }
                         },
                         "500": {"description": "媒體服務不健康"}
+                    }
+                }
+            },
+            "/admins": {
+                "get": {
+                    "tags": ["管理員"],
+                    "summary": "獲取管理員列表",
+                    "security": [{"Bearer": []}],
+                    "parameters": [
+                        {
+                            "name": "page",
+                            "in": "query",
+                            "type": "integer",
+                            "description": "頁碼",
+                            "default": 1,
+                            "minimum": 1
+                        },
+                        {
+                            "name": "per_page",
+                            "in": "query",
+                            "type": "integer",
+                            "description": "每頁數量",
+                            "default": 10,
+                            "minimum": 1,
+                            "maximum": 100
+                        },
+                        {
+                            "name": "all",
+                            "in": "query",
+                            "type": "string",
+                            "description": "是否獲取所有數據 (設為 'true' 則忽略分頁參數)",
+                            "enum": ["true", "false"],
+                            "default": "false"
+                        },
+                        {
+                            "name": "q",
+                            "in": "query",
+                            "type": "string",
+                            "description": "搜索關鍵字",
+                            "example": "admin"
+                        }
+                    ],
+                    "responses": {
+                        "200": {"description": "成功獲取管理員列表"},
+                        "401": {"description": "未認證"},
+                        "403": {"description": "無權限（需要超級管理員）"}
+                    }
+                }
+            },
+            "/edit-records": {
+                "get": {
+                    "tags": ["編輯記錄"],
+                    "summary": "獲取編輯記錄列表",
+                    "security": [{"Bearer": []}],
+                    "parameters": [
+                        {
+                            "name": "page",
+                            "in": "query",
+                            "type": "integer",
+                            "description": "頁碼",
+                            "default": 1,
+                            "minimum": 1
+                        },
+                        {
+                            "name": "per_page",
+                            "in": "query",
+                            "type": "integer",
+                            "description": "每頁數量",
+                            "default": 10,
+                            "minimum": 1,
+                            "maximum": 100
+                        },
+                        {
+                            "name": "all",
+                            "in": "query",
+                            "type": "string",
+                            "description": "是否獲取所有數據 (設為 'true' 則忽略分頁參數)",
+                            "enum": ["true", "false"],
+                            "default": "false"
+                        },
+                        {
+                            "name": "admin_id",
+                            "in": "query",
+                            "type": "integer",
+                            "description": "管理員ID篩選",
+                            "example": 1
+                        },
+                        {
+                            "name": "edit_module",
+                            "in": "query",
+                            "type": "integer",
+                            "description": "操作模組篩選",
+                            "example": 3
+                        },
+                        {
+                            "name": "edit_type",
+                            "in": "query",
+                            "type": "string",
+                            "description": "操作類型篩選",
+                            "enum": ["CREATE", "UPDATE", "DELETE"],
+                            "example": "CREATE"
+                        },
+                        {
+                            "name": "start_date",
+                            "in": "query",
+                            "type": "string",
+                            "format": "date",
+                            "description": "開始日期",
+                            "example": "2024-01-01"
+                        },
+                        {
+                            "name": "end_date",
+                            "in": "query",
+                            "type": "string",
+                            "format": "date",
+                            "description": "結束日期",
+                            "example": "2024-12-31"
+                        }
+                    ],
+                    "responses": {
+                        "200": {"description": "成功獲取編輯記錄列表"},
+                        "401": {"description": "未認證"}
                     }
                 }
             }

@@ -62,7 +62,52 @@ Content-Type: application/json
 }
 ```
 
+### 分頁查詢說明
+
+**分頁參數**
+- `page`: 頁碼，從 1 開始
+- `per_page`: 每頁數量，默認 10，最大 100
+- `all`: 設為 `true` 時忽略分頁參數，返回所有數據
+
+**參數優先級策略**
+
+當多個參數同時存在時，遵循以下優先級順序：
+
+1. **`all=true`** - 最高優先級，返回所有數據
+2. **`all=false` 或未設置** - 使用標準分頁邏輯
+3. **`page` 和 `per_page`** - 在分頁模式下生效
+
+**參數組合行為表**
+
+| 參數組合 | 實際行為 | 說明 |
+|---------|---------|------|
+| `?all=true` | 返回所有數據 | 忽略其他參數 |
+| `?all=true&page=2&per_page=5` | 返回所有數據 | `all=true` 優先，忽略分頁參數 |
+| `?all=false&page=2&per_page=5` | 返回第2頁，每頁5條 | 使用指定的分頁參數 |
+| `?page=2&per_page=5` | 返回第2頁，每頁5條 | 默認分頁模式 |
+| `?all=false` | 返回第1頁，每頁10條 | 使用默認分頁參數 |
+| 無參數 | 返回第1頁，每頁10條 | 使用默認分頁參數 |
+
+**使用示例**
+```bash
+# 標準分頁查詢
+GET /api/members?page=1&per_page=20
+
+# 獲取所有數據（推薦）
+GET /api/members?all=true
+
+# 混合參數（all=true 生效，忽略分頁參數）
+GET /api/members?all=true&page=2&per_page=5
+# 結果：返回所有數據
+
+# 明確禁用 all 參數
+GET /api/members?all=false&page=2&per_page=5
+# 結果：返回第2頁，每頁5條數據
+```
+
 ### 分頁響應格式
+
+**標準分頁響應**
 ```json
 {
   "code": 0,
@@ -77,6 +122,21 @@ Content-Type: application/json
     "pages": 10,
     "has_prev": false,
     "has_next": true
+  }
+}
+```
+
+**獲取所有數據響應**（當 `all=true` 時）
+```json
+{
+  "code": 0,
+  "message": "OK",
+  "data": {
+    "items": [
+      // 所有數據列表
+    ],
+    "total": 100,
+    "all": true
   }
 }
 ```
@@ -278,6 +338,7 @@ Authorization: Bearer <token> (需要超級管理員權限)
 | show_all | boolean | - | 是否顯示已刪除（默認false） | true |
 | page | integer | - | 頁碼（默認1） | 1 |
 | per_page | integer | - | 每頁數量（默認10，最大100） | 10 |
+| all | string | - | 獲取所有數據（設為 'true' 時忽略分頁參數） | true |
 
 **響應範例**
 ```json
@@ -475,6 +536,7 @@ GET /api/research-groups
 | show_all | boolean | - | 是否顯示已刪除 | false |
 | page | integer | - | 頁碼（默認1） | 1 |
 | per_page | integer | - | 每頁數量（默認10） | 10 |
+| all | string | - | 獲取所有數據（設為 'true' 時忽略分頁參數） | true |
 
 **響應範例**
 ```json
@@ -610,6 +672,7 @@ GET /api/members
 | order | string | - | 排序順序（asc/desc） | asc |
 | page | integer | - | 頁碼 | 1 |
 | per_page | integer | - | 每頁數量 | 10 |
+| all | string | - | 獲取所有數據（設為 'true' 時忽略分頁參數） | true |
 
 **響應範例**
 ```json
@@ -799,6 +862,7 @@ GET /api/papers
 | order | string | - | 排序順序（asc/desc） | desc |
 | page | integer | - | 頁碼 | 1 |
 | per_page | integer | - | 每頁數量 | 10 |
+| all | string | - | 獲取所有數據（設為 'true' 時忽略分頁參數） | true |
 
 **響應範例**
 ```json
@@ -986,6 +1050,7 @@ GET /api/news
 | show_all | boolean | - | 是否顯示已刪除 | false |
 | page | integer | - | 頁碼 | 1 |
 | per_page | integer | - | 每頁數量 | 10 |
+| all | string | - | 獲取所有數據（設為 'true' 時忽略分頁參數） | true |
 
 **響應範例**
 ```json
@@ -1111,6 +1176,7 @@ GET /api/projects
 | order | string | - | 排序順序（asc/desc） | desc |
 | page | integer | - | 頁碼 | 1 |
 | per_page | integer | - | 每頁數量 | 10 |
+| all | string | - | 獲取所有數據（設為 'true' 時忽略分頁參數） | true |
 
 **響應範例**
 ```json
@@ -1345,6 +1411,7 @@ Authorization: Bearer <token>
 | end_date | string | - | 結束日期 | 2024-12-31 |
 | page | integer | - | 頁碼 | 1 |
 | per_page | integer | - | 每頁數量 | 10 |
+| all | string | - | 獲取所有數據（設為 'true' 時忽略分頁參數） | true |
 
 **響應範例**
 ```json
