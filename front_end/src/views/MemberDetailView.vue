@@ -43,9 +43,9 @@
 
     <!-- 成員詳情 -->
     <div v-else-if="member" class="member-detail-content">
-      <n-grid :x-gap="24" :y-gap="24" cols="1 800:2">
+      <div class="member-layout">
         <!-- 左側：頭像 -->
-        <n-grid-item class="avatar-section">
+        <div class="avatar-section">
           <div class="member-avatar-container">
             <n-avatar
               :size="200"
@@ -54,48 +54,48 @@
               class="member-avatar"
             />
           </div>
-        </n-grid-item>
+        </div>
 
         <!-- 右側：詳細信息 -->
-        <n-grid-item class="info-section">
+        <div class="info-section">
           <div class="member-info-container">
             <!-- 姓名和職位 -->
             <h1 class="member-name">
               {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
             </h1>
-            
-            <div class="member-position">
-              {{ getMemberPosition(member, getCurrentLocale()) }}
-            </div>
-
-            <!-- 聯繫方式 -->
-            <div v-if="member.mem_email" class="contact-info">
-              <n-icon size="16" class="contact-icon">
-                <svg viewBox="0 0 24 24">
-                  <path fill="currentColor" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                </svg>
-              </n-icon>
-              <span>{{ member.mem_email }}</span>
-            </div>
-
-            <!-- 所屬課題組 -->
-            <div v-if="researchGroup" class="research-group" @click="toResearchGroup">
-              <n-icon size="16" class="contact-icon">
-                <svg viewBox="0 0 24 24">
-                  <path fill="currentColor" d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2M4 1v6h6V5.5l6 6v-2.84c-.94-.18-2-.76-2-1.66s1.06-1.48 2-1.66V1H4zm14.5 17.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5"/>
-                </svg>
-              </n-icon>
-              <span class="group-link">{{ getResearchGroupName() }}</span>
-            </div>
-
-            <!-- 個人描述 -->
-            <div v-if="member.mem_desc_zh || member.mem_desc_en" class="member-description">
-              <h3>{{ $t('members.description') }}</h3>
-              <div class="description-content" v-html="getMemberDescription()"></div>
-            </div>
+          
+          <div class="member-position">
+            {{ getMemberPosition(member, getCurrentLocale()) }}
           </div>
-        </n-grid-item>
-      </n-grid>
+
+          <!-- 聯繫方式 -->
+          <div v-if="member.mem_email" class="contact-info">
+            <n-icon size="16" class="contact-icon">
+              <svg viewBox="0 0 24 24">
+                <path fill="currentColor" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+              </svg>
+            </n-icon>
+            <span>{{ member.mem_email }}</span>
+          </div>
+
+          <!-- 所屬課題組 -->
+          <div v-if="researchGroup" class="research-group" @click="toResearchGroup">
+            <n-icon size="16" class="contact-icon">
+              <svg viewBox="0 0 24 24">
+                <path fill="currentColor" d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2M4 1v6h6V5.5l6 6v-2.84c-.94-.18-2-.76-2-1.66s1.06-1.48 2-1.66V1H4zm14.5 17.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5"/>
+              </svg>
+            </n-icon>
+            <span class="group-link">{{ getResearchGroupName() }}</span>
+          </div>
+
+          <!-- 個人描述 -->
+          <div v-if="member.mem_desc_zh || member.mem_desc_en" class="member-description">
+            <h3>{{ $t('members.description') }}</h3>
+            <div class="description-content" v-html="getMemberDescription()"></div>
+          </div>
+          </div>
+        </div>
+      </div>
 
       <!-- 相關論文 -->
       <div v-if="relatedPapers.length > 0" class="related-papers-section">
@@ -226,7 +226,7 @@ const fetchMemberDetail = async () => {
 
 const toResearchGroup = () => {
   if (member.value?.research_group_id) {
-    router.push(`/members?group=${member.value.research_group_id}`);
+    router.push(`/group/${member.value.research_group_id}`);
   }
 };
 
@@ -253,9 +253,10 @@ watch(() => route.params.id, () => {
 
 <style scoped>
 .member-detail-view {
-  padding: 24px;
-  max-width: 1200px;
+  padding: 1.5rem;
+  max-width: 87.5rem;
   margin: 0 auto;
+  width: 100%;
 }
 
 .member-detail-skeleton,
@@ -266,44 +267,59 @@ watch(() => route.params.id, () => {
 .error-state,
 .not-found-state {
   text-align: center;
-  padding: 80px 20px;
+  padding: 5rem 1.25rem;
+}
+
+/* Flex 布局容器 */
+.member-layout {
+  display: flex;
+  gap: 3rem;
+  align-items: flex-start;
+  min-height: 25rem;
 }
 
 /* 頭像區域 */
 .avatar-section {
+  flex: 0 0 auto;
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  min-width: 15rem;
 }
 
 .member-avatar-container {
   text-align: center;
+  position: sticky;
+  top: 1.5rem;
 }
 
 .member-avatar {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 
 .member-avatar:hover {
   transform: scale(1.02);
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0.75rem 3rem rgba(0, 0, 0, 0.15);
 }
 
 /* 信息區域 */
 .info-section {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 18.75rem;
 }
 
 .member-info-container {
   flex: 1;
+  padding-left: 0;
 }
 
 .member-name {
   font-size: 2.5rem;
   font-weight: 700;
-  margin: 0 0 12px 0;
+  margin: 0 0 0.75rem 0;
   background: linear-gradient(135deg, #1890ff, #722ed1);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -315,20 +331,20 @@ watch(() => route.params.id, () => {
   font-size: 1.25rem;
   color: #1890ff;
   font-weight: 600;
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
 }
 
 .contact-info,
 .research-group {
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 0.75rem;
   font-size: 1rem;
   color: #666;
 }
 
 .contact-icon {
-  margin-right: 8px;
+  margin-right: 0.5rem;
   color: #1890ff;
   flex-shrink: 0;
 }
@@ -348,13 +364,13 @@ watch(() => route.params.id, () => {
 }
 
 .member-description {
-  margin-top: 24px;
+  margin-top: 1.5rem;
 }
 
 .member-description h3 {
   font-size: 1.25rem;
   font-weight: 600;
-  margin: 0 0 12px 0;
+  margin: 0 0 0.75rem 0;
   color: #333;
 }
 
@@ -366,37 +382,37 @@ watch(() => route.params.id, () => {
 
 /* 相關論文區域 */
 .related-papers-section {
-  margin-top: 48px;
+  margin-top: 3rem;
 }
 
 .section-title {
   font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
   color: #1890ff;
-  border-bottom: 2px solid #1890ff;
-  padding-bottom: 8px;
+  border-bottom: 0.125rem solid #1890ff;
+  padding-bottom: 0.5rem;
 }
 
 .papers-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1rem;
 }
 
 .paper-item {
-  padding: 20px;
+  padding: 1.25rem;
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 0.75rem;
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: all 0.3s ease;
-  border: 2px solid transparent;
+  border: 0.125rem solid transparent;
 }
 
 .paper-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-0.125rem);
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15);
   border-color: #1890ff;
 }
 
@@ -404,7 +420,7 @@ watch(() => route.params.id, () => {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
 
 .paper-title {
@@ -413,7 +429,7 @@ watch(() => route.params.id, () => {
   margin: 0;
   color: #333;
   flex: 1;
-  margin-right: 12px;
+  margin-right: 0.75rem;
   line-height: 1.4;
 }
 
@@ -421,13 +437,13 @@ watch(() => route.params.id, () => {
   font-size: 0.9rem;
   color: #1890ff;
   font-weight: 500;
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
 }
 
 .paper-date {
   font-size: 0.875rem;
   color: #999;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
 
 .paper-description {
@@ -507,9 +523,29 @@ watch(() => route.params.id, () => {
 }
 
 /* 響應式設計 */
-@media (max-width: 800px) {
+@media (max-width: 48rem) {
   .member-detail-view {
-    padding: 16px;
+    padding: 1rem;
+  }
+  
+  .member-layout {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .avatar-section {
+    min-width: auto;
+  }
+  
+  .member-avatar-container {
+    position: static;
+  }
+  
+  .info-section {
+    min-height: auto;
+    width: 100%;
   }
   
   .member-name {
@@ -520,6 +556,11 @@ watch(() => route.params.id, () => {
     font-size: 1.125rem;
   }
   
+  .contact-info,
+  .research-group {
+    justify-content: center;
+  }
+  
   .paper-header {
     flex-direction: column;
     align-items: flex-start;
@@ -527,14 +568,14 @@ watch(() => route.params.id, () => {
   
   .paper-title {
     margin-right: 0;
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 30rem) {
   .member-avatar {
-    width: 150px !important;
-    height: 150px !important;
+    width: 9.375rem !important;
+    height: 9.375rem !important;
   }
   
   .member-name {
