@@ -20,7 +20,7 @@ export function useResearchGroups() {
       if (response.code === 0) {
         researchGroups.value = response.data.items;
         total.value = response.data.total;
-        currentPage.value = response.data.page;
+        currentPage.value = response.data.page || 1;
       } else {
         error.value = response.message;
       }
@@ -123,13 +123,15 @@ export function useResearchGroups() {
 }
 
 /**
- * 自動獲取課題組數據的 Hook
+ * 自動獲取課題組數據的 Hook（默認獲取所有數據）
  */
 export function useResearchGroupsWithAutoFetch(params?: ResearchGroupQueryParams) {
   const researchGroupData = useResearchGroups();
   
   onMounted(() => {
-    researchGroupData.fetchResearchGroups(params);
+    // 默認使用 all=true 獲取所有數據，除非用戶明確指定了分頁參數
+    const queryParams = params || { all: 'true' };
+    researchGroupData.fetchResearchGroups(queryParams);
   });
   
   return researchGroupData;

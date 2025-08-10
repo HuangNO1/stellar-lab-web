@@ -45,7 +45,9 @@ export default {
     postdoc: 'Postdoc',
     phd: 'PhD Student',
     master: 'Master Student',
-    undergraduate: 'Undergraduate'
+    undergraduate: 'Undergraduate',
+    alumni: 'Alumni',
+    others: 'Others'
   },
   research: {
     title: 'Research Areas',

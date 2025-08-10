@@ -10,11 +10,11 @@
         <!-- 如果没有轮播图，显示默认图片 -->
         <img v-if="!hasCarouselImages" 
              class="carousel-img"
-             src="https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel1.jpeg"
+             src="../assets/engineering.jpg"
              :alt="$t('defaults.carousel.defaultAlt1')" />
         <img v-if="!hasCarouselImages" 
              class="carousel-img"
-             src="https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel2.jpeg"
+             src="../assets/laptop.jpg"
              :alt="$t('defaults.carousel.defaultAlt2')" />
       </n-carousel>
     </div>
@@ -41,13 +41,13 @@
                   <n-skeleton text :repeat="1" />
                 </template>
                 <template #header-extra>
-                  <n-skeleton text style="width: 60px;" />
+                  <n-skeleton text class="skeleton-header-tag" />
                 </template>
                 <div class="card-description">
                   <n-skeleton text :repeat="3" />
                 </div>
                 <template #action>
-                  <n-skeleton text style="width: 80px;" />
+                  <n-skeleton text class="skeleton-action-button" />
                 </template>
               </n-card>
             </div>
@@ -434,5 +434,14 @@ const toResearchGroup = (group: ResearchGroup) => {
 
 :deep(.n-carousel .n-carousel__arrow:hover) {
   background-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* 骨架屏樣式 */
+.skeleton-header-tag {
+  width: 60px;
+}
+
+.skeleton-action-button {
+  width: 80px;
 }
 </style>

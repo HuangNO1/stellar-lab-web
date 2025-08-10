@@ -9,11 +9,12 @@ export interface ApiResponse<T = any> {
 export interface PaginatedResponse<T = any> {
   items: T[];
   total: number;
-  page: number;
-  per_page: number;
-  pages: number;
-  has_prev: boolean;
-  has_next: boolean;
+  page?: number;
+  per_page?: number;
+  pages?: number;
+  has_prev?: boolean;
+  has_next?: boolean;
+  all?: boolean; // 新增：當使用 all=true 時
 }
 
 // 實驗室信息
@@ -150,6 +151,7 @@ export interface BaseQueryParams {
   show_all?: boolean;
   page?: number;
   per_page?: number;
+  all?: string; // 新增：設為 'true' 時獲取所有數據
 }
 
 // 課題組查詢參數

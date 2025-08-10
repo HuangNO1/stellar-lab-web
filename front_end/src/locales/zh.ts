@@ -45,7 +45,9 @@ export default {
     postdoc: '博士後',
     phd: '博士生',
     master: '碩士生',
-    undergraduate: '本科生'
+    undergraduate: '本科生',
+    alumni: '校友',
+    others: '其他成員'
   },
   research: {
     title: '研究領域',
