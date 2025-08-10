@@ -33,10 +33,26 @@
         <h1 style="text-align: center; margin-bottom: 32px; font-size: 28px; font-weight: bold;">{{ $t('researchGroups.title') }}</h1>
         
         <!-- 加載狀態 -->
-        <div v-if="loading" style="text-align: center; padding: 40px;">
-          <n-spin size="large" />
-          <p style="margin-top: 16px;">{{ $t('common.loading') }}</p>
-        </div>
+        <n-grid v-if="loading" :x-gap="12" :y-gap="8" :cols="3">
+          <n-grid-item v-for="i in 6" :key="i">
+            <div class="card-container">
+              <n-card class="research-card">
+                <template #header>
+                  <n-skeleton text :repeat="1" />
+                </template>
+                <template #header-extra>
+                  <n-skeleton text style="width: 60px;" />
+                </template>
+                <div class="card-description">
+                  <n-skeleton text :repeat="3" />
+                </div>
+                <template #action>
+                  <n-skeleton text style="width: 80px;" />
+                </template>
+              </n-card>
+            </div>
+          </n-grid-item>
+        </n-grid>
         
         <!-- 錯誤狀態 -->
         <div v-else-if="error" style="text-align: center; padding: 40px;">
