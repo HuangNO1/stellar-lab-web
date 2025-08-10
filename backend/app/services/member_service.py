@@ -377,8 +377,24 @@ class MemberService(BaseService):
         
         # 成員類型校驗
         if 'mem_type' in form_data:
-            if form_data['mem_type'] not in [0, 1, 2]:  # 0=教師, 1=學生, 2=其他
+            if form_data['mem_type'] not in [0, 1, 2]:  # 0=教師, 1=學生, 2=校友
                 raise ValidationError('成員類型無效')
+        
+        # 職稱類型校驗（僅教師）
+        if 'job_type' in form_data and form_data['job_type'] is not None:
+            if form_data.get('mem_type') == 0:  # 教師
+                if form_data['job_type'] not in [0, 1, 2, 3, 4]:  # 0=教授, 1=副教授, 2=講師, 3=助理研究員, 4=博士後
+                    raise ValidationError('職稱類型無效')
+            else:
+                raise ValidationError('職稱類型僅適用於教師')
+        
+        # 學生類型校驗（僅學生）
+        if 'student_type' in form_data and form_data['student_type'] is not None:
+            if form_data.get('mem_type') == 1:  # 學生
+                if form_data['student_type'] not in [0, 1, 2]:  # 0=博士生, 1=碩士生, 2=大學生
+                    raise ValidationError('學生類型無效')
+            else:
+                raise ValidationError('學生類型僅適用於學生')
         
         # 字符串長度校驗
         string_fields = {

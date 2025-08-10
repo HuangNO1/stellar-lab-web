@@ -664,7 +664,7 @@ GET /api/members
 | 參數 | 類型 | 必填 | 含義 | 範例值 |
 |------|------|------|------|--------|
 | q | string | - | 搜索關鍵字（姓名、信箱） | 張教授 |
-| type | integer | - | 成員類型（0=教師, 1=學生, 2=其他） | 0 |
+| type | integer | - | 成員類型（0=教師, 1=學生, 2=校友） | 0 |
 | research_group_id | integer | - | 課題組ID篩選 | 1 |
 | lab_id | integer | - | 實驗室ID篩選 | 1 |
 | show_all | boolean | - | 是否顯示已刪除 | false |
@@ -741,9 +741,9 @@ Content-Type: multipart/form-data
 | mem_name_zh | string | ✓ | 成員中文姓名 | 李教授 |
 | mem_name_en | string | ✓ | 成員英文姓名 | Prof. Li |
 | mem_email | string | ✓ | 電子信箱 | li@lab.edu.cn |
-| mem_type | integer | ✓ | 成員類型（0=教師, 1=學生, 2=其他） | 0 |
-| job_type | integer | - | 職務類型（教師：0=教授, 1=副教授, 2=講師, 3=助理教授, 4=其他） | 0 |
-| student_type | integer | - | 學生類型（學生：0=博士, 1=碩士, 2=本科） | 0 |
+| mem_type | integer | ✓ | 成員類型（0=教師, 1=學生, 2=校友） | 0 |
+| job_type | integer | - | 職務類型（教師：0=教授, 1=副教授, 2=講師, 3=助理研究員, 4=博士後） | 0 |
+| student_type | integer | - | 學生類型（學生：0=博士生, 1=碩士生, 2=大學生） | 0 |
 | student_grade | integer | - | 學生年級 | 1 |
 | research_group_id | integer | ✓ | 所屬課題組ID | 1 |
 | mem_desc_zh | string | - | 成員中文描述 | 專注於機器學習研究 |
@@ -1551,19 +1551,19 @@ GET /api/swagger.json
 **成員類型 (mem_type)**
 - 0: 教師
 - 1: 學生  
-- 2: 其他
+- 2: 校友
 
 **職務類型 (job_type)** - 僅教師
 - 0: 教授
 - 1: 副教授
 - 2: 講師
-- 3: 助理教授
-- 4: 其他
+- 3: 助理研究員
+- 4: 博士後
 
 **學生類型 (student_type)** - 僅學生
-- 0: 博士
-- 1: 碩士
-- 2: 本科
+- 0: 博士生
+- 1: 碩士生
+- 2: 大學生
 
 **論文類型 (paper_type)**
 - 0: 會議
