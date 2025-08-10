@@ -197,9 +197,17 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+import { useRouter, useRoute } from 'vue-router';
 import { useMembersWithAutoFetch } from '@/composables/useMembers';
 
 const { locale } = useI18n();
+const router = useRouter();
+const route = useRoute();
+
+// 根據URL查詢參數決定是否篩選特定課題組
+const queryParams = route.query.group ? 
+  { all: 'true', research_group_id: parseInt(route.query.group as string), sort_by: 'name', order: 'asc' } :
+  { all: 'true', sort_by: 'name', order: 'asc' };
 
 // 使用 composable 獲取成員數據
 const { 
@@ -210,7 +218,7 @@ const {
   fetchMembers, 
   getMemberAvatar, 
   getMemberPosition 
-} = useMembersWithAutoFetch();
+} = useMembersWithAutoFetch(queryParams);
 
 // 獲取當前語言
 const getCurrentLocale = () => {
@@ -219,9 +227,7 @@ const getCurrentLocale = () => {
 
 // 跳轉到成員詳情頁面
 const toMember = (memberId: number) => {
-  // 可以跳轉到成員詳情頁面，例如 /member/:id
-  console.log('Navigate to member:', memberId);
-  // router.push(`/member/${memberId}`);
+  router.push(`/member/${memberId}`);
 };
 </script>
 

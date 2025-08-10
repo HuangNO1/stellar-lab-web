@@ -47,7 +47,9 @@ export default {
     master: 'Master Student',
     undergraduate: 'Undergraduate',
     alumni: 'Alumni',
-    others: 'Others'
+    others: 'Others',
+    description: 'Biography',
+    relatedPapers: 'Related Papers'
   },
   research: {
     title: 'Research Areas',
@@ -73,5 +75,16 @@ export default {
     leader: 'Group Leader',
     members: 'Members Count',
     projects: 'Projects Count'
+  },
+  papers: {
+    title: 'Publications',
+    accepted: 'Accepted',
+    submitted: 'Submitted'
+  },
+  groups: {
+    title: 'Research Groups',
+    leader: 'Group Leader',
+    description: 'Group Description',
+    members: 'Members'
   }
 }

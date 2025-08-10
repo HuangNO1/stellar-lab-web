@@ -1,12 +1,544 @@
-<script setup lang="ts">
-
-</script>
-
 <template>
- 左側頭像
-  右側
+  <div class="member-detail-view">
+    <!-- 加載狀態 -->
+    <template v-if="loading">
+      <div class="member-detail-skeleton">
+        <n-grid :x-gap="24" cols="1 800:2">
+          <n-grid-item>
+            <div class="member-avatar-section">
+              <n-skeleton height="200px" width="200px" circle />
+            </div>
+          </n-grid-item>
+          <n-grid-item>
+            <div class="member-info-section">
+              <n-skeleton text height="32px" width="60%" style="margin-bottom: 16px" />
+              <n-skeleton text height="18px" width="40%" style="margin-bottom: 12px" />
+              <n-skeleton text height="18px" width="50%" style="margin-bottom: 12px" />
+              <n-skeleton text height="18px" width="45%" style="margin-bottom: 20px" />
+              <n-skeleton text height="16px" width="100%" :repeat="3" />
+            </div>
+          </n-grid-item>
+        </n-grid>
+        
+        <!-- 相關論文骨架屏 -->
+        <div class="related-papers-section" style="margin-top: 32px">
+          <n-skeleton text height="24px" width="20%" style="margin-bottom: 16px" />
+          <div v-for="i in 3" :key="i" style="margin-bottom: 16px">
+            <n-skeleton text height="20px" width="80%" style="margin-bottom: 8px" />
+            <n-skeleton text height="16px" width="60%" />
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- 錯誤狀態 -->
+    <div v-else-if="error" class="error-state">
+      <n-alert type="warning" :title="$t('common.error')" style="margin-bottom: 16px;">
+        {{ error }}
+      </n-alert>
+      <n-button @click="fetchMemberDetail" type="primary" ghost>
+        {{ $t('common.retry') }}
+      </n-button>
+    </div>
+
+    <!-- 成員詳情 -->
+    <div v-else-if="member" class="member-detail-content">
+      <n-grid :x-gap="24" :y-gap="24" cols="1 800:2">
+        <!-- 左側：頭像 -->
+        <n-grid-item class="avatar-section">
+          <div class="member-avatar-container">
+            <n-avatar
+              :size="200"
+              :src="getMemberAvatar(member) || '/default-avatar.svg'"
+              :fallback-src="'/default-avatar.svg'"
+              class="member-avatar"
+            />
+          </div>
+        </n-grid-item>
+
+        <!-- 右側：詳細信息 -->
+        <n-grid-item class="info-section">
+          <div class="member-info-container">
+            <!-- 姓名和職位 -->
+            <h1 class="member-name">
+              {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
+            </h1>
+            
+            <div class="member-position">
+              {{ getMemberPosition(member, getCurrentLocale()) }}
+            </div>
+
+            <!-- 聯繫方式 -->
+            <div v-if="member.mem_email" class="contact-info">
+              <n-icon size="16" class="contact-icon">
+                <svg viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+              </n-icon>
+              <span>{{ member.mem_email }}</span>
+            </div>
+
+            <!-- 所屬課題組 -->
+            <div v-if="researchGroup" class="research-group" @click="toResearchGroup">
+              <n-icon size="16" class="contact-icon">
+                <svg viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2M4 1v6h6V5.5l6 6v-2.84c-.94-.18-2-.76-2-1.66s1.06-1.48 2-1.66V1H4zm14.5 17.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5"/>
+                </svg>
+              </n-icon>
+              <span class="group-link">{{ getResearchGroupName() }}</span>
+            </div>
+
+            <!-- 個人描述 -->
+            <div v-if="member.mem_desc_zh || member.mem_desc_en" class="member-description">
+              <h3>{{ $t('members.description') }}</h3>
+              <div class="description-content" v-html="getMemberDescription()"></div>
+            </div>
+          </div>
+        </n-grid-item>
+      </n-grid>
+
+      <!-- 相關論文 -->
+      <div v-if="relatedPapers.length > 0" class="related-papers-section">
+        <h2 class="section-title">{{ $t('members.relatedPapers') }}</h2>
+        <div class="papers-list">
+          <div v-for="paper in relatedPapers" :key="paper.paper_id" class="paper-item" @click="toPaper(paper.paper_id)">
+            <div class="paper-header">
+              <h4 class="paper-title">
+                {{ getCurrentLocale() === 'zh' ? paper.paper_title_zh : paper.paper_title_en }}
+              </h4>
+              <n-tag v-if="paper.paper_accept === 1" type="success" size="small">
+                {{ $t('papers.accepted') }}
+              </n-tag>
+              <n-tag v-else type="warning" size="small">
+                {{ $t('papers.submitted') }}
+              </n-tag>
+            </div>
+            <div class="paper-venue">{{ paper.paper_venue }}</div>
+            <div class="paper-date">{{ formatDate(paper.paper_date) }}</div>
+            <div v-if="paper.paper_desc_zh || paper.paper_desc_en" class="paper-description">
+              {{ getCurrentLocale() === 'zh' ? paper.paper_desc_zh : paper.paper_desc_en }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 沒有找到成員 -->
+    <div v-else class="not-found-state">
+      <n-empty description="未找到該成員" />
+    </div>
+  </div>
 </template>
 
-<style scoped>
+<script setup lang="ts">
+import { ref, onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+import { memberApi, researchGroupApi, paperApi } from '@/services/api';
+import { useMembers } from '@/composables/useMembers';
+import type { Member, ResearchGroup, Paper } from '@/types/api';
 
+const route = useRoute();
+const router = useRouter();
+const { locale } = useI18n();
+const { getMemberAvatar, getMemberPosition } = useMembers();
+
+// 響應式數據
+const member = ref<Member | null>(null);
+const researchGroup = ref<ResearchGroup | null>(null);
+const relatedPapers = ref<Paper[]>([]);
+const loading = ref(false);
+const error = ref<string | null>(null);
+
+// 計算屬性
+const getCurrentLocale = () => {
+  return locale.value as 'zh' | 'en';
+};
+
+const getMemberDescription = () => {
+  if (!member.value) return '';
+  const desc = getCurrentLocale() === 'zh' ? member.value.mem_desc_zh : member.value.mem_desc_en;
+  // 簡單的 Markdown 渲染 (基本支持段落和換行)
+  return desc?.replace(/\n/g, '<br>') || '';
+};
+
+const getResearchGroupName = () => {
+  if (!researchGroup.value) return '';
+  return getCurrentLocale() === 'zh' ? researchGroup.value.research_group_name_zh : researchGroup.value.research_group_name_en;
+};
+
+// 方法
+const fetchMemberDetail = async () => {
+  try {
+    loading.value = true;
+    error.value = null;
+    
+    const memberId = parseInt(route.params.id as string);
+    if (isNaN(memberId)) {
+      error.value = '無效的成員ID';
+      return;
+    }
+
+    // 獲取成員詳情
+    const memberResponse = await memberApi.getMember(memberId);
+    if (memberResponse.code === 0) {
+      member.value = memberResponse.data;
+      
+      // 獲取所屬課題組信息
+      if (member.value.research_group_id) {
+        try {
+          const groupResponse = await researchGroupApi.getResearchGroup(member.value.research_group_id);
+          if (groupResponse.code === 0) {
+            researchGroup.value = groupResponse.data;
+          }
+        } catch (err) {
+          console.warn('Failed to fetch research group:', err);
+        }
+      }
+      
+      // 獲取相關論文 (作為作者的論文)
+      try {
+        const papersResponse = await paperApi.getPapers({ 
+          all: 'true', 
+          sort_by: 'paper_date', 
+          order: 'desc' 
+        });
+        if (papersResponse.code === 0) {
+          // 篩選出該成員參與的論文
+          relatedPapers.value = papersResponse.data.items.filter(paper => 
+            paper.authors && paper.authors.some(author => author.mem_id === memberId)
+          );
+        }
+      } catch (err) {
+        console.warn('Failed to fetch related papers:', err);
+      }
+      
+    } else {
+      error.value = memberResponse.message;
+    }
+  } catch (err) {
+    console.error('Failed to fetch member detail:', err);
+    error.value = '獲取成員詳情失敗';
+  } finally {
+    loading.value = false;
+  }
+};
+
+const toResearchGroup = () => {
+  if (member.value?.research_group_id) {
+    router.push(`/members?group=${member.value.research_group_id}`);
+  }
+};
+
+const toPaper = (paperId: number) => {
+  // 跳轉到論文詳情頁面 (假設存在)
+  router.push(`/paper/${paperId}`);
+};
+
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString(getCurrentLocale() === 'zh' ? 'zh-CN' : 'en-US');
+};
+
+// 生命週期
+onMounted(() => {
+  fetchMemberDetail();
+});
+
+// 監聽路由參數變化
+watch(() => route.params.id, () => {
+  fetchMemberDetail();
+});
+</script>
+
+<style scoped>
+.member-detail-view {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.member-detail-skeleton,
+.member-detail-content {
+  width: 100%;
+}
+
+.error-state,
+.not-found-state {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+/* 頭像區域 */
+.avatar-section {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.member-avatar-container {
+  text-align: center;
+}
+
+.member-avatar {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.member-avatar:hover {
+  transform: scale(1.02);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+}
+
+/* 信息區域 */
+.info-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.member-info-container {
+  flex: 1;
+}
+
+.member-name {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  background: linear-gradient(135deg, #1890ff, #722ed1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+
+.member-position {
+  font-size: 1.25rem;
+  color: #1890ff;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.contact-info,
+.research-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 1rem;
+  color: #666;
+}
+
+.contact-icon {
+  margin-right: 8px;
+  color: #1890ff;
+  flex-shrink: 0;
+}
+
+.research-group {
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.research-group:hover {
+  color: #1890ff;
+}
+
+.group-link {
+  color: #1890ff;
+  text-decoration: underline;
+}
+
+.member-description {
+  margin-top: 24px;
+}
+
+.member-description h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: #333;
+}
+
+.description-content {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #666;
+}
+
+/* 相關論文區域 */
+.related-papers-section {
+  margin-top: 48px;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #1890ff;
+  border-bottom: 2px solid #1890ff;
+  padding-bottom: 8px;
+}
+
+.papers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.paper-item {
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.paper-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-color: #1890ff;
+}
+
+.paper-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.paper-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+  color: #333;
+  flex: 1;
+  margin-right: 12px;
+  line-height: 1.4;
+}
+
+.paper-venue {
+  font-size: 0.9rem;
+  color: #1890ff;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.paper-date {
+  font-size: 0.875rem;
+  color: #999;
+  margin-bottom: 8px;
+}
+
+.paper-description {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 暗色主題支持 */
+[data-theme="dark"] .member-detail-view,
+.dark .member-detail-view {
+  color: #fff;
+}
+
+[data-theme="dark"] .member-position,
+.dark .member-position {
+  color: #70a1ff;
+}
+
+[data-theme="dark"] .contact-info,
+[data-theme="dark"] .research-group,
+.dark .contact-info,
+.dark .research-group {
+  color: #ccc;
+}
+
+[data-theme="dark"] .member-description h3,
+.dark .member-description h3 {
+  color: #fff;
+}
+
+[data-theme="dark"] .description-content,
+.dark .description-content {
+  color: #ccc;
+}
+
+[data-theme="dark"] .section-title,
+.dark .section-title {
+  color: #70a1ff;
+  border-bottom-color: #70a1ff;
+}
+
+[data-theme="dark"] .paper-item,
+.dark .paper-item {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: transparent;
+}
+
+[data-theme="dark"] .paper-item:hover,
+.dark .paper-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #70a1ff;
+}
+
+[data-theme="dark"] .paper-title,
+.dark .paper-title {
+  color: #fff;
+}
+
+[data-theme="dark"] .paper-venue,
+.dark .paper-venue {
+  color: #70a1ff;
+}
+
+[data-theme="dark"] .paper-date,
+.dark .paper-date {
+  color: #999;
+}
+
+[data-theme="dark"] .paper-description,
+.dark .paper-description {
+  color: #ccc;
+}
+
+/* 響應式設計 */
+@media (max-width: 800px) {
+  .member-detail-view {
+    padding: 16px;
+  }
+  
+  .member-name {
+    font-size: 2rem;
+  }
+  
+  .member-position {
+    font-size: 1.125rem;
+  }
+  
+  .paper-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .paper-title {
+    margin-right: 0;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .member-avatar {
+    width: 150px !important;
+    height: 150px !important;
+  }
+  
+  .member-name {
+    font-size: 1.75rem;
+  }
+}
 </style>

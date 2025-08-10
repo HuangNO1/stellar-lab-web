@@ -183,7 +183,7 @@ const hasCarouselImages = computed(() => {
 
 // 跳轉到研究組詳情頁面
 const toResearchGroup = (group: ResearchGroup) => {
-  router.push(`/members?group=${group.research_group_id}`);
+  router.push(`/group/${group.research_group_id}`);
 };
 </script>
 <style scoped>

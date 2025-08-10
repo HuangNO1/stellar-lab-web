@@ -47,7 +47,9 @@ export default {
     master: '碩士生',
     undergraduate: '本科生',
     alumni: '校友',
-    others: '其他成員'
+    others: '其他成員',
+    description: '個人簡介',
+    relatedPapers: '相關論文'
   },
   research: {
     title: '研究領域',
@@ -73,5 +75,16 @@ export default {
     leader: '課題組負責人',
     members: '成員數量',
     projects: '項目數量'
+  },
+  papers: {
+    title: '論文成果',
+    accepted: '已接收',
+    submitted: '投稿中'
+  },
+  groups: {
+    title: '研究課題組',
+    leader: '課題組負責人',
+    description: '課題組簡介',
+    members: '成員列表'
   }
 }

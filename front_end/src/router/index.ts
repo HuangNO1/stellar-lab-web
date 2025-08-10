@@ -13,6 +13,18 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/MemberView.vue'),
     },
     {
+        path: '/group/:id',
+        name: 'group',
+        component: () => import('@/views/GroupView.vue'),
+        props: true
+    },
+    {
+        path: '/member/:id',
+        name: 'member',
+        component: () => import('@/views/MemberDetailView.vue'),
+        props: true
+    },
+    {
         path: '/about',
         name: 'about',
         // route level code-splitting
