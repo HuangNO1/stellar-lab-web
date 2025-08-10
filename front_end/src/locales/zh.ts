@@ -49,5 +49,12 @@ export default {
     mission: '使命',
     vision: '願景',
     contact: '聯繫我們'
+  },
+  researchGroups: {
+    title: '研究課題組',
+    viewDetails: '查看詳情',
+    leader: '課題組負責人',
+    members: '成員數量',
+    projects: '項目數量'
   }
 }

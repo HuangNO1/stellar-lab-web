@@ -49,5 +49,12 @@ export default {
     mission: 'Mission',
     vision: 'Vision',
     contact: 'Contact Us'
+  },
+  researchGroups: {
+    title: 'Research Groups',
+    viewDetails: 'View Details',
+    leader: 'Group Leader',
+    members: 'Members Count',
+    projects: 'Projects Count'
   }
 }
