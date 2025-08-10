@@ -25,6 +25,21 @@ const routes: Array<RouteRecordRaw> = [
         props: true
     },
     {
+        path: '/news',
+        name: 'news',
+        component: () => import('@/views/NewsView.vue')
+    },
+    {
+        path: '/papers',
+        name: 'papers',
+        component: () => import('@/views/PaperView.vue')
+    },
+    {
+        path: '/projects',
+        name: 'projects',
+        component: () => import('@/views/ProjectView.vue')
+    },
+    {
         path: '/about',
         name: 'about',
         // route level code-splitting

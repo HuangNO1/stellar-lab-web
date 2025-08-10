@@ -25,6 +25,7 @@
               mode="horizontal"
               :options="menuOptions"
               class="nav-menu"
+              @update:value="handleMenuSelect"
             />
             
             <!-- Language Selector -->
@@ -61,7 +62,7 @@
   </n-config-provider>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, h, computed, provide } from 'vue'
+import { ref, onMounted, h, computed, provide, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { NIcon, darkTheme } from 'naive-ui'
@@ -105,14 +106,12 @@ const menuOptions = computed(() => [
   {
     label: t('nav.home'),
     key: 'home',
-    icon: () => h(NIcon, { size: 16, component: HomeOutline }),
-    onClick: () => router.push('/')
+    icon: () => h(NIcon, { size: 16, component: HomeOutline })
   },
   {
     label: t('nav.members'),
     key: 'members',
-    icon: () => h(NIcon, { size: 16, component: PeopleOutline }),
-    onClick: () => router.push('/members')
+    icon: () => h(NIcon, { size: 16, component: PeopleOutline })
   },
   {
     label: t('nav.research'),
@@ -122,28 +121,24 @@ const menuOptions = computed(() => [
       {
         label: t('nav.projects'),
         key: 'projects',
-        icon: () => h(NIcon, { size: 16, component: FolderOpenOutline }),
-        onClick: () => router.push('/projects')
+        icon: () => h(NIcon, { size: 16, component: FolderOpenOutline })
       },
       {
         label: t('nav.papers'),
         key: 'papers',
-        icon: () => h(NIcon, { size: 16, component: DocumentTextOutline }),
-        onClick: () => router.push('/papers')
+        icon: () => h(NIcon, { size: 16, component: DocumentTextOutline })
       }
     ]
   },
   {
     label: t('nav.news'),
     key: 'news',
-    icon: () => h(NIcon, { size: 14, component: NewspaperOutline }),
-    onClick: () => router.push('/news')
+    icon: () => h(NIcon, { size: 14, component: NewspaperOutline })
   },
   {
     label: t('nav.about'),
     key: 'about',
-    icon: () => h(NIcon, { size: 16, component: InformationCircleOutline }),
-    onClick: () => router.push('/about')
+    icon: () => h(NIcon, { size: 16, component: InformationCircleOutline })
   }
 ])
 
@@ -167,6 +162,31 @@ const handleLanguageSelect = (key: string) => {
   locale.value = key
   setLanguage(key)
   console.log('Language changed to:', key)
+}
+
+// Handle menu selection
+const handleMenuSelect = (key: string) => {
+  console.log('Menu selected:', key)
+  switch (key) {
+    case 'home':
+      router.push('/')
+      break
+    case 'members':
+      router.push('/members')
+      break
+    case 'projects':
+      router.push('/projects')
+      break
+    case 'papers':
+      router.push('/papers')
+      break
+    case 'news':
+      router.push('/news')
+      break
+    case 'about':
+      router.push('/about')
+      break
+  }
 }
 
 // Theme toggle
@@ -193,6 +213,28 @@ const getLabName = () => {
 
 // 移除重複的媒體URL函數，使用工具類
 
+// Update active menu based on route
+const updateActiveKey = (path: string) => {
+  if (path === '/') {
+    activeKey.value = 'home'
+  } else if (path.startsWith('/members')) {
+    activeKey.value = 'members'
+  } else if (path.startsWith('/projects')) {
+    activeKey.value = 'projects'
+  } else if (path.startsWith('/papers')) {
+    activeKey.value = 'papers'
+  } else if (path.startsWith('/news')) {
+    activeKey.value = 'news'
+  } else if (path.startsWith('/about')) {
+    activeKey.value = 'about'
+  }
+}
+
+// Watch route changes
+watch(() => route.path, (newPath) => {
+  updateActiveKey(newPath)
+})
+
 // Initialize
 onMounted(() => {
   // Set initial background based on theme
@@ -201,20 +243,7 @@ onMounted(() => {
   document.documentElement.style.background = bgColor
   
   // Set active menu based on current route
-  const currentPath = router.currentRoute.value.path
-  if (currentPath === '/') {
-    activeKey.value = 'home'
-  } else if (currentPath.startsWith('/members')) {
-    activeKey.value = 'members'
-  } else if (currentPath.startsWith('/projects')) {
-    activeKey.value = 'projects'
-  } else if (currentPath.startsWith('/papers')) {
-    activeKey.value = 'papers'
-  } else if (currentPath.startsWith('/news')) {
-    activeKey.value = 'news'
-  } else if (currentPath.startsWith('/about')) {
-    activeKey.value = 'about'
-  }
+  updateActiveKey(route.path)
 })
 </script>
 
