@@ -11,17 +11,15 @@
         <h2 class="section-title">
           <n-skeleton text width="150px" />
         </h2>
-        <n-grid :x-gap="16" :y-gap="16" cols="8 600:4 800:6 1000:8 1200:10">
-          <n-grid-item v-for="i in 8" :key="i">
-            <div class="member-card skeleton-card">
-              <n-skeleton height="60px" width="60px" circle />
-              <div class="member-info">
-                <n-skeleton text height="16px" width="80%" style="margin-bottom: 8px" />
-                <n-skeleton text height="14px" width="60%" />
-              </div>
+        <div class="members-grid">
+          <div v-for="i in 8" :key="i" class="member-card skeleton-card">
+            <n-skeleton height="60px" width="60px" circle />
+            <div class="member-info">
+              <n-skeleton text height="16px" width="80%" style="margin-bottom: 8px" />
+              <n-skeleton text height="14px" width="60%" />
             </div>
-          </n-grid-item>
-        </n-grid>
+          </div>
+        </div>
       </div>
     </template>
 
@@ -40,151 +38,139 @@
       <!-- 教師 -->
       <div v-if="groupedMembers.teachers.length > 0" class="member-section">
         <h2 class="section-title">{{ $t('members.professor') }}</h2>
-        <n-grid :x-gap="16" :y-gap="16" cols="8 600:4 800:6 1000:8 1200:10">
-          <n-grid-item v-for="member in groupedMembers.teachers" :key="member.mem_id">
-            <div class="member-card" @click="toMember(member.mem_id)">
-              <n-avatar
-                :round="true"
-                :size="60"
-                :src="getMemberAvatar(member) || '/default-avatar.svg'"
-                :fallback-src="'/default-avatar.svg'"
-              />
-              <div class="member-info">
-                <div class="member-name">
-                  {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
-                </div>
-                <div class="member-position">
-                  {{ getMemberPosition(member, getCurrentLocale()) }}
-                </div>
+        <div class="members-grid">
+          <div v-for="member in groupedMembers.teachers" :key="member.mem_id" class="member-card" @click="toMember(member.mem_id)">
+            <n-avatar
+              :round="true"
+              :size="60"
+              :src="getMemberAvatar(member) || '/default-avatar.svg'"
+              :fallback-src="'/default-avatar.svg'"
+            />
+            <div class="member-info">
+              <div class="member-name">
+                {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
+              </div>
+              <div class="member-position">
+                {{ getMemberPosition(member, getCurrentLocale()) }}
               </div>
             </div>
-          </n-grid-item>
-        </n-grid>
+          </div>
+        </div>
       </div>
 
       <!-- 博士生 -->
       <div v-if="groupedMembers.phd.length > 0" class="member-section">
         <h2 class="section-title">{{ $t('members.phd') }}</h2>
-        <n-grid :x-gap="16" :y-gap="16" cols="8 600:4 800:6 1000:8 1200:10">
-          <n-grid-item v-for="member in groupedMembers.phd" :key="member.mem_id">
-            <div class="member-card" @click="toMember(member.mem_id)">
-              <n-avatar
-                :round="true"
-                :size="60"
-                :src="getMemberAvatar(member) || '/default-avatar.svg'"
-                :fallback-src="'/default-avatar.svg'"
-              />
-              <div class="member-info">
-                <div class="member-name">
-                  {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
-                </div>
-                <div class="member-position">
-                  {{ getMemberPosition(member, getCurrentLocale()) }}
-                </div>
+        <div class="members-grid">
+          <div v-for="member in groupedMembers.phd" :key="member.mem_id" class="member-card" @click="toMember(member.mem_id)">
+            <n-avatar
+              :round="true"
+              :size="60"
+              :src="getMemberAvatar(member) || '/default-avatar.svg'"
+              :fallback-src="'/default-avatar.svg'"
+            />
+            <div class="member-info">
+              <div class="member-name">
+                {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
+              </div>
+              <div class="member-position">
+                {{ getMemberPosition(member, getCurrentLocale()) }}
               </div>
             </div>
-          </n-grid-item>
-        </n-grid>
+          </div>
+        </div>
       </div>
 
       <!-- 碩士生 -->
       <div v-if="groupedMembers.master.length > 0" class="member-section">
         <h2 class="section-title">{{ $t('members.master') }}</h2>
-        <n-grid :x-gap="16" :y-gap="16" cols="8 600:4 800:6 1000:8 1200:10">
-          <n-grid-item v-for="member in groupedMembers.master" :key="member.mem_id">
-            <div class="member-card" @click="toMember(member.mem_id)">
-              <n-avatar
-                :round="true"
-                :size="60"
-                :src="getMemberAvatar(member) || '/default-avatar.svg'"
-                :fallback-src="'/default-avatar.svg'"
-              />
-              <div class="member-info">
-                <div class="member-name">
-                  {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
-                </div>
-                <div class="member-position">
-                  {{ getMemberPosition(member, getCurrentLocale()) }}
-                </div>
+        <div class="members-grid">
+          <div v-for="member in groupedMembers.master" :key="member.mem_id" class="member-card" @click="toMember(member.mem_id)">
+            <n-avatar
+              :round="true"
+              :size="60"
+              :src="getMemberAvatar(member) || '/default-avatar.svg'"
+              :fallback-src="'/default-avatar.svg'"
+            />
+            <div class="member-info">
+              <div class="member-name">
+                {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
+              </div>
+              <div class="member-position">
+                {{ getMemberPosition(member, getCurrentLocale()) }}
               </div>
             </div>
-          </n-grid-item>
-        </n-grid>
+          </div>
+        </div>
       </div>
 
       <!-- 本科生 -->
       <div v-if="groupedMembers.undergraduate.length > 0" class="member-section">
         <h2 class="section-title">{{ $t('members.undergraduate') }}</h2>
-        <n-grid :x-gap="16" :y-gap="16" cols="8 600:4 800:6 1000:8 1200:10">
-          <n-grid-item v-for="member in groupedMembers.undergraduate" :key="member.mem_id">
-            <div class="member-card" @click="toMember(member.mem_id)">
-              <n-avatar
-                :round="true"
-                :size="60"
-                :src="getMemberAvatar(member) || '/default-avatar.svg'"
-                :fallback-src="'/default-avatar.svg'"
-              />
-              <div class="member-info">
-                <div class="member-name">
-                  {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
-                </div>
-                <div class="member-position">
-                  {{ getMemberPosition(member, getCurrentLocale()) }}
-                </div>
+        <div class="members-grid">
+          <div v-for="member in groupedMembers.undergraduate" :key="member.mem_id" class="member-card" @click="toMember(member.mem_id)">
+            <n-avatar
+              :round="true"
+              :size="60"
+              :src="getMemberAvatar(member) || '/default-avatar.svg'"
+              :fallback-src="'/default-avatar.svg'"
+            />
+            <div class="member-info">
+              <div class="member-name">
+                {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
+              </div>
+              <div class="member-position">
+                {{ getMemberPosition(member, getCurrentLocale()) }}
               </div>
             </div>
-          </n-grid-item>
-        </n-grid>
+          </div>
+        </div>
       </div>
 
       <!-- 校友 -->
       <div v-if="groupedMembers.alumni.length > 0" class="member-section">
         <h2 class="section-title">{{ $t('members.alumni') }}</h2>
-        <n-grid :x-gap="16" :y-gap="16" cols="8 600:4 800:6 1000:8 1200:10">
-          <n-grid-item v-for="member in groupedMembers.alumni" :key="member.mem_id">
-            <div class="member-card" @click="toMember(member.mem_id)">
-              <n-avatar
-                :round="true"
-                :size="60"
-                :src="getMemberAvatar(member) || '/default-avatar.svg'"
-                :fallback-src="'/default-avatar.svg'"
-              />
-              <div class="member-info">
-                <div class="member-name">
-                  {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
-                </div>
-                <div class="member-position">
-                  {{ getMemberPosition(member, getCurrentLocale()) }}
-                </div>
+        <div class="members-grid">
+          <div v-for="member in groupedMembers.alumni" :key="member.mem_id" class="member-card" @click="toMember(member.mem_id)">
+            <n-avatar
+              :round="true"
+              :size="60"
+              :src="getMemberAvatar(member) || '/default-avatar.svg'"
+              :fallback-src="'/default-avatar.svg'"
+            />
+            <div class="member-info">
+              <div class="member-name">
+                {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
+              </div>
+              <div class="member-position">
+                {{ getMemberPosition(member, getCurrentLocale()) }}
               </div>
             </div>
-          </n-grid-item>
-        </n-grid>
+          </div>
+        </div>
       </div>
 
       <!-- 其他 -->
       <div v-if="groupedMembers.others.length > 0" class="member-section">
         <h2 class="section-title">{{ $t('members.others') }}</h2>
-        <n-grid :x-gap="16" :y-gap="16" cols="8 600:4 800:6 1000:8 1200:10">
-          <n-grid-item v-for="member in groupedMembers.others" :key="member.mem_id">
-            <div class="member-card" @click="toMember(member.mem_id)">
-              <n-avatar
-                :round="true"
-                :size="60"
-                :src="getMemberAvatar(member) || '/default-avatar.svg'"
-                :fallback-src="'/default-avatar.svg'"
-              />
-              <div class="member-info">
-                <div class="member-name">
-                  {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
-                </div>
-                <div class="member-position">
-                  {{ getMemberPosition(member, getCurrentLocale()) }}
-                </div>
+        <div class="members-grid">
+          <div v-for="member in groupedMembers.others" :key="member.mem_id" class="member-card" @click="toMember(member.mem_id)">
+            <n-avatar
+              :round="true"
+              :size="60"
+              :src="getMemberAvatar(member) || '/default-avatar.svg'"
+              :fallback-src="'/default-avatar.svg'"
+            />
+            <div class="member-info">
+              <div class="member-name">
+                {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
+              </div>
+              <div class="member-position">
+                {{ getMemberPosition(member, getCurrentLocale()) }}
               </div>
             </div>
-          </n-grid-item>
-        </n-grid>
+          </div>
+        </div>
       </div>
 
       <!-- 沒有數據 -->
@@ -233,15 +219,15 @@ const toMember = (memberId: number) => {
 
 <style scoped>
 .member-view {
-  padding: 24px;
-  max-width: 1400px; /* 增加最大寬度 */
+  padding: 1.5rem;
+  max-width: 87.5rem;
   margin: 0 auto;
-  width: 100%; /* 確保占滿可用寬度 */
+  width: 100%;
 }
 
 .page-header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 2rem;
 }
 
 .page-title {
@@ -255,66 +241,110 @@ const toMember = (memberId: number) => {
 }
 
 .member-section {
-  margin-bottom: 48px;
+  margin-bottom: 3rem;
 }
 
 .section-title {
   font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
   color: #1890ff;
-  border-bottom: 2px solid #1890ff;
-  padding-bottom: 8px;
+  border-bottom: 0.125rem solid #1890ff;
+  padding-bottom: 0.5rem;
+}
+
+/* Flex 網格布局 */
+.members-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: flex-start; /* 左对齊而不是居中 */
 }
 
 .member-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 16px;
-  border-radius: 12px;
+  padding: 1rem;
+  border-radius: 0.75rem;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   cursor: pointer;
-  border: 2px solid transparent;
+  border: 0.125rem solid transparent;
+  /* 固定尺寸 - 不使用彈性佈局 */
+  width: 7rem;
+  min-width: 7rem;
+  max-width: 7rem;
+  height: 9rem;
+  min-height: 9rem;
+  max-height: 9rem;
+  flex-shrink: 0; /* 防止壓縮 */
+}
+
+/* 小屏幕调整 */
+@media (max-width: 30rem) {
+  .members-grid {
+    justify-content: center; /* 小屏幕才居中 */
+  }
+  
+  .member-card {
+    width: 6rem;
+    min-width: 6rem;
+    max-width: 6rem;
+    height: 8rem;
+    min-height: 8rem;
+    max-height: 8rem;
+  }
 }
 
 .member-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-0.25rem);
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15);
   border-color: #1890ff;
 }
 
 .member-info {
   text-align: center;
-  margin-top: 12px;
+  margin-top: 0.75rem;
   width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .member-name {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
   color: #333;
-  word-wrap: break-word;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .member-position {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   color: #666;
-  line-height: 1.4;
-  word-wrap: break-word;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .error-state {
   text-align: center;
-  padding: 40px;
+  padding: 2.5rem;
 }
 
 .empty-state {
   text-align: center;
-  padding: 80px 0;
+  padding: 5rem 0;
 }
 
 /* 暗色主題支持 */
@@ -381,9 +411,9 @@ const toMember = (memberId: number) => {
 }
 
 /* 響應式設計 */
-@media (max-width: 768px) {
+@media (max-width: 48rem) {
   .member-view {
-    padding: 16px;
+    padding: 1rem;
   }
   
   .page-title {
@@ -394,16 +424,16 @@ const toMember = (memberId: number) => {
     font-size: 1.25rem;
   }
   
-  .member-card {
-    padding: 12px;
+  .members-grid {
+    gap: 0.75rem;
   }
   
   .member-name {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
   
   .member-position {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 }
 
