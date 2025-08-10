@@ -47,12 +47,22 @@
               :fallback-src="'/default-avatar.svg'"
             />
             <div class="member-info">
-              <div class="member-name">
+              <n-tooltip trigger="hover" :disabled="!isNameTruncated(member)">
+                <template #trigger>
+                  <div class="member-name">
+                    {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
+                  </div>
+                </template>
                 {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
-              </div>
-              <div class="member-position">
+              </n-tooltip>
+              <n-tooltip trigger="hover" :disabled="!isPositionTruncated(member)">
+                <template #trigger>
+                  <div class="member-position">
+                    {{ getMemberPosition(member, getCurrentLocale()) }}
+                  </div>
+                </template>
                 {{ getMemberPosition(member, getCurrentLocale()) }}
-              </div>
+              </n-tooltip>
             </div>
           </div>
         </div>
@@ -70,12 +80,22 @@
               :fallback-src="'/default-avatar.svg'"
             />
             <div class="member-info">
-              <div class="member-name">
+              <n-tooltip trigger="hover" :disabled="!isNameTruncated(member)">
+                <template #trigger>
+                  <div class="member-name">
+                    {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
+                  </div>
+                </template>
                 {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
-              </div>
-              <div class="member-position">
+              </n-tooltip>
+              <n-tooltip trigger="hover" :disabled="!isPositionTruncated(member)">
+                <template #trigger>
+                  <div class="member-position">
+                    {{ getMemberPosition(member, getCurrentLocale()) }}
+                  </div>
+                </template>
                 {{ getMemberPosition(member, getCurrentLocale()) }}
-              </div>
+              </n-tooltip>
             </div>
           </div>
         </div>
@@ -93,12 +113,22 @@
               :fallback-src="'/default-avatar.svg'"
             />
             <div class="member-info">
-              <div class="member-name">
+              <n-tooltip trigger="hover" :disabled="!isNameTruncated(member)">
+                <template #trigger>
+                  <div class="member-name">
+                    {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
+                  </div>
+                </template>
                 {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
-              </div>
-              <div class="member-position">
+              </n-tooltip>
+              <n-tooltip trigger="hover" :disabled="!isPositionTruncated(member)">
+                <template #trigger>
+                  <div class="member-position">
+                    {{ getMemberPosition(member, getCurrentLocale()) }}
+                  </div>
+                </template>
                 {{ getMemberPosition(member, getCurrentLocale()) }}
-              </div>
+              </n-tooltip>
             </div>
           </div>
         </div>
@@ -116,12 +146,22 @@
               :fallback-src="'/default-avatar.svg'"
             />
             <div class="member-info">
-              <div class="member-name">
+              <n-tooltip trigger="hover" :disabled="!isNameTruncated(member)">
+                <template #trigger>
+                  <div class="member-name">
+                    {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
+                  </div>
+                </template>
                 {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
-              </div>
-              <div class="member-position">
+              </n-tooltip>
+              <n-tooltip trigger="hover" :disabled="!isPositionTruncated(member)">
+                <template #trigger>
+                  <div class="member-position">
+                    {{ getMemberPosition(member, getCurrentLocale()) }}
+                  </div>
+                </template>
                 {{ getMemberPosition(member, getCurrentLocale()) }}
-              </div>
+              </n-tooltip>
             </div>
           </div>
         </div>
@@ -139,12 +179,22 @@
               :fallback-src="'/default-avatar.svg'"
             />
             <div class="member-info">
-              <div class="member-name">
+              <n-tooltip trigger="hover" :disabled="!isNameTruncated(member)">
+                <template #trigger>
+                  <div class="member-name">
+                    {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
+                  </div>
+                </template>
                 {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
-              </div>
-              <div class="member-position">
+              </n-tooltip>
+              <n-tooltip trigger="hover" :disabled="!isPositionTruncated(member)">
+                <template #trigger>
+                  <div class="member-position">
+                    {{ getMemberPosition(member, getCurrentLocale()) }}
+                  </div>
+                </template>
                 {{ getMemberPosition(member, getCurrentLocale()) }}
-              </div>
+              </n-tooltip>
             </div>
           </div>
         </div>
@@ -162,12 +212,22 @@
               :fallback-src="'/default-avatar.svg'"
             />
             <div class="member-info">
-              <div class="member-name">
+              <n-tooltip trigger="hover" :disabled="!isNameTruncated(member)">
+                <template #trigger>
+                  <div class="member-name">
+                    {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
+                  </div>
+                </template>
                 {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
-              </div>
-              <div class="member-position">
+              </n-tooltip>
+              <n-tooltip trigger="hover" :disabled="!isPositionTruncated(member)">
+                <template #trigger>
+                  <div class="member-position">
+                    {{ getMemberPosition(member, getCurrentLocale()) }}
+                  </div>
+                </template>
                 {{ getMemberPosition(member, getCurrentLocale()) }}
-              </div>
+              </n-tooltip>
             </div>
           </div>
         </div>
@@ -209,6 +269,20 @@ const {
 // 獲取當前語言
 const getCurrentLocale = () => {
   return locale.value as 'zh' | 'en';
+};
+
+// 判断名字是否被截断
+const isNameTruncated = (member: any) => {
+  const name = getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en;
+  // 更新判断条件：英文名字超过15字符或中文超过7字符
+  return getCurrentLocale() === 'zh' ? (name?.length || 0) > 7 : (name?.length || 0) > 15;
+};
+
+// 判断職位是否被截断
+const isPositionTruncated = (member: any) => {
+  const position = getMemberPosition(member, getCurrentLocale());
+  // 更新判断条件：英文職位超过18字符或中文超过8字符
+  return getCurrentLocale() === 'zh' ? (position?.length || 0) > 8 : (position?.length || 0) > 18;
 };
 
 // 跳轉到成員詳情頁面
@@ -272,14 +346,14 @@ const toMember = (memberId: number) => {
   transition: all 0.3s ease;
   cursor: pointer;
   border: 0.125rem solid transparent;
-  /* 固定尺寸 - 不使用彈性佈局 */
-  width: 7rem;
-  min-width: 7rem;
-  max-width: 7rem;
+  /* 增大寬度以適應英文名字 */
+  width: 10rem;
+  min-width: 10rem;
+  max-width: 10rem;
   height: 9rem;
   min-height: 9rem;
   max-height: 9rem;
-  flex-shrink: 0; /* 防止壓縮 */
+  flex-shrink: 0;
 }
 
 /* 小屏幕调整 */
@@ -289,9 +363,9 @@ const toMember = (memberId: number) => {
   }
   
   .member-card {
-    width: 6rem;
-    min-width: 6rem;
-    max-width: 6rem;
+    width: 8rem;
+    min-width: 8rem;
+    max-width: 8rem;
     height: 8rem;
     min-height: 8rem;
     max-height: 8rem;

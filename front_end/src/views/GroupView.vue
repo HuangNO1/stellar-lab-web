@@ -8,19 +8,17 @@
         <n-skeleton text height="16px" width="100%" :repeat="3" />
       </div>
       
-      <div class="members-skeleton" style="margin-top: 32px">
-        <n-skeleton text height="24px" width="20%" style="margin-bottom: 16px" />
-        <n-grid :x-gap="16" :y-gap="16" cols="2 600:4 800:6 1000:8 1200:10">
-          <n-grid-item v-for="i in 8" :key="i">
-            <div class="member-card skeleton-card">
-              <n-skeleton height="60px" width="60px" circle />
-              <div class="member-info">
-                <n-skeleton text height="16px" width="80%" style="margin-bottom: 8px" />
-                <n-skeleton text height="14px" width="60%" />
-              </div>
+      <div class="members-skeleton" style="margin-top: 2rem">
+        <n-skeleton text height="1.5rem" width="20%" style="margin-bottom: 1rem" />
+        <div class="members-grid">
+          <div v-for="i in 8" :key="i" class="member-card skeleton-card">
+            <n-skeleton height="3.75rem" width="3.75rem" circle />
+            <div class="member-info">
+              <n-skeleton text height="1rem" width="80%" style="margin-bottom: 0.5rem" />
+              <n-skeleton text height="0.875rem" width="60%" />
             </div>
-          </n-grid-item>
-        </n-grid>
+          </div>
+        </div>
       </div>
     </template>
 
@@ -68,26 +66,34 @@
       <!-- 課題組成員 -->
       <div v-if="groupMembers.length > 0" class="group-members-section">
         <h2 class="section-title">{{ $t('groups.members') }} ({{ groupMembers.length }})</h2>
-        <n-grid :x-gap="16" :y-gap="16" cols="2 600:4 800:6 1000:8 1200:10">
-          <n-grid-item v-for="member in groupMembers" :key="member.mem_id">
-            <div class="member-card" @click="toMember(member.mem_id)">
-              <n-avatar
-                :round="true"
-                :size="60"
-                :src="getMemberAvatar(member) || '/default-avatar.svg'"
-                :fallback-src="'/default-avatar.svg'"
-              />
-              <div class="member-info">
-                <div class="member-name">
-                  {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
-                </div>
-                <div class="member-position">
-                  {{ getMemberPosition(member, getCurrentLocale()) }}
-                </div>
-              </div>
+        <div class="members-grid">
+          <div v-for="member in groupMembers" :key="member.mem_id" class="member-card" @click="toMember(member.mem_id)">
+            <n-avatar
+              :round="true"
+              :size="60"
+              :src="getMemberAvatar(member) || '/default-avatar.svg'"
+              :fallback-src="'/default-avatar.svg'"
+            />
+            <div class="member-info">
+              <n-tooltip trigger="hover" :disabled="!isNameTruncated(member)">
+                <template #trigger>
+                  <div class="member-name">
+                    {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
+                  </div>
+                </template>
+                {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
+              </n-tooltip>
+              <n-tooltip trigger="hover" :disabled="!isPositionTruncated(member)">
+                <template #trigger>
+                  <div class="member-position">
+                    {{ getMemberPosition(member, getCurrentLocale()) }}
+                  </div>
+                </template>
+                {{ getMemberPosition(member, getCurrentLocale()) }}
+              </n-tooltip>
             </div>
-          </n-grid-item>
-        </n-grid>
+          </div>
+        </div>
       </div>
 
       <!-- 沒有成員 -->
@@ -122,9 +128,21 @@ const groupMembers = ref<Member[]>([]);
 const loading = ref(false);
 const error = ref<string | null>(null);
 
-// 計算屬性
+// 獲取當前語言
 const getCurrentLocale = () => {
   return locale.value as 'zh' | 'en';
+};
+
+// 判断名字是否被截断
+const isNameTruncated = (member: any) => {
+  const name = getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en;
+  return getCurrentLocale() === 'zh' ? (name?.length || 0) > 7 : (name?.length || 0) > 15;
+};
+
+// 判断職位是否被截断
+const isPositionTruncated = (member: any) => {
+  const position = getMemberPosition(member, getCurrentLocale());
+  return getCurrentLocale() === 'zh' ? (position?.length || 0) > 8 : (position?.length || 0) > 18;
 };
 
 const getGroupDescription = () => {
@@ -195,8 +213,8 @@ watch(() => route.params.id, () => {
 
 <style scoped>
 .group-view {
-  padding: 24px;
-  max-width: 1400px;
+  padding: 1.5rem;
+  max-width: 87.5rem;
   margin: 0 auto;
 }
 
@@ -208,18 +226,22 @@ watch(() => route.params.id, () => {
 .error-state,
 .not-found-state {
   text-align: center;
-  padding: 80px 20px;
+  padding: 5rem 1.25rem;
 }
 
 /* 課題組頭部 */
 .group-header {
-  margin-bottom: 48px;
+  margin-bottom: 3rem;
+  background: linear-gradient(135deg, rgba(24, 144, 255, 0.05), rgba(114, 46, 209, 0.05));
+  padding: 2rem;
+  border-radius: 1rem;
+  border: 0.0625rem solid rgba(24, 144, 255, 0.1);
 }
 
 .group-name {
   font-size: 2.5rem;
   font-weight: 700;
-  margin: 0 0 24px 0;
+  margin: 0 0 1.5rem 0;
   background: linear-gradient(135deg, #1890ff, #722ed1);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -232,8 +254,8 @@ watch(() => route.params.id, () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
-  gap: 12px;
+  margin-bottom: 1.5rem;
+  gap: 0.75rem;
 }
 
 .leader-label {
@@ -245,21 +267,23 @@ watch(() => route.params.id, () => {
 .leader-info {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  padding: 8px 12px;
-  border-radius: 8px;
-  background: rgba(24, 144, 255, 0.05);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: rgba(24, 144, 255, 0.08);
+  border: 0.0625rem solid rgba(24, 144, 255, 0.15);
 }
 
 .leader-info:hover {
-  background: rgba(24, 144, 255, 0.1);
-  transform: translateY(-1px);
+  background: rgba(24, 144, 255, 0.12);
+  border-color: rgba(24, 144, 255, 0.25);
+  transform: translateY(-0.0625rem);
 }
 
 .leader-avatar {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
 }
 
 .leader-name {
@@ -269,81 +293,130 @@ watch(() => route.params.id, () => {
 }
 
 .group-description {
-  text-align: center;
-  max-width: 800px;
+  text-align: left;
+  max-width: 50rem;
   margin: 0 auto;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border-left: 0.25rem solid #1890ff;
 }
 
 .group-description h3 {
   font-size: 1.25rem;
   font-weight: 600;
-  margin: 0 0 16px 0;
-  color: #333;
+  margin: 0 0 1rem 0;
+  color: #1890ff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.group-description h3::before {
+  content: '📝';
+  font-size: 1.125rem;
 }
 
 .description-content {
-  font-size: 1.125rem;
-  line-height: 1.6;
-  color: #666;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #555;
+  text-align: justify;
 }
 
 /* 成員區域 */
 .group-members-section {
-  margin-top: 48px;
+  margin-top: 3rem;
 }
 
 .section-title {
   font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
   color: #1890ff;
-  border-bottom: 2px solid #1890ff;
-  padding-bottom: 8px;
+  border-bottom: 0.125rem solid #1890ff;
+  padding-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-title::before {
+  content: '👥';
+  font-size: 1.25rem;
+}
+
+/* Flex 網格布局 */
+.members-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: flex-start;
 }
 
 .member-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 16px;
-  border-radius: 12px;
+  padding: 1rem;
+  border-radius: 0.75rem;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   cursor: pointer;
-  border: 2px solid transparent;
+  border: 0.125rem solid transparent;
+  /* 固定尺寸 */
+  width: 12rem;
+  min-width: 12rem;
+  max-width: 12rem;
+  height: 9rem;
+  min-height: 9rem;
+  max-height: 9rem;
+  flex-shrink: 0;
 }
 
 .member-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-0.25rem);
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15);
   border-color: #1890ff;
 }
 
 .member-info {
   text-align: center;
-  margin-top: 12px;
+  margin-top: 0.75rem;
   width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .member-name {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
   color: #333;
-  word-wrap: break-word;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .member-position {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   color: #666;
-  line-height: 1.4;
-  word-wrap: break-word;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .empty-members {
   text-align: center;
-  padding: 80px 20px;
+  padding: 5rem 1.25rem;
 }
 
 /* 骨架屏樣式 */
@@ -426,9 +499,14 @@ watch(() => route.params.id, () => {
 }
 
 /* 響應式設計 */
-@media (max-width: 800px) {
+@media (max-width: 50rem) {
   .group-view {
-    padding: 16px;
+    padding: 1rem;
+  }
+  
+  .group-header {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
   }
   
   .group-name {
@@ -437,29 +515,54 @@ watch(() => route.params.id, () => {
   
   .group-leader {
     flex-direction: column;
-    gap: 8px;
+    gap: 0.5rem;
   }
   
   .leader-label {
     font-size: 1rem;
   }
+  
+  .group-description {
+    padding: 1rem;
+    text-align: center;
+  }
+  
+  .members-grid {
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  
+  .member-card {
+    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
+    height: 8rem;
+    min-height: 8rem;
+    max-height: 8rem;
+  }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 30rem) {
   .group-name {
     font-size: 1.75rem;
   }
   
   .member-card {
-    padding: 12px;
+    padding: 0.75rem;
+    width: 8rem;
+    min-width: 8rem;
+    max-width: 8rem;
+    height: 7.5rem;
+    min-height: 7.5rem;
+    max-height: 7.5rem;
   }
   
   .member-name {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
   
   .member-position {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 }
 </style>
