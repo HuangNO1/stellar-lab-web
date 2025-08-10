@@ -1,159 +1,128 @@
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt
-from app import db
-from app.models import Admin, EditRecord
+from flask import Blueprint, request, jsonify, g
+from app.services import AuthService
+from app.services.base_service import ServiceException
 from app.auth import admin_required
-from flask import g
+from app.utils.helpers import success_response, error_response
 
 bp = Blueprint('auth', __name__)
 
+# 初始化服務
+auth_service = AuthService()
+
 @bp.route('/admin/login', methods=['POST'])
-def login():
-    data = request.get_json()
+def admin_login():
+    """
+    管理員登錄
     
-    if not data or not data.get('admin_name') or not data.get('admin_pass'):
-        return jsonify({
-            'code': 2000,
-            'message': '用戶名和密碼不能為空'
-        }), 400
-    
-    admin = Admin.query.filter_by(
-        admin_name=data['admin_name'], 
-        enable=1
-    ).first()
-    
-    if not admin or not admin.check_password(data['admin_pass']):
-        return jsonify({
-            'code': 1000,
-            'message': '用戶名或密碼錯誤'
-        }), 401
-    
-    access_token = create_access_token(identity=admin.admin_id)
-    
-    return jsonify({
-        'code': 0,
-        'message': 'OK',
-        'data': {
-            'access_token': f'Bearer {access_token}',
-            'expires_in': 86400,  # 24小時
-            'admin': admin.to_dict()
+    重構後的登錄邏輯：
+    - 所有業務邏輯在服務層
+    - 統一的錯誤處理
+    - 自動審計記錄
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify(error_response(2000, '請提供登錄數據')), 400
+        
+        admin_name = data.get('admin_name', '').strip()
+        admin_pass = data.get('admin_pass', '')
+        
+        # 收集登錄信息
+        login_info = {
+            'ip_address': request.remote_addr,
+            'user_agent': request.headers.get('User-Agent', ''),
+            'timestamp': request.timestamp if hasattr(request, 'timestamp') else None
         }
-    })
+        
+        result = auth_service.login(admin_name, admin_pass, login_info)
+        return jsonify(success_response(result, '登錄成功'))
+        
+    except ServiceException as e:
+        error_data = auth_service.format_error_response(e)
+        return jsonify(error_response(error_data['code'], error_data['message'])), 400
+        
+    except Exception as e:
+        return jsonify(error_response(5000, '登錄失敗')), 500
+
+@bp.route('/admin/logout', methods=['POST'])
+@admin_required
+def admin_logout():
+    """管理員登出"""
+    try:
+        logout_info = {
+            'ip_address': request.remote_addr,
+            'user_agent': request.headers.get('User-Agent', '')
+        }
+        
+        auth_service.logout(g.current_admin.admin_id, logout_info)
+        return jsonify(success_response(message='登出成功'))
+        
+    except ServiceException as e:
+        error_data = auth_service.format_error_response(e)
+        return jsonify(error_response(error_data['code'], error_data['message'])), 400
+        
+    except Exception as e:
+        return jsonify(error_response(5000, '登出失敗')), 500
 
 @bp.route('/admin/change-password', methods=['POST'])
 @admin_required
 def change_password():
-    data = request.get_json()
-    
-    if not data or not data.get('old_password') or not data.get('new_password'):
-        return jsonify({
-            'code': 2000,
-            'message': '舊密碼和新密碼不能為空'
-        }), 400
-    
-    admin = g.current_admin
-    
-    if not admin.check_password(data['old_password']):
-        return jsonify({
-            'code': 1000,
-            'message': '原密碼錯誤'
-        }), 400
-    
-    if len(data['new_password']) < 8:
-        return jsonify({
-            'code': 2000,
-            'message': '新密碼長度至少8位'
-        }), 400
-    
-    admin.set_password(data['new_password'])
-    db.session.commit()
-    
-    return jsonify({
-        'code': 0,
-        'message': '密碼修改成功'
-    })
-
-@bp.route('/admin/logout', methods=['POST'])
-@admin_required
-def logout():
-    """管理員登出
-    
-    雖然JWT是無狀態的，但我們記錄登出操作以便審計
-    前端應該在收到成功響應後主動刪除本地存儲的token
-    """
+    """修改密碼"""
     try:
-        # 記錄登出操作
-        record = EditRecord(
-            admin_id=g.current_admin.admin_id,
-            edit_type='LOGOUT',
-            edit_module=0,  # 管理員模組
-        )
-        record.set_content({
-            'admin_name': g.current_admin.admin_name,
-            'logout_time': record.edit_date.isoformat()
-        })
-        db.session.add(record)
-        db.session.commit()
+        data = request.get_json()
+        if not data:
+            return jsonify(error_response(2000, '請提供密碼數據')), 400
         
-        return jsonify({
-            'code': 0,
-            'message': '登出成功'
-        })
+        old_password = data.get('old_password', '')
+        new_password = data.get('new_password', '')
+        
+        auth_service.change_password(
+            admin_id=g.current_admin.admin_id,
+            old_password=old_password,
+            new_password=new_password
+        )
+        return jsonify(success_response(message='密碼修改成功'))
+        
+    except ServiceException as e:
+        error_data = auth_service.format_error_response(e)
+        return jsonify(error_response(error_data['code'], error_data['message'])), 400
         
     except Exception as e:
-        db.session.rollback()
-        return jsonify({
-            'code': 5000,
-            'message': f'登出失敗: {str(e)}'
-        }), 500
+        return jsonify(error_response(5000, '修改密碼失敗')), 500
 
 @bp.route('/admin/profile', methods=['GET'])
-@admin_required 
+@admin_required
 def get_profile():
-    """獲取當前登錄管理員信息"""
-    return jsonify({
-        'code': 0,
-        'message': 'OK',
-        'data': g.current_admin.to_dict()
-    })
+    """獲取個人資料"""
+    try:
+        profile = auth_service.get_profile(g.current_admin.admin_id)
+        return jsonify(success_response(profile))
+        
+    except ServiceException as e:
+        error_data = auth_service.format_error_response(e)
+        return jsonify(error_response(error_data['code'], error_data['message'])), 400
+        
+    except Exception as e:
+        return jsonify(error_response(5000, '獲取個人資料失敗')), 500
 
 @bp.route('/admin/profile', methods=['PUT'])
 @admin_required
 def update_profile():
-    """更新當前管理員個人信息"""
-    data = request.get_json()
-    admin = g.current_admin
-    
+    """更新個人資料"""
     try:
-        # 只允許更新某些字段
-        updated_fields = {}
+        data = request.get_json()
+        if not data:
+            return jsonify(error_response(2000, '請提供要更新的資料')), 400
         
-        # 這裡可以根據需要添加其他可更新的個人信息字段
-        # 比如：姓名、郵箱等（需要先在Admin模型中添加這些字段）
-        
-        # 記錄操作
-        record = EditRecord(
-            admin_id=admin.admin_id,
-            edit_type='UPDATE',
-            edit_module=0,
+        profile = auth_service.update_profile(
+            admin_id=g.current_admin.admin_id,
+            profile_data=data
         )
-        record.set_content({
-            'updated_fields': updated_fields,
-            'admin_name': admin.admin_name
-        })
-        db.session.add(record)
+        return jsonify(success_response(profile, '個人資料更新成功'))
         
-        db.session.commit()
-        
-        return jsonify({
-            'code': 0,
-            'message': '個人信息更新成功',
-            'data': admin.to_dict()
-        })
+    except ServiceException as e:
+        error_data = auth_service.format_error_response(e)
+        return jsonify(error_response(error_data['code'], error_data['message'])), 400
         
     except Exception as e:
-        db.session.rollback()
-        return jsonify({
-            'code': 5000,
-            'message': f'更新失敗: {str(e)}'
-        }), 500
+        return jsonify(error_response(5000, '更新個人資料失敗')), 500
