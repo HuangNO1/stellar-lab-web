@@ -1,5 +1,5 @@
 <template>
-  <n-layout class="admin-layout">
+  <n-layout class="admin-layout" has-sider>
     <!-- 側邊欄 -->
     <n-layout-sider
       :collapsed="collapsed"
@@ -60,7 +60,7 @@
                   <path fill="currentColor" d="M12.87,15.07L10.33,12.56L10.36,12.53C12.1,10.59 13.34,8.36 14.07,6H17V4H10V2H8V4H1V6H12.17C11.5,7.92 10.44,9.75 9,11.35C8.07,10.32 7.3,9.19 6.69,8H4.69C5.42,9.63 6.42,11.17 7.67,12.56L2.58,17.58L4,19L9,14L12.11,17.11L12.87,15.07Z"/>
                 </svg>
               </n-icon>
-              {{ $t('language.' + currentLang) }}
+              {{ currentLang === 'zh' ? $t('language.chinese') : $t('language.english') }}
             </n-button>
           </n-dropdown>
 
@@ -225,11 +225,11 @@ const menuOptions = computed<MenuOption[]>(() => [
 // 語言選項
 const languageOptions: DropdownOption[] = [
   {
-    label: '中文',
+    label: t('language.chinese'),
     key: 'zh'
   },
   {
-    label: 'English',
+    label: t('language.english'),
     key: 'en'
   }
 ];
@@ -331,6 +331,7 @@ initTheme();
 }
 
 .header {
+  height: 64px;
   padding: 0 1.5rem;
   display: flex;
   align-items: center;

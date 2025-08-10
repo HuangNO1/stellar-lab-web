@@ -86,6 +86,9 @@ export function useMembers() {
               groups.others.push(member);
           }
         }
+      } else if (member.mem_type === 2) {
+        // 校友
+        groups.alumni.push(member);
       } else {
         // 其他類型
         groups.others.push(member);
@@ -95,7 +98,7 @@ export function useMembers() {
     // 為每個分組排序
     const sortMembers = (memberList: Member[]) => {
       return memberList.sort((a, b) => {
-        // 教師按職務類型排序：教授(0) > 副教授(1) > 助理教授(3) > 講師(2) > 其他(4)
+        // 教師按職務類型排序：教授(0) > 副教授(1) > 助理教授(3) > 講師(2) > 博士後(4)
         if (a.mem_type === 0 && b.mem_type === 0) {
           const jobOrder = [0, 1, 3, 2, 4];
           const aOrder = jobOrder.indexOf(a.job_type || 4);
@@ -131,14 +134,14 @@ export function useMembers() {
     if (member.mem_type === 0) {
       // 教師
       const jobTypes = {
-        zh: ['教授', '副教授', '講師', '助理教授', '其他'],
-        en: ['Professor', 'Associate Professor', 'Lecturer', 'Assistant Professor', 'Other']
+        zh: ['教授', '副教授', '講師', '助理教授', '博士後'],
+        en: ['Professor', 'Associate Professor', 'Lecturer', 'Assistant Professor', 'Postdoc']
       };
       return jobTypes[locale][member.job_type || 4];
     } else if (member.mem_type === 1) {
       // 學生
       if (member.destination_zh || member.destination_en) {
-        // 校友 - 顯示去向
+        // 有去向信息的學生視為校友 - 顯示去向
         return locale === 'zh' ? member.destination_zh : member.destination_en;
       } else {
         // 在校學生
@@ -149,6 +152,13 @@ export function useMembers() {
         const type = studentTypes[locale][member.student_type || 0];
         const grade = member.student_grade ? `${member.student_grade}年級` : '';
         return locale === 'zh' ? `${type}${grade}` : `${type} ${grade ? `Year ${member.student_grade}` : ''}`;
+      }
+    } else if (member.mem_type === 2) {
+      // 校友 - 顯示去向或默認文本
+      if (member.destination_zh || member.destination_en) {
+        return locale === 'zh' ? member.destination_zh : member.destination_en;
+      } else {
+        return locale === 'zh' ? '校友' : 'Alumni';
       }
     } else {
       // 其他

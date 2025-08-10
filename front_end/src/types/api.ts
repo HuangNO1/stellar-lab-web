@@ -65,8 +65,8 @@ export interface Member {
   mem_desc_zh?: string;
   mem_desc_en?: string;
   mem_email: string;
-  mem_type: number; // 0=教師, 1=學生, 2=其他
-  job_type?: number; // 0=教授, 1=副教授, 2=講師, 3=助理教授, 4=其他
+  mem_type: number; // 0=教師, 1=學生, 2=校友
+  job_type?: number; // 0=教授, 1=副教授, 2=講師, 3=助理教授, 4=博士後
   student_type?: number; // 0=博士, 1=碩士, 2=本科
   student_grade?: number;
   destination_zh?: string;

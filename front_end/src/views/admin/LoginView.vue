@@ -168,7 +168,7 @@ const handleLogin = async () => {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 400px;
+  max-width: 40rem;
   padding: 0 2rem;
 }
 

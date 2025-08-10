@@ -276,6 +276,20 @@ const toResearchGroup = (group: ResearchGroup) => {
   min-height: 16rem;
 }
 
+/* 黑夜模式下的研究組卡片樣式 */
+.dark-theme :deep(.research-card.n-card) {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.dark-theme :deep(.research-card .n-card__header) {
+  color: #e6e6e6 !important;
+}
+
+.dark-theme :deep(.research-card .n-card__content) {
+  color: #cccccc !important;
+}
+
 .research-card-skeleton {
   flex: 0 0 auto;
   width: 100%;
@@ -303,6 +317,37 @@ const toResearchGroup = (group: ResearchGroup) => {
   margin-bottom: 0.75rem;
   text-align: left;
   padding: 0 0.5rem;
+}
+
+/* 黑夜模式下的卡片描述 */
+.dark-theme .card-description {
+  color: #cccccc !important;
+}
+
+/* 黑夜模式下的標籤樣式 */
+.dark-theme :deep(.research-card .n-tag) {
+  background-color: rgba(24, 144, 255, 0.15) !important;
+  color: #70a1ff !important;
+  border: 1px solid rgba(24, 144, 255, 0.25) !important;
+}
+
+/* 黑夜模式下的按鈕樣式 */
+.dark-theme :deep(.research-card .n-button.n-button--ghost) {
+  color: #70a1ff !important;
+  border-color: #70a1ff !important;
+}
+
+.dark-theme :deep(.research-card .n-button.n-button--ghost:hover) {
+  background-color: rgba(112, 161, 255, 0.1) !important;
+  border-color: #70a1ff !important;
+}
+
+/* 黑夜模式下的卡片懸停效果 */
+.dark-theme :deep(.research-card.n-card:hover) {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 /* 統一卡片最小高度 */

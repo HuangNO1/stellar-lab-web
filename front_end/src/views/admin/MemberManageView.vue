@@ -139,7 +139,7 @@ const groupOptions = ref<Array<{ label: string; value: number }>>([]);
 const typeOptions = [
   { label: t('members.professor'), value: 0 },
   { label: t('members.student'), value: 1 },
-  { label: t('members.others'), value: 2 }
+  { label: t('members.alumni'), value: 2 }
 ];
 
 // 表格列定義
@@ -178,7 +178,7 @@ const columns: DataTableColumns<Member> = [
       const typeMap = {
         0: { text: t('members.professor'), type: 'success' as const },
         1: { text: t('members.student'), type: 'info' as const },
-        2: { text: t('members.others'), type: 'default' as const }
+        2: { text: t('members.alumni'), type: 'warning' as const }
       };
       const config = typeMap[row.mem_type as keyof typeof typeMap];
       return h(NTag, { type: config.type }, { default: () => config.text });
