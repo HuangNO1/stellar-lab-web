@@ -264,13 +264,24 @@ class AuthProfile(Resource):
         pass
     
     @ns_auth.doc('更新个人信息', security='Bearer')
-    @ns_auth.expect(api.model('ProfileRequest', {
-        'admin_email': fields.String(description='管理员邮箱')
+    @ns_auth.expect(api.model('ProfileUpdateRequest', {
+        'admin_name': fields.String(description='管理员用户名（必须唯一）', example='super_admin')
     }))
     @ns_auth.marshal_with(base_response)
     @ns_auth.response(401, '未认证')
+    @ns_auth.response(400, '用户名已存在或参数错误')
     def put(self):
-        """更新当前登录管理员的个人信息"""
+        """更新当前登录管理员的个人信息
+        
+        功能说明：
+        - 管理员只能修改自己的个人资料
+        - 用户名必须唯一，不能与现有管理员重复
+        - 修改后的用户名会立即生效，新的JWT token将包含更新后的用户名
+        - 所有修改操作都会自动记录到操作日志中
+        
+        当前支持的可更新字段：
+        - admin_name: 管理员用户名
+        """
         pass
 
 # ==================== 管理员管理接口 ====================

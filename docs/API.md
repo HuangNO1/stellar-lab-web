@@ -243,14 +243,14 @@ Content-Type: application/json
 **請求參數**
 | 參數 | 類型 | 必填 | 含義 | 範例值 |
 |------|------|------|------|--------|
-| old_password | string | ✓ | 當前密碼 | oldpass123 |
-| new_password | string | ✓ | 新密碼（至少8位） | newpass123 |
+| old_password | string | ✓ | 當前密碼 | admin123 |
+| new_password | string | ✓ | 新密碼（至少6位） | new_admin123 |
 
 **請求範例**
 ```json
 {
-  "old_password": "oldpass123",
-  "new_password": "newpass123"
+  "old_password": "admin123",
+  "new_password": "new_admin123"
 }
 ```
 
@@ -302,22 +302,38 @@ Content-Type: application/json
 ```
 
 **請求參數**
-根據Admin模型的可更新欄位而定。
+| 參數 | 類型 | 必填 | 含義 | 範例值 |
+|------|------|------|------|--------|
+| admin_name | string | - | 管理員使用者名稱（會檢查唯一性） | new_admin |
+
+**請求範例**
+```json
+{
+  "admin_name": "super_admin"
+}
+```
 
 **響應範例**
 ```json
 {
   "code": 0,
-  "message": "個人資訊更新成功",
+  "message": "個人資料更新成功",
   "data": {
     "admin_id": 1,
-    "admin_name": "admin",
+    "admin_name": "super_admin",
     "is_super": 1,
     "enable": 1,
-    "created_at": "2024-01-01T00:00:00"
+    "created_at": "2024-01-01T00:00:00",
+    "updated_at": "2025-01-01T10:30:00"
   }
 }
 ```
+
+**注意事項**
+- 管理員只能修改自己的個人資料
+- 用戶名必須唯一，不能與現有管理員重複
+- 修改後的用戶名會立即生效，新的JWT token將包含更新後的用戶名
+- 所有修改操作都會自動記錄到操作日誌中
 
 ## 管理員管理
 
@@ -411,9 +427,43 @@ Content-Type: application/json
 **請求參數**
 | 參數 | 類型 | 必填 | 含義 | 範例值 |
 |------|------|------|------|--------|
-| admin_name | string | - | 管理員使用者名稱 | newname |
+| admin_name | string | - | 管理員使用者名稱（會檢查唯一性） | newname |
+| admin_pass | string | - | 新密碼（至少6位字符） | newpass123 |
 | is_super | integer | - | 是否為超級管理員（0/1） | 1 |
 | enable | integer | - | 是否啟用（0/1） | 1 |
+
+**請求範例**
+```json
+{
+  "admin_name": "updated_admin",
+  "admin_pass": "newpassword123",
+  "is_super": 0,
+  "enable": 1
+}
+```
+
+**響應範例**
+```json
+{
+  "code": 0,
+  "message": "管理員更新成功",
+  "data": {
+    "admin_id": 2,
+    "admin_name": "updated_admin",
+    "is_super": 0,
+    "enable": 1,
+    "created_at": "2024-01-01T00:00:00",
+    "updated_at": "2025-01-01T10:30:00"
+  }
+}
+```
+
+**注意事項**
+- 僅超級管理員可以更新其他管理員資訊
+- 用戶名必須唯一，不能與現有管理員重複
+- 密碼會自動加密存儲
+- 不能修改自己的超級管理員權限
+- 所有修改操作都會自動記錄到操作日誌中
 
 ### 刪除管理員
 ```
