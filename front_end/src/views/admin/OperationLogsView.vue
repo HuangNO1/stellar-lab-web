@@ -112,7 +112,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, h } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useMessage } from 'naive-ui';
+import { useMessage, NButton } from 'naive-ui';
 import { zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
 import type { DataTableColumns } from 'naive-ui';
 import { editRecordApi, adminApi } from '@/services/api';
@@ -274,19 +274,19 @@ const columns = computed<DataTableColumns<EditRecord>>(() => [
     render: (row) => {
       const hasContent = row.edit_content && Object.keys(row.edit_content).length > 0;
       
-      // 如果沒有內容，直接返回 '-'
       if (!hasContent) {
         return '-';
       }
       
-      // 如果有內容，返回查看詳情按鈕
-      return h('n-button', {
-        size: 'small',
-        type: 'primary',
-        onClick: () => showJsonDetail(row.edit_content, `${formatEditType(row.edit_type)} - ${formatModuleName(row.edit_module)}`)
-      }, {
-        default: () => t('common.viewDetails')
-      });
+      return h(
+        NButton,
+        {
+          size: 'small',
+          type: 'primary',
+          onClick: () => showJsonDetail(row.edit_content, `${formatEditType(row.edit_type)} - ${formatModuleName(row.edit_module)}`)
+        },
+        { default: () => t('common.viewDetails') }
+      );
     }
   }
 ]);
