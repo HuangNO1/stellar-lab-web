@@ -202,25 +202,6 @@ const moduleOptions = computed(() => [
   { label: t('admin.operationLogs.projectModule'), value: 6 }
 ]);
 
-// 格式化操作內容（已廢棄，保留以防需要）
-// const formatEditContent = (content: Record<string, any> | undefined): string => {
-//   if (!content) return '-';
-//   
-//   const keys = Object.keys(content);
-//   if (keys.length === 0) return '-';
-//   
-//   // 顯示前3個鍵名，如果超過3個則顯示省略號
-//   const displayKeys = keys.slice(0, 3);
-//   const result = displayKeys.join(', ');
-//   return keys.length > 3 ? `${result}...` : result;
-// };
-
-// 格式化JSON內容用於tooltip顯示（已廢棄，保留以防需要）
-// const formatJsonForTooltip = (content: Record<string, any> | undefined): string => {
-//   if (!content) return '';
-//   return JSON.stringify(content, null, 2);
-// };
-
 // 顯示 JSON 詳情
 const showJsonDetail = (content: Record<string, any> | undefined, title: string) => {
   if (!content || Object.keys(content).length === 0) return;
