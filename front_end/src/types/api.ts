@@ -204,8 +204,15 @@ export interface EditRecord {
   edit_type: string;
   edit_module: number;
   edit_date: string;
-  edit_content?: string;
-  admin_name: string;
+  edit_content?: Record<string, any>; // 改為對象類型
+  admin: {
+    admin_id: number;
+    admin_name: string;
+    created_at: string;
+    enable: number;
+    is_super: number;
+    updated_at: string;
+  };
 }
 
 // 操作日誌查詢參數

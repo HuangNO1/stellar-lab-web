@@ -238,8 +238,12 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, h } from 'vue';
-import { memberApi, paperApi, projectApi, newsApi } from '@/services/api';
+import { useI18n } from 'vue-i18n';
+import { memberApi, paperApi, projectApi, newsApi, editRecordApi } from '@/services/api';
+import type { EditRecord } from '@/types/api';
 import QuickActionModal from '@/components/QuickActionModal.vue';
+
+const { t, locale } = useI18n();
 
 // 統計數據
 const stats = reactive({
@@ -252,9 +256,10 @@ const stats = reactive({
 // 最近活動
 const recentActivities = ref<Array<{
   id: string;
-  type: 'create' | 'update' | 'delete';
+  type: 'create' | 'update' | 'delete' | 'login' | 'logout' | 'change_password' | 'batch_delete' | 'batch_update' | 'upload';
   title: string;
   time: Date;
+  admin: string;
 }>>([]);
 
 // Modal 狀態
@@ -264,6 +269,57 @@ const modalConfig = reactive({
   actionType: 'create' as 'create' | 'edit',
   editData: {}
 });
+
+// 獲取最近活動
+const fetchRecentActivities = async () => {
+  try {
+    const response = await editRecordApi.getEditRecords({
+      page: 1,
+      per_page: 10
+    });
+    
+    if (response.code === 0 && response.data.items) {
+      recentActivities.value = response.data.items.map((log: EditRecord) => {
+        const moduleNames = {
+          0: t('admin.operationLogs.adminModule'),
+          1: t('admin.operationLogs.labModule'),
+          2: t('admin.operationLogs.groupModule'),
+          3: t('admin.operationLogs.memberModule'),
+          4: t('admin.operationLogs.paperModule'),
+          5: t('admin.operationLogs.newsModule'),
+          6: t('admin.operationLogs.projectModule')
+        };
+        
+        const actionNames = {
+          'CREATE': t('admin.operationLogs.create'),
+          'UPDATE': t('admin.operationLogs.update'),
+          'DELETE': t('admin.operationLogs.delete'),
+          'LOGIN': t('admin.operationLogs.login'),
+          'LOGOUT': t('admin.operationLogs.logout'),
+          'CHANGE_PASSWORD': t('admin.operationLogs.changePassword'),
+          'BATCH_DELETE': t('admin.operationLogs.batchDelete'),
+          'BATCH_UPDATE': t('admin.operationLogs.batchUpdate'),
+          'UPLOAD': t('admin.operationLogs.upload')
+        };
+        
+        const moduleName = moduleNames[log.edit_module as keyof typeof moduleNames] || `模組 ${log.edit_module}`;
+        const actionName = actionNames[log.edit_type as keyof typeof actionNames] || log.edit_type;
+        
+        return {
+          id: log.edit_id.toString(),
+          type: log.edit_type.toLowerCase().replace('_', '_') as 'create' | 'update' | 'delete' | 'login' | 'logout' | 'change_password' | 'batch_delete' | 'batch_update' | 'upload',
+          title: `${log.admin?.admin_name || 'Unknown'} ${actionName}了${moduleName}`,
+          time: new Date(log.edit_date),
+          admin: log.admin?.admin_name || 'Unknown'
+        };
+      });
+    }
+  } catch (error) {
+    console.error('獲取最近活動失敗:', error);
+    // 發生錯誤時顯示空狀態
+    recentActivities.value = [];
+  }
+};
 
 // 獲取統計數據
 const fetchStats = async () => {
@@ -297,7 +353,13 @@ const getActivityColor = (type: string) => {
   const colors = {
     create: '#52c41a',
     update: '#1890ff',
-    delete: '#ff4d4f'
+    delete: '#ff4d4f',
+    login: '#722ed1',
+    logout: '#fa8c16',
+    change_password: '#eb2f96',
+    batch_delete: '#f5222d',
+    batch_update: '#13c2c2',
+    upload: '#52c41a'
   };
   return colors[type as keyof typeof colors] || '#666';
 };
@@ -313,6 +375,24 @@ const getActivityIcon = (type: string) => {
     ]),
     delete: () => h('svg', { viewBox: '0 0 24 24' }, [
       h('path', { fill: 'currentColor', d: 'M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z' })
+    ]),
+    login: () => h('svg', { viewBox: '0 0 24 24' }, [
+      h('path', { fill: 'currentColor', d: 'M10,17V14H3V10H10V7L15,12L10,17M10,2H19A2,2 0 0,1 21,4V20A2,2 0 0,1 19,22H10A2,2 0 0,1 8,20V18H10V20H19V4H10V6H8V4A2,2 0 0,1 10,2Z' })
+    ]),
+    logout: () => h('svg', { viewBox: '0 0 24 24' }, [
+      h('path', { fill: 'currentColor', d: 'M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z' })
+    ]),
+    change_password: () => h('svg', { viewBox: '0 0 24 24' }, [
+      h('path', { fill: 'currentColor', d: 'M6,14A3,3 0 0,1 9,11A3,3 0 0,1 12,14A3,3 0 0,1 9,17A3,3 0 0,1 6,14M12,20H2V18C2,15.79 4.69,14 8,14H10C13.31,14 16,15.79 16,18V20H14M22,15V9H20L19,10H17V15A2,2 0 0,0 19,17H21A2,2 0 0,0 23,15M19,15V10H21V15H19Z' })
+    ]),
+    batch_delete: () => h('svg', { viewBox: '0 0 24 24' }, [
+      h('path', { fill: 'currentColor', d: 'M20.37,8.91L19.37,10.64L7.24,3.64L8.24,1.91L11.28,3.66L12.64,3.29L16.97,5.79L17.34,7.16L20.37,8.91M6,19V7H11.07L18,11V19A2,2 0 0,1 16,21H8A2,2 0 0,1 6,19Z' })
+    ]),
+    batch_update: () => h('svg', { viewBox: '0 0 24 24' }, [
+      h('path', { fill: 'currentColor', d: 'M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z' })
+    ]),
+    upload: () => h('svg', { viewBox: '0 0 24 24' }, [
+      h('path', { fill: 'currentColor', d: 'M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z' })
     ])
   };
   return icons[type as keyof typeof icons] || icons.create;
@@ -326,14 +406,26 @@ const formatTime = (time: Date) => {
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
 
-  if (days > 0) {
-    return `${days}天前`;
-  } else if (hours > 0) {
-    return `${hours}小時前`;
-  } else if (minutes > 0) {
-    return `${minutes}分鐘前`;
+  if (locale.value === 'zh') {
+    if (days > 0) {
+      return `${days}${t('admin.quickAction.timeFormat.daysAgo')}`;
+    } else if (hours > 0) {
+      return `${hours}${t('admin.quickAction.timeFormat.hoursAgo')}`;
+    } else if (minutes > 0) {
+      return `${minutes}${t('admin.quickAction.timeFormat.minutesAgo')}`;
+    } else {
+      return t('admin.quickAction.timeFormat.justNow');
+    }
   } else {
-    return '剛剛';
+    if (days > 0) {
+      return `${days} day${days > 1 ? 's' : ''} ago`;
+    } else if (hours > 0) {
+      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    } else if (minutes > 0) {
+      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    } else {
+      return 'Just now';
+    }
   }
 };
 
@@ -341,7 +433,7 @@ const formatTime = (time: Date) => {
 const openModal = (
   moduleType: 'members' | 'papers' | 'projects' | 'news' | 'research-groups',
   actionType: 'create' | 'edit',
-  editData: any = {}
+  editData: Record<string, unknown> = {}
 ) => {
   modalConfig.moduleType = moduleType;
   modalConfig.actionType = actionType;
@@ -351,32 +443,34 @@ const openModal = (
 
 // 處理 Modal 成功
 const handleModalSuccess = () => {
-  // 刷新統計數據
+  // 刷新統計數據和最近活動
   fetchStats();
+  fetchRecentActivities();
   
-  // 添加活動記錄
+  // 添加臨時活動記錄（實際的記錄會通過 fetchRecentActivities 獲取）
   const moduleNames = {
-    members: '成員',
-    papers: '論文',
-    projects: '項目',
-    news: '新聞',
-    'research-groups': '課題組'
+    members: t('admin.quickAction.activities.moduleNames.members'),
+    papers: t('admin.quickAction.activities.moduleNames.papers'),
+    projects: t('admin.quickAction.activities.moduleNames.projects'),
+    news: t('admin.quickAction.activities.moduleNames.news'),
+    'research-groups': t('admin.quickAction.activities.moduleNames.groups')
   };
   
   const actionNames = {
-    create: '新增',
-    edit: '編輯'
+    create: t('admin.quickAction.activities.created'),
+    edit: t('admin.quickAction.activities.updated')
   };
   
   const activity = {
     id: Date.now().toString(),
     type: modalConfig.actionType === 'create' ? 'create' as const : 'update' as const,
-    title: `${actionNames[modalConfig.actionType]}了${moduleNames[modalConfig.moduleType]}`,
-    time: new Date()
+    title: `${actionNames[modalConfig.actionType]}${moduleNames[modalConfig.moduleType]}`,
+    time: new Date(),
+    admin: 'Current Admin' // 臨時值，真實數據會從API獲取
   };
   
+  // 臨時添加到列表開頭，真實數據會在 fetchRecentActivities 完成後替換
   recentActivities.value.unshift(activity);
-  // 只保留最近 10 條記錄
   if (recentActivities.value.length > 10) {
     recentActivities.value = recentActivities.value.slice(0, 10);
   }
@@ -384,6 +478,7 @@ const handleModalSuccess = () => {
 
 onMounted(() => {
   fetchStats();
+  fetchRecentActivities();
 });
 </script>
 

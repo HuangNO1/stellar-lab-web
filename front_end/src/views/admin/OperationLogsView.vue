@@ -98,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, h } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMessage } from 'naive-ui';
 import { zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
@@ -165,7 +165,11 @@ const editTypeOptions = computed(() => [
   { label: t('admin.operationLogs.update'), value: 'UPDATE' },
   { label: t('admin.operationLogs.delete'), value: 'DELETE' },
   { label: t('admin.operationLogs.login'), value: 'LOGIN' },
-  { label: t('admin.operationLogs.logout'), value: 'LOGOUT' }
+  { label: t('admin.operationLogs.logout'), value: 'LOGOUT' },
+  { label: t('admin.operationLogs.changePassword'), value: 'CHANGE_PASSWORD' },
+  { label: t('admin.operationLogs.batchDelete'), value: 'BATCH_DELETE' },
+  { label: t('admin.operationLogs.batchUpdate'), value: 'BATCH_UPDATE' },
+  { label: t('admin.operationLogs.upload'), value: 'UPLOAD' }
 ]);
 
 // 模組選項
@@ -181,14 +185,22 @@ const moduleOptions = computed(() => [
 ]);
 
 // 格式化操作內容
-const formatEditContent = (content: string | undefined): string => {
+const formatEditContent = (content: Record<string, any> | undefined): string => {
   if (!content) return '-';
-  try {
-    const data = JSON.parse(content);
-    return Object.keys(data).slice(0, 3).join(', ') + (Object.keys(data).length > 3 ? '...' : '');
-  } catch {
-    return content.length > 50 ? content.substring(0, 50) + '...' : content;
-  }
+  
+  const keys = Object.keys(content);
+  if (keys.length === 0) return '-';
+  
+  // 顯示前3個鍵名，如果超過3個則顯示省略號
+  const displayKeys = keys.slice(0, 3);
+  const result = displayKeys.join(', ');
+  return keys.length > 3 ? `${result}...` : result;
+};
+
+// 格式化JSON內容用於tooltip顯示
+const formatJsonForTooltip = (content: Record<string, any> | undefined): string => {
+  if (!content) return '';
+  return JSON.stringify(content, null, 2);
 };
 
 // 格式化模組名稱
@@ -212,7 +224,11 @@ const formatEditType = (type: string): string => {
     UPDATE: t('admin.operationLogs.update'),
     DELETE: t('admin.operationLogs.delete'),
     LOGIN: t('admin.operationLogs.login'),
-    LOGOUT: t('admin.operationLogs.logout')
+    LOGOUT: t('admin.operationLogs.logout'),
+    CHANGE_PASSWORD: t('admin.operationLogs.changePassword'),
+    BATCH_DELETE: t('admin.operationLogs.batchDelete'),
+    BATCH_UPDATE: t('admin.operationLogs.batchUpdate'),
+    UPLOAD: t('admin.operationLogs.upload')
   };
   return typeMap[type] || type;
 };
@@ -227,8 +243,9 @@ const columns = computed<DataTableColumns<EditRecord>>(() => [
   },
   {
     title: t('admin.operationLogs.admin'),
-    key: 'admin_name',
-    width: 120
+    key: 'admin',
+    width: 120,
+    render: (row) => row.admin?.admin_name || '-'
   },
   {
     title: t('admin.operationLogs.operation'),
@@ -245,10 +262,54 @@ const columns = computed<DataTableColumns<EditRecord>>(() => [
   {
     title: t('admin.operationLogs.content'),
     key: 'edit_content',
-    ellipsis: {
-      tooltip: true
-    },
-    render: (row) => formatEditContent(row.edit_content)
+    ellipsis: true,
+    render: (row) => {
+      const formattedContent = formatEditContent(row.edit_content);
+      const tooltipContent = formatJsonForTooltip(row.edit_content);
+      
+      // 如果沒有內容，直接返回 '-'
+      if (!formattedContent || formattedContent === '-') {
+        return '-';
+      }
+      
+      // 如果有內容但沒有 tooltip，返回純文本
+      if (!tooltipContent) {
+        return formattedContent;
+      }
+      
+      // 返回帶 tooltip 的內容
+      return h('n-tooltip', {
+        trigger: 'hover'
+      }, {
+        trigger: () => h('span', {
+          style: {
+            color: '#1890ff',
+            cursor: 'pointer',
+            textDecoration: 'underline'
+          }
+        }, formattedContent),
+        default: () => h('div', {
+          style: {
+            maxWidth: '400px',
+            maxHeight: '300px',
+            overflow: 'auto'
+          }
+        }, [
+          h('pre', {
+            style: {
+              margin: 0,
+              padding: '8px',
+              background: '#f5f5f5',
+              borderRadius: '4px',
+              fontSize: '12px',
+              lineHeight: '1.4',
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word'
+            }
+          }, tooltipContent)
+        ])
+      });
+    }
   }
 ]);
 
