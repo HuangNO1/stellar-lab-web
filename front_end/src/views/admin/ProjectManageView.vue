@@ -195,9 +195,17 @@ const columns: DataTableColumns<Project> = [
       tooltip: true
     },
     render(row) {
-      return row.project_desc_zh ? 
-        h('div', { style: { maxWidth: '300px' } }, row.project_desc_zh.slice(0, 80) + (row.project_desc_zh.length > 80 ? '...' : '')) :
-        '-';
+      if (!row.project_desc_zh && !row.project_desc_en) {
+        return '-';
+      }
+      
+      const zhDesc = row.project_desc_zh || '';
+      const enDesc = row.project_desc_en || '';
+      
+      return h('div', { style: { maxWidth: '300px' } }, [
+        zhDesc ? h('div', { style: { fontSize: '0.875rem', marginBottom: '4px' } }, zhDesc.slice(0, 60) + (zhDesc.length > 60 ? '...' : '')) : null,
+        enDesc ? h('div', { style: { fontSize: '0.8rem', color: '#666', fontStyle: 'italic' } }, enDesc.slice(0, 60) + (enDesc.length > 60 ? '...' : '')) : null
+      ].filter(Boolean));
     }
   },
   {

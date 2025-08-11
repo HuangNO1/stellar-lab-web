@@ -305,7 +305,7 @@ const pagination = reactive({
 });
 
 // 課題組選項
-const groupOptions = ref<Array<{ label: string; value: number }>>([]);
+const groupOptions = ref<Array<{ label: string; value: number; nameEn?: string }>>([]);
 
 // 選項數據
 const typeOptions = computed(() => [
@@ -404,7 +404,12 @@ const columns: DataTableColumns<Member> = [
     key: 'research_group_id',
     render(row) {
       const group = groupOptions.value.find(g => g.value === row.research_group_id);
-      return group ? group.label : '-';
+      if (!group) return '-';
+      
+      return h('div', [
+        h('div', { style: { fontSize: '0.875rem' } }, group.label),
+        group.nameEn ? h('div', { style: { fontSize: '0.8rem', color: '#666', fontStyle: 'italic' } }, group.nameEn) : null
+      ].filter(Boolean));
     }
   },
   {
@@ -474,7 +479,8 @@ const fetchGroups = async () => {
     if (response.code === 0) {
       groupOptions.value = response.data.items.map((group: ResearchGroup) => ({
         label: group.research_group_name_zh,
-        value: group.research_group_id
+        value: group.research_group_id,
+        nameEn: group.research_group_name_en // 保存英文名稱
       }));
     }
   } catch (error) {

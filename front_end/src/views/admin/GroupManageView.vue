@@ -168,7 +168,12 @@ const columns: DataTableColumns<ResearchGroup> = [
     key: 'leader',
     width: 150,
     render(row) {
-      return row.leader ? h('span', row.leader.mem_name_zh) : '-';
+      if (!row.leader) return '-';
+      
+      return h('div', [
+        h('div', { style: { fontSize: '0.875rem' } }, row.leader.mem_name_zh),
+        h('div', { style: { fontSize: '0.8rem', color: '#666', fontStyle: 'italic' } }, row.leader.mem_name_en)
+      ].filter(item => item.children));
     }
   },
   {
@@ -178,9 +183,17 @@ const columns: DataTableColumns<ResearchGroup> = [
       tooltip: true
     },
     render(row) {
-      return row.research_group_desc_zh ? 
-        h('div', { style: { maxWidth: '300px' } }, row.research_group_desc_zh.slice(0, 100) + (row.research_group_desc_zh.length > 100 ? '...' : '')) :
-        '-';
+      if (!row.research_group_desc_zh && !row.research_group_desc_en) {
+        return '-';
+      }
+      
+      const zhDesc = row.research_group_desc_zh || '';
+      const enDesc = row.research_group_desc_en || '';
+      
+      return h('div', { style: { maxWidth: '300px' } }, [
+        zhDesc ? h('div', { style: { fontSize: '0.875rem', marginBottom: '4px' } }, zhDesc.slice(0, 60) + (zhDesc.length > 60 ? '...' : '')) : null,
+        enDesc ? h('div', { style: { fontSize: '0.8rem', color: '#666', fontStyle: 'italic' } }, enDesc.slice(0, 60) + (enDesc.length > 60 ? '...' : '')) : null
+      ].filter(Boolean));
     }
   },
   {
