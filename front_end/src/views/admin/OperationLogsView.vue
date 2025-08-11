@@ -77,27 +77,29 @@
 
     <!-- 操作日誌列表 -->
     <n-card>
-      <n-data-table
-        :columns="columns"
-        :data="logs"
-        :loading="loading"
-        :row-key="(row: EditRecord) => row.edit_id"
-        :pagination="false"
-        :bordered="false"
-      />
-      
-      <!-- 分頁組件 -->
-      <div class="pagination-container">
-        <n-pagination
-          v-model:page="pagination.page"
-          v-model:page-size="pagination.per_page"
-          :page-count="Math.ceil(pagination.total / pagination.per_page)"
-          :page-sizes="[10, 20, 50]"
-          show-size-picker
-          @update:page="handlePageChange"
-          @update:page-size="handlePageSizeChange"
+      <n-config-provider :locale="naiveLocale" :date-locale="dateLocale">
+        <n-data-table
+          :columns="columns"
+          :data="logs"
+          :loading="loading"
+          :row-key="(row: EditRecord) => row.edit_id"
+          :pagination="false"
+          :bordered="false"
         />
-      </div>
+        
+        <!-- 分頁組件 -->
+        <div class="pagination-container">
+          <n-pagination
+            v-model:page="pagination.page"
+            v-model:page-size="pagination.per_page"
+            :page-count="Math.ceil(pagination.total / pagination.per_page)"
+            :page-sizes="[10, 20, 50]"
+            show-size-picker
+            @update:page="handlePageChange"
+            @update:page-size="handlePageSizeChange"
+          />
+        </div>
+      </n-config-provider>
     </n-card>
 
     <!-- JSON 詳情 Modal -->

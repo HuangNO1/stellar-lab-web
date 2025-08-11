@@ -53,16 +53,18 @@
 
     <!-- 數據表格 -->
     <n-card>
-      <n-data-table
-        :columns="columns"
-        :data="projectList"
-        :pagination="pagination"
-        :loading="loading"
-        :remote="true"
-        :row-key="(row: Project) => row.project_id"
-        @update:page="handlePageChange"
-        @update:page-size="handlePageSizeChange"
-      />
+      <n-config-provider :locale="naiveLocale" :date-locale="dateLocale">
+        <n-data-table
+          :columns="columns"
+          :data="projectList"
+          :pagination="pagination"
+          :loading="loading"
+          :remote="true"
+          :row-key="(row: Project) => row.project_id"
+          @update:page="handlePageChange"
+          @update:page-size="handlePageSizeChange"
+        />
+      </n-config-provider>
     </n-card>
 
     <!-- 新增/編輯 Modal -->
@@ -118,14 +120,27 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, h, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useMessage, NButton, NTag, NSpace } from 'naive-ui';
+import { useMessage, NButton, NTag, NSpace, zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
 import { projectApi } from '@/services/api';
 import QuickActionModal from '@/components/QuickActionModal.vue';
 import type { Project } from '@/types/api';
 import type { DataTableColumns } from 'naive-ui';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const message = useMessage();
+
+// 當前語言環境
+const currentLocale = computed(() => locale.value);
+
+// Naive UI 語言包配置
+const naiveLocale = computed(() => {
+  return locale.value === 'zh' ? zhCN : enUS;
+});
+
+// 日期選擇器的國際化配置
+const dateLocale = computed(() => {
+  return locale.value === 'zh' ? dateZhCN : dateEnUS;
+});
 
 // 響應式數據
 const projectList = ref<Project[]>([]);

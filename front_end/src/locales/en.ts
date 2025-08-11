@@ -23,7 +23,9 @@ export default {
     viewDetails: 'View Details',
     fetchError: 'Failed to fetch data',
     goBack: 'Go Back',
-    page: 'Page'
+    page: 'Page',
+    noData: 'No Data',
+    itemsPerPage: 'Items per page'
   },
   defaults: {
     labName: 'Laboratory',
@@ -234,6 +236,7 @@ export default {
       batchEdit: 'Batch Edit',
       batchDelete: 'Batch Delete',
       noPermission: 'No Permission',
+      status: 'Status',
       // Form Options
       memberTypes: {
         teacher: 'Teacher',

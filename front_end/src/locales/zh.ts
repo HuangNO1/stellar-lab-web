@@ -23,7 +23,9 @@ export default {
     viewDetails: '查看詳情',
     fetchError: '獲取數據失敗',
     goBack: '返回',
-    page: '頁'
+    page: '頁',
+    noData: '暫無數據',
+    itemsPerPage: '每頁條數'
   },
   defaults: {
     labName: '實驗室',
@@ -221,6 +223,7 @@ export default {
       batchEdit: '批量編輯',
       batchDelete: '批量刪除',
       noPermission: '無權限',
+      status: '狀態',
       // 表單選項
       memberTypes: {
         teacher: '教師',
