@@ -6,15 +6,17 @@
     :preview="preview"
     :toolbars="toolbars"
     :style="style"
+    :theme="currentTheme"
     @update:modelValue="$emit('update:modelValue', $event)"
   />
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, inject } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { MdEditor, config } from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
+import { getTheme } from '@/locales';
 
 // Props
 interface Props {
@@ -39,12 +41,24 @@ defineEmits<{
 
 const { locale } = useI18n();
 
+// Try to inject theme from parent, fallback to getTheme()
+const isDarkMode = inject('isDarkMode', null);
+
 // 當前語言
 const currentLanguage = computed(() => {
   return locale.value === 'zh' ? 'zh-CN' : 'en-US';
 });
 
-// 配置國際化
+// 當前主題
+const currentTheme = computed(() => {
+  // Try to get theme from injected value or fallback to stored theme
+  if (isDarkMode && typeof isDarkMode === 'object' && 'value' in isDarkMode) {
+    return isDarkMode.value ? 'dark' : 'light';
+  }
+  return getTheme() === 'dark' ? 'dark' : 'light';
+});
+
+// 配置國際化和主題
 onMounted(() => {
   config({
     editorConfig: {
@@ -209,6 +223,24 @@ onMounted(() => {
           footer: {
             markdownTotal: 'Word Count',
             scrollAuto: 'Sync Scroll',
+          },
+        },
+      },
+    },
+    editorExtensions: {
+      highlight: {
+        css: {
+          atom: {
+            light: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-light.min.css',
+            dark: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css',
+          },
+          github: {
+            light: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css',
+            dark: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css',
+          },
+          vscode: {
+            light: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/vs.min.css',
+            dark: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/vs2015.min.css',
           },
         },
       },

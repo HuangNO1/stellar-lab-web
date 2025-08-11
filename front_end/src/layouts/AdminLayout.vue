@@ -6,7 +6,7 @@
       v-if="!isMobile"
       :collapsed="collapsed"
       :collapsed-width="64"
-      :width="240"
+      :width="280"
       collapse-mode="width"
       bordered
       show-trigger
@@ -156,7 +156,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, h, onMounted, onUnmounted } from 'vue';
+import { ref, computed, h, onMounted, onUnmounted, provide } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useMessage, NIcon, darkTheme } from 'naive-ui';
@@ -188,6 +188,9 @@ const currentLang = computed(() => locale.value);
 const currentTheme = computed<GlobalTheme | null>(() => {
   return isDark.value ? darkTheme : null;
 });
+
+// Provide theme state to child components
+provide('isDarkMode', isDark);
 
 // 活躍菜單項
 const activeKey = computed(() => {

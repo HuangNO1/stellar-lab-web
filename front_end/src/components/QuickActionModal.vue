@@ -1,7 +1,7 @@
 <template>
   <n-modal v-model:show="show" @update:show="handleModalClose" class="quick-action-modal">
     <n-card
-      :style="{ width: isMobile ? '95vw' : '800px', maxWidth: isMobile ? '95vw' : '800px' }"
+      :style="{ width: isMobile ? '95vw' : '60rem', maxWidth: isMobile ? '95vw' : '60rem' }"
       :title="modalTitle"
       :bordered="false"
       :size="isMobile ? 'medium' : 'huge'"
@@ -30,7 +30,7 @@
         :model="formData"
         :rules="formRules"
         :label-placement="isMobile ? 'top' : 'left'"
-        :label-width="isMobile ? 'auto' : '120'"
+        :label-width="isMobile ? 'auto' : '160'"
         require-mark-placement="right-hanging"
         class="modal-form"
       >
