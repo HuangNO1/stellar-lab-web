@@ -129,6 +129,8 @@ def update_member(mem_id):
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
         
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify(error_response(5000, '更新成員失敗')), 500
 
 @bp.route('/members/<int:mem_id>', methods=['DELETE'])

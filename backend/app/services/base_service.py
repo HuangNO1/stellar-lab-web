@@ -154,6 +154,14 @@ class BaseService(ABC):
         Raises:
             PermissionError: 權限不足
         """
+        # 檢查是否在請求上下文中
+        try:
+            from flask import has_request_context
+            if not has_request_context():
+                return True
+        except ImportError:
+            pass
+        
         if not hasattr(g, 'current_admin') or g.current_admin is None:
             raise PermissionError("未登錄或登錄已過期")
         

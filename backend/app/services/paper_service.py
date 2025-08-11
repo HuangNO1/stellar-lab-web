@@ -191,10 +191,49 @@ class PaperService(BaseService):
             self.db.session.flush()
             updated_paper = Paper.query.get(paper_id)
             
-            return updated_paper.to_dict(), update_data
+            return updated_paper.to_dict()
+        
+        # 先收集更新數據用於審計
+        update_data = {}
+        basic_fields = [
+            'paper_title_zh', 'paper_title_en',
+            'paper_desc_zh', 'paper_desc_en',
+            'paper_venue', 'paper_url', 'paper_type', 'paper_accept'
+        ]
+        
+        for field in basic_fields:
+            if field in paper_data:
+                old_value = getattr(paper, field)
+                new_value = paper_data[field]
+                
+                if field in ['paper_type', 'paper_accept'] and isinstance(new_value, str):
+                    new_value = int(new_value)
+                
+                if old_value != new_value:
+                    update_data[field] = {'old': old_value, 'new': new_value}
+        
+        if 'paper_date' in paper_data and paper_data['paper_date']:
+            try:
+                new_date = datetime.strptime(paper_data['paper_date'], '%Y-%m-%d').date()
+                if paper.paper_date != new_date:
+                    update_data['paper_date'] = {'old': str(paper.paper_date), 'new': str(new_date)}
+            except ValueError:
+                raise ValidationError('日期格式錯誤，應為 YYYY-MM-DD')
+        
+        if 'research_group_id' in paper_data:
+            research_group_id = paper_data['research_group_id']
+            if research_group_id and ResearchGroup.query.get(research_group_id):
+                if paper.research_group_id != research_group_id:
+                    update_data['research_group_id'] = {
+                        'old': paper.research_group_id,
+                        'new': research_group_id
+                    }
+        
+        if 'authors' in paper_data and isinstance(paper_data['authors'], list):
+            update_data['authors'] = paper_data['authors']
         
         # 執行操作並記錄審計
-        result, update_data = self.execute_with_audit(
+        result = self.execute_with_audit(
             operation_func=_update_operation,
             operation_type='UPDATE',
             content=update_data

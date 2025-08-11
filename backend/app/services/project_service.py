@@ -131,10 +131,29 @@ class ProjectService(BaseService):
                         setattr(project, field, new_value)
                         update_data[field] = {'old': str(old_value), 'new': str(new_value)}
             
-            return project.to_dict(), update_data
+            return project.to_dict()
+        
+        # 先收集更新數據用於審計
+        update_data = {}
+        fields = [
+            'project_name_zh', 'project_name_en', 
+            'project_desc_zh', 'project_desc_en',
+            'project_url', 'project_date_start', 'is_end'
+        ]
+        
+        for field in fields:
+            if field in project_data:
+                old_value = getattr(project, field)
+                if field == 'project_date_start':
+                    new_value = datetime.strptime(project_data[field], '%Y-%m-%d').date()
+                else:
+                    new_value = project_data[field]
+                
+                if old_value != new_value:
+                    update_data[field] = {'old': str(old_value), 'new': str(new_value)}
         
         # 執行操作並記錄審計
-        result, update_data = self.execute_with_audit(
+        result = self.execute_with_audit(
             operation_func=_update_operation,
             operation_type='UPDATE',
             content=update_data

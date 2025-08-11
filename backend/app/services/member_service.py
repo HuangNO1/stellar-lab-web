@@ -68,7 +68,7 @@ class MemberService(BaseService):
         
         return member.to_dict()
     
-    def create_member(self, form_data: Dict[str, Any], files_data: Dict[str, Any] = None) -> Dict[str, Any]:
+    def create_member(self, form_data: Dict[str, Any], files_data: Dict[str, Any] = None, current_admin=None) -> Dict[str, Any]:
         """
         創建成員
         
@@ -80,6 +80,11 @@ class MemberService(BaseService):
             Dict: 創建的成員信息
         """
         # 驗證權限
+        if current_admin:
+            # 如果傳遞了管理員，則設置到 g 對象中
+            from flask import g
+            g.current_admin = current_admin
+            
         self.validate_permissions('CREATE')
         
         # 數據校驗
@@ -112,7 +117,7 @@ class MemberService(BaseService):
         
         return result
     
-    def update_member(self, mem_id: int, form_data: Dict[str, Any], files_data: Dict[str, Any] = None) -> Dict[str, Any]:
+    def update_member(self, mem_id: int, form_data: Dict[str, Any], files_data: Dict[str, Any] = None, current_admin=None) -> Dict[str, Any]:
         """
         更新成員信息
         
@@ -125,6 +130,11 @@ class MemberService(BaseService):
             Dict: 更新後的成員信息
         """
         # 驗證權限
+        if current_admin:
+            # 如果傳遞了管理員，則設置到 g 對象中
+            from flask import g
+            g.current_admin = current_admin
+            
         self.validate_permissions('UPDATE', mem_id)
         
         member = Member.query.filter_by(mem_id=mem_id, enable=1).first()
@@ -151,10 +161,21 @@ class MemberService(BaseService):
             association_updates = self._update_member_associations(member, form_data)
             update_data.update(association_updates)
             
-            return member.to_dict(), update_data
+            return member.to_dict()
+        
+        # 先收集更新數據用於審計
+        update_data = {}
+        basic_updates = self._update_member_basic_info(member, form_data)
+        update_data.update(basic_updates)
+        if files_data:
+            avatar_update = self._handle_avatar_update(member, files_data)
+            if avatar_update:
+                update_data.update(avatar_update)
+        association_updates = self._update_member_associations(member, form_data)
+        update_data.update(association_updates)
         
         # 執行操作並記錄審計
-        result, update_data = self.execute_with_audit(
+        result = self.execute_with_audit(
             operation_func=_update_operation,
             operation_type='UPDATE',
             content=update_data
