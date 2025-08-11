@@ -257,7 +257,8 @@ export default {
         selectFile: '選擇文件',
         uploadSuccess: '文件上傳成功',
         uploadError: '文件上傳失敗'
-      }
+      },
+      viewDetails: '查看詳情'
     },
     members: {
       addMember: '添加成員',
@@ -581,6 +582,43 @@ export default {
           adminPassRequired: '密碼必填'
         }
       }
+    },
+    // 操作日誌翻譯
+    operationLogs: {
+      title: '操作日誌',
+      description: '查看所有管理員操作和系統活動記錄',
+      searchPlaceholder: '搜索管理員姓名、操作類型或內容...',
+      selectAdmin: '選擇管理員',
+      selectOperation: '選擇操作類型',
+      selectModule: '選擇模塊',
+      allAdmins: '全部管理員',
+      allOperations: '全部操作',
+      allModules: '全部模塊',
+      time: '操作時間',
+      admin: '操作管理員',
+      operation: '操作類型',
+      module: '操作模塊',
+      content: '操作內容',
+      create: '創建',
+      update: '更新',
+      delete: '刪除',
+      login: '登錄',
+      logout: '登出',
+      adminModule: '管理員/認證',
+      labModule: '實驗室',
+      groupModule: '課題組',
+      memberModule: '成員',
+      paperModule: '論文',
+      newsModule: '新聞',
+      projectModule: '項目',
+      loadError: '載入操作日誌失敗'
+    },
+    // 系統管理翻譯
+    system: {
+      backup: '數據備份',
+      backupDesc: '備份和還原系統數據',
+      settings: '系統設置',
+      settingsDesc: '配置系統參數和選項'
     }
   }
 }

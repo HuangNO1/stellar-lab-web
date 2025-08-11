@@ -197,6 +197,30 @@ export interface ProjectQueryParams extends BaseQueryParams {
   order?: string;
 }
 
+// 操作日誌信息
+export interface EditRecord {
+  edit_id: number;
+  admin_id: number;
+  edit_type: string;
+  edit_module: number;
+  edit_date: string;
+  edit_content?: string;
+  admin_name: string;
+}
+
+// 操作日誌查詢參數
+export interface EditRecordQueryParams {
+  admin_id?: number;
+  edit_module?: number;
+  edit_type?: string;
+  start_date?: string;
+  end_date?: string;
+  q?: string;
+  page?: number;
+  per_page?: number;
+  all?: string;
+}
+
 // 搜索過濾器接口（用於搜索組件）
 export interface SearchFilters {
   q?: string;

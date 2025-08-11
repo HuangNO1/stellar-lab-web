@@ -108,6 +108,11 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import('@/views/admin/SystemManageView.vue')
             },
             {
+                path: 'operation-logs',
+                name: 'admin-operation-logs',
+                component: () => import('@/views/admin/OperationLogsView.vue')
+            },
+            {
                 path: 'profile',
                 name: 'admin-profile',
                 component: () => import('@/views/admin/ProfileView.vue')

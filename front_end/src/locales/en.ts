@@ -270,7 +270,8 @@ export default {
         selectFile: 'Select File',
         uploadSuccess: 'File uploaded successfully',
         uploadError: 'File upload failed'
-      }
+      },
+      viewDetails: 'View Details'
     },
     members: {
       addMember: 'Add Member',
@@ -589,6 +590,43 @@ export default {
           adminPassRequired: 'Password is required'
         }
       }
+    },
+    // Operation Logs translations
+    operationLogs: {
+      title: 'Operation Logs',
+      description: 'View all admin operations and system activities',
+      searchPlaceholder: 'Search admin name, operation type, or content...',
+      selectAdmin: 'Select Admin',
+      selectOperation: 'Select Operation',
+      selectModule: 'Select Module',
+      allAdmins: 'All Admins',
+      allOperations: 'All Operations',
+      allModules: 'All Modules',
+      time: 'Time',
+      admin: 'Admin',
+      operation: 'Operation',
+      module: 'Module',
+      content: 'Content',
+      create: 'Create',
+      update: 'Update',
+      delete: 'Delete',
+      login: 'Login',
+      logout: 'Logout',
+      adminModule: 'Admin/Auth',
+      labModule: 'Lab',
+      groupModule: 'Group',
+      memberModule: 'Member',
+      paperModule: 'Paper',
+      newsModule: 'News',
+      projectModule: 'Project',
+      loadError: 'Failed to load operation logs'
+    },
+    // System Management translations
+    system: {
+      backup: 'Data Backup',
+      backupDesc: 'Backup and restore system data',
+      settings: 'System Settings',
+      settingsDesc: 'Configure system parameters and options'
     }
   }
 }

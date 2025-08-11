@@ -91,6 +91,71 @@
             </div>
           </div>
         </div>
+        <!-- 新聞列表 -->
+        <div class="news-section">
+          <div class="section-header">
+            <h2>{{ $t('nav.news') }}</h2>
+            <n-button type="primary" ghost @click="toNewsPage">
+              {{ $t('news.viewMore') }}
+            </n-button>
+          </div>
+
+          <!-- 加載狀態 -->
+          <div v-if="newsLoading" class="news-skeleton">
+            <div v-for="i in 5" :key="i" class="news-item-skeleton">
+              <div class="skeleton-tag">
+                <n-skeleton text width="3rem" />
+              </div>
+              <div class="skeleton-content">
+                <n-skeleton text width="70%" />
+                <n-skeleton text width="40%" style="margin-top: 0.5rem" />
+              </div>
+            </div>
+          </div>
+
+          <!-- 錯誤狀態 -->
+          <div v-else-if="newsError" class="error-state">
+            <n-alert type="warning" :title="$t('common.error')" style="margin-bottom: 1rem;">
+              {{ newsError }}
+            </n-alert>
+            <n-button @click="fetchLatestNews" type="primary" ghost size="small">
+              {{ $t('common.retry') }}
+            </n-button>
+          </div>
+
+          <!-- 新聞列表 -->
+          <div v-else class="news-list">
+            <div v-if="latestNews.length > 0">
+              <div 
+                v-for="news in latestNews" 
+                :key="news.news_id" 
+                class="news-item-compact" 
+                @click="toNewsPage"
+              >
+                <div class="news-item-header">
+                  <n-tag 
+                    :type="getNewsTypeColor(news.news_type)" 
+                    size="small"
+                    class="news-tag"
+                  >
+                    {{ getNewsTypeText(news.news_type) }}
+                  </n-tag>
+                  <span class="news-date">{{ formatDate(news.news_date) }}</span>
+                </div>
+                <div class="news-content-compact">
+                  <span class="news-title-compact">
+                    {{ getCurrentLocale() === 'zh' ? news.news_content_zh : (news.news_content_en || news.news_content_zh) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 空狀態 -->
+            <div v-else class="empty-state-compact">
+              <n-empty :description="$t('news.empty')" size="small" />
+            </div>
+          </div>
+        </div>
         
         <!-- 聯繫我們 -->
         <div class="contact-section">
@@ -130,12 +195,13 @@
 </template>
 
 <script setup lang="ts">
-import { inject, computed } from 'vue';
+import { inject, computed, ref, onMounted } from 'vue';
 import { useRouter } from "vue-router";
 import { useI18n } from 'vue-i18n';
 import { useResearchGroupsWithAutoFetch } from '@/composables/useResearchGroups';
 import { getMediaUrl, hasCarouselImages as checkCarouselImages } from '@/utils/media';
-import type { ResearchGroup, Lab } from '@/types/api';
+import { newsApi } from '@/services/api';
+import type { ResearchGroup, Lab, News } from '@/types/api';
 
 const router = useRouter();
 const { t, locale } = useI18n();
@@ -147,6 +213,11 @@ const lab = computed(() => labRef && typeof labRef === 'object' && 'value' in la
 
 // 使用 composable 獲取課題組數據
 const { researchGroups, loading, error, fetchResearchGroups } = useResearchGroupsWithAutoFetch();
+
+// 新聞相關狀態
+const latestNews = ref<News[]>([]);
+const newsLoading = ref(false);
+const newsError = ref<string | null>(null);
 
 // 獲取當前語言
 const getCurrentLocale = () => {
@@ -187,6 +258,67 @@ const hasCarouselImages = computed(() => {
 const toResearchGroup = (group: ResearchGroup) => {
   router.push(`/group/${group.research_group_id}`);
 };
+
+// 獲取新聞類型顏色
+const getNewsTypeColor = (type: number) => {
+  const colorMap = {
+    0: 'info',     // 論文發表
+    1: 'success',  // 獲獎消息
+    2: 'warning'   // 學術活動
+  };
+  return colorMap[type as keyof typeof colorMap] || 'default';
+};
+
+// 獲取新聞類型文本
+const getNewsTypeText = (type: number) => {
+  const textMap = {
+    0: t('news.paperPublished'),
+    1: t('news.award'),
+    2: t('news.academic')
+  };
+  return textMap[type as keyof typeof textMap] || t('news.other');
+};
+
+// 格式化日期
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString(getCurrentLocale() === 'zh' ? 'zh-CN' : 'en-US');
+};
+
+// 獲取最新新聞
+const fetchLatestNews = async () => {
+  try {
+    newsLoading.value = true;
+    newsError.value = null;
+
+    const response = await newsApi.getNews({
+      per_page: 10,
+      page: 1
+    });
+
+    if (response.code === 0) {
+      latestNews.value = response.data.items;
+    } else {
+      newsError.value = response.message || t('common.fetchError');
+    }
+  } catch (err) {
+    console.error('Failed to fetch latest news:', err);
+    newsError.value = t('common.networkError');
+  } finally {
+    newsLoading.value = false;
+  }
+};
+
+// 跳轉到新聞頁面
+const toNewsPage = () => {
+  router.push('/news');
+};
+
+// 生命週期
+onMounted(() => {
+  fetchLatestNews();
+});
 </script>
 <style scoped>
 .home {
@@ -715,5 +847,282 @@ const toResearchGroup = (group: ResearchGroup) => {
 
 .skeleton-action-button {
   width: 80px;
+}
+
+/* =============== 新聞列表樣式 =============== */
+.news-section {
+  margin: 3rem 0;
+  padding: 0 1rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.section-header h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0;
+  background: linear-gradient(135deg, #1890ff, #722ed1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 暗色主題下的標題 */
+.dark-theme .section-header {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 新聞骨架屏 */
+.news-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.news-item-skeleton {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.skeleton-tag {
+  flex-shrink: 0;
+}
+
+.skeleton-content {
+  flex: 1;
+}
+
+/* 錯誤狀態 */
+.error-state {
+  text-align: center;
+  padding: 1.5rem;
+  background: rgba(255, 193, 7, 0.05);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+/* 新聞列表 */
+.news-list {
+  background: #fff;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.dark-theme .news-list {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* 緊湊型新聞項 */
+.news-item-compact {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.news-item-compact:hover {
+  background: rgba(24, 144, 255, 0.04);
+  border-color: rgba(24, 144, 255, 0.2);
+  transform: translateX(4px);
+}
+
+.dark-theme .news-item-compact:hover {
+  background: rgba(24, 144, 255, 0.08);
+  border-color: rgba(112, 161, 255, 0.3);
+}
+
+.news-item-compact + .news-item-compact {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.dark-theme .news-item-compact + .news-item-compact {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* 新聞項頭部 */
+.news-item-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  min-width: 6rem;
+}
+
+.news-tag {
+  font-size: 0.75rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 0.25rem !important;
+  font-weight: 500;
+}
+
+.news-date {
+  font-size: 0.75rem;
+  color: #999;
+  font-weight: 400;
+}
+
+.dark-theme .news-date {
+  color: #999;
+}
+
+/* 新聞內容 */
+.news-content-compact {
+  flex: 1;
+  min-width: 0;
+}
+
+.news-title-compact {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #333;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.dark-theme .news-title-compact {
+  color: #e6e6e6;
+}
+
+.news-title-compact:hover {
+  color: #1890ff;
+}
+
+.dark-theme .news-title-compact:hover {
+  color: #70a1ff;
+}
+
+/* 空狀態 */
+.empty-state-compact {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #999;
+}
+
+.dark-theme .empty-state-compact {
+  color: #666;
+}
+
+/* 響應式設計 - 新聞列表 */
+@media (max-width: 768px) {
+  .news-section {
+    margin: 2rem 0;
+    padding: 0 0.5rem;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+  
+  .section-header h2 {
+    font-size: 1.5rem;
+    align-self: center;
+  }
+  
+  .news-list {
+    padding: 0.75rem;
+  }
+  
+  .news-item-compact {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+  
+  .news-item-header {
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    min-width: auto;
+  }
+  
+  .news-content-compact {
+    width: 100%;
+  }
+  
+  .news-title-compact {
+    font-size: 0.95rem;
+    -webkit-line-clamp: 3;
+  }
+}
+
+@media (max-width: 640px) {
+  .section-header h2 {
+    font-size: 1.375rem;
+  }
+  
+  .news-item-compact {
+    padding: 0.75rem;
+  }
+  
+  .news-tag {
+    font-size: 0.7rem !important;
+    padding: 0.2rem 0.4rem !important;
+  }
+  
+  .news-date {
+    font-size: 0.7rem;
+  }
+  
+  .news-title-compact {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .news-item-compact {
+    padding: 0.6rem;
+  }
+  
+  .news-item-header {
+    gap: 0.5rem;
+  }
+  
+  .news-tag {
+    font-size: 0.65rem !important;
+  }
+  
+  .news-date {
+    font-size: 0.65rem;
+  }
+  
+  .news-title-compact {
+    font-size: 0.8rem;
+    line-height: 1.3;
+  }
 }
 </style>
