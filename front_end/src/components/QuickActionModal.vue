@@ -564,7 +564,16 @@ const formRules = computed(() => {
       { required: true, message: t('admin.members.form.validation.emailRequired'), trigger: 'blur' },
       { type: 'email', message: t('admin.common.validationMessages.invalidEmail'), trigger: 'blur' }
     ];
-    rules.mem_type = { required: true, message: t('admin.members.form.validation.typeRequired'), trigger: 'change' };
+    rules.mem_type = {
+      required: false,
+      validator: (rule: any, value: any) => {
+        if (value === null || value === undefined || value === '') {
+          return new Error(t('admin.members.form.validation.typeRequired'));
+        }
+        return true;
+      },
+      trigger: 'change'
+    };
     rules.research_group_id = { required: true, message: t('admin.members.form.validation.groupRequired'), trigger: 'change' };
     
     // 條件性驗證規則 - 使用 validator 函數動態檢查
@@ -608,13 +617,40 @@ const formRules = computed(() => {
     
   } else if (props.moduleType === 'papers') {
     rules.paper_title_zh = { required: true, message: t('admin.papers.form.validation.titleZhRequired'), trigger: 'blur' };
-    rules.paper_type = { required: true, message: t('admin.papers.form.validation.typeRequired'), trigger: 'change' };
-    rules.paper_accept = { required: true, message: t('admin.papers.form.validation.statusRequired'), trigger: 'change' };
+    rules.paper_type = {
+      required: false,
+      validator: (rule: any, value: any) => {
+        if (value === null || value === undefined || value === '') {
+          return new Error(t('admin.papers.form.validation.typeRequired'));
+        }
+        return true;
+      },
+      trigger: 'change'
+    };
+    rules.paper_accept = {
+      required: false,
+      validator: (rule: any, value: any) => {
+        if (value === null || value === undefined || value === '') {
+          return new Error(t('admin.papers.form.validation.statusRequired'));
+        }
+        return true;
+      },
+      trigger: 'change'
+    };
     rules.paper_date = { required: true, message: t('admin.papers.form.validation.dateRequired'), trigger: 'change' };
   } else if (props.moduleType === 'projects') {
     rules.project_name_zh = { required: true, message: t('admin.projects.form.validation.nameZhRequired'), trigger: 'blur' };
   } else if (props.moduleType === 'news') {
-    rules.news_type = { required: true, message: t('admin.news.form.validation.typeRequired'), trigger: 'change' };
+    rules.news_type = {
+      required: false,
+      validator: (rule: any, value: any) => {
+        if (value === null || value === undefined || value === '') {
+          return new Error(t('admin.news.form.validation.typeRequired'));
+        }
+        return true;
+      },
+      trigger: 'change'
+    };
     rules.news_content_zh = { required: true, message: t('admin.news.form.validation.contentZhRequired'), trigger: 'blur' };
     rules.news_date = { required: true, message: t('admin.news.form.validation.dateRequired'), trigger: 'change' };
   } else if (props.moduleType === 'research-groups') {
