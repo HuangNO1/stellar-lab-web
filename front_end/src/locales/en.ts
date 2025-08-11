@@ -108,7 +108,14 @@ export default {
     title: 'Research Groups',
     leader: 'Group Leader',
     description: 'Group Description',
-    members: 'Members'
+    members: 'Members',
+    addGroup: 'Add Group',
+    editGroup: 'Edit Group',
+    searchPlaceholder: 'Search group name...',
+    fetchError: 'Failed to fetch research groups',
+    deleteConfirmText: 'Are you sure you want to delete this research group? This action cannot be undone.',
+    deleteSuccess: 'Research group deleted successfully',
+    deleteError: 'Failed to delete research group'
   },
   projects: {
     title: 'Research Projects',
@@ -222,6 +229,8 @@ export default {
       loading: 'Loading...',
       success: 'Success',
       failed: 'Failed',
+      batchEdit: 'Batch Edit',
+      batchDelete: 'Batch Delete',
       // Form Options
       memberTypes: {
         teacher: 'Teacher',
@@ -273,10 +282,41 @@ export default {
       type: 'Type',
       group: 'Group',
       status: 'Status',
+      details: 'Details',
+      studentGrade: 'Grade',
+      jobType: 'Job Type',
+      studentType: 'Student Type',
+      grade: 'Grade',
       fetchError: 'Failed to fetch members',
       deleteConfirmText: 'Are you sure you want to delete this member? This action cannot be undone.',
       deleteSuccess: 'Member deleted successfully',
       deleteError: 'Failed to delete member',
+      batchEdit: 'Batch Edit',
+      batchEditTip: 'Will batch update {count} selected members',
+      batchDeleteConfirmText: 'Are you sure you want to delete {count} selected members? This action cannot be undone.',
+      batchDeleteWarning: 'Batch delete operation cannot be recovered, please proceed with caution!',
+      batchDeleteSuccess: 'Successfully deleted {count} members',
+      batchUpdateSuccess: 'Successfully updated {count} members',
+      updateError: 'Failed to update members',
+      noUpdatesSelected: 'Please select at least one field to update',
+      jobTypes: {
+        professor: 'Professor',
+        assocProfessor: 'Associate Professor',
+        lecturer: 'Lecturer',
+        assistantProfessor: 'Assistant Professor',
+        postdoc: 'Postdoc'
+      },
+      studentTypes: {
+        phd: 'PhD',
+        master: 'Master',
+        undergraduate: 'Undergraduate'
+      },
+      placeholders: {
+        studentGrade: 'Enter grade (1-6)',
+        jobType: 'Select job type',
+        studentType: 'Select student type',
+        status: 'Select status'
+      },
       // QuickActionModal related
       form: {
         nameZh: 'Chinese Name',
@@ -331,6 +371,13 @@ export default {
     papers: {
       addPaper: 'Add Paper',
       editPaper: 'Edit Paper',
+      searchPlaceholder: 'Search paper title...',
+      filterByType: 'Filter by type',
+      filterByStatus: 'Filter by status',
+      fetchError: 'Failed to fetch papers',
+      deleteConfirmText: 'Are you sure you want to delete this paper? This action cannot be undone.',
+      deleteSuccess: 'Paper deleted successfully',
+      deleteError: 'Failed to delete paper',
       form: {
         titleZh: 'Chinese Title',
         titleEn: 'English Title',
@@ -360,6 +407,12 @@ export default {
     projects: {
       addProject: 'Add Project',
       editProject: 'Edit Project',
+      searchPlaceholder: 'Search project name...',
+      filterByStatus: 'Filter by status',
+      fetchError: 'Failed to fetch projects',
+      deleteConfirmText: 'Are you sure you want to delete this project? This action cannot be undone.',
+      deleteSuccess: 'Project deleted successfully',
+      deleteError: 'Failed to delete project',
       form: {
         nameZh: 'Chinese Name',
         nameEn: 'English Name',
@@ -383,6 +436,12 @@ export default {
     news: {
       addNews: 'Add News',
       editNews: 'Edit News',
+      searchPlaceholder: 'Search news content...',
+      filterByType: 'Filter by type',
+      fetchError: 'Failed to fetch news',
+      deleteConfirmText: 'Are you sure you want to delete this news? This action cannot be undone.',
+      deleteSuccess: 'News deleted successfully',
+      deleteError: 'Failed to delete news',
       form: {
         type: 'News Type',
         contentZh: 'Chinese Content',

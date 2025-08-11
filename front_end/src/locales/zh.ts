@@ -216,6 +216,8 @@ export default {
       loading: '載入中...',
       success: '成功',
       failed: '失敗',
+      batchEdit: '批量編輯',
+      batchDelete: '批量刪除',
       // 表單選項
       memberTypes: {
         teacher: '教師',
@@ -267,10 +269,41 @@ export default {
       type: '類型',
       group: '課題組',
       status: '狀態',
+      details: '詳情',
+      studentGrade: '年級',
+      jobType: '職位',
+      studentType: '學位類型',
+      grade: '年級',
       fetchError: '獲取成員列表失敗',
       deleteConfirmText: '確定要刪除這個成員嗎？此操作不可撤銷。',
       deleteSuccess: '成員刪除成功',
       deleteError: '刪除成員失敗',
+      batchEdit: '批量編輯',
+      batchEditTip: '將對選中的 {count} 位成員進行批量修改',
+      batchDeleteConfirmText: '確定要刪除選中的 {count} 位成員嗎？此操作不可撤銷。',
+      batchDeleteWarning: '批量刪除操作將無法恢復，請謹慎操作！',
+      batchDeleteSuccess: '成功刪除 {count} 位成員',
+      batchUpdateSuccess: '成功更新 {count} 位成員',
+      updateError: '更新成員失敗',
+      noUpdatesSelected: '請至少選擇一個要更新的字段',
+      jobTypes: {
+        professor: '教授',
+        assocProfessor: '副教授',
+        lecturer: '講師',
+        assistantProfessor: '助理教授',
+        postdoc: '博士後'
+      },
+      studentTypes: {
+        phd: '博士',
+        master: '碩士',
+        undergraduate: '本科'
+      },
+      placeholders: {
+        studentGrade: '請輸入年級 (1-6)',
+        jobType: '請選擇職位類型',
+        studentType: '請選擇學位類型',
+        status: '請選擇狀態'
+      },
       // QuickActionModal 相關
       form: {
         nameZh: '中文姓名',
@@ -300,6 +333,13 @@ export default {
     papers: {
       addPaper: '添加論文',
       editPaper: '編輯論文',
+      searchPlaceholder: '搜索論文標題...',
+      filterByType: '按類型篩選',
+      filterByStatus: '按狀態篩選',
+      fetchError: '獲取論文列表失敗',
+      deleteConfirmText: '確定要刪除這篇論文嗎？此操作不可撤銷。',
+      deleteSuccess: '論文刪除成功',
+      deleteError: '刪除論文失敗',
       form: {
         titleZh: '中文標題',
         titleEn: '英文標題',
@@ -329,6 +369,12 @@ export default {
     projects: {
       addProject: '添加項目',
       editProject: '編輯項目',
+      searchPlaceholder: '搜索項目名稱...',
+      filterByStatus: '按狀態篩選',
+      fetchError: '獲取項目列表失敗',
+      deleteConfirmText: '確定要刪除這個項目嗎？此操作不可撤銷。',
+      deleteSuccess: '項目刪除成功',
+      deleteError: '刪除項目失敗',
       form: {
         nameZh: '中文名稱',
         nameEn: '英文名稱',
@@ -352,6 +398,12 @@ export default {
     news: {
       addNews: '添加新聞',
       editNews: '編輯新聞',
+      searchPlaceholder: '搜索新聞內容...',
+      filterByType: '按類型篩選',
+      fetchError: '獲取新聞列表失敗',
+      deleteConfirmText: '確定要刪除這條新聞嗎？此操作不可撤銷。',
+      deleteSuccess: '新聞刪除成功',
+      deleteError: '刪除新聞失敗',
       form: {
         type: '新聞類型',
         contentZh: '中文內容',
@@ -377,6 +429,11 @@ export default {
       members: '成員列表',
       addGroup: '添加課題組',
       editGroup: '編輯課題組',
+      searchPlaceholder: '搜索課題組名稱...',
+      fetchError: '獲取課題組列表失敗',
+      deleteConfirmText: '確定要刪除這個課題組嗎？此操作不可撤銷。',
+      deleteSuccess: '課題組刪除成功',
+      deleteError: '刪除課題組失敗',
       form: {
         nameZh: '中文名稱',
         nameEn: '英文名稱',

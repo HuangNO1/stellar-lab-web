@@ -78,31 +78,9 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import('@/views/admin/MemberManageView.vue')
             },
             {
-                path: 'members/create',
-                name: 'admin-member-create',
-                component: () => import('@/views/admin/MemberEditView.vue')
-            },
-            {
-                path: 'members/:id/edit',
-                name: 'admin-member-edit',
-                component: () => import('@/views/admin/MemberEditView.vue'),
-                props: true
-            },
-            {
                 path: 'groups',
                 name: 'admin-groups',
                 component: () => import('@/views/admin/GroupManageView.vue')
-            },
-            {
-                path: 'groups/create',
-                name: 'admin-group-create',
-                component: () => import('@/views/admin/GroupEditView.vue')
-            },
-            {
-                path: 'groups/:id/edit',
-                name: 'admin-group-edit',
-                component: () => import('@/views/admin/GroupEditView.vue'),
-                props: true
             },
             {
                 path: 'papers',
@@ -110,47 +88,14 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import('@/views/admin/PaperManageView.vue')
             },
             {
-                path: 'papers/create',
-                name: 'admin-paper-create',
-                component: () => import('@/views/admin/PaperEditView.vue')
-            },
-            {
-                path: 'papers/:id/edit',
-                name: 'admin-paper-edit',
-                component: () => import('@/views/admin/PaperEditView.vue'),
-                props: true
-            },
-            {
                 path: 'projects',
                 name: 'admin-projects',
                 component: () => import('@/views/admin/ProjectManageView.vue')
             },
             {
-                path: 'projects/create',
-                name: 'admin-project-create',
-                component: () => import('@/views/admin/ProjectEditView.vue')
-            },
-            {
-                path: 'projects/:id/edit',
-                name: 'admin-project-edit',
-                component: () => import('@/views/admin/ProjectEditView.vue'),
-                props: true
-            },
-            {
                 path: 'news',
                 name: 'admin-news',
                 component: () => import('@/views/admin/NewsManageView.vue')
-            },
-            {
-                path: 'news/create',
-                name: 'admin-news-create',
-                component: () => import('@/views/admin/NewsEditView.vue')
-            },
-            {
-                path: 'news/:id/edit',
-                name: 'admin-news-edit',
-                component: () => import('@/views/admin/NewsEditView.vue'),
-                props: true
             },
             {
                 path: 'lab',
