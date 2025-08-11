@@ -379,37 +379,68 @@
 
         <!-- 管理員表單 -->
         <template v-if="moduleType === 'admins'">
-          <n-form-item :label="t('admin.admins.form.adminName')" path="admin_name">
-            <n-input
-              v-model:value="formData.admin_name"
-              :placeholder="t('admin.admins.form.placeholders.adminName')"
-              style="width: 100%"
-            />
-          </n-form-item>
-          <n-form-item v-if="actionType === 'create'" :label="t('admin.admins.form.adminPass')" path="admin_pass">
-            <n-input
-              v-model:value="formData.admin_pass"
-              type="password"
-              :placeholder="t('admin.admins.form.placeholders.adminPass')"
-              style="width: 100%"
-            />
-          </n-form-item>
-          <n-form-item :label="t('admin.admins.form.isSuper')" path="is_super">
-            <n-select
-              v-model:value="formData.is_super"
-              :options="adminTypeOptions"
-              :placeholder="t('admin.admins.form.placeholders.isSuper')"
-              style="width: 100%"
-            />
-          </n-form-item>
-          <n-form-item v-if="actionType === 'edit'" :label="t('admin.admins.form.enable')" path="enable">
-            <n-select
-              v-model:value="formData.enable"
-              :options="enableOptions"
-              :placeholder="t('admin.admins.form.placeholders.enable')"
-              style="width: 100%"
-            />
-          </n-form-item>
+          <!-- 密碼修改模式：只顯示密碼相關字段 -->
+          <template v-if="passwordOnly">
+            <n-form-item :label="t('admin.profile.currentPassword')" path="old_password">
+              <n-input
+                v-model:value="formData.old_password"
+                type="password"
+                :placeholder="t('admin.profile.placeholders.currentPassword')"
+                style="width: 100%"
+              />
+            </n-form-item>
+            <n-form-item :label="t('admin.profile.newPassword')" path="new_password">
+              <n-input
+                v-model:value="formData.new_password"
+                type="password"
+                :placeholder="t('admin.profile.placeholders.newPassword')"
+                style="width: 100%"
+              />
+            </n-form-item>
+            <n-form-item :label="t('admin.profile.confirmPassword')" path="confirm_password">
+              <n-input
+                v-model:value="formData.confirm_password"
+                type="password"
+                :placeholder="t('admin.profile.placeholders.confirmPassword')"
+                style="width: 100%"
+              />
+            </n-form-item>
+          </template>
+          
+          <!-- 正常管理員表單模式 -->
+          <template v-else>
+            <n-form-item :label="t('admin.admins.form.adminName')" path="admin_name">
+              <n-input
+                v-model:value="formData.admin_name"
+                :placeholder="t('admin.admins.form.placeholders.adminName')"
+                style="width: 100%"
+              />
+            </n-form-item>
+            <n-form-item v-if="actionType === 'create'" :label="t('admin.admins.form.adminPass')" path="admin_pass">
+              <n-input
+                v-model:value="formData.admin_pass"
+                type="password"
+                :placeholder="t('admin.admins.form.placeholders.adminPass')"
+                style="width: 100%"
+              />
+            </n-form-item>
+            <n-form-item :label="t('admin.admins.form.isSuper')" path="is_super">
+              <n-select
+                v-model:value="formData.is_super"
+                :options="adminTypeOptions"
+                :placeholder="t('admin.admins.form.placeholders.isSuper')"
+                style="width: 100%"
+              />
+            </n-form-item>
+            <n-form-item v-if="actionType === 'edit'" :label="t('admin.admins.form.enable')" path="enable">
+              <n-select
+                v-model:value="formData.enable"
+                :options="enableOptions"
+                :placeholder="t('admin.admins.form.placeholders.enable')"
+                style="width: 100%"
+              />
+            </n-form-item>
+          </template>
         </template>
       </n-form>
 
@@ -448,10 +479,12 @@ interface Props {
   moduleType: 'members' | 'papers' | 'projects' | 'news' | 'research-groups' | 'admins';
   actionType: 'create' | 'edit';
   editData?: Record<string, any>;
+  passwordOnly?: boolean; // 新增：僅密碼修改模式
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  editData: () => ({})
+  editData: () => ({}),
+  passwordOnly: false
 });
 
 // Emits
@@ -537,6 +570,11 @@ const memberOptions = ref<Array<{ label: string; value: number }>>([]);
 
 // Computed
 const modalTitle = computed(() => {
+  // 如果是僅密碼修改模式
+  if (props.passwordOnly) {
+    return t('admin.user.changePassword');
+  }
+
   // Map module types to correct title keys
   const moduleKeyMap: Record<string, string> = {
     'members': 'Member',
@@ -656,9 +694,31 @@ const formRules = computed(() => {
   } else if (props.moduleType === 'research-groups') {
     rules.research_group_name_zh = { required: true, message: t('admin.groups.form.validation.nameZhRequired'), trigger: 'blur' };
   } else if (props.moduleType === 'admins') {
-    rules.admin_name = { required: true, message: t('admin.admins.form.validation.adminNameRequired'), trigger: 'blur' };
-    if (props.actionType === 'create') {
-      rules.admin_pass = { required: true, message: t('admin.admins.form.validation.adminPassRequired'), trigger: 'blur' };
+    if (props.passwordOnly) {
+      // 密碼修改模式的驗證規則
+      rules.old_password = { required: true, message: t('admin.profile.validation.currentPasswordRequired'), trigger: 'blur' };
+      rules.new_password = [
+        { required: true, message: t('admin.profile.validation.newPasswordRequired'), trigger: 'blur' },
+        { min: 6, message: t('admin.profile.validation.passwordMinLength'), trigger: 'blur' }
+      ];
+      rules.confirm_password = [
+        { required: true, message: t('admin.profile.validation.confirmPasswordRequired'), trigger: 'blur' },
+        {
+          validator: (rule: any, value: string) => {
+            if (value !== formData.new_password) {
+              return new Error(t('admin.profile.validation.passwordNotMatch'));
+            }
+            return true;
+          },
+          trigger: ['blur', 'change']
+        }
+      ];
+    } else {
+      // 正常管理員表單模式的驗證規則
+      rules.admin_name = { required: true, message: t('admin.admins.form.validation.adminNameRequired'), trigger: 'blur' };
+      if (props.actionType === 'create') {
+        rules.admin_pass = { required: true, message: t('admin.admins.form.validation.adminPassRequired'), trigger: 'blur' };
+      }
     }
   }
   
@@ -887,8 +947,45 @@ const handleFileRemove = (fieldName: string) => {
 
 const handleSubmit = async () => {
   try {
-    // 對於管理員操作，檢查權限
-    if (props.moduleType === 'admins') {
+    // 密碼修改模式的特殊處理
+    if (props.passwordOnly && props.moduleType === 'admins') {
+      await formRef.value?.validate();
+      submitting.value = true;
+
+      try {
+        const passwordData = {
+          old_password: formData.old_password,
+          new_password: formData.new_password
+        };
+
+        const response = await fetch('/api/admin/change-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': authStore.token || ''
+          },
+          body: JSON.stringify(passwordData)
+        });
+
+        const result = await response.json();
+        if (result.code !== 0) {
+          throw new Error(result.message || t('admin.profile.messages.passwordChangeFailed'));
+        }
+
+        message.success(t('admin.profile.messages.passwordChangeSuccess'));
+        emit('success', result.data);
+        show.value = false;
+        return;
+      } catch (error: any) {
+        message.error(error.message || t('admin.profile.messages.passwordChangeFailed'));
+        return;
+      } finally {
+        submitting.value = false;
+      }
+    }
+
+    // 對於管理員操作，檢查權限（密碼修改模式除外）
+    if (props.moduleType === 'admins' && !props.passwordOnly) {
       // 編輯管理員時，檢查是否為超級管理員且不是編輯其他超級管理員
       if (props.actionType === 'edit') {
         if (!authStore.isSuperAdmin) {
@@ -896,7 +993,7 @@ const handleSubmit = async () => {
           return;
         }
         
-        // 不能編輯自己
+        // 在密碼模式下允許編輯自己，但在正常編輯模式下不允許
         if (formData.admin_id === authStore.admin?.admin_id) {
           message.error(t('admin.admins.cannotEditSelf'));
           return;

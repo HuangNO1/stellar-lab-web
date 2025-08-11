@@ -671,6 +671,32 @@ export default {
       expand: 'Expand',
       collapse: 'Collapse'
     },
+    // Profile Management translations
+    profile: {
+      editProfile: 'Edit Profile',
+      currentPassword: 'Current Password',
+      newPassword: 'New Password',
+      confirmPassword: 'Confirm Password',
+      placeholders: {
+        currentPassword: 'Enter current password',
+        newPassword: 'Enter new password (at least 6 characters)',
+        confirmPassword: 'Confirm new password'
+      },
+      validation: {
+        currentPasswordRequired: 'Current password is required',
+        newPasswordRequired: 'New password is required',
+        confirmPasswordRequired: 'Please confirm new password',
+        passwordMinLength: 'Password must be at least 6 characters',
+        passwordNotMatch: 'Passwords do not match'
+      },
+      messages: {
+        profileUpdateSuccess: 'Profile updated successfully',
+        passwordChangeSuccess: 'Password changed successfully',
+        passwordChangeFailed: 'Failed to change password',
+        updateFailed: 'Update failed',
+        noChanges: 'No changes to save'
+      }
+    },
     // System Management translations
     system: {
       backup: 'Data Backup',

@@ -165,11 +165,11 @@ const formatDate = (dateStr: string) => {
 
 // 權限檢查函數
 const canEditAdmin = (targetAdmin: Admin) => {
-  // 只有超級管理員可以編輯其他管理員
+  // 只有超級管理員可以編輯管理員
   if (!authStore.isSuperAdmin) return false;
   
-  // 不能編輯自己
-  if (targetAdmin.admin_id === authStore.admin?.admin_id) return false;
+  // 超級管理員可以編輯自己的信息
+  if (targetAdmin.admin_id === authStore.admin?.admin_id) return true;
   
   // 不能編輯其他超級管理員
   return targetAdmin.is_super !== 1;
@@ -278,7 +278,22 @@ const fetchAdmins = async () => {
 
     const response = await adminApi.getAdmins(params);
     if (response.code === 0) {
-      adminList.value = response.data.items;
+      let admins = response.data.items;
+      
+      // 將當前登錄的管理員排在最前面
+      const currentAdminId = authStore.admin?.admin_id;
+      if (currentAdminId) {
+        admins = admins.sort((a: Admin, b: Admin) => {
+          // 當前用戶排在最前
+          if (a.admin_id === currentAdminId) return -1;
+          if (b.admin_id === currentAdminId) return 1;
+          
+          // 其他按創建時間排序
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        });
+      }
+      
+      adminList.value = admins;
       pagination.itemCount = response.data.total;
     } else {
       message.error(response.message || t('admin.admins.fetchError'));

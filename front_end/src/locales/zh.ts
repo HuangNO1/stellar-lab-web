@@ -663,6 +663,32 @@ export default {
       expand: '展開',
       collapse: '收起'
     },
+    // 個人資料管理翻譯
+    profile: {
+      editProfile: '編輯個人資料',
+      currentPassword: '當前密碼',
+      newPassword: '新密碼',
+      confirmPassword: '確認新密碼',
+      placeholders: {
+        currentPassword: '請輸入當前密碼',
+        newPassword: '請輸入新密碼（至少6位字符）',
+        confirmPassword: '請確認新密碼'
+      },
+      validation: {
+        currentPasswordRequired: '請輸入當前密碼',
+        newPasswordRequired: '請輸入新密碼',
+        confirmPasswordRequired: '請確認新密碼',
+        passwordMinLength: '密碼至少需要6位字符',
+        passwordNotMatch: '兩次輸入的密碼不一致'
+      },
+      messages: {
+        profileUpdateSuccess: '個人資料更新成功',
+        passwordChangeSuccess: '密碼修改成功',
+        passwordChangeFailed: '密碼修改失敗',
+        updateFailed: '更新失敗',
+        noChanges: '沒有需要保存的更改'
+      }
+    },
     // 系統管理翻譯
     system: {
       backup: '數據備份',

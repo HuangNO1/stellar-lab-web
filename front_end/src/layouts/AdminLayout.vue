@@ -134,6 +134,22 @@
         <router-view />
       </n-layout-content>
     </n-layout>
+
+    <!-- Profile Modal -->
+    <ProfileModal
+      v-model="showProfileModal"
+      @success="handleProfileSuccess"
+    />
+
+    <!-- 修改密碼 Modal -->
+    <QuickActionModal
+      v-model="showPasswordModal"
+      :module-type="'admins'"
+      :action-type="'edit'"
+      :edit-data="passwordEditData"
+      :password-only="true"
+      @success="handlePasswordSuccess"
+    />
   </n-layout>
 </template>
 
@@ -144,6 +160,8 @@ import { useI18n } from 'vue-i18n';
 import { useMessage, NIcon } from 'naive-ui';
 import { useAuthStore } from '@/stores/auth';
 import { setLanguage, getTheme, setTheme } from '@/locales';
+import ProfileModal from '@/components/ProfileModal.vue';
+import QuickActionModal from '@/components/QuickActionModal.vue';
 import type { MenuOption, DropdownOption } from 'naive-ui';
 
 const router = useRouter();
@@ -156,6 +174,9 @@ const collapsed = ref(false);
 const isDark = ref(false);
 const isMobile = ref(window.innerWidth <= 1024);
 const showMobileSidebar = ref(false);
+const showProfileModal = ref(false);
+const showPasswordModal = ref(false);
+const passwordEditData = ref<any>({});
 
 // 當前語言
 const currentLang = computed(() => locale.value);
@@ -227,7 +248,7 @@ const menuOptions = computed<MenuOption[]>(() => [
       {
         label: t('admin.menu.members'),
         key: 'members',
-        icon: renderIcon('<svg viewBox="0 0 24 24"><path fill="currentColor" d="M16,4C18.2,4 20,5.8 20,8A4,4 0 0,1 16,12A4,4 0 0,1 12,8A4,4 0 0,1 16,4M16,14C18.25,14 22,15.13 22,17.25V20H10V17.25C10,15.13 13.75,14 16,14M8.5,14L7.5,16H6L4.5,12H6L7,14H8.5M15,7L14,9H13L11.5,5H13L14,7H15M1.5,5H3L4,7H5.5L4.5,9H3L1.5,5Z"/></svg>')
+        icon: renderIcon('<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,5.5A3.5,3.5 0 0,1 15.5,9A3.5,3.5 0 0,1 12,12.5A3.5,3.5 0 0,1 8.5,9A3.5,3.5 0 0,1 12,5.5M5,8C5.56,8 6.08,8.15 6.53,8.42C6.38,9.85 6.8,11.27 7.66,12.38C7.16,13.34 6.16,14 5,14A3,3 0 0,1 2,11A3,3 0 0,1 5,8M19,8A3,3 0 0,1 22,11A3,3 0 0,1 19,14C17.84,14 16.84,13.34 16.34,12.38C17.2,11.27 17.62,9.85 17.47,8.42C17.92,8.15 18.44,8 19,8M5.5,18.25C5.5,16.18 8.41,14.5 12,14.5C15.59,14.5 18.5,16.18 18.5,18.25V20H5.5V18.25M0,20V18.5C0,17.11 1.89,15.94 4.45,15.6C3.86,16.28 3.5,17.22 3.5,18.25V20H0M24,20H20.5V18.25C20.5,17.22 20.14,16.28 19.55,15.6C22.11,15.94 24,17.11 24,18.5V20Z"/></svg>')
       },
       {
         label: t('admin.menu.groups'),
@@ -363,12 +384,23 @@ const handleUserMenuSelect = async (key: string) => {
     message.success(t('admin.user.logoutSuccess'));
     router.push('/admin/login');
   } else if (key === 'profile') {
-    // 跳轉到個人資料頁面
-    router.push('/admin/profile');
+    // 顯示個人資料彈窗
+    showProfileModal.value = true;
   } else if (key === 'changePassword') {
-    // 跳轉到修改密碼頁面
-    router.push('/admin/change-password');
+    // 直接彈出修改密碼的modal
+    passwordEditData.value = { ...authStore.admin };
+    showPasswordModal.value = true;
   }
+};
+
+// 處理個人資料更新成功
+const handleProfileSuccess = () => {
+  // 個人資料更新成功時的回調，可以在這裡做一些額外的處理
+};
+
+// 處理密碼修改成功
+const handlePasswordSuccess = () => {
+  message.success(t('admin.profile.messages.passwordChangeSuccess'));
 };
 
 // 初始化主題
