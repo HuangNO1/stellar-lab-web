@@ -22,7 +22,8 @@ export default {
     retry: '重試',
     viewDetails: '查看詳情',
     fetchError: '獲取數據失敗',
-    goBack: '返回'
+    goBack: '返回',
+    page: '頁'
   },
   defaults: {
     labName: '實驗室',
@@ -615,7 +616,14 @@ export default {
       paperModule: '論文',
       newsModule: '新聞',
       projectModule: '項目',
-      loadError: '載入操作日誌失敗'
+      loadError: '載入操作日誌失敗',
+      emptyContent: '沒有操作內容',
+      copyJson: '複製JSON',
+      copying: '複製中...',
+      copySuccess: 'JSON已複製到剪貼板',
+      copyFailed: '複製失敗',
+      expand: '展開',
+      collapse: '收起'
     },
     // 系統管理翻譯
     system: {

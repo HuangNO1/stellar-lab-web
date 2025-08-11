@@ -82,18 +82,30 @@
         :data="logs"
         :loading="loading"
         :row-key="(row: EditRecord) => row.edit_id"
-        :pagination="{
-          page: pagination.page,
-          pageSize: pagination.per_page,
-          itemCount: pagination.total,
-          showSizePicker: true,
-          pageSizes: [10, 20, 50],
-          onUpdatePage: handlePageChange,
-          onUpdatePageSize: handlePageSizeChange
-        }"
+        :pagination="false"
         :bordered="false"
       />
+      
+      <!-- 分頁組件 -->
+      <div class="pagination-container">
+        <n-pagination
+          v-model:page="pagination.page"
+          v-model:page-size="pagination.per_page"
+          :page-count="Math.ceil(pagination.total / pagination.per_page)"
+          :page-sizes="[10, 20, 50]"
+          show-size-picker
+          @update:page="handlePageChange"
+          @update:page-size="handlePageSizeChange"
+        />
+      </div>
     </n-card>
+
+    <!-- JSON 詳情 Modal -->
+    <JsonDetailModal
+      v-model:show="showJsonModal"
+      :title="jsonModalTitle"
+      :content="jsonModalContent"
+    />
   </div>
 </template>
 
@@ -105,6 +117,7 @@ import { zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
 import type { DataTableColumns } from 'naive-ui';
 import { editRecordApi, adminApi } from '@/services/api';
 import type { EditRecord, EditRecordQueryParams, Admin } from '@/types/api';
+import JsonDetailModal from '@/components/JsonDetailModal.vue';
 
 const { t, locale } = useI18n();
 const message = useMessage();
@@ -115,6 +128,11 @@ const logs = ref<EditRecord[]>([]);
 const searchQuery = ref('');
 const dateRange = ref<[string, string] | null>(null);
 const adminList = ref<Admin[]>([]);
+
+// JSON 詳情 modal
+const showJsonModal = ref(false);
+const jsonModalTitle = ref('');
+const jsonModalContent = ref<Record<string, any> | null>(null);
 
 // 篩選條件
 const filters = ref<EditRecordQueryParams>({
@@ -184,23 +202,32 @@ const moduleOptions = computed(() => [
   { label: t('admin.operationLogs.projectModule'), value: 6 }
 ]);
 
-// 格式化操作內容
-const formatEditContent = (content: Record<string, any> | undefined): string => {
-  if (!content) return '-';
-  
-  const keys = Object.keys(content);
-  if (keys.length === 0) return '-';
-  
-  // 顯示前3個鍵名，如果超過3個則顯示省略號
-  const displayKeys = keys.slice(0, 3);
-  const result = displayKeys.join(', ');
-  return keys.length > 3 ? `${result}...` : result;
-};
+// 格式化操作內容（已廢棄，保留以防需要）
+// const formatEditContent = (content: Record<string, any> | undefined): string => {
+//   if (!content) return '-';
+//   
+//   const keys = Object.keys(content);
+//   if (keys.length === 0) return '-';
+//   
+//   // 顯示前3個鍵名，如果超過3個則顯示省略號
+//   const displayKeys = keys.slice(0, 3);
+//   const result = displayKeys.join(', ');
+//   return keys.length > 3 ? `${result}...` : result;
+// };
 
-// 格式化JSON內容用於tooltip顯示
-const formatJsonForTooltip = (content: Record<string, any> | undefined): string => {
-  if (!content) return '';
-  return JSON.stringify(content, null, 2);
+// 格式化JSON內容用於tooltip顯示（已廢棄，保留以防需要）
+// const formatJsonForTooltip = (content: Record<string, any> | undefined): string => {
+//   if (!content) return '';
+//   return JSON.stringify(content, null, 2);
+// };
+
+// 顯示 JSON 詳情
+const showJsonDetail = (content: Record<string, any> | undefined, title: string) => {
+  if (!content || Object.keys(content).length === 0) return;
+  
+  jsonModalContent.value = content;
+  jsonModalTitle.value = title;
+  showJsonModal.value = true;
 };
 
 // 格式化模組名稱
@@ -262,52 +289,22 @@ const columns = computed<DataTableColumns<EditRecord>>(() => [
   {
     title: t('admin.operationLogs.content'),
     key: 'edit_content',
-    ellipsis: true,
+    width: 160,
     render: (row) => {
-      const formattedContent = formatEditContent(row.edit_content);
-      const tooltipContent = formatJsonForTooltip(row.edit_content);
+      const hasContent = row.edit_content && Object.keys(row.edit_content).length > 0;
       
       // 如果沒有內容，直接返回 '-'
-      if (!formattedContent || formattedContent === '-') {
+      if (!hasContent) {
         return '-';
       }
       
-      // 如果有內容但沒有 tooltip，返回純文本
-      if (!tooltipContent) {
-        return formattedContent;
-      }
-      
-      // 返回帶 tooltip 的內容
-      return h('n-tooltip', {
-        trigger: 'hover'
+      // 如果有內容，返回查看詳情按鈕
+      return h('n-button', {
+        size: 'small',
+        type: 'primary',
+        onClick: () => showJsonDetail(row.edit_content, `${formatEditType(row.edit_type)} - ${formatModuleName(row.edit_module)}`)
       }, {
-        trigger: () => h('span', {
-          style: {
-            color: '#1890ff',
-            cursor: 'pointer',
-            textDecoration: 'underline'
-          }
-        }, formattedContent),
-        default: () => h('div', {
-          style: {
-            maxWidth: '400px',
-            maxHeight: '300px',
-            overflow: 'auto'
-          }
-        }, [
-          h('pre', {
-            style: {
-              margin: 0,
-              padding: '8px',
-              background: '#f5f5f5',
-              borderRadius: '4px',
-              fontSize: '12px',
-              lineHeight: '1.4',
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word'
-            }
-          }, tooltipContent)
-        ])
+        default: () => t('common.viewDetails')
       });
     }
   }
@@ -432,6 +429,12 @@ onMounted(() => {
 
 .search-controls {
   width: 100%;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 
 /* 響應式設計 */

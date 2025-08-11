@@ -22,7 +22,8 @@ export default {
     retry: 'Retry',
     viewDetails: 'View Details',
     fetchError: 'Failed to fetch data',
-    goBack: 'Go Back'
+    goBack: 'Go Back',
+    page: 'Page'
   },
   defaults: {
     labName: 'Laboratory',
@@ -623,7 +624,14 @@ export default {
       paperModule: 'Paper',
       newsModule: 'News',
       projectModule: 'Project',
-      loadError: 'Failed to load operation logs'
+      loadError: 'Failed to load operation logs',
+      emptyContent: 'No operation content',
+      copyJson: 'Copy JSON',
+      copying: 'Copying...',
+      copySuccess: 'JSON copied to clipboard',
+      copyFailed: 'Copy failed',
+      expand: 'Expand',
+      collapse: 'Collapse'
     },
     // System Management translations
     system: {
