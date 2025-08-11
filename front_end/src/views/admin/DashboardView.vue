@@ -125,7 +125,7 @@
                   </svg>
                 </n-icon>
               </template>
-              新增課題組
+              {{ $t('admin.groups.addGroup') }}
             </n-button>
           </div>
         </n-card>

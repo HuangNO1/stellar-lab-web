@@ -214,7 +214,52 @@ export default {
       confirmDelete: 'Confirm Delete',
       actions: 'Actions',
       comingSoon: 'Coming Soon',
-      comingSoonDesc: 'This feature is under development. Stay tuned!'
+      comingSoonDesc: 'This feature is under development. Stay tuned!',
+      create: 'Create',
+      update: 'Update',
+      cancel: 'Cancel',
+      submit: 'Submit',
+      loading: 'Loading...',
+      success: 'Success',
+      failed: 'Failed',
+      // Form Options
+      memberTypes: {
+        teacher: 'Teacher',
+        student: 'Student',
+        alumni: 'Alumni'
+      },
+      paperTypes: {
+        conference: 'Conference',
+        journal: 'Journal',
+        patent: 'Patent',
+        book: 'Book',
+        other: 'Other'
+      },
+      paperStatus: {
+        submitting: 'Submitting',
+        accepted: 'Accepted'
+      },
+      projectStatus: {
+        ongoing: 'Ongoing',
+        completed: 'Completed'
+      },
+      newsTypes: {
+        publication: 'Publication',
+        award: 'Award',
+        activity: 'Activity'
+      },
+      validationMessages: {
+        required: 'This field is required',
+        invalidEmail: 'Please enter a valid email',
+        invalidUrl: 'Please enter a valid URL'
+      },
+      fileUpload: {
+        selectImage: 'Select Image',
+        selectPdf: 'Select PDF File',
+        selectFile: 'Select File',
+        uploadSuccess: 'File uploaded successfully',
+        uploadError: 'File upload failed'
+      }
     },
     members: {
       addMember: 'Add Member',
@@ -231,23 +276,184 @@ export default {
       fetchError: 'Failed to fetch members',
       deleteConfirmText: 'Are you sure you want to delete this member? This action cannot be undone.',
       deleteSuccess: 'Member deleted successfully',
-      deleteError: 'Failed to delete member'
+      deleteError: 'Failed to delete member',
+      // QuickActionModal related
+      form: {
+        nameZh: 'Chinese Name',
+        nameEn: 'English Name',
+        email: 'Email',
+        type: 'Member Type',
+        group: 'Research Group',
+        description: 'Description',
+        avatar: 'Avatar Upload',
+        placeholders: {
+          nameZh: 'Enter Chinese name',
+          nameEn: 'Enter English name',
+          email: 'Enter email address',
+          type: 'Select member type',
+          group: 'Select research group',
+          description: 'Enter member description (supports Markdown syntax)'
+        },
+        validation: {
+          nameZhRequired: 'Chinese name is required',
+          nameEnRequired: 'English name is required',
+          emailRequired: 'Email is required',
+          typeRequired: 'Member type is required',
+          groupRequired: 'Research group is required'
+        }
+      }
     },
     groups: {
+      title: 'Research Groups',
+      leader: 'Group Leader',
+      description: 'Group Description',
+      members: 'Member List',
       addGroup: 'Add Group',
-      editGroup: 'Edit Group'
+      editGroup: 'Edit Group',
+      form: {
+        nameZh: 'Chinese Name',
+        nameEn: 'English Name',
+        descriptionZh: 'Chinese Description',
+        descriptionEn: 'English Description',
+        leader: 'Leader',
+        placeholders: {
+          nameZh: 'Enter group Chinese name',
+          nameEn: 'Enter group English name',
+          descriptionZh: 'Enter group Chinese description (supports Markdown syntax)',
+          descriptionEn: 'Enter group English description (supports Markdown syntax)',
+          leader: 'Select leader'
+        },
+        validation: {
+          nameZhRequired: 'Group Chinese name is required'
+        }
+      }
     },
     papers: {
       addPaper: 'Add Paper',
-      editPaper: 'Edit Paper'
+      editPaper: 'Edit Paper',
+      form: {
+        titleZh: 'Chinese Title',
+        titleEn: 'English Title',
+        description: 'Paper Description',
+        venue: 'Journal/Conference',
+        type: 'Paper Type',
+        date: 'Publication Date',
+        status: 'Acceptance Status',
+        file: 'Paper File',
+        placeholders: {
+          titleZh: 'Enter paper Chinese title',
+          titleEn: 'Enter paper English title',
+          description: 'Enter paper Chinese description (supports Markdown syntax)',
+          venue: 'Enter publication journal or conference',
+          type: 'Select paper type',
+          date: 'Select publication date',
+          status: 'Select acceptance status'
+        },
+        validation: {
+          titleZhRequired: 'Chinese title is required',
+          typeRequired: 'Paper type is required',
+          statusRequired: 'Acceptance status is required',
+          dateRequired: 'Publication date is required'
+        }
+      }
     },
     projects: {
       addProject: 'Add Project',
-      editProject: 'Edit Project'
+      editProject: 'Edit Project',
+      form: {
+        nameZh: 'Chinese Name',
+        nameEn: 'English Name',
+        description: 'Project Description',
+        url: 'Project URL',
+        startDate: 'Start Date',
+        status: 'Project Status',
+        placeholders: {
+          nameZh: 'Enter project Chinese name',
+          nameEn: 'Enter project English name',
+          description: 'Enter project description (supports Markdown syntax)',
+          url: 'Enter project URL',
+          startDate: 'Select start date',
+          status: 'Select project status'
+        },
+        validation: {
+          nameZhRequired: 'Project Chinese name is required'
+        }
+      }
     },
     news: {
       addNews: 'Add News',
-      editNews: 'Edit News'
+      editNews: 'Edit News',
+      form: {
+        type: 'News Type',
+        contentZh: 'Chinese Content',
+        contentEn: 'English Content',
+        date: 'News Date',
+        placeholders: {
+          type: 'Select news type',
+          contentZh: 'Enter Chinese news content (supports Markdown syntax)',
+          contentEn: 'Enter English news content (supports Markdown syntax)',
+          date: 'Select news date'
+        },
+        validation: {
+          typeRequired: 'News type is required',
+          contentZhRequired: 'Chinese news content is required',
+          dateRequired: 'News date is required'
+        }
+      }
+    },
+    // MarkdownEditor translations
+    markdownEditor: {
+      preview: 'Preview',
+      edit: 'Edit',
+      tip: 'Supports Markdown syntax: **bold**, *italic*, ### heading, - list, [link](url)',
+      placeholder: 'Enter content...',
+      toolbar: {
+        bold: 'Bold',
+        italic: 'Italic',
+        heading: 'Heading',
+        list: 'List',
+        link: 'Link'
+      }
+    },
+    // QuickActionModal translations
+    quickAction: {
+      modalTitle: {
+        createMember: 'Add Member',
+        editMember: 'Edit Member',
+        createPaper: 'Add Paper',
+        editPaper: 'Edit Paper',
+        createProject: 'Add Project',
+        editProject: 'Edit Project',
+        createNews: 'Add News',
+        editNews: 'Edit News',
+        createGroup: 'Add Group',
+        editGroup: 'Edit Group'
+      },
+      messages: {
+        createSuccess: 'Created successfully',
+        updateSuccess: 'Updated successfully',
+        operationFailed: 'Operation failed',
+        checkInput: 'Operation failed, please check your input',
+        loadGroupsFailed: 'Failed to load research groups',
+        loadMembersFailed: 'Failed to load members'
+      },
+      timeFormat: {
+        daysAgo: ' days ago',
+        hoursAgo: ' hours ago',
+        minutesAgo: ' minutes ago',
+        justNow: 'just now'
+      },
+      activities: {
+        created: 'created',
+        updated: 'updated',
+        moduleNames: {
+          members: 'member',
+          papers: 'paper',
+          projects: 'project',
+          news: 'news',
+          groups: 'group'
+        }
+      }
     }
   }
 }

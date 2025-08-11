@@ -36,7 +36,7 @@
       v-model:value="inputValue"
       type="textarea"
       :rows="rows"
-      :placeholder="placeholder"
+      :placeholder="placeholder || t('admin.markdownEditor.placeholder')"
       :disabled="disabled"
       @input="handleInput"
       @blur="handleBlur"
@@ -45,7 +45,7 @@
     
     <div class="editor-footer" v-if="showPreview">
       <n-button size="tiny" quaternary @click="togglePreview">
-        {{ isPreviewMode ? '編輯' : '預覽' }}
+        {{ isPreviewMode ? t('admin.markdownEditor.edit') : t('admin.markdownEditor.preview') }}
       </n-button>
     </div>
     
@@ -55,7 +55,7 @@
     
     <div class="editor-tip" v-if="showTip">
       <n-text depth="3" style="font-size: 12px">
-        支持 Markdown 語法：**粗體**, *斜體*, ### 標題, - 列表, [鏈接](url)
+        {{ t('admin.markdownEditor.tip') }}
       </n-text>
     </div>
   </div>
@@ -63,7 +63,10 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { NInput, NButton, NIcon, NText } from 'naive-ui';
+
+const { t } = useI18n();
 
 interface Props {
   modelValue: string;
@@ -79,7 +82,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
   label: '',
-  placeholder: '請輸入內容...',
+  placeholder: '',
   rows: 4,
   disabled: false,
   showHeader: true,

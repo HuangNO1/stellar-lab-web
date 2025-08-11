@@ -34,47 +34,47 @@
       >
         <!-- 成員表單 -->
         <template v-if="moduleType === 'members'">
-          <n-form-item label="中文姓名" path="mem_name_zh">
+          <n-form-item :label="t('admin.members.form.nameZh')" path="mem_name_zh">
             <n-input
               v-model:value="formData.mem_name_zh"
-              placeholder="請輸入中文姓名"
+              :placeholder="t('admin.members.form.placeholders.nameZh')"
             />
           </n-form-item>
-          <n-form-item label="英文姓名" path="mem_name_en">
+          <n-form-item :label="t('admin.members.form.nameEn')" path="mem_name_en">
             <n-input
               v-model:value="formData.mem_name_en"
-              placeholder="請輸入英文姓名"
+              :placeholder="t('admin.members.form.placeholders.nameEn')"
             />
           </n-form-item>
-          <n-form-item label="電子信箱" path="mem_email">
+          <n-form-item :label="t('admin.members.form.email')" path="mem_email">
             <n-input
               v-model:value="formData.mem_email"
-              placeholder="請輸入電子信箱"
+              :placeholder="t('admin.members.form.placeholders.email')"
             />
           </n-form-item>
-          <n-form-item label="成員類型" path="mem_type">
+          <n-form-item :label="t('admin.members.form.type')" path="mem_type">
             <n-select
               v-model:value="formData.mem_type"
               :options="memberTypeOptions"
-              placeholder="請選擇成員類型"
+              :placeholder="t('admin.members.form.placeholders.type')"
             />
           </n-form-item>
-          <n-form-item label="課題組" path="research_group_id">
+          <n-form-item :label="t('admin.members.form.group')" path="research_group_id">
             <n-select
               v-model:value="formData.research_group_id"
               :options="researchGroupOptions"
-              placeholder="請選擇課題組"
+              :placeholder="t('admin.members.form.placeholders.group')"
               :loading="loadingGroups"
             />
           </n-form-item>
-          <n-form-item label="成員描述" path="mem_desc_zh">
+          <n-form-item :label="t('admin.members.form.description')" path="mem_desc_zh">
             <MarkdownEditor
               v-model="formData.mem_desc_zh"
-              placeholder="請輸入成員中文描述（支持 Markdown 語法）"
+              :placeholder="t('admin.members.form.placeholders.description')"
               :rows="3"
             />
           </n-form-item>
-          <n-form-item label="頭像上傳" path="mem_avatar">
+          <n-form-item :label="t('admin.members.form.avatar')" path="mem_avatar">
             <n-upload
               :default-file-list="getDefaultFileList('mem_avatar')"
               :max="1"
@@ -82,60 +82,60 @@
               @change="handleFileChange('mem_avatar', $event)"
               @remove="handleFileRemove('mem_avatar')"
             >
-              <n-button>選擇頭像圖片</n-button>
+              <n-button>{{ t('admin.common.fileUpload.selectImage') }}</n-button>
             </n-upload>
           </n-form-item>
         </template>
 
         <!-- 論文表單 -->
         <template v-if="moduleType === 'papers'">
-          <n-form-item label="中文標題" path="paper_title_zh">
+          <n-form-item :label="t('admin.papers.form.titleZh')" path="paper_title_zh">
             <n-input
               v-model:value="formData.paper_title_zh"
-              placeholder="請輸入論文中文標題"
+              :placeholder="t('admin.papers.form.placeholders.titleZh')"
             />
           </n-form-item>
-          <n-form-item label="英文標題" path="paper_title_en">
+          <n-form-item :label="t('admin.papers.form.titleEn')" path="paper_title_en">
             <n-input
               v-model:value="formData.paper_title_en"
-              placeholder="請輸入論文英文標題"
+              :placeholder="t('admin.papers.form.placeholders.titleEn')"
             />
           </n-form-item>
-          <n-form-item label="論文描述" path="paper_desc_zh">
+          <n-form-item :label="t('admin.papers.form.description')" path="paper_desc_zh">
             <MarkdownEditor
               v-model="formData.paper_desc_zh"
-              placeholder="請輸入論文中文描述（支持 Markdown 語法）"
+              :placeholder="t('admin.papers.form.placeholders.description')"
               :rows="3"
             />
           </n-form-item>
-          <n-form-item label="期刊/會議" path="paper_venue">
+          <n-form-item :label="t('admin.papers.form.venue')" path="paper_venue">
             <n-input
               v-model:value="formData.paper_venue"
-              placeholder="請輸入發表期刊或會議"
+              :placeholder="t('admin.papers.form.placeholders.venue')"
             />
           </n-form-item>
-          <n-form-item label="論文類型" path="paper_type">
+          <n-form-item :label="t('admin.papers.form.type')" path="paper_type">
             <n-select
               v-model:value="formData.paper_type"
               :options="paperTypeOptions"
-              placeholder="請選擇論文類型"
+              :placeholder="t('admin.papers.form.placeholders.type')"
             />
           </n-form-item>
-          <n-form-item label="發表日期" path="paper_date">
+          <n-form-item :label="t('admin.papers.form.date')" path="paper_date">
             <n-date-picker
               v-model:value="formData.paper_date"
               type="date"
-              placeholder="請選擇發表日期"
+              :placeholder="t('admin.papers.form.placeholders.date')"
             />
           </n-form-item>
-          <n-form-item label="接收狀態" path="paper_accept">
+          <n-form-item :label="t('admin.papers.form.status')" path="paper_accept">
             <n-select
               v-model:value="formData.paper_accept"
               :options="paperAcceptOptions"
-              placeholder="請選擇接收狀態"
+              :placeholder="t('admin.papers.form.placeholders.status')"
             />
           </n-form-item>
-          <n-form-item label="論文文件" path="paper_file">
+          <n-form-item :label="t('admin.papers.form.file')" path="paper_file">
             <n-upload
               :default-file-list="getDefaultFileList('paper_file')"
               :max="1"
@@ -143,119 +143,119 @@
               @change="handleFileChange('paper_file', $event)"
               @remove="handleFileRemove('paper_file')"
             >
-              <n-button>選擇 PDF 文件</n-button>
+              <n-button>{{ t('admin.common.fileUpload.selectPdf') }}</n-button>
             </n-upload>
           </n-form-item>
         </template>
 
         <!-- 項目表單 -->
         <template v-if="moduleType === 'projects'">
-          <n-form-item label="中文名稱" path="project_name_zh">
+          <n-form-item :label="t('admin.projects.form.nameZh')" path="project_name_zh">
             <n-input
               v-model:value="formData.project_name_zh"
-              placeholder="請輸入項目中文名稱"
+              :placeholder="t('admin.projects.form.placeholders.nameZh')"
             />
           </n-form-item>
-          <n-form-item label="英文名稱" path="project_name_en">
+          <n-form-item :label="t('admin.projects.form.nameEn')" path="project_name_en">
             <n-input
               v-model:value="formData.project_name_en"
-              placeholder="請輸入項目英文名稱"
+              :placeholder="t('admin.projects.form.placeholders.nameEn')"
             />
           </n-form-item>
-          <n-form-item label="項目描述" path="project_desc_zh">
+          <n-form-item :label="t('admin.projects.form.description')" path="project_desc_zh">
             <MarkdownEditor
               v-model="formData.project_desc_zh"
-              placeholder="請輸入項目描述（支持 Markdown 語法）"
+              :placeholder="t('admin.projects.form.placeholders.description')"
               :rows="3"
             />
           </n-form-item>
-          <n-form-item label="項目URL" path="project_url">
+          <n-form-item :label="t('admin.projects.form.url')" path="project_url">
             <n-input
               v-model:value="formData.project_url"
-              placeholder="請輸入項目URL"
+              :placeholder="t('admin.projects.form.placeholders.url')"
             />
           </n-form-item>
-          <n-form-item label="開始日期" path="project_date_start">
+          <n-form-item :label="t('admin.projects.form.startDate')" path="project_date_start">
             <n-date-picker
               v-model:value="formData.project_date_start"
               type="date"
-              placeholder="請選擇開始日期"
+              :placeholder="t('admin.projects.form.placeholders.startDate')"
             />
           </n-form-item>
-          <n-form-item label="項目狀態" path="is_end">
+          <n-form-item :label="t('admin.projects.form.status')" path="is_end">
             <n-select
               v-model:value="formData.is_end"
               :options="projectStatusOptions"
-              placeholder="請選擇項目狀態"
+              :placeholder="t('admin.projects.form.placeholders.status')"
             />
           </n-form-item>
         </template>
 
         <!-- 新聞表單 -->
         <template v-if="moduleType === 'news'">
-          <n-form-item label="新聞類型" path="news_type">
+          <n-form-item :label="t('admin.news.form.type')" path="news_type">
             <n-select
               v-model:value="formData.news_type"
               :options="newsTypeOptions"
-              placeholder="請選擇新聞類型"
+              :placeholder="t('admin.news.form.placeholders.type')"
             />
           </n-form-item>
-          <n-form-item label="中文內容" path="news_content_zh">
+          <n-form-item :label="t('admin.news.form.contentZh')" path="news_content_zh">
             <MarkdownEditor
               v-model="formData.news_content_zh"
-              placeholder="請輸入新聞中文內容（支持 Markdown 語法）"
+              :placeholder="t('admin.news.form.placeholders.contentZh')"
               :rows="4"
             />
           </n-form-item>
-          <n-form-item label="英文內容" path="news_content_en">
+          <n-form-item :label="t('admin.news.form.contentEn')" path="news_content_en">
             <MarkdownEditor
               v-model="formData.news_content_en"
-              placeholder="請輸入新聞英文內容（支持 Markdown 語法）"
+              :placeholder="t('admin.news.form.placeholders.contentEn')"
               :rows="4"
             />
           </n-form-item>
-          <n-form-item label="新聞日期" path="news_date">
+          <n-form-item :label="t('admin.news.form.date')" path="news_date">
             <n-date-picker
               v-model:value="formData.news_date"
               type="date"
-              placeholder="請選擇新聞日期"
+              :placeholder="t('admin.news.form.placeholders.date')"
             />
           </n-form-item>
         </template>
 
         <!-- 課題組表單 -->
         <template v-if="moduleType === 'research-groups'">
-          <n-form-item label="中文名稱" path="research_group_name_zh">
+          <n-form-item :label="t('admin.groups.form.nameZh')" path="research_group_name_zh">
             <n-input
               v-model:value="formData.research_group_name_zh"
-              placeholder="請輸入課題組中文名稱"
+              :placeholder="t('admin.groups.form.placeholders.nameZh')"
             />
           </n-form-item>
-          <n-form-item label="英文名稱" path="research_group_name_en">
+          <n-form-item :label="t('admin.groups.form.nameEn')" path="research_group_name_en">
             <n-input
               v-model:value="formData.research_group_name_en"
-              placeholder="請輸入課題組英文名稱"
+              :placeholder="t('admin.groups.form.placeholders.nameEn')"
             />
           </n-form-item>
-          <n-form-item label="中文描述" path="research_group_desc_zh">
+          <n-form-item :label="t('admin.groups.form.descriptionZh')" path="research_group_desc_zh">
             <MarkdownEditor
               v-model="formData.research_group_desc_zh"
-              placeholder="請輸入課題組中文描述（支持 Markdown 語法）"
+              :placeholder="t('admin.groups.form.placeholders.descriptionZh')"
               :rows="3"
             />
           </n-form-item>
-          <n-form-item label="英文描述" path="research_group_desc_en">
+          <n-form-item :label="t('admin.groups.form.descriptionEn')" path="research_group_desc_en">
             <MarkdownEditor
               v-model="formData.research_group_desc_en"
-              placeholder="請輸入課題組英文描述（支持 Markdown 語法）"
+              :placeholder="t('admin.groups.form.placeholders.descriptionEn')"
               :rows="3"
             />
           </n-form-item>
-          <n-form-item label="組長" path="mem_id">
+          <n-form-item :label="t('admin.groups.form.leader')" path="mem_id">
             <n-select
               v-model:value="formData.mem_id"
               :options="memberOptions"
-              placeholder="請選擇組長"
+              :placeholder="t('admin.groups.form.placeholders.leader')"
               :loading="loadingMembers"
             />
           </n-form-item>
@@ -265,14 +265,14 @@
       <template #footer>
         <div class="modal-footer">
           <n-button @click="show = false">
-            取消
+            {{ t('admin.common.cancel') }}
           </n-button>
           <n-button
             type="primary"
             :loading="submitting"
             @click="handleSubmit"
           >
-            {{ actionType === 'create' ? '創建' : '更新' }}
+            {{ actionType === 'create' ? t('admin.common.create') : t('admin.common.update') }}
           </n-button>
         </div>
       </template>
@@ -283,8 +283,11 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch, nextTick } from 'vue';
 import { useMessage } from 'naive-ui';
+import { useI18n } from 'vue-i18n';
 import { memberApi, paperApi, projectApi, newsApi, researchGroupApi } from '@/services/api';
 import MarkdownEditor from './MarkdownEditor.vue';
+
+const { t } = useI18n();
 
 // Props
 interface Props {
@@ -319,53 +322,54 @@ const formData = reactive<Record<string, any>>({});
 const uploadedFiles = reactive<Record<string, File>>({});
 
 // Options
-const memberTypeOptions = [
-  { label: '教師', value: 0 },
-  { label: '學生', value: 1 },
-  { label: '校友', value: 2 }
-];
+const memberTypeOptions = computed(() => [
+  { label: t('admin.common.memberTypes.teacher'), value: 0 },
+  { label: t('admin.common.memberTypes.student'), value: 1 },
+  { label: t('admin.common.memberTypes.alumni'), value: 2 }
+]);
 
-const paperTypeOptions = [
-  { label: '會議', value: 0 },
-  { label: '期刊', value: 1 },
-  { label: '專利', value: 2 },
-  { label: '書籍', value: 3 },
-  { label: '其他', value: 4 }
-];
+const paperTypeOptions = computed(() => [
+  { label: t('admin.common.paperTypes.conference'), value: 0 },
+  { label: t('admin.common.paperTypes.journal'), value: 1 },
+  { label: t('admin.common.paperTypes.patent'), value: 2 },
+  { label: t('admin.common.paperTypes.book'), value: 3 },
+  { label: t('admin.common.paperTypes.other'), value: 4 }
+]);
 
-const paperAcceptOptions = [
-  { label: '投稿中', value: 0 },
-  { label: '已接收', value: 1 }
-];
+const paperAcceptOptions = computed(() => [
+  { label: t('admin.common.paperStatus.submitting'), value: 0 },
+  { label: t('admin.common.paperStatus.accepted'), value: 1 }
+]);
 
-const projectStatusOptions = [
-  { label: '進行中', value: 0 },
-  { label: '已完成', value: 1 }
-];
+const projectStatusOptions = computed(() => [
+  { label: t('admin.common.projectStatus.ongoing'), value: 0 },
+  { label: t('admin.common.projectStatus.completed'), value: 1 }
+]);
 
-const newsTypeOptions = [
-  { label: '論文發表', value: 0 },
-  { label: '獲獎消息', value: 1 },
-  { label: '學術活動', value: 2 }
-];
+const newsTypeOptions = computed(() => [
+  { label: t('admin.common.newsTypes.publication'), value: 0 },
+  { label: t('admin.common.newsTypes.award'), value: 1 },
+  { label: t('admin.common.newsTypes.activity'), value: 2 }
+]);
 
 const researchGroupOptions = ref<Array<{ label: string; value: number }>>([]);
 const memberOptions = ref<Array<{ label: string; value: number }>>([]);
 
 // Computed
 const modalTitle = computed(() => {
-  const moduleNames = {
-    members: '成員',
-    papers: '論文',
-    projects: '項目',
-    news: '新聞',
-    'research-groups': '課題組'
+  // Map module types to correct title keys
+  const moduleKeyMap: Record<string, string> = {
+    'members': 'Member',
+    'papers': 'Paper', 
+    'projects': 'Project',
+    'news': 'News',
+    'research-groups': 'Group'
   };
-  const actionNames = {
-    create: '新增',
-    edit: '編輯'
-  };
-  return `${actionNames[props.actionType]}${moduleNames[props.moduleType]}`;
+  
+  const actionKey = props.actionType === 'create' ? 'create' : 'edit';
+  const moduleKey = moduleKeyMap[props.moduleType] || 'Member';
+  
+  return t(`admin.quickAction.modalTitle.${actionKey}${moduleKey}`);
 });
 
 // Form rules
@@ -373,24 +377,24 @@ const formRules = computed(() => {
   const rules: Record<string, any> = {};
   
   if (props.moduleType === 'members') {
-    rules.mem_name_zh = { required: true, message: '請輸入中文姓名', trigger: 'blur' };
-    rules.mem_name_en = { required: true, message: '請輸入英文姓名', trigger: 'blur' };
-    rules.mem_email = { required: true, message: '請輸入電子信箱', trigger: 'blur' };
-    rules.mem_type = { required: true, message: '請選擇成員類型', trigger: 'change' };
-    rules.research_group_id = { required: true, message: '請選擇課題組', trigger: 'change' };
+    rules.mem_name_zh = { required: true, message: t('admin.members.form.validation.nameZhRequired'), trigger: 'blur' };
+    rules.mem_name_en = { required: true, message: t('admin.members.form.validation.nameEnRequired'), trigger: 'blur' };
+    rules.mem_email = { required: true, message: t('admin.members.form.validation.emailRequired'), trigger: 'blur' };
+    rules.mem_type = { required: true, message: t('admin.members.form.validation.typeRequired'), trigger: 'change' };
+    rules.research_group_id = { required: true, message: t('admin.members.form.validation.groupRequired'), trigger: 'change' };
   } else if (props.moduleType === 'papers') {
-    rules.paper_title_zh = { required: true, message: '請輸入中文標題', trigger: 'blur' };
-    rules.paper_type = { required: true, message: '請選擇論文類型', trigger: 'change' };
-    rules.paper_accept = { required: true, message: '請選擇接收狀態', trigger: 'change' };
-    rules.paper_date = { required: true, message: '請選擇發表日期', trigger: 'change' };
+    rules.paper_title_zh = { required: true, message: t('admin.papers.form.validation.titleZhRequired'), trigger: 'blur' };
+    rules.paper_type = { required: true, message: t('admin.papers.form.validation.typeRequired'), trigger: 'change' };
+    rules.paper_accept = { required: true, message: t('admin.papers.form.validation.statusRequired'), trigger: 'change' };
+    rules.paper_date = { required: true, message: t('admin.papers.form.validation.dateRequired'), trigger: 'change' };
   } else if (props.moduleType === 'projects') {
-    rules.project_name_zh = { required: true, message: '請輸入項目中文名稱', trigger: 'blur' };
+    rules.project_name_zh = { required: true, message: t('admin.projects.form.validation.nameZhRequired'), trigger: 'blur' };
   } else if (props.moduleType === 'news') {
-    rules.news_type = { required: true, message: '請選擇新聞類型', trigger: 'change' };
-    rules.news_content_zh = { required: true, message: '請輸入新聞中文內容', trigger: 'blur' };
-    rules.news_date = { required: true, message: '請選擇新聞日期', trigger: 'change' };
+    rules.news_type = { required: true, message: t('admin.news.form.validation.typeRequired'), trigger: 'change' };
+    rules.news_content_zh = { required: true, message: t('admin.news.form.validation.contentZhRequired'), trigger: 'blur' };
+    rules.news_date = { required: true, message: t('admin.news.form.validation.dateRequired'), trigger: 'change' };
   } else if (props.moduleType === 'research-groups') {
-    rules.research_group_name_zh = { required: true, message: '請輸入課題組中文名稱', trigger: 'blur' };
+    rules.research_group_name_zh = { required: true, message: t('admin.groups.form.validation.nameZhRequired'), trigger: 'blur' };
   }
   
   return rules;
@@ -454,7 +458,7 @@ const loadResearchGroups = async () => {
       }));
     }
   } catch (error) {
-    console.error('載入課題組失敗:', error);
+    console.error(t('admin.quickAction.messages.loadGroupsFailed'), error);
   } finally {
     loadingGroups.value = false;
   }
@@ -471,7 +475,7 @@ const loadMembers = async () => {
       }));
     }
   } catch (error) {
-    console.error('載入成員失敗:', error);
+    console.error(t('admin.quickAction.messages.loadMembersFailed'), error);
   } finally {
     loadingMembers.value = false;
   }
@@ -602,17 +606,20 @@ const handleSubmit = async () => {
     }
 
     if (response.code === 0) {
-      message.success(`${props.actionType === 'create' ? '創建' : '更新'}成功`);
+      const successMessage = props.actionType === 'create' 
+        ? t('admin.quickAction.messages.createSuccess')
+        : t('admin.quickAction.messages.updateSuccess');
+      message.success(successMessage);
       emit('success', response.data);
       show.value = false;
     } else {
-      message.error(response.message || '操作失敗');
+      message.error(response.message || t('admin.quickAction.messages.operationFailed'));
     }
   } catch (error: any) {
     if (error?.message) {
       message.error(error.message);
     } else {
-      message.error('操作失敗，請檢查輸入');
+      message.error(t('admin.quickAction.messages.checkInput'));
     }
   } finally {
     submitting.value = false;

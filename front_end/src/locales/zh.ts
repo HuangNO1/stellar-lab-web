@@ -104,12 +104,6 @@ export default {
     date: '發表日期',
     venue: '發表期刊/會議'
   },
-  groups: {
-    title: '研究課題組',
-    leader: '課題組負責人',
-    description: '課題組簡介',
-    members: '成員列表'
-  },
   projects: {
     title: '研究項目',
     description: '查看實驗室的研究項目',
@@ -214,7 +208,52 @@ export default {
       confirmDelete: '確認刪除',
       actions: '操作',
       comingSoon: '功能開發中',
-      comingSoonDesc: '此功能正在開發中，敬請期待！'
+      comingSoonDesc: '此功能正在開發中，敬請期待！',
+      create: '創建',
+      update: '更新',
+      cancel: '取消',
+      submit: '提交',
+      loading: '載入中...',
+      success: '成功',
+      failed: '失敗',
+      // 表單選項
+      memberTypes: {
+        teacher: '教師',
+        student: '學生',
+        alumni: '校友'
+      },
+      paperTypes: {
+        conference: '會議',
+        journal: '期刊',
+        patent: '專利',
+        book: '書籍',
+        other: '其他'
+      },
+      paperStatus: {
+        submitting: '投稿中',
+        accepted: '已接收'
+      },
+      projectStatus: {
+        ongoing: '進行中',
+        completed: '已完成'
+      },
+      newsTypes: {
+        publication: '論文發表',
+        award: '獲獎消息',
+        activity: '學術活動'
+      },
+      validationMessages: {
+        required: '此欄位為必填項',
+        invalidEmail: '請輸入有效的電子信箱',
+        invalidUrl: '請輸入有效的URL'
+      },
+      fileUpload: {
+        selectImage: '選擇圖片',
+        selectPdf: '選擇 PDF 文件',
+        selectFile: '選擇文件',
+        uploadSuccess: '文件上傳成功',
+        uploadError: '文件上傳失敗'
+      }
     },
     members: {
       addMember: '添加成員',
@@ -231,23 +270,184 @@ export default {
       fetchError: '獲取成員列表失敗',
       deleteConfirmText: '確定要刪除這個成員嗎？此操作不可撤銷。',
       deleteSuccess: '成員刪除成功',
-      deleteError: '刪除成員失敗'
-    },
-    groups: {
-      addGroup: '添加課題組',
-      editGroup: '編輯課題組'
+      deleteError: '刪除成員失敗',
+      // QuickActionModal 相關
+      form: {
+        nameZh: '中文姓名',
+        nameEn: '英文姓名',
+        email: '電子信箱',
+        type: '成員類型',
+        group: '課題組',
+        description: '成員描述',
+        avatar: '頭像上傳',
+        placeholders: {
+          nameZh: '請輸入中文姓名',
+          nameEn: '請輸入英文姓名',
+          email: '請輸入電子信箱',
+          type: '請選擇成員類型',
+          group: '請選擇課題組',
+          description: '請輸入成員中文描述（支持 Markdown 語法）'
+        },
+        validation: {
+          nameZhRequired: '請輸入中文姓名',
+          nameEnRequired: '請輸入英文姓名',
+          emailRequired: '請輸入電子信箱',
+          typeRequired: '請選擇成員類型',
+          groupRequired: '請選擇課題組'
+        }
+      }
     },
     papers: {
       addPaper: '添加論文',
-      editPaper: '編輯論文'
+      editPaper: '編輯論文',
+      form: {
+        titleZh: '中文標題',
+        titleEn: '英文標題',
+        description: '論文描述',
+        venue: '期刊/會議',
+        type: '論文類型',
+        date: '發表日期',
+        status: '接收狀態',
+        file: '論文文件',
+        placeholders: {
+          titleZh: '請輸入論文中文標題',
+          titleEn: '請輸入論文英文標題',
+          description: '請輸入論文中文描述（支持 Markdown 語法）',
+          venue: '請輸入發表期刊或會議',
+          type: '請選擇論文類型',
+          date: '請選擇發表日期',
+          status: '請選擇接收狀態'
+        },
+        validation: {
+          titleZhRequired: '請輸入中文標題',
+          typeRequired: '請選擇論文類型',
+          statusRequired: '請選擇接收狀態',
+          dateRequired: '請選擇發表日期'
+        }
+      }
     },
     projects: {
       addProject: '添加項目',
-      editProject: '編輯項目'
+      editProject: '編輯項目',
+      form: {
+        nameZh: '中文名稱',
+        nameEn: '英文名稱',
+        description: '項目描述',
+        url: '項目URL',
+        startDate: '開始日期',
+        status: '項目狀態',
+        placeholders: {
+          nameZh: '請輸入項目中文名稱',
+          nameEn: '請輸入項目英文名稱',
+          description: '請輸入項目描述（支持 Markdown 語法）',
+          url: '請輸入項目URL',
+          startDate: '請選擇開始日期',
+          status: '請選擇項目狀態'
+        },
+        validation: {
+          nameZhRequired: '請輸入項目中文名稱'
+        }
+      }
     },
     news: {
       addNews: '添加新聞',
-      editNews: '編輯新聞'
+      editNews: '編輯新聞',
+      form: {
+        type: '新聞類型',
+        contentZh: '中文內容',
+        contentEn: '英文內容',
+        date: '新聞日期',
+        placeholders: {
+          type: '請選擇新聞類型',
+          contentZh: '請輸入新聞中文內容（支持 Markdown 語法）',
+          contentEn: '請輸入新聞英文內容（支持 Markdown 語法）',
+          date: '請選擇新聞日期'
+        },
+        validation: {
+          typeRequired: '請選擇新聞類型',
+          contentZhRequired: '請輸入新聞中文內容',
+          dateRequired: '請選擇新聞日期'
+        }
+      }
+    },
+    groups: {
+      title: '研究課題組',
+      leader: '課題組負責人',
+      description: '課題組簡介',
+      members: '成員列表',
+      addGroup: '添加課題組',
+      editGroup: '編輯課題組',
+      form: {
+        nameZh: '中文名稱',
+        nameEn: '英文名稱',
+        descriptionZh: '中文描述',
+        descriptionEn: '英文描述',
+        leader: '組長',
+        placeholders: {
+          nameZh: '請輸入課題組中文名稱',
+          nameEn: '請輸入課題組英文名稱',
+          descriptionZh: '請輸入課題組中文描述（支持 Markdown 語法）',
+          descriptionEn: '請輸入課題組英文描述（支持 Markdown 語法）',
+          leader: '請選擇組長'
+        },
+        validation: {
+          nameZhRequired: '請輸入課題組中文名稱'
+        }
+      }
+    },
+    // MarkdownEditor 翻譯
+    markdownEditor: {
+      preview: '預覽',
+      edit: '編輯',
+      tip: '支持 Markdown 語法：**粗體**, *斜體*, ### 標題, - 列表, [鏈接](url)',
+      placeholder: '請輸入內容...',
+      toolbar: {
+        bold: '粗體',
+        italic: '斜體',
+        heading: '標題',
+        list: '列表',
+        link: '鏈接'
+      }
+    },
+    // QuickActionModal 翻譯
+    quickAction: {
+      modalTitle: {
+        createMember: '新增成員',
+        editMember: '編輯成員',
+        createPaper: '新增論文',
+        editPaper: '編輯論文',
+        createProject: '新增項目',
+        editProject: '編輯項目',
+        createNews: '新增新聞',
+        editNews: '編輯新聞',
+        createGroup: '新增課題組',
+        editGroup: '編輯課題組'
+      },
+      messages: {
+        createSuccess: '創建成功',
+        updateSuccess: '更新成功',
+        operationFailed: '操作失敗',
+        checkInput: '操作失敗，請檢查輸入',
+        loadGroupsFailed: '載入課題組失敗',
+        loadMembersFailed: '載入成員失敗'
+      },
+      timeFormat: {
+        daysAgo: '天前',
+        hoursAgo: '小時前', 
+        minutesAgo: '分鐘前',
+        justNow: '剛剛'
+      },
+      activities: {
+        created: '新增了',
+        updated: '編輯了',
+        moduleNames: {
+          members: '成員',
+          papers: '論文',
+          projects: '項目',
+          news: '新聞',
+          groups: '課題組'
+        }
+      }
     }
   }
 }
