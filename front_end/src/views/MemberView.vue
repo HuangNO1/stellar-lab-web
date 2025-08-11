@@ -386,7 +386,8 @@ const toMember = (memberId: number) => {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  overflow: hidden;
+  overflow: visible;
+  padding: 0 4px;
 }
 
 .member-name {
@@ -394,21 +395,29 @@ const toMember = (memberId: number) => {
   font-weight: 600;
   margin-bottom: 0.25rem;
   color: #333;
-  line-height: 1.2;
+  line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
+  min-height: 1.26rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .member-position {
   font-size: 0.8rem;
   color: #666;
-  line-height: 1.3;
+  line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
+  min-height: 1.12rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .error-state {
@@ -470,7 +479,112 @@ const toMember = (memberId: number) => {
   }
 }
 
-/* 響應式設計 */
+/* 響應式設計 - 改善版 */
+@media (max-width: 1024px) {
+  .member-view {
+    padding: 1.25rem;
+  }
+  
+  .members-grid {
+    gap: 0.875rem;
+  }
+  
+  .member-card {
+    width: 9rem;
+    min-width: 9rem;
+    max-width: 9rem;
+    height: 8.5rem;
+    min-height: 8.5rem;
+    max-height: 8.5rem;
+  }
+  
+  .member-name {
+    font-size: 0.875rem;
+  }
+  
+  .member-position {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .member-view {
+    padding: 1rem;
+  }
+  
+  .page-title {
+    font-size: 1.75rem;
+  }
+  
+  .section-title {
+    font-size: 1.375rem;
+  }
+  
+  .members-grid {
+    gap: 0.75rem;
+    justify-content: center;
+  }
+  
+  .member-card {
+    width: 8.5rem;
+    min-width: 8.5rem;
+    max-width: 8.5rem;
+    height: 8.5rem;
+    min-height: 8.5rem;
+    max-height: 8.5rem;
+  }
+  
+  .member-info {
+    margin-top: 0.5rem;
+    padding: 0 3px;
+  }
+  
+  .member-name {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    min-height: 1.19rem;
+    margin-bottom: 0.2rem;
+  }
+  
+  .member-position {
+    font-size: 0.7rem;
+    line-height: 1.4;
+    min-height: 0.98rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .members-grid {
+    gap: 0.625rem;
+  }
+  
+  .member-card {
+    width: 8rem;
+    min-width: 8rem;
+    max-width: 8rem;
+    height: 8rem;
+    min-height: 8rem;
+    max-height: 8rem;
+    padding: 0.75rem;
+  }
+  
+  .member-info {
+    margin-top: 0.4rem;
+    padding: 0 2px;
+  }
+  
+  .member-name {
+    font-size: 0.8rem;
+    margin-bottom: 0.15rem;
+    min-height: 1.12rem;
+  }
+  
+  .member-position {
+    font-size: 0.65rem;
+    min-height: 0.91rem;
+  }
+}
+
 @media (max-width: 48rem) {
   .member-view {
     padding: 1rem;
@@ -490,10 +604,47 @@ const toMember = (memberId: number) => {
   
   .member-name {
     font-size: 0.85rem;
+    line-height: 1.4;
+    min-height: 1.19rem;
   }
   
   .member-position {
     font-size: 0.75rem;
+    line-height: 1.4;
+    min-height: 1.05rem;
+  }
+}
+
+/* 小屏幕调整 - 優化版 */
+@media (max-width: 30rem) {
+  .members-grid {
+    justify-content: center;
+  }
+  
+  .member-card {
+    width: 7.5rem;
+    min-width: 7.5rem;
+    max-width: 7.5rem;
+    height: 7.5rem;
+    min-height: 7.5rem;
+    max-height: 7.5rem;
+    padding: 0.6rem 0.4rem;
+  }
+  
+  .member-info {
+    margin-top: 0.3rem;
+    padding: 0 2px;
+  }
+  
+  .member-name {
+    font-size: 0.75rem;
+    min-height: 1.05rem;
+    margin-bottom: 0.1rem;
+  }
+  
+  .member-position {
+    font-size: 0.6rem;
+    min-height: 0.84rem;
   }
 }
 

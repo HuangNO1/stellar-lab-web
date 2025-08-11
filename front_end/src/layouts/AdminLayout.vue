@@ -376,6 +376,108 @@ initTheme();
   overflow-y: auto;
 }
 
+/* 響應式設計 */
+@media (max-width: 1024px) {
+  .admin-layout :deep(.n-layout-sider) {
+    position: fixed !important;
+    z-index: 1000;
+    height: 100vh;
+  }
+  
+  .admin-layout :deep(.n-layout:not(.n-layout--has-sider)) {
+    margin-left: 0 !important;
+  }
+  
+  .header {
+    padding: 0 1rem;
+  }
+  
+  .header-right {
+    gap: 0.5rem;
+  }
+  
+  .user-avatar span {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-layout :deep(.n-layout-sider) {
+    width: 280px !important;
+  }
+  
+  .header {
+    padding: 0 0.75rem;
+  }
+  
+  .header-left {
+    min-width: 0;
+    flex: 1;
+  }
+  
+  .header-left :deep(.n-breadcrumb-item__link) {
+    font-size: 0.875rem;
+  }
+  
+  .content {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-layout :deep(.n-layout-sider) {
+    width: 260px !important;
+  }
+  
+  .header {
+    padding: 0 0.5rem;
+    height: 56px;
+  }
+  
+  .sidebar-header {
+    padding: 0.75rem;
+  }
+  
+  .logo-text {
+    font-size: 0.875rem;
+  }
+  
+  .content {
+    padding: 0.75rem;
+  }
+  
+  .header-right {
+    gap: 0.25rem;
+  }
+  
+  .header-right .n-button {
+    padding: 0.25rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-layout :deep(.n-layout-sider) {
+    width: 240px !important;
+  }
+  
+  .header {
+    padding: 0 0.5rem;
+    height: 52px;
+  }
+  
+  .sidebar-header {
+    padding: 0.5rem;
+  }
+  
+  .content {
+    padding: 0.5rem;
+  }
+  
+  .header-left :deep(.n-breadcrumb) {
+    font-size: 0.75rem;
+  }
+}
+
 /* 暗色主題 */
 [data-theme="dark"] .sidebar-header,
 .dark .sidebar-header {

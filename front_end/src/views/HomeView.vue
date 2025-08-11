@@ -471,6 +471,118 @@ const toResearchGroup = (group: ResearchGroup) => {
 }
 
 /* 響應式設計 */
+@media (max-width: 1024px) {
+  .content-wrapper {
+    padding: 2rem 1.25rem 0;
+  }
+  
+  .lab-title {
+    font-size: 2.25rem;
+  }
+  
+  .lab-description {
+    font-size: 1.125rem;
+  }
+  
+  .research-groups-grid {
+    gap: 1.25rem;
+  }
+  
+  .card-container {
+    max-width: 20rem;
+    min-width: 16rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding: 2rem 1rem 0;
+  }
+  
+  .lab-introduction {
+    text-align: center;
+    padding: 1.5rem 0;
+  }
+  
+  .lab-title {
+    font-size: 2rem;
+  }
+  
+  .lab-description {
+    font-size: 1rem;
+    padding: 0 0.5rem;
+    text-align: center;
+  }
+  
+  .research-groups-grid {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .card-container,
+  .research-card-skeleton {
+    max-width: none;
+    width: 100%;
+    max-width: 28rem;
+  }
+  
+  /* 卡片內字體調整 */
+  :deep(.research-card .n-card__header .n-card__header__main) {
+    font-size: 1rem !important;
+  }
+  
+  .card-description {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  
+  :deep(.research-card .n-tag) {
+    font-size: 0.75rem !important;
+  }
+  
+  :deep(.research-card .n-button) {
+    font-size: 0.875rem !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 1.5rem 0.75rem 0;
+  }
+  
+  .lab-title {
+    font-size: 1.75rem;
+  }
+  
+  .lab-description {
+    font-size: 0.9rem;
+  }
+  
+  .card-container {
+    max-width: 24rem;
+  }
+  
+  /* 進一步縮小卡片字體 */
+  :deep(.research-card .n-card__header .n-card__header__main) {
+    font-size: 0.95rem !important;
+  }
+  
+  .card-description {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  
+  :deep(.research-card .n-tag) {
+    font-size: 0.7rem !important;
+  }
+  
+  :deep(.research-card .n-button) {
+    font-size: 0.8rem !important;
+    padding: 0.25rem 0.75rem !important;
+  }
+}
+
 @media (max-width: 48rem) {
   .content-wrapper {
     padding: 2rem 1rem 0;
@@ -514,6 +626,56 @@ const toResearchGroup = (group: ResearchGroup) => {
     width: 100%;
     max-width: 18.75rem;
     justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-wrapper {
+    padding: 1.25rem 0.5rem 0;
+  }
+  
+  .lab-title {
+    font-size: 1.5rem;
+  }
+  
+  .lab-description {
+    font-size: 0.875rem;
+  }
+  
+  .card-container {
+    max-width: 20rem;
+  }
+  
+  /* 最小屏幕的卡片字體 */
+  :deep(.research-card .n-card__header .n-card__header__main) {
+    font-size: 0.9rem !important;
+  }
+  
+  .card-description {
+    font-size: 0.8rem;
+    line-height: 1.3;
+  }
+  
+  :deep(.research-card .n-tag) {
+    font-size: 0.65rem !important;
+  }
+  
+  :deep(.research-card .n-button) {
+    font-size: 0.75rem !important;
+    padding: 0.2rem 0.6rem !important;
+  }
+  
+  .contact-wrapper {
+    padding: 1rem 0.75rem;
+  }
+  
+  .contact-section h2 {
+    font-size: 1.5rem;
+  }
+  
+  .contact-item {
+    font-size: 0.875rem;
+    padding: 0.6rem 0.8rem;
   }
 }
 

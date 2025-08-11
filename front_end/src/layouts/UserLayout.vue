@@ -24,17 +24,30 @@
               
               <!-- Right side: Menu, Language, Theme Toggle -->
               <div class="nav-right">
-                <!-- Navigation Menu -->
+                <!-- Mobile Menu Button (hidden on desktop) -->
+                <n-button 
+                  text 
+                  class="mobile-menu-btn" 
+                  @click="showMobileMenu = !showMobileMenu"
+                >
+                  <n-icon size="20">
+                    <svg viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/>
+                    </svg>
+                  </n-icon>
+                </n-button>
+                
+                <!-- Navigation Menu (hidden on mobile) -->
                 <n-menu
                   v-model:value="activeKey"
                   mode="horizontal"
                   :options="menuOptions"
-                  class="nav-menu"
+                  class="nav-menu desktop-menu"
                   @update:value="handleMenuSelect"
                 />
                 
                 <!-- Language Selector -->
-                <n-dropdown :options="languageOptions" @select="handleLanguageSelect">
+                <n-dropdown :options="languageOptions" @select="handleLanguageSelect" class="desktop-lang-selector">
                   <n-button text>
                     <template #icon>
                       <n-icon size="18">
@@ -46,7 +59,7 @@
                 </n-dropdown>
                 
                 <!-- Theme Toggle -->
-                <n-button text @click="toggleTheme" class="theme-btn">
+                <n-button text @click="toggleTheme" class="theme-btn desktop-theme-btn">
                   <template #icon>
                     <n-icon size="18">
                       <component :is="isDarkMode ? SunnyOutline : MoonOutline" />
@@ -56,6 +69,56 @@
               </div>
             </div>
           </n-layout-header>
+          
+          <!-- Mobile Menu Overlay -->
+          <n-drawer
+            v-model:show="showMobileMenu"
+            :width="280"
+            placement="right"
+            class="mobile-drawer"
+          >
+            <n-drawer-content title="導航選單">
+              <div class="mobile-nav-content">
+                <n-menu
+                  v-model:value="activeKey"
+                  :options="menuOptions"
+                  class="mobile-nav-menu"
+                  @update:value="handleMobileMenuSelect"
+                />
+                
+                <n-divider />
+                
+                <div class="mobile-settings">
+                  <!-- Language Selector -->
+                  <div class="setting-item">
+                    <span class="setting-label">語言</span>
+                    <n-select
+                      :value="locale"
+                      :options="languageSelectOptions"
+                      size="small"
+                      @update:value="handleLanguageSelect"
+                    />
+                  </div>
+                  
+                  <!-- Theme Toggle -->
+                  <div class="setting-item">
+                    <span class="setting-label">主題</span>
+                    <n-switch
+                      :value="isDarkMode"
+                      @update:value="toggleTheme"
+                    >
+                      <template #checked>
+                        暗色
+                      </template>
+                      <template #unchecked>
+                        明亮
+                      </template>
+                    </n-switch>
+                  </div>
+                </div>
+              </div>
+            </n-drawer-content>
+          </n-drawer>
           
           <!-- Main Content Area -->
           <n-layout 
@@ -89,11 +152,9 @@ import type { GlobalTheme } from 'naive-ui'
 import {
   HomeOutline,
   PeopleOutline,
-  LibraryOutline,
   FolderOpenOutline,
   DocumentTextOutline,
   NewspaperOutline,
-  InformationCircleOutline,
   SunnyOutline,
   MoonOutline
 } from '@vicons/ionicons5'
@@ -120,6 +181,7 @@ provide('lab', lab)
 
 // Navigation menu
 const activeKey = ref<string>('home')
+const showMobileMenu = ref(false)
 
 const menuOptions = computed(() => [
   {
@@ -133,31 +195,19 @@ const menuOptions = computed(() => [
     icon: () => h(NIcon, { size: 16, component: PeopleOutline })
   },
   {
-    label: t('nav.research'),
-    key: 'research',
-    icon: () => h(NIcon, { size: 16, component: LibraryOutline }),
-    children: [
-      {
-        label: t('nav.projects'),
-        key: 'projects',
-        icon: () => h(NIcon, { size: 16, component: FolderOpenOutline })
-      },
-      {
-        label: t('nav.papers'),
-        key: 'papers',
-        icon: () => h(NIcon, { size: 16, component: DocumentTextOutline })
-      }
-    ]
+    label: t('nav.projects'),
+    key: 'projects',
+    icon: () => h(NIcon, { size: 16, component: FolderOpenOutline })
+  },
+  {
+    label: t('nav.papers'),
+    key: 'papers',
+    icon: () => h(NIcon, { size: 16, component: DocumentTextOutline })
   },
   {
     label: t('nav.news'),
     key: 'news',
     icon: () => h(NIcon, { size: 14, component: NewspaperOutline })
-  },
-  {
-    label: t('nav.about'),
-    key: 'about',
-    icon: () => h(NIcon, { size: 16, component: InformationCircleOutline })
   }
 ])
 
@@ -177,6 +227,17 @@ const languageOptions = [
   }
 ]
 
+const languageSelectOptions = computed(() => [
+  {
+    label: t('language.chinese'),
+    value: 'zh',
+  },
+  {
+    label: t('language.english'),
+    value: 'en',
+  }
+])
+
 const handleLanguageSelect = (key: string) => {
   locale.value = key
   setLanguage(key)
@@ -186,6 +247,7 @@ const handleLanguageSelect = (key: string) => {
 // Handle menu selection
 const handleMenuSelect = (key: string) => {
   console.log('Menu selected:', key)
+  showMobileMenu.value = false // Close mobile menu when item selected
   switch (key) {
     case 'home':
       router.push('/')
@@ -202,10 +264,12 @@ const handleMenuSelect = (key: string) => {
     case 'news':
       router.push('/news')
       break
-    case 'about':
-      router.push('/about')
-      break
   }
+}
+
+// Handle mobile menu selection
+const handleMobileMenuSelect = (key: string) => {
+  handleMenuSelect(key)
 }
 
 // Theme toggle
@@ -242,8 +306,6 @@ const updateActiveKey = (path: string) => {
     activeKey.value = 'papers'
   } else if (path.startsWith('/news')) {
     activeKey.value = 'news'
-  } else if (path.startsWith('/about')) {
-    activeKey.value = 'about'
   }
 }
 
@@ -395,12 +457,117 @@ html:has(#user-app.dark-mode) {
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  height: 100%;
 }
 
-.nav-menu {
+.nav-menu.desktop-menu {
   background: transparent !important;
   border: none !important;
+  margin-right: 8px;
+}
+
+.mobile-menu-btn {
+  display: none;
+}
+
+.desktop-lang-selector,
+.desktop-theme-btn {
+  display: flex;
+  align-items: center;
+  height: 2.5rem;
+}
+
+.desktop-lang-selector .n-button,
+.desktop-theme-btn {
+  height: 2.5rem;
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1.25rem;
+  padding: 0 12px;
+  transition: all 0.2s ease;
+}
+
+.desktop-lang-selector .n-button:hover,
+.desktop-theme-btn:hover {
+  background-color: rgba(24, 144, 255, 0.1);
+}
+
+/* Dark theme styles for buttons */
+.header-nav.dark-theme .desktop-lang-selector .n-button:hover,
+.header-nav.dark-theme .desktop-theme-btn:hover {
+  background-color: rgba(112, 161, 255, 0.15);
+}
+
+/* Mobile Navigation Styles */
+.mobile-nav-content {
+  padding: 1rem 0;
+}
+
+.mobile-nav-menu {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* 移動端菜單項樣式 */
+:deep(.mobile-nav-menu .n-menu-item) {
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+
+:deep(.mobile-nav-menu .n-menu-item .n-menu-item-content) {
+  padding: 12px 16px;
+}
+
+/* 暗色主題下的移動端菜單 */
+.dark-mode :deep(.mobile-nav-menu .n-menu-item:hover) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-settings {
+  margin-top: 1rem;
+  padding: 1rem 0;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-label {
+  font-weight: 500;
+  color: #666;
+  font-size: 1rem;
+  flex-shrink: 0;
+  min-width: 60px;
+}
+
+/* Dark mode for mobile settings */
+.dark-mode .setting-label {
+  color: #ccc;
+}
+
+.dark-mode .setting-item {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 語言選擇器樣式調整 */
+.setting-item .n-select {
+  min-width: 120px;
+}
+
+/* 主題開關樣式調整 */
+.setting-item .n-switch {
+  flex-shrink: 0;
 }
 
 /* Better aligned menu styling */
@@ -430,32 +597,6 @@ html:has(#user-app.dark-mode) {
   justify-content: center !important;
 }
 
-/* Fix submenu/dropdown alignment specifically */
-:deep(.n-submenu) {
-  display: flex !important;
-  align-items: center !important;
-}
-
-:deep(.n-submenu .n-menu-item-content) {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  height: 2.5rem !important;
-}
-
-:deep(.n-submenu .n-menu-item-content .n-menu-item-content__icon) {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  margin-right: 8px !important;
-}
-
-:deep(.n-submenu .n-menu-item-content .n-menu-item-content__arrow) {
-  display: flex !important;
-  align-items: center !important;
-  margin-left: 8px !important;
-}
-
 /* Main Layout */
 .main-layout {
   margin-top: 4.5rem;
@@ -482,27 +623,111 @@ html:has(#user-app.dark-mode) {
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+/* Responsive Design */
+@media (max-width: 1024px) {
   .nav-container {
-    padding: 0 16px;
+    width: 85vw;
+    padding: 0 1.5rem;
+  }
+  
+  .nav-right {
+    gap: 10px;
   }
   
   .lab-name {
     font-size: 16px;
   }
   
+  .desktop-lang-selector .n-button,
+  .desktop-theme-btn {
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-container {
+    width: 90vw;
+    padding: 0 1rem;
+    height: 4rem;
+    border-radius: 0 0 2rem 2rem;
+  }
+  
+  .lab-name {
+    font-size: 15px;
+  }
+  
   .nav-right {
-    gap: 8px;
+    gap: 4px;
+  }
+  
+  .desktop-menu {
+    display: none;
+  }
+  
+  .mobile-menu-btn {
+    display: block !important;
+  }
+  
+  .desktop-lang-selector,
+  .desktop-theme-btn {
+    display: none !important;
+  }
+  
+  .main-layout {
+    margin-top: 4rem;
+  }
+  
+  .main-content {
+    padding: 16px;
+    min-height: calc(100vh - 4rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .nav-container {
+    width: 95vw;
+    padding: 0 0.75rem;
+    height: 3.5rem;
+    border-radius: 0 0 1.75rem 1.75rem;
+  }
+  
+  .lab-name {
+    font-size: 14px;
+  }
+  
+  .main-layout {
+    margin-top: 3.5rem;
+  }
+  
+  .main-content {
+    padding: 12px;
+    min-height: calc(100vh - 3.5rem);
   }
 }
 
 @media (max-width: 480px) {
-  .lab-name {
-    display: none;
+  .nav-container {
+    width: 98vw;
+    padding: 0 0.5rem;
+    height: 3rem;
+    border-radius: 0 0 1.5rem 1.5rem;
   }
   
-  .nav-container {
-    padding: 0 12px;
+  .lab-name {
+    font-size: 12px;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .main-layout {
+    margin-top: 3rem;
+  }
+  
+  .main-content {
+    padding: 8px;
+    min-height: calc(100vh - 3rem);
   }
 }
 </style>
