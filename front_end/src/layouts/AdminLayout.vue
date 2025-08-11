@@ -111,6 +111,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useMessage, NIcon } from 'naive-ui';
 import { useAuthStore } from '@/stores/auth';
+import { setLanguage } from '@/locales';
 import type { MenuOption, DropdownOption } from 'naive-ui';
 
 const router = useRouter();
@@ -265,7 +266,7 @@ const handleMenuSelect = (key: string) => {
 // 處理語言切換
 const handleLanguageChange = (key: string) => {
   locale.value = key;
-  localStorage.setItem('language', key);
+  setLanguage(key); // 使用統一的 setLanguage 函數保存到 cookie
   message.success(t('admin.layout.languageChanged'));
 };
 

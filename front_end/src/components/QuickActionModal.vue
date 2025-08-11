@@ -287,7 +287,7 @@ import { useI18n } from 'vue-i18n';
 import { memberApi, paperApi, projectApi, newsApi, researchGroupApi } from '@/services/api';
 import MarkdownEditor from './MarkdownEditor.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 // Props
 interface Props {
@@ -421,6 +421,13 @@ watch(show, (newValue) => {
   emit('update:modelValue', newValue);
 });
 
+// Watch locale changes to reload options with correct language
+watch(locale, () => {
+  if (show.value) {
+    loadOptionsData();
+  }
+});
+
 // Methods
 const resetForm = () => {
   Object.keys(formData).forEach(key => {
@@ -453,7 +460,9 @@ const loadResearchGroups = async () => {
     const response = await researchGroupApi.getResearchGroups({ all: 'true' });
     if (response.code === 0) {
       researchGroupOptions.value = response.data.items.map((group: any) => ({
-        label: group.research_group_name_zh || group.research_group_name_en,
+        label: locale.value === 'zh' 
+          ? (group.research_group_name_zh || group.research_group_name_en)
+          : (group.research_group_name_en || group.research_group_name_zh),
         value: group.research_group_id
       }));
     }
@@ -470,7 +479,9 @@ const loadMembers = async () => {
     const response = await memberApi.getMembers({ all: 'true', type: 0 }); // 只載入教師
     if (response.code === 0) {
       memberOptions.value = response.data.items.map((member: any) => ({
-        label: member.mem_name_zh || member.mem_name_en,
+        label: locale.value === 'zh'
+          ? (member.mem_name_zh || member.mem_name_en)
+          : (member.mem_name_en || member.mem_name_zh),
         value: member.mem_id
       }));
     }
