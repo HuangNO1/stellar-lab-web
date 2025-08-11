@@ -1,12 +1,13 @@
 <template>
-  <n-modal v-model:show="show" @update:show="handleModalClose">
+  <n-modal v-model:show="show" @update:show="handleModalClose" class="quick-action-modal">
     <n-card
-      style="width: 800px"
+      :style="{ width: isMobile ? '95vw' : '800px', maxWidth: isMobile ? '95vw' : '800px' }"
       :title="modalTitle"
       :bordered="false"
-      size="huge"
+      :size="isMobile ? 'medium' : 'huge'"
       role="dialog"
       aria-modal="true"
+      class="modal-card"
     >
       <template #header-extra>
         <n-button
@@ -28,9 +29,10 @@
         ref="formRef"
         :model="formData"
         :rules="formRules"
-        label-placement="left"
-        label-width="120"
+        :label-placement="isMobile ? 'top' : 'left'"
+        :label-width="isMobile ? 'auto' : '120'"
         require-mark-placement="right-hanging"
+        class="modal-form"
       >
         <!-- 成員表單 -->
         <template v-if="moduleType === 'members'">
@@ -312,7 +314,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch, nextTick } from 'vue';
+import { ref, reactive, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { useMessage } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/auth';
@@ -345,6 +347,7 @@ const show = ref(props.modelValue);
 const formRef = ref();
 const submitting = ref(false);
 const message = useMessage();
+const isMobile = ref(window.innerWidth <= 768);
 
 // Loading states
 const loadingGroups = ref(false);
@@ -475,6 +478,21 @@ watch(locale, () => {
   if (show.value) {
     loadOptionsData();
   }
+});
+
+// 檢查屏幕尺寸
+const checkScreenSize = () => {
+  isMobile.value = window.innerWidth <= 768;
+};
+
+// 監聽窗口大小變化
+onMounted(() => {
+  window.addEventListener('resize', checkScreenSize);
+  checkScreenSize();
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkScreenSize);
 });
 
 // Methods
@@ -721,9 +739,138 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
+.quick-action-modal :deep(.n-modal) {
+  padding: 1rem;
+}
+
+.modal-card {
+  margin: 0 auto;
+}
+
+.modal-form {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 8px;
+  margin-right: -8px;
+}
+
+/* 自定義滾動條樣式 */
+.modal-form::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-form::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-form::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.modal-form::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
 .modal-footer {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+  margin-top: 1rem;
+}
+
+/* 移動端樣式調整 */
+@media (max-width: 768px) {
+  .quick-action-modal :deep(.n-modal) {
+    padding: 0.5rem;
+  }
+  
+  .modal-card :deep(.n-card__header) {
+    padding: 1rem 1rem 0.75rem 1rem;
+    font-size: 1.125rem;
+  }
+  
+  .modal-card :deep(.n-card__content) {
+    padding: 0.75rem 1rem;
+  }
+  
+  .modal-card :deep(.n-card__footer) {
+    padding: 0.75rem 1rem 1rem 1rem;
+  }
+  
+  .modal-form {
+    max-height: 60vh;
+    padding-right: 6px;
+    margin-right: -6px;
+  }
+  
+  .modal-form :deep(.n-form-item) {
+    margin-bottom: 1rem;
+  }
+  
+  .modal-form :deep(.n-form-item-label) {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+  
+  .modal-footer {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+  }
+  
+  .modal-footer .n-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .quick-action-modal :deep(.n-modal) {
+    padding: 0.25rem;
+  }
+  
+  .modal-card :deep(.n-card__header) {
+    padding: 0.75rem 0.75rem 0.5rem 0.75rem;
+  }
+  
+  .modal-card :deep(.n-card__content) {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .modal-card :deep(.n-card__footer) {
+    padding: 0.5rem 0.75rem 0.75rem 0.75rem;
+  }
+  
+  .modal-form {
+    max-height: 55vh;
+    padding-right: 4px;
+    margin-right: -4px;
+  }
+  
+  .modal-form :deep(.n-form-item) {
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* MarkdownEditor 在移動端的調整 */
+@media (max-width: 768px) {
+  .modal-form :deep(.markdown-editor) {
+    min-height: 100px;
+  }
+  
+  .modal-form :deep(.n-input__textarea-el) {
+    min-height: 100px !important;
+  }
+}
+
+/* 上傳組件在移動端的調整 */
+@media (max-width: 768px) {
+  .modal-form :deep(.n-upload) {
+    width: 100%;
+  }
+  
+  .modal-form :deep(.n-upload .n-button) {
+    width: 100%;
+  }
 }
 </style>
