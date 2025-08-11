@@ -7,7 +7,7 @@
           <div class="card-icon members">
             <n-icon size="24">
               <svg viewBox="0 0 24 24">
-                <path fill="currentColor" d="M16,4C18.2,4 20,5.8 20,8A4,4 0 0,1 16,12A4,4 0 0,1 12,8A4,4 0 0,1 16,4M16,14C18.25,14 22,15.13 22,17.25V20H10V17.25C10,15.13 13.75,14 16,14Z"/>
+                <path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
               </svg>
             </n-icon>
           </div>
@@ -55,7 +55,7 @@
           <div class="card-icon news">
             <n-icon size="24">
               <svg viewBox="0 0 24 24">
-                <path fill="currentColor" d="M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5Z"/>
+                <path fill="currentColor" d="M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63M12,6A6,6 0 0,1 18,12C18,14.22 16.79,16.16 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.21,16.16 6,14.22 6,12A6,6 0 0,1 12,6M14,21V22A1,1 0 0,1 13,23H11A1,1 0 0,1 10,22V21H14M11,18H13V15.87C14.73,15.43 16,13.86 16,12A4,4 0 0,0 8,12C8,13.86 9.27,15.43 11,15.87V18Z"/>
               </svg>
             </n-icon>
           </div>
@@ -513,11 +513,24 @@ onMounted(() => {
 .card-icon {
   width: 48px;
   height: 48px;
-  border-radius: 0.5rem;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.card-icon :deep(.n-icon) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-icon :deep(svg) {
+  width: 24px;
+  height: 24px;
 }
 
 .card-icon.members {

@@ -28,7 +28,11 @@
       <!-- 查看模式 -->
       <div v-if="!editMode" class="profile-view">
         <div class="profile-info">
-          <n-descriptions :column="1" :label-placement="isMobile ? 'top' : 'left'">
+          <n-descriptions 
+            :column="1" 
+            :label-placement="isMobile ? 'top' : 'left'"
+            :label-width="isMobile ? 'auto' : '140px'"
+          >
             <n-descriptions-item :label="t('admin.admins.form.adminName')">
               {{ authStore.admin?.admin_name }}
             </n-descriptions-item>
@@ -56,7 +60,7 @@
           :model="formData"
           :rules="formRules"
           :label-placement="isMobile ? 'top' : 'left'"
-          :label-width="isMobile ? 'auto' : '120'"
+          :label-width="isMobile ? 'auto' : '140'"
           require-mark-placement="right-hanging"
         >
           <n-form-item :label="t('admin.admins.form.adminName')" path="admin_name">
@@ -399,8 +403,54 @@ const handleSubmit = async () => {
   padding: 1rem 0;
 }
 
+.profile-info {
+  max-width: 100%;
+}
+
 .profile-info :deep(.n-descriptions-item-label) {
   font-weight: 600;
+  min-width: 120px;
+}
+
+.profile-info :deep(.n-descriptions-item-content) {
+  text-align: left;
+}
+
+/* 確保標籤和內容對齊 */
+.profile-info :deep(.n-descriptions) {
+  width: 100%;
+}
+
+.profile-info :deep(.n-descriptions-item) {
+  margin-bottom: 20px;
+  align-items: flex-start;
+}
+
+.profile-info :deep(.n-descriptions-item-label) {
+  font-weight: 600;
+  min-width: 140px;
+  padding-right: 16px;
+  text-align: left;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.profile-info :deep(.n-descriptions-item-content) {
+  text-align: left;
+  flex: 1;
+}
+
+/* 編輯模式表單對齊 */
+.profile-edit :deep(.n-form-item-label) {
+  min-width: 140px;
+  text-align: left;
+  padding-right: 16px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.profile-edit :deep(.n-form-item-blank) {
+  flex: 1;
 }
 
 .profile-edit {
@@ -445,6 +495,24 @@ const handleSubmit = async () => {
 
   .profile-view {
     padding: 0.5rem 0;
+  }
+  
+  .profile-info :deep(.n-descriptions-item-label) {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    min-width: auto;
+    padding-right: 0;
+  }
+  
+  .profile-info :deep(.n-descriptions-item) {
+    margin-bottom: 1rem;
+  }
+  
+  /* 編輯模式移動端對齊 */
+  .profile-edit :deep(.n-form-item-label) {
+    min-width: auto;
+    padding-right: 0;
+    margin-bottom: 0.5rem;
   }
 }
 

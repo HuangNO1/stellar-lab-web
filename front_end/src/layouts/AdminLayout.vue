@@ -1,5 +1,6 @@
 <template>
-  <n-layout class="admin-layout" :class="{ 'mobile-layout': isMobile }" :has-sider="!isMobile">
+  <n-config-provider :theme="currentTheme">
+    <n-layout class="admin-layout" :class="{ 'mobile-layout': isMobile, 'dark-theme': isDark }" :has-sider="!isMobile">
     <!-- 側邊欄 -->
     <n-layout-sider
       v-if="!isMobile"
@@ -151,13 +152,15 @@
       @success="handlePasswordSuccess"
     />
   </n-layout>
+  </n-config-provider>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, h, onMounted, onUnmounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { useMessage, NIcon } from 'naive-ui';
+import { useMessage, NIcon, darkTheme } from 'naive-ui';
+import type { GlobalTheme } from 'naive-ui';
 import { useAuthStore } from '@/stores/auth';
 import { setLanguage, getTheme, setTheme } from '@/locales';
 import ProfileModal from '@/components/ProfileModal.vue';
@@ -180,6 +183,11 @@ const passwordEditData = ref<any>({});
 
 // 當前語言
 const currentLang = computed(() => locale.value);
+
+// Theme management
+const currentTheme = computed<GlobalTheme | null>(() => {
+  return isDark.value ? darkTheme : null;
+});
 
 // 活躍菜單項
 const activeKey = computed(() => {
@@ -248,12 +256,12 @@ const menuOptions = computed<MenuOption[]>(() => [
       {
         label: t('admin.menu.members'),
         key: 'members',
-        icon: renderIcon('<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,5.5A3.5,3.5 0 0,1 15.5,9A3.5,3.5 0 0,1 12,12.5A3.5,3.5 0 0,1 8.5,9A3.5,3.5 0 0,1 12,5.5M5,8C5.56,8 6.08,8.15 6.53,8.42C6.38,9.85 6.8,11.27 7.66,12.38C7.16,13.34 6.16,14 5,14A3,3 0 0,1 2,11A3,3 0 0,1 5,8M19,8A3,3 0 0,1 22,11A3,3 0 0,1 19,14C17.84,14 16.84,13.34 16.34,12.38C17.2,11.27 17.62,9.85 17.47,8.42C17.92,8.15 18.44,8 19,8M5.5,18.25C5.5,16.18 8.41,14.5 12,14.5C15.59,14.5 18.5,16.18 18.5,18.25V20H5.5V18.25M0,20V18.5C0,17.11 1.89,15.94 4.45,15.6C3.86,16.28 3.5,17.22 3.5,18.25V20H0M24,20H20.5V18.25C20.5,17.22 20.14,16.28 19.55,15.6C22.11,15.94 24,17.11 24,18.5V20Z"/></svg>')
+        icon: renderIcon('<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>')
       },
       {
         label: t('admin.menu.groups'),
         key: 'groups',
-        icon: renderIcon('<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,5.5A3.5,3.5 0 0,1 15.5,9A3.5,3.5 0 0,1 12,12.5A3.5,3.5 0 0,1 8.5,9A3.5,3.5 0 0,1 12,5.5M5,8C5.56,8 6.08,8.15 6.53,8.42C6.38,9.85 6.8,11.27 7.66,12.38C7.16,13.34 6.16,14 5,14A3,3 0 0,1 2,11A3,3 0 0,1 5,8M19,8A3,3 0 0,1 22,11A3,3 0 0,1 19,14C17.84,14 16.84,13.34 16.34,12.38C17.2,11.27 17.62,9.85 17.47,8.42C17.92,8.15 18.44,8 19,8M5.5,18.25C5.5,16.18 8.41,14.5 12,14.5C15.59,14.5 18.5,16.18 18.5,18.25V20H5.5V18.25M0,20V18.5C0,17.11 1.89,15.94 4.45,15.6C3.86,16.28 3.5,17.22 3.5,18.25V20H0M24,20H20.5V18.25C20.5,17.22 20.14,16.28 19.55,15.6C22.11,15.94 24,17.11 24,18.5V20Z"/></svg>')
+        icon: renderIcon('<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,12V20H16V22H8V20H5V12H7V20H9V18H15V20H17V12H19M2,16H4V18H2V16M20,16H22V18H20V16Z"/></svg>')
       },
       {
         label: t('admin.menu.papers'),
@@ -280,7 +288,7 @@ const menuOptions = computed<MenuOption[]>(() => [
   ...(authStore.isSuperAdmin ? [{
     label: t('admin.menu.admins'),
     key: 'admins',
-    icon: renderIcon('<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14M21,12H15L13.5,7.5C13.1,6.1 11.9,5 10.5,5C9.1,5 7.9,6.1 7.5,7.5L6,12H0L1.5,6.5C2.2,4.4 4.2,3 6.5,3C8.8,3 10.8,4.4 11.5,6.5L13,12H21Z"/></svg>')
+    icon: renderIcon('<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 7h-6v13h-2v-6h-2v6H9V9H3V7h18v2z"/></svg>')
   }] : []),
   ...(authStore.isSuperAdmin ? [{
     label: t('admin.menu.system'),
@@ -375,6 +383,11 @@ const toggleTheme = () => {
   const newTheme = isDark.value ? 'dark' : 'light';
   document.documentElement.setAttribute('data-theme', newTheme);
   setTheme(newTheme);
+  
+  // Update body and html background immediately for consistent theming
+  const bgColor = isDark.value ? 'rgb(16, 16, 20)' : '#fff';
+  document.body.style.background = bgColor;
+  document.documentElement.style.background = bgColor;
 };
 
 // 處理用戶菜單選擇
@@ -521,24 +534,30 @@ initTheme();
   padding: 1.5rem;
   background-color: #f9fafb;
   overflow-y: auto;
+  min-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
 }
 
 /* 移動端內容區調整 */
 @media (max-width: 1024px) {
   .content {
     padding: 1rem;
+    min-height: calc(100vh - 64px);
   }
 }
 
 @media (max-width: 768px) {
   .content {
     padding: 0.75rem;
+    min-height: calc(100vh - 56px);
   }
 }
 
 @media (max-width: 480px) {
   .content {
     padding: 0.5rem;
+    min-height: calc(100vh - 48px);
   }
 }
 
@@ -615,6 +634,117 @@ initTheme();
 
 [data-theme="dark"] .mobile-sidebar :deep(.n-menu-item:hover .n-menu-item-content) {
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 全面的暗色主題 */
+.admin-layout.dark-theme,
+[data-theme="dark"] .admin-layout {
+  background-color: #111827;
+}
+
+[data-theme="dark"] .sidebar-header,
+.dark .sidebar-header {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+  background-color: #1f2937;
+}
+
+[data-theme="dark"] .logo-text,
+.dark .logo-text {
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .header,
+.dark .header {
+  background: #1f2937;
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .user-avatar:hover,
+.dark .user-avatar:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .content,
+.dark .content {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .mobile-menu-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* N-Layout-Sider 暗色主題 */
+[data-theme="dark"] :deep(.n-layout-sider),
+.dark-theme :deep(.n-layout-sider) {
+  background-color: #1f2937 !important;
+  color: #f9fafb;
+}
+
+/* N-Menu 暗色主題 */
+[data-theme="dark"] :deep(.n-menu),
+.dark-theme :deep(.n-menu) {
+  background-color: transparent !important;
+  color: #f9fafb;
+}
+
+[data-theme="dark"] :deep(.n-menu .n-menu-item),
+.dark-theme :deep(.n-menu .n-menu-item) {
+  color: #d1d5db !important;
+}
+
+[data-theme="dark"] :deep(.n-menu .n-menu-item:hover),
+.dark-theme :deep(.n-menu .n-menu-item:hover) {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] :deep(.n-menu .n-menu-item.n-menu-item--selected),
+.dark-theme :deep(.n-menu .n-menu-item.n-menu-item--selected) {
+  background-color: rgba(99, 102, 241, 0.2) !important;
+  color: #6366f1 !important;
+}
+
+/* 麵包屑暗色主題 */
+[data-theme="dark"] :deep(.n-breadcrumb),
+.dark-theme :deep(.n-breadcrumb) {
+  color: #d1d5db;
+}
+
+[data-theme="dark"] :deep(.n-breadcrumb .n-breadcrumb-item),
+.dark-theme :deep(.n-breadcrumb .n-breadcrumb-item) {
+  color: #d1d5db;
+}
+
+/* 下拉菜單暗色主題 */
+[data-theme="dark"] :deep(.n-dropdown-menu),
+.dark-theme :deep(.n-dropdown-menu) {
+  background-color: #1f2937 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] :deep(.n-dropdown-option),
+.dark-theme :deep(.n-dropdown-option) {
+  color: #d1d5db !important;
+}
+
+[data-theme="dark"] :deep(.n-dropdown-option:hover),
+.dark-theme :deep(.n-dropdown-option:hover) {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f9fafb !important;
+}
+
+/* 按鈕暗色主題 */
+[data-theme="dark"] :deep(.n-button--text),
+.dark-theme :deep(.n-button--text) {
+  color: #d1d5db;
+}
+
+[data-theme="dark"] :deep(.n-button--text:hover),
+.dark-theme :deep(.n-button--text:hover) {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #f9fafb;
 }
 
 /* 暗色主題 */
