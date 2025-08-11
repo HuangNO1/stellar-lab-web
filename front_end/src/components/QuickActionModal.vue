@@ -135,6 +135,13 @@
               style="height: 200px; width: 100%"
             />
           </n-form-item>
+          <n-form-item :label="t('admin.members.form.descriptionEn')" path="mem_desc_en">
+            <I18nMdEditor
+              v-model="formData.mem_desc_en"
+              :placeholder="t('admin.members.form.placeholders.descriptionEn')"
+              style="height: 200px; width: 100%"
+            />
+          </n-form-item>
           <n-form-item :label="t('admin.members.form.avatar')" path="mem_avatar">
             <n-upload
               :default-file-list="getDefaultFileList('mem_avatar')"
@@ -168,6 +175,13 @@
             <I18nMdEditor
               v-model="formData.paper_desc_zh"
               :placeholder="t('admin.papers.form.placeholders.description')"
+              style="height: 200px; width: 100%"
+            />
+          </n-form-item>
+          <n-form-item :label="t('admin.papers.form.descriptionEn')" path="paper_desc_en">
+            <I18nMdEditor
+              v-model="formData.paper_desc_en"
+              :placeholder="t('admin.papers.form.placeholders.descriptionEn')"
               style="height: 200px; width: 100%"
             />
           </n-form-item>
@@ -213,6 +227,13 @@
               style="width: 100%"
             />
           </n-form-item>
+          <n-form-item :label="t('admin.papers.form.url')" path="paper_url">
+            <n-input
+              v-model:value="formData.paper_url"
+              :placeholder="t('admin.papers.form.placeholders.url')"
+              style="width: 100%"
+            />
+          </n-form-item>
           <n-form-item :label="t('admin.papers.form.file')" path="paper_file">
             <n-upload
               :default-file-list="getDefaultFileList('paper_file')"
@@ -246,6 +267,13 @@
             <I18nMdEditor
               v-model="formData.project_desc_zh"
               :placeholder="t('admin.projects.form.placeholders.description')"
+              style="height: 200px; width: 100%"
+            />
+          </n-form-item>
+          <n-form-item :label="t('admin.projects.form.descriptionEn')" path="project_desc_en">
+            <I18nMdEditor
+              v-model="formData.project_desc_en"
+              :placeholder="t('admin.projects.form.placeholders.descriptionEn')"
               style="height: 200px; width: 100%"
             />
           </n-form-item>

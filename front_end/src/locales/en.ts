@@ -348,7 +348,8 @@ export default {
         destinationZh: 'Destination (Chinese)',
         destinationEn: 'Destination (English)',
         group: 'Research Group',
-        description: 'Description',
+        description: 'Description (Chinese)',
+        descriptionEn: 'Description (English)',
         avatar: 'Avatar Upload',
         placeholders: {
           nameZh: 'Enter Chinese name',
@@ -361,7 +362,8 @@ export default {
           destinationZh: 'Enter destination (Chinese)',
           destinationEn: 'Enter destination (English)',
           group: 'Select research group',
-          description: 'Enter member description (supports Markdown syntax)'
+          description: 'Enter member description (Chinese, supports Markdown syntax)',
+          descriptionEn: 'Enter member description (English, supports Markdown syntax)'
         },
         validation: {
           nameZhRequired: 'Chinese name is required',
@@ -413,21 +415,25 @@ export default {
       form: {
         titleZh: 'Chinese Title',
         titleEn: 'English Title',
-        description: 'Paper Description',
+        description: 'Description (Chinese)',
+        descriptionEn: 'Description (English)',
         venue: 'Journal/Conference',
         type: 'Paper Type',
         date: 'Publication Date',
         status: 'Acceptance Status',
+        url: 'Paper URL',
         file: 'Paper File',
         authors: 'Authors',
         placeholders: {
           titleZh: 'Enter paper Chinese title',
           titleEn: 'Enter paper English title',
           description: 'Enter paper Chinese description (supports Markdown syntax)',
+          descriptionEn: 'Enter paper English description (supports Markdown syntax)',
           venue: 'Enter publication journal or conference',
           type: 'Select paper type',
           date: 'Select publication date',
           status: 'Select acceptance status',
+          url: 'Enter paper URL',
           authors: 'Select paper authors'
         },
         validation: {
@@ -450,14 +456,16 @@ export default {
       form: {
         nameZh: 'Chinese Name',
         nameEn: 'English Name',
-        description: 'Project Description',
+        description: 'Description (Chinese)',
+        descriptionEn: 'Description (English)',
         url: 'Project URL',
         startDate: 'Start Date',
         status: 'Project Status',
         placeholders: {
           nameZh: 'Enter project Chinese name',
           nameEn: 'Enter project English name',
-          description: 'Enter project description (supports Markdown syntax)',
+          description: 'Enter project Chinese description (supports Markdown syntax)',
+          descriptionEn: 'Enter project English description (supports Markdown syntax)',
           url: 'Enter project URL',
           startDate: 'Select start date',
           status: 'Select project status'

@@ -335,7 +335,8 @@ export default {
         destinationZh: '去向（中文）',
         destinationEn: '去向（英文）',
         group: '課題組',
-        description: '成員描述',
+        description: '成員描述（中文）',
+        descriptionEn: '成員描述（英文）',
         avatar: '頭像上傳',
         placeholders: {
           nameZh: '請輸入中文姓名',
@@ -348,7 +349,8 @@ export default {
           destinationZh: '請輸入去向（中文）',
           destinationEn: '請輸入去向（英文）',
           group: '請選擇課題組',
-          description: '請輸入成員中文描述（支持 Markdown 語法）'
+          description: '請輸入成員中文描述（支持 Markdown 語法）',
+          descriptionEn: '請輸入成員英文描述（支持 Markdown 語法）'
         },
         validation: {
           nameZhRequired: '請輸入中文姓名',
@@ -375,21 +377,25 @@ export default {
       form: {
         titleZh: '中文標題',
         titleEn: '英文標題',
-        description: '論文描述',
+        description: '論文描述（中文）',
+        descriptionEn: '論文描述（英文）',
         venue: '期刊/會議',
         type: '論文類型',
         date: '發表日期',
         status: '接收狀態',
+        url: '論文連結',
         file: '論文文件',
         authors: '作者',
         placeholders: {
           titleZh: '請輸入論文中文標題',
           titleEn: '請輸入論文英文標題',
           description: '請輸入論文中文描述（支持 Markdown 語法）',
+          descriptionEn: '請輸入論文英文描述（支持 Markdown 語法）',
           venue: '請輸入發表期刊或會議',
           type: '請選擇論文類型',
           date: '請選擇發表日期',
           status: '請選擇接收狀態',
+          url: '請輸入論文連結URL',
           authors: '請選擇論文作者'
         },
         validation: {
@@ -412,7 +418,8 @@ export default {
       form: {
         nameZh: '中文名稱',
         nameEn: '英文名稱',
-        description: '項目描述',
+        description: '項目描述（中文）',
+        descriptionEn: '項目描述（英文）',
         url: '項目URL',
         startDate: '開始日期',
         status: '項目狀態',
@@ -420,6 +427,7 @@ export default {
           nameZh: '請輸入項目中文名稱',
           nameEn: '請輸入項目英文名稱',
           description: '請輸入項目描述（支持 Markdown 語法）',
+          descriptionEn: '請輸入項目英文描述（支持 Markdown 語法）',
           url: '請輸入項目URL',
           startDate: '請選擇開始日期',
           status: '請選擇項目狀態'
