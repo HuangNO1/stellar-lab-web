@@ -1,15 +1,47 @@
 from functools import wraps
 from flask import request, jsonify, current_app, g
-from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.models import Admin
 
 def admin_required(func):
     @wraps(func)
-    @jwt_required()
     def wrapper(*args, **kwargs):
-        admin_id = get_jwt_identity()
-        admin = Admin.query.filter_by(admin_id=admin_id, enable=1).first()
+        # 獲取Authorization header
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({
+                'code': 1000,
+                'message': '未認證或 token 無效'
+            }), 401
         
+        token = auth_header[7:]  # 移除 "Bearer " 前綴
+        
+        # 使用AuthService驗證token
+        from app.services.auth_service import AuthService
+        token_data = AuthService.verify_token(token)
+        
+        if not token_data:
+            return jsonify({
+                'code': 1000,
+                'message': '未認證或 token 無效'
+            }), 401
+        
+        # 獲取admin_id並查詢管理員
+        admin_id = token_data.get('sub')  # Flask-JWT-Extended 將 identity 存儲在 sub 中
+        if not admin_id:
+            return jsonify({
+                'code': 1000,
+                'message': '未認證或 token 無效'
+            }), 401
+        
+        try:
+            admin_id = int(admin_id)  # 轉換為整數
+        except (ValueError, TypeError):
+            return jsonify({
+                'code': 1000,
+                'message': '未認證或 token 無效'
+            }), 401
+            
+        admin = Admin.query.filter_by(admin_id=admin_id, enable=1).first()
         if not admin:
             return jsonify({
                 'code': 1000,

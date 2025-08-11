@@ -1,7 +1,6 @@
 from typing import Optional, Dict, Any
 from datetime import datetime, timedelta
 from flask import request
-import jwt
 from werkzeug.security import check_password_hash, generate_password_hash
 from app import db
 from app.models import Admin
@@ -61,18 +60,19 @@ class AuthService(BaseService):
             raise PermissionError('密碼錯誤')
         
         def _login_operation():
-            # 生成JWT令牌
-            token_data = {
-                'admin_id': admin.admin_id,
+            # 生成JWT令牌 - 使用Flask-JWT-Extended標準格式
+            from flask_jwt_extended import create_access_token
+            
+            # 創建額外聲明
+            additional_claims = {
                 'admin_name': admin.admin_name,
-                'is_super': admin.is_super,
-                'exp': datetime.utcnow() + timedelta(days=1)
+                'is_super': admin.is_super
             }
             
-            access_token = jwt.encode(
-                token_data,
-                Config.JWT_SECRET_KEY,
-                algorithm='HS256'
+            # 使用Flask-JWT-Extended創建token，admin_id作為identity (sub claim)
+            access_token = create_access_token(
+                identity=str(admin.admin_id),  # 轉換為字符串
+                additional_claims=additional_claims
             )
             
             # 更新最後登錄時間
@@ -239,7 +239,7 @@ class AuthService(BaseService):
     @staticmethod
     def verify_token(token: str) -> Optional[Dict[str, Any]]:
         """
-        驗證JWT令牌
+        驗證JWT令牌 - 兼容當前格式
         
         Args:
             token: JWT令牌
@@ -248,11 +248,13 @@ class AuthService(BaseService):
             Dict: 解碼後的令牌數據，無效時返回None
         """
         try:
+            import jwt
+            
             # 移除 "Bearer " 前綴
             if token.startswith('Bearer '):
                 token = token[7:]
             
-            # 解碼令牌
+            # 使用當前格式解碼令牌
             payload = jwt.decode(
                 token,
                 Config.JWT_SECRET_KEY,

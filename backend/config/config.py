@@ -2,7 +2,13 @@ import os
 from datetime import timedelta
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
+    # JWT配置 - 統一使用同一個密鑰
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'jwt-secret-string'
+    SECRET_KEY = JWT_SECRET_KEY  # Flask-JWT-Extended使用SECRET_KEY
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
+    
+    # 數據庫配置
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'mysql+pymysql://root:password@localhost/lab_web?charset=utf8mb4'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -10,11 +16,6 @@ class Config:
         'pool_pre_ping': True,
         'pool_recycle': 300,
     }
-    
-    # JWT配置
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'jwt-secret-string'
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
     
     # 文件上傳配置
     UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER') or os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'media')
