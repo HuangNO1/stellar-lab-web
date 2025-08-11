@@ -105,7 +105,8 @@ export default {
     book: 'Book',
     other: 'Other',
     date: 'Publication Date',
-    venue: 'Journal/Conference'
+    venue: 'Journal/Conference',
+    andOthers: 'et al.'
   },
   groups: {
     title: 'Research Groups',
@@ -152,7 +153,10 @@ export default {
   },
   errorMessages: {
     fetchGroupDetail: 'Failed to fetch group details',
-    fetchMemberDetail: 'Failed to fetch member details'
+    fetchMemberDetail: 'Failed to fetch member details',
+    invalidMemberId: 'Invalid member ID',
+    invalidGroupId: 'Invalid group ID',
+    networkError: 'Network connection error'
   },
   language: {
     chinese: '中文',

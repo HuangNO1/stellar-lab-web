@@ -160,7 +160,7 @@ const fetchGroupDetail = async () => {
     
     const groupId = parseInt(route.params.id as string);
     if (isNaN(groupId)) {
-      error.value = '無效的課題組ID';
+      error.value = t('errorMessages.invalidGroupId');
       return;
     }
 
@@ -436,65 +436,85 @@ watch(() => route.params.id, () => {
 
 /* 暗色主題支持 */
 [data-theme="dark"] .group-view,
-.dark .group-view {
+.dark .group-view,
+.dark-mode .group-view {
   color: #fff;
 }
 
+[data-theme="dark"] .group-description,
+.dark .group-description,
+.dark-mode .group-description {
+  background: rgba(255, 255, 255, 0.05);
+}
+
 [data-theme="dark"] .leader-label,
-.dark .leader-label {
+.dark .leader-label,
+.dark-mode .leader-label {
   color: #ccc;
 }
 
 [data-theme="dark"] .leader-info,
-.dark .leader-info {
+.dark .leader-info,
+.dark-mode .leader-info {
   background: rgba(112, 161, 255, 0.1);
 }
 
 [data-theme="dark"] .leader-info:hover,
-.dark .leader-info:hover {
+.dark .leader-info:hover,
+.dark-mode .leader-info:hover {
   background: rgba(112, 161, 255, 0.15);
 }
 
 [data-theme="dark"] .leader-name,
-.dark .leader-name {
+.dark .leader-name,
+.dark-mode .leader-name {
   color: #70a1ff;
 }
 
 [data-theme="dark"] .group-description h3,
-.dark .group-description h3 {
+.dark .group-description h3,
+.dark-mode .group-description h3 {
   color: #fff;
 }
 
 [data-theme="dark"] .description-content,
-.dark .description-content {
+.dark .description-content,
+.dark-mode .description-content {
   color: #ccc;
 }
 
 [data-theme="dark"] .section-title,
-.dark .section-title {
+.dark .section-title,
+.dark-mode .section-title {
   color: #70a1ff;
   border-bottom-color: #70a1ff;
 }
 
 [data-theme="dark"] .member-card,
-.dark .member-card {
+.dark .member-card,
+.dark-mode .member-card {
   background: rgba(255, 255, 255, 0.08);
-  border-color: transparent;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.2);
 }
 
 [data-theme="dark"] .member-card:hover,
-.dark .member-card:hover {
+.dark .member-card:hover,
+.dark-mode .member-card:hover {
   background: rgba(255, 255, 255, 0.12);
   border-color: #70a1ff;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.3);
 }
 
 [data-theme="dark"] .member-name,
-.dark .member-name {
+.dark .member-name,
+.dark-mode .member-name {
   color: #fff;
 }
 
 [data-theme="dark"] .member-position,
-.dark .member-position {
+.dark .member-position,
+.dark-mode .member-position {
   color: #ccc;
 }
 

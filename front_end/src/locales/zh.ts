@@ -105,7 +105,8 @@ export default {
     book: '書籍',
     other: '其他',
     date: '發表日期',
-    venue: '發表期刊/會議'
+    venue: '發表期刊/會議',
+    andOthers: '等'
   },
   projects: {
     title: '研究項目',
@@ -117,6 +118,12 @@ export default {
     ongoing: '進行中',
     completed: '已完成',
     name: '項目名稱'
+  },
+  groups: {
+    title: '研究課題組',
+    leader: '課題組負責人',
+    description: '課題組簡介',
+    members: '成員列表'
   },
   search: {
     placeholder: '搜索...',
@@ -139,7 +146,10 @@ export default {
   },
   errorMessages: {
     fetchGroupDetail: '獲取課題組詳情失敗',
-    fetchMemberDetail: '獲取成員詳情失敗'
+    fetchMemberDetail: '獲取成員詳情失敗',
+    invalidMemberId: '無效的成員ID',
+    invalidGroupId: '無效的課題組ID',
+    networkError: '網路連接錯誤'
   },
   language: {
     chinese: '中文',

@@ -175,7 +175,7 @@ const fetchMemberDetail = async () => {
     
     const memberId = parseInt(route.params.id as string);
     if (isNaN(memberId)) {
-      error.value = '無效的成員ID';
+      error.value = t('errorMessages.invalidMemberId');
       return;
     }
 
@@ -458,67 +458,82 @@ watch(() => route.params.id, () => {
 
 /* 暗色主題支持 */
 [data-theme="dark"] .member-detail-view,
-.dark .member-detail-view {
+.dark .member-detail-view,
+.dark-mode .member-detail-view {
   color: #fff;
 }
 
 [data-theme="dark"] .member-position,
-.dark .member-position {
+.dark .member-position,
+.dark-mode .member-position {
   color: #70a1ff;
 }
 
 [data-theme="dark"] .contact-info,
 [data-theme="dark"] .research-group,
 .dark .contact-info,
-.dark .research-group {
+.dark .research-group,
+.dark-mode .contact-info,
+.dark-mode .research-group {
   color: #ccc;
 }
 
 [data-theme="dark"] .member-description h3,
-.dark .member-description h3 {
+.dark .member-description h3,
+.dark-mode .member-description h3 {
   color: #fff;
 }
 
 [data-theme="dark"] .description-content,
-.dark .description-content {
+.dark .description-content,
+.dark-mode .description-content {
   color: #ccc;
 }
 
 [data-theme="dark"] .section-title,
-.dark .section-title {
+.dark .section-title,
+.dark-mode .section-title {
   color: #70a1ff;
   border-bottom-color: #70a1ff;
 }
 
 [data-theme="dark"] .paper-item,
-.dark .paper-item {
+.dark .paper-item,
+.dark-mode .paper-item {
   background: rgba(255, 255, 255, 0.08);
-  border-color: transparent;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.2);
 }
 
 [data-theme="dark"] .paper-item:hover,
-.dark .paper-item:hover {
+.dark .paper-item:hover,
+.dark-mode .paper-item:hover {
   background: rgba(255, 255, 255, 0.12);
-  border-color: #70a1ff;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.3);
+  border-left-color: #70a1ff;
 }
 
 [data-theme="dark"] .paper-title,
-.dark .paper-title {
+.dark .paper-title,
+.dark-mode .paper-title {
   color: #fff;
 }
 
 [data-theme="dark"] .paper-venue,
-.dark .paper-venue {
+.dark .paper-venue,
+.dark-mode .paper-venue {
   color: #70a1ff;
 }
 
 [data-theme="dark"] .paper-date,
-.dark .paper-date {
-  color: #999;
+.dark .paper-date,
+.dark-mode .paper-date {
+  color: #bbb;
 }
 
 [data-theme="dark"] .paper-description,
-.dark .paper-description {
+.dark .paper-description,
+.dark-mode .paper-description {
   color: #ccc;
 }
 
