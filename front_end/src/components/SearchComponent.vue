@@ -1,6 +1,7 @@
 <template>
   <div class="search-component">
-    <!-- 基礎搜索 -->
+    <n-config-provider :locale="naiveLocale" :date-locale="dateLocale">
+      <!-- 基礎搜索 -->
     <div class="basic-search">
       <n-input
         v-model:value="localFilters.q"
@@ -40,14 +41,14 @@
           <!-- 日期範圍 -->
           <n-form-item :label="$t('search.dateRange')" v-if="config.dateRange">
             <n-date-picker
+              :key="`date-picker-${currentLocale}`"
               v-model:value="dateRange"
               type="daterange"
-              :placeholder="[$t('search.startDate'), $t('search.endDate')]"
               @update:value="handleDateChange"
-              format="yyyy-MM-dd"
+              :format="currentLocale === 'zh' ? 'yyyy年MM月dd日' : 'yyyy-MM-dd'"
               value-format="yyyy-MM-dd"
               clearable
-              style="width: 300px"
+              :style="{ width: currentLocale === 'zh' ? '350px' : '300px' }"
             />
           </n-form-item>
 
@@ -129,12 +130,14 @@
         </n-form>
       </div>
     </n-collapse-transition>
+    </n-config-provider>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
 import type { SearchFilters } from '@/types/api';
 
 interface SearchConfig {
@@ -155,9 +158,24 @@ const emit = defineEmits<{
   search: [filters: SearchFilters];
 }>();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const showAdvanced = ref(false);
 const dateRange = ref<[string, string] | null>(null);
+const startDate = ref<string | null>(null);
+const endDate = ref<string | null>(null);
+
+// 當前語言環境
+const currentLocale = computed(() => locale.value);
+
+// Naive UI 語言包配置
+const naiveLocale = computed(() => {
+  return locale.value === 'zh' ? zhCN : enUS;
+});
+
+// 日期選擇器的國際化配置
+const dateLocale = computed(() => {
+  return locale.value === 'zh' ? dateZhCN : dateEnUS;
+});
 
 // 本地篩選狀態
 const localFilters = ref<SearchFilters>({
@@ -240,9 +258,13 @@ const handleDateChange = (value: [string, string] | null) => {
   if (value) {
     localFilters.value.start_date = value[0];
     localFilters.value.end_date = value[1];
+    startDate.value = value[0];
+    endDate.value = value[1];
   } else {
     localFilters.value.start_date = undefined;
     localFilters.value.end_date = undefined;
+    startDate.value = null;
+    endDate.value = null;
   }
   handleSearch();
 };
@@ -256,13 +278,25 @@ const toggleAdvanced = () => {
 watch(() => props.filters, (newFilters) => {
   if (newFilters) {
     localFilters.value = { ...localFilters.value, ...newFilters };
+    if (newFilters.start_date) {
+      startDate.value = newFilters.start_date;
+    }
+    if (newFilters.end_date) {
+      endDate.value = newFilters.end_date;
+    }
     if (newFilters.start_date && newFilters.end_date) {
       dateRange.value = [newFilters.start_date, newFilters.end_date];
     }
   }
 }, { deep: true });
 
-// 初始設置日期範圍
+// 初始設置日期
+if (localFilters.value.start_date) {
+  startDate.value = localFilters.value.start_date;
+}
+if (localFilters.value.end_date) {
+  endDate.value = localFilters.value.end_date;
+}
 if (localFilters.value.start_date && localFilters.value.end_date) {
   dateRange.value = [localFilters.value.start_date, localFilters.value.end_date];
 }
@@ -341,6 +375,11 @@ if (localFilters.value.start_date && localFilters.value.end_date) {
   :deep(.n-form-item-label) {
     padding-bottom: 0.5rem !important;
     padding-right: 0 !important;
+  }
+
+  /* 移動端日期選擇器調整 */
+  :deep(.n-date-picker) {
+    width: 100% !important;
   }
 
   .advanced-search {
