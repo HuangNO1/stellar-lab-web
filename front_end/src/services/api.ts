@@ -15,6 +15,8 @@ import type {
   ProjectQueryParams,
   Admin,
   AdminQueryParams,
+  EditRecord,
+  EditRecordQueryParams,
   LoginResponse
 } from '@/types/api';
 
@@ -25,6 +27,9 @@ const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+    // 安全配置
+    withCredentials: false, // 關閉自動發送cookies，使用token認證更安全
+    maxRedirects: 3, // 限制重定向次數
 });
 
 // 請求攔截器
@@ -38,12 +43,38 @@ api.interceptors.request.use(
         if (token) {
             config.headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
         }
+        
+        // 安全檢查：清理請求數據中的潛在XSS
+        if (config.data && typeof config.data === 'object') {
+            config.data = sanitizeRequestData(config.data);
+        }
+        
         return config;
     },
     (error) => {
         return Promise.reject(error);
     }
 );
+
+// 輸入清理函數
+function sanitizeRequestData(data: any): any {
+    if (typeof data === 'string') {
+        // 移除潛在的腳本標籤和事件處理器
+        return data
+            .replace(/<script[^>]*>.*?<\/script>/gi, '')
+            .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
+            .replace(/javascript:/gi, '');
+    } else if (Array.isArray(data)) {
+        return data.map(sanitizeRequestData);
+    } else if (typeof data === 'object' && data !== null) {
+        const sanitized: any = {};
+        for (const key in data) {
+            sanitized[key] = sanitizeRequestData(data[key]);
+        }
+        return sanitized;
+    }
+    return data;
+}
 
 // 響應攔截器
 api.interceptors.response.use(
@@ -354,6 +385,21 @@ export const adminApi = {
   // 刪除管理員
   deleteAdmin(adminId: number): Promise<ApiResponse<null>> {
     return api.delete(`/admins/${adminId}`);
+  }
+};
+
+/**
+ * 操作日誌相關 API
+ */
+export const editRecordApi = {
+  // 獲取編輯記錄列表
+  getEditRecords(params?: EditRecordQueryParams): Promise<ApiResponse<PaginatedResponse<EditRecord>>> {
+    return api.get('/edit-records', { params });
+  },
+  
+  // 獲取編輯記錄詳情
+  getEditRecord(editId: number): Promise<ApiResponse<EditRecord>> {
+    return api.get(`/edit-records/${editId}`);
   }
 };
 

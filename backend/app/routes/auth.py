@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify, g
+from app import limiter
 from app.services import AuthService
 from app.services.base_service import ServiceException
 from app.auth import admin_required
@@ -10,6 +11,7 @@ bp = Blueprint('auth', __name__)
 auth_service = AuthService()
 
 @bp.route('/admin/login', methods=['POST'])
+@limiter.limit("5 per minute")  # 登錄頻率限制
 def admin_login():
     """
     管理員登錄

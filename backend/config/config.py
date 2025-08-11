@@ -2,8 +2,11 @@ import os
 from datetime import timedelta
 
 class Config:
-    # JWT配置 - 統一使用同一個密鑰
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'jwt-secret-string'
+    # JWT配置 - 移除硬編碼默認值
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
+    if not JWT_SECRET_KEY:
+        raise ValueError("JWT_SECRET_KEY environment variable must be set")
+    
     SECRET_KEY = JWT_SECRET_KEY  # Flask-JWT-Extended使用SECRET_KEY
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
@@ -36,14 +39,21 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
+    # 開發環境允許默認密鑰
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'dev-jwt-secret-please-change-in-production'
+    SECRET_KEY = JWT_SECRET_KEY
     
 class ProductionConfig(Config):
     DEBUG = False
+    # 生產環境強制HTTPS
+    SSL_REDIRECT = True
     
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI') or 'sqlite:///:memory:'
     WTF_CSRF_ENABLED = False
+    JWT_SECRET_KEY = 'test-secret-key'
+    SECRET_KEY = JWT_SECRET_KEY
 
 config = {
     'development': DevelopmentConfig,
