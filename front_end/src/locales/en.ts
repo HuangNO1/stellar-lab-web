@@ -394,6 +394,7 @@ export default {
         date: 'Publication Date',
         status: 'Acceptance Status',
         file: 'Paper File',
+        authors: 'Authors',
         placeholders: {
           titleZh: 'Enter paper Chinese title',
           titleEn: 'Enter paper English title',
@@ -401,7 +402,8 @@ export default {
           venue: 'Enter publication journal or conference',
           type: 'Select paper type',
           date: 'Select publication date',
-          status: 'Select acceptance status'
+          status: 'Select acceptance status',
+          authors: 'Select paper authors'
         },
         validation: {
           titleZhRequired: 'Chinese title is required',

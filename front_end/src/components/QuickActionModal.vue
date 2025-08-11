@@ -40,18 +40,21 @@
             <n-input
               v-model:value="formData.mem_name_zh"
               :placeholder="t('admin.members.form.placeholders.nameZh')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.members.form.nameEn')" path="mem_name_en">
             <n-input
               v-model:value="formData.mem_name_en"
               :placeholder="t('admin.members.form.placeholders.nameEn')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.members.form.email')" path="mem_email">
             <n-input
               v-model:value="formData.mem_email"
               :placeholder="t('admin.members.form.placeholders.email')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.members.form.type')" path="mem_type">
@@ -59,6 +62,7 @@
               v-model:value="formData.mem_type"
               :options="memberTypeOptions"
               :placeholder="t('admin.members.form.placeholders.type')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.members.form.group')" path="research_group_id">
@@ -67,13 +71,14 @@
               :options="researchGroupOptions"
               :placeholder="t('admin.members.form.placeholders.group')"
               :loading="loadingGroups"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.members.form.description')" path="mem_desc_zh">
-            <MarkdownEditor
+            <I18nMdEditor
               v-model="formData.mem_desc_zh"
               :placeholder="t('admin.members.form.placeholders.description')"
-              :rows="3"
+              style="height: 200px; width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.members.form.avatar')" path="mem_avatar">
@@ -95,25 +100,37 @@
             <n-input
               v-model:value="formData.paper_title_zh"
               :placeholder="t('admin.papers.form.placeholders.titleZh')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.papers.form.titleEn')" path="paper_title_en">
             <n-input
               v-model:value="formData.paper_title_en"
               :placeholder="t('admin.papers.form.placeholders.titleEn')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.papers.form.description')" path="paper_desc_zh">
-            <MarkdownEditor
+            <I18nMdEditor
               v-model="formData.paper_desc_zh"
               :placeholder="t('admin.papers.form.placeholders.description')"
-              :rows="3"
+              style="height: 200px; width: 100%"
+            />
+          </n-form-item>
+          <n-form-item :label="t('admin.papers.form.authors')" path="authors">
+            <n-select
+              v-model:value="formData.authors"
+              multiple
+              :options="memberOptions"
+              :placeholder="t('admin.papers.form.placeholders.authors')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.papers.form.venue')" path="paper_venue">
             <n-input
               v-model:value="formData.paper_venue"
               :placeholder="t('admin.papers.form.placeholders.venue')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.papers.form.type')" path="paper_type">
@@ -121,6 +138,7 @@
               v-model:value="formData.paper_type"
               :options="paperTypeOptions"
               :placeholder="t('admin.papers.form.placeholders.type')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.papers.form.date')" path="paper_date">
@@ -128,6 +146,7 @@
               v-model:value="formData.paper_date"
               type="date"
               :placeholder="t('admin.papers.form.placeholders.date')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.papers.form.status')" path="paper_accept">
@@ -135,6 +154,7 @@
               v-model:value="formData.paper_accept"
               :options="paperAcceptOptions"
               :placeholder="t('admin.papers.form.placeholders.status')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.papers.form.file')" path="paper_file">
@@ -156,25 +176,28 @@
             <n-input
               v-model:value="formData.project_name_zh"
               :placeholder="t('admin.projects.form.placeholders.nameZh')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.projects.form.nameEn')" path="project_name_en">
             <n-input
               v-model:value="formData.project_name_en"
               :placeholder="t('admin.projects.form.placeholders.nameEn')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.projects.form.description')" path="project_desc_zh">
-            <MarkdownEditor
+            <I18nMdEditor
               v-model="formData.project_desc_zh"
               :placeholder="t('admin.projects.form.placeholders.description')"
-              :rows="3"
+              style="height: 200px; width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.projects.form.url')" path="project_url">
             <n-input
               v-model:value="formData.project_url"
               :placeholder="t('admin.projects.form.placeholders.url')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.projects.form.startDate')" path="project_date_start">
@@ -182,6 +205,7 @@
               v-model:value="formData.project_date_start"
               type="date"
               :placeholder="t('admin.projects.form.placeholders.startDate')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.projects.form.status')" path="is_end">
@@ -189,6 +213,7 @@
               v-model:value="formData.is_end"
               :options="projectStatusOptions"
               :placeholder="t('admin.projects.form.placeholders.status')"
+              style="width: 100%"
             />
           </n-form-item>
         </template>
@@ -200,20 +225,21 @@
               v-model:value="formData.news_type"
               :options="newsTypeOptions"
               :placeholder="t('admin.news.form.placeholders.type')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.news.form.contentZh')" path="news_content_zh">
-            <MarkdownEditor
+            <I18nMdEditor
               v-model="formData.news_content_zh"
               :placeholder="t('admin.news.form.placeholders.contentZh')"
-              :rows="4"
+              style="height: 200px; width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.news.form.contentEn')" path="news_content_en">
-            <MarkdownEditor
+            <I18nMdEditor
               v-model="formData.news_content_en"
               :placeholder="t('admin.news.form.placeholders.contentEn')"
-              :rows="4"
+              style="height: 200px; width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.news.form.date')" path="news_date">
@@ -221,6 +247,7 @@
               v-model:value="formData.news_date"
               type="date"
               :placeholder="t('admin.news.form.placeholders.date')"
+              style="width: 100%"
             />
           </n-form-item>
         </template>
@@ -231,26 +258,28 @@
             <n-input
               v-model:value="formData.research_group_name_zh"
               :placeholder="t('admin.groups.form.placeholders.nameZh')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.groups.form.nameEn')" path="research_group_name_en">
             <n-input
               v-model:value="formData.research_group_name_en"
               :placeholder="t('admin.groups.form.placeholders.nameEn')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.groups.form.descriptionZh')" path="research_group_desc_zh">
-            <MarkdownEditor
+            <I18nMdEditor
               v-model="formData.research_group_desc_zh"
               :placeholder="t('admin.groups.form.placeholders.descriptionZh')"
-              :rows="3"
+              style="height: 200px; width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.groups.form.descriptionEn')" path="research_group_desc_en">
-            <MarkdownEditor
+            <I18nMdEditor
               v-model="formData.research_group_desc_en"
               :placeholder="t('admin.groups.form.placeholders.descriptionEn')"
-              :rows="3"
+              style="height: 200px; width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.groups.form.leader')" path="mem_id">
@@ -259,6 +288,7 @@
               :options="memberOptions"
               :placeholder="t('admin.groups.form.placeholders.leader')"
               :loading="loadingMembers"
+              style="width: 100%"
             />
           </n-form-item>
         </template>
@@ -269,6 +299,7 @@
             <n-input
               v-model:value="formData.admin_name"
               :placeholder="t('admin.admins.form.placeholders.adminName')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item v-if="actionType === 'create'" :label="t('admin.admins.form.adminPass')" path="admin_pass">
@@ -276,6 +307,7 @@
               v-model:value="formData.admin_pass"
               type="password"
               :placeholder="t('admin.admins.form.placeholders.adminPass')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.admins.form.isSuper')" path="is_super">
@@ -283,6 +315,7 @@
               v-model:value="formData.is_super"
               :options="adminTypeOptions"
               :placeholder="t('admin.admins.form.placeholders.isSuper')"
+              style="width: 100%"
             />
           </n-form-item>
           <n-form-item v-if="actionType === 'edit'" :label="t('admin.admins.form.enable')" path="enable">
@@ -290,6 +323,7 @@
               v-model:value="formData.enable"
               :options="enableOptions"
               :placeholder="t('admin.admins.form.placeholders.enable')"
+              style="width: 100%"
             />
           </n-form-item>
         </template>
@@ -319,7 +353,7 @@ import { useMessage } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/auth';
 import { memberApi, paperApi, projectApi, newsApi, researchGroupApi, adminApi } from '@/services/api';
-import MarkdownEditor from './MarkdownEditor.vue';
+import I18nMdEditor from '@/components/I18nMdEditor.vue';
 
 const { t, locale } = useI18n();
 const authStore = useAuthStore();

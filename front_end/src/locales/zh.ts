@@ -356,6 +356,7 @@ export default {
         date: '發表日期',
         status: '接收狀態',
         file: '論文文件',
+        authors: '作者',
         placeholders: {
           titleZh: '請輸入論文中文標題',
           titleEn: '請輸入論文英文標題',
@@ -363,7 +364,8 @@ export default {
           venue: '請輸入發表期刊或會議',
           type: '請選擇論文類型',
           date: '請選擇發表日期',
-          status: '請選擇接收狀態'
+          status: '請選擇接收狀態',
+          authors: '請選擇論文作者'
         },
         validation: {
           titleZhRequired: '請輸入中文標題',
