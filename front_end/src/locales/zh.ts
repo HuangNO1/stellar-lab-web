@@ -448,6 +448,42 @@ export default {
           groups: '課題組'
         }
       }
+    },
+    // 實驗室管理翻譯
+    lab: {
+      basicInfo: '基本信息',
+      contactInfo: '聯繫信息',
+      imageManagement: '圖片管理',
+      nameZh: '實驗室中文名稱',
+      nameEn: '實驗室英文名稱',
+      descZh: '中文描述',
+      descEn: '英文描述',
+      addressZh: '中文地址',
+      addressEn: '英文地址',
+      email: '聯繫郵箱',
+      phone: '聯繫電話',
+      logo: '實驗室Logo',
+      carouselImages: '輪播圖片',
+      carouselImage: '輪播圖片 {number}',
+      placeholders: {
+        nameZh: '請輸入實驗室中文名稱',
+        nameEn: '請輸入實驗室英文名稱',
+        descZh: '請輸入實驗室中文描述',
+        descEn: '請輸入實驗室英文描述',
+        addressZh: '請輸入實驗室中文地址',
+        addressEn: '請輸入實驗室英文地址',
+        email: '請輸入聯繫郵箱',
+        phone: '請輸入聯繫電話'
+      },
+      validation: {
+        nameZhRequired: '實驗室中文名稱必填',
+        nameEnRequired: '實驗室英文名稱必填'
+      },
+      messages: {
+        fetchFailed: '獲取實驗室信息失敗',
+        saveSuccess: '保存成功',
+        saveFailed: '保存失敗'
+      }
     }
   }
 }

@@ -454,6 +454,42 @@ export default {
           groups: 'group'
         }
       }
+    },
+    // Lab Management translations
+    lab: {
+      basicInfo: 'Basic Information',
+      contactInfo: 'Contact Information',
+      imageManagement: 'Image Management',
+      nameZh: 'Lab Chinese Name',
+      nameEn: 'Lab English Name',
+      descZh: 'Chinese Description',
+      descEn: 'English Description',
+      addressZh: 'Chinese Address',
+      addressEn: 'English Address',
+      email: 'Contact Email',
+      phone: 'Contact Phone',
+      logo: 'Lab Logo',
+      carouselImages: 'Carousel Images',
+      carouselImage: 'Carousel Image {number}',
+      placeholders: {
+        nameZh: 'Enter lab Chinese name',
+        nameEn: 'Enter lab English name',
+        descZh: 'Enter lab Chinese description',
+        descEn: 'Enter lab English description',
+        addressZh: 'Enter lab Chinese address',
+        addressEn: 'Enter lab English address',
+        email: 'Enter contact email',
+        phone: 'Enter contact phone'
+      },
+      validation: {
+        nameZhRequired: 'Lab Chinese name is required',
+        nameEnRequired: 'Lab English name is required'
+      },
+      messages: {
+        fetchFailed: 'Failed to fetch lab information',
+        saveSuccess: 'Saved successfully',
+        saveFailed: 'Save failed'
+      }
     }
   }
 }
