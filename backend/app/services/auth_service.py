@@ -153,13 +153,13 @@ class AuthService(BaseService):
         if not admin:
             raise NotFoundError('管理員不存在')
         
-        # 驗證舊密碼
-        if not check_password_hash(admin.admin_pass, old_password):
+        # 驗證舊密碼 - 使用admin模型的check_password方法
+        if not admin.check_password(old_password):
             raise PermissionError('舊密碼錯誤')
         
         def _change_password_operation():
-            # 更新密碼
-            admin.admin_pass = generate_password_hash(new_password)
+            # 更新密碼 - 使用admin模型的set_password方法
+            admin.set_password(new_password)
             admin.updated_at = datetime.utcnow()
             
             return {'password_changed': True}
@@ -202,6 +202,7 @@ class AuthService(BaseService):
         Returns:
             Dict: 更新後的管理員資料
         """
+        # 不需要權限檢查，因為管理員只能修改自己的資料
         admin = Admin.query.get(admin_id)
         if not admin:
             raise NotFoundError('管理員不存在')
@@ -209,8 +210,8 @@ class AuthService(BaseService):
         def _update_profile_operation():
             update_data = {}
             
-            # 可更新的字段（排除敏感字段）
-            allowed_fields = ['admin_name', 'email', 'phone', 'description']
+            # 可更新的字段（僅限admin模型中實際存在的字段）
+            allowed_fields = ['admin_name']
             
             for field in allowed_fields:
                 if field in profile_data:
@@ -218,6 +219,12 @@ class AuthService(BaseService):
                     new_value = profile_data[field]
                     
                     if old_value != new_value:
+                        # 檢查admin_name是否重複
+                        if field == 'admin_name':
+                            existing_admin = Admin.query.filter_by(admin_name=new_value).first()
+                            if existing_admin and existing_admin.admin_id != admin_id:
+                                raise ValidationError('用戶名已存在')
+                        
                         setattr(admin, field, new_value)
                         update_data[field] = {'old': old_value, 'new': new_value}
             
@@ -226,14 +233,17 @@ class AuthService(BaseService):
             
             return admin.to_dict(), update_data
         
-        # 執行操作並記錄審計
-        result, update_data = self.execute_with_audit(
+        # 執行操作並記錄審計  
+        result = self.execute_with_audit(
             operation_func=_update_profile_operation,
             operation_type='UPDATE',
-            content=update_data,
+            content={},  # 內容會在operation_func中填充
             admin_id=admin_id
         )
         
+        # 如果返回的是元組，取第一個元素
+        if isinstance(result, tuple):
+            return result[0]
         return result
     
     @staticmethod
