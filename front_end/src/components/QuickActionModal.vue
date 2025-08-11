@@ -204,9 +204,11 @@
               v-model:value="formData.authors"
               multiple
               filterable
+              tag
               :options="memberOptions"
               :placeholder="t('admin.papers.form.placeholders.authors')"
               :loading="loadingMembers"
+              :filter="filterMemberOption"
               style="width: 100%"
             />
           </n-form-item>
@@ -383,9 +385,11 @@
           <n-form-item :label="t('admin.groups.form.leader')" path="mem_id">
             <n-select
               v-model:value="formData.mem_id"
+              filterable
               :options="memberOptions"
               :placeholder="t('admin.groups.form.placeholders.leader')"
               :loading="loadingMembers"
+              :filter="filterMemberOption"
               style="width: 100%"
             />
           </n-form-item>
@@ -712,7 +716,16 @@ const formRules = computed(() => {
       },
       trigger: 'change'
     };
-    rules.paper_date = { required: true, message: t('admin.papers.form.validation.dateRequired'), trigger: 'change' };
+    rules.paper_date = {
+      required: false,
+      validator: (rule: any, value: any) => {
+        if (value === null || value === undefined || value === '') {
+          return new Error(t('admin.papers.form.validation.dateRequired'));
+        }
+        return true;
+      },
+      trigger: 'change'
+    };
   } else if (props.moduleType === 'projects') {
     rules.project_name_zh = { required: true, message: t('admin.projects.form.validation.nameZhRequired'), trigger: 'blur' };
   } else if (props.moduleType === 'news') {
@@ -727,7 +740,16 @@ const formRules = computed(() => {
       trigger: 'change'
     };
     rules.news_content_zh = { required: true, message: t('admin.news.form.validation.contentZhRequired'), trigger: 'blur' };
-    rules.news_date = { required: true, message: t('admin.news.form.validation.dateRequired'), trigger: 'change' };
+    rules.news_date = {
+      required: false,
+      validator: (rule: any, value: any) => {
+        if (value === null || value === undefined || value === '') {
+          return new Error(t('admin.news.form.validation.dateRequired'));
+        }
+        return true;
+      },
+      trigger: 'change'
+    };
   } else if (props.moduleType === 'research-groups') {
     rules.research_group_name_zh = { required: true, message: t('admin.groups.form.validation.nameZhRequired'), trigger: 'blur' };
   } else if (props.moduleType === 'admins') {
@@ -879,9 +901,12 @@ const handleModalClose = (value: boolean) => {
 };
 
 const loadOptionsData = async () => {
-  if (props.moduleType === 'members' || props.moduleType === 'research-groups') {
+  // 成員相關模塊需要加載課題組數據
+  if (props.moduleType === 'members') {
     await loadResearchGroups();
   }
+  
+  // 論文和課題組模塊需要加載成員數據  
   if (props.moduleType === 'papers' || props.moduleType === 'research-groups') {
     await loadMembers();
   }
@@ -891,13 +916,15 @@ const loadResearchGroups = async () => {
   try {
     loadingGroups.value = true;
     const response = await researchGroupApi.getResearchGroups({ all: 'true' });
-    // 響應攔截器已經處理成功情況，直接使用 response
-    researchGroupOptions.value = response.items.map((group: any) => ({
-      label: locale.value === 'zh' 
-        ? (group.research_group_name_zh || group.research_group_name_en)
-        : (group.research_group_name_en || group.research_group_name_zh),
-      value: group.research_group_id
-    }));
+    // 檢查響應結構，處理實際的 API 返回格式
+    if (response.code === 0 && response.data) {
+      researchGroupOptions.value = response.data.items.map((group: any) => ({
+        label: locale.value === 'zh' 
+          ? (group.research_group_name_zh || group.research_group_name_en)
+          : (group.research_group_name_en || group.research_group_name_zh),
+        value: group.research_group_id
+      }));
+    }
   } catch (error: any) {
     console.error(t('admin.quickAction.messages.loadGroupsFailed'), error);
   } finally {
@@ -912,31 +939,42 @@ const loadMembers = async () => {
     // 獲取所有類型的成員，包括教師、學生、校友
     const response = await memberApi.getMembers({ all: 'true' });
     
-    // 響應攔截器已經處理成功情況，直接使用 response
-    memberOptions.value = response.items.map((member: any) => {
-      const name = locale.value === 'zh'
-        ? (member.mem_name_zh || member.mem_name_en)
-        : (member.mem_name_en || member.mem_name_zh);
-      
-      // 獲取成員類型標籤
-      const memberTypeLabels = {
-        0: t('admin.common.memberTypes.teacher'),
-        1: t('admin.common.memberTypes.student'),
-        2: t('admin.common.memberTypes.alumni')
-      };
-      const typeLabel = memberTypeLabels[member.mem_type as keyof typeof memberTypeLabels] || '';
-      
-      return {
-        label: `${name} (${member.mem_email}) - ${typeLabel}`,
-        value: member.mem_id
-      };
-    });
-    console.log(`成功加載 ${memberOptions.value.length} 個成員選項`);
+    // 檢查響應結構，處理實際的 API 返回格式
+    if (response.code === 0 && response.data) {
+      memberOptions.value = response.data.items.map((member: any) => {
+        const name = locale.value === 'zh'
+          ? (member.mem_name_zh || member.mem_name_en)
+          : (member.mem_name_en || member.mem_name_zh);
+        
+        // 獲取成員類型標籤
+        const memberTypeLabels = {
+          0: t('admin.common.memberTypes.teacher'),
+          1: t('admin.common.memberTypes.student'),
+          2: t('admin.common.memberTypes.alumni')
+        };
+        const typeLabel = memberTypeLabels[member.mem_type as keyof typeof memberTypeLabels] || '';
+        
+        return {
+          label: `${name} (${member.mem_email}) - ${typeLabel}`,
+          value: member.mem_id
+        };
+      });
+      console.log(`成功加載 ${memberOptions.value.length} 個成員選項`);
+    }
   } catch (error: any) {
     console.error('加載成員失敗:', error);
   } finally {
     loadingMembers.value = false;
   }
+};
+
+// 成員選項過濾函數
+const filterMemberOption = (pattern: string, option: { label: string; value: number }) => {
+  const searchPattern = pattern.toLowerCase();
+  const label = option.label.toLowerCase();
+  
+  // 支持按姓名、郵箱、類型搜索
+  return label.includes(searchPattern);
 };
 
 const formatDateForApi = (date: any) => {
@@ -1203,14 +1241,17 @@ const handleSubmit = async () => {
       response = await (api as any)[updateMethods[props.moduleType]](id, submitData);
     }
 
-    // API 調用成功會直接返回 response.data（由響應攔截器處理）
-    // 失敗會被 catch 塊捕獲
-    const successMessage = props.actionType === 'create' 
-      ? t('admin.quickAction.messages.createSuccess')
-      : t('admin.quickAction.messages.updateSuccess');
-    message.success(successMessage);
-    emit('success', response);
-    show.value = false;
+    // 檢查 API 響應結構
+    if (response.code === 0) {
+      const successMessage = props.actionType === 'create' 
+        ? t('admin.quickAction.messages.createSuccess')
+        : t('admin.quickAction.messages.updateSuccess');
+      message.success(successMessage);
+      emit('success', response.data);
+      show.value = false;
+    } else {
+      message.error(response.message || t('admin.quickAction.messages.operationFailed'));
+    }
   } catch (error: any) {
     if (error?.message) {
       message.error(error.message);
