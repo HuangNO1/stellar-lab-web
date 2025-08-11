@@ -73,7 +73,7 @@
         <!-- 快速操作 -->
         <n-card :title="$t('admin.dashboard.quickActions')" class="quick-actions">
           <div class="action-buttons">
-            <n-button type="primary" @click="router.push('/admin/members/create')">
+            <n-button type="primary" @click="openModal('members', 'create')">
               <template #icon>
                 <n-icon>
                   <svg viewBox="0 0 24 24">
@@ -84,7 +84,7 @@
               {{ $t('admin.dashboard.addMember') }}
             </n-button>
 
-            <n-button type="info" @click="router.push('/admin/papers/create')">
+            <n-button type="info" @click="openModal('papers', 'create')">
               <template #icon>
                 <n-icon>
                   <svg viewBox="0 0 24 24">
@@ -95,7 +95,7 @@
               {{ $t('admin.dashboard.addPaper') }}
             </n-button>
 
-            <n-button type="success" @click="router.push('/admin/projects/create')">
+            <n-button type="success" @click="openModal('projects', 'create')">
               <template #icon>
                 <n-icon>
                   <svg viewBox="0 0 24 24">
@@ -106,7 +106,7 @@
               {{ $t('admin.dashboard.addProject') }}
             </n-button>
 
-            <n-button type="warning" @click="router.push('/admin/news/create')">
+            <n-button type="warning" @click="openModal('news', 'create')">
               <template #icon>
                 <n-icon>
                   <svg viewBox="0 0 24 24">
@@ -115,6 +115,17 @@
                 </n-icon>
               </template>
               {{ $t('admin.dashboard.addNews') }}
+            </n-button>
+
+            <n-button type="default" @click="openModal('research-groups', 'create')">
+              <template #icon>
+                <n-icon>
+                  <svg viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M12,5.5A3.5,3.5 0 0,1 15.5,9A3.5,3.5 0 0,1 12,12.5A3.5,3.5 0 0,1 8.5,9A3.5,3.5 0 0,1 12,5.5M5,8C5.56,8 6.08,8.15 6.53,8.42C6.38,9.85 6.8,11.27 7.66,12.38C7.16,13.34 6.16,14 5,14A3,3 0 0,1 2,11A3,3 0 0,1 5,8M19,8A3,3 0 0,1 22,11A3,3 0 0,1 19,14C17.84,14 16.84,13.34 16.34,12.38C17.2,11.27 17.62,9.85 17.47,8.42C17.92,8.15 18.44,8 19,8M5.5,18.25C5.5,16.18 8.41,14.5 12,14.5C15.59,14.5 18.5,16.18 18.5,18.25V20H5.5V18.25Z"/>
+                  </svg>
+                </n-icon>
+              </template>
+              新增課題組
             </n-button>
           </div>
         </n-card>
@@ -213,17 +224,22 @@
         </n-card>
       </div>
     </div>
+
+    <!-- 快速操作 Modal -->
+    <QuickActionModal
+      v-model="showModal"
+      :module-type="modalConfig.moduleType"
+      :action-type="modalConfig.actionType"
+      :edit-data="modalConfig.editData"
+      @success="handleModalSuccess"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, h } from 'vue';
-import { useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
-import { memberApi, paperApi, projectApi, newsApi, systemApi } from '@/services/api';
-
-const router = useRouter();
-const { t } = useI18n();
+import { memberApi, paperApi, projectApi, newsApi } from '@/services/api';
+import QuickActionModal from '@/components/QuickActionModal.vue';
 
 // 統計數據
 const stats = reactive({
@@ -240,6 +256,14 @@ const recentActivities = ref<Array<{
   title: string;
   time: Date;
 }>>([]);
+
+// Modal 狀態
+const showModal = ref(false);
+const modalConfig = reactive({
+  moduleType: 'members' as 'members' | 'papers' | 'projects' | 'news' | 'research-groups',
+  actionType: 'create' as 'create' | 'edit',
+  editData: {}
+});
 
 // 獲取統計數據
 const fetchStats = async () => {
@@ -310,6 +334,51 @@ const formatTime = (time: Date) => {
     return `${minutes}分鐘前`;
   } else {
     return '剛剛';
+  }
+};
+
+// 打開 Modal
+const openModal = (
+  moduleType: 'members' | 'papers' | 'projects' | 'news' | 'research-groups',
+  actionType: 'create' | 'edit',
+  editData: any = {}
+) => {
+  modalConfig.moduleType = moduleType;
+  modalConfig.actionType = actionType;
+  modalConfig.editData = editData;
+  showModal.value = true;
+};
+
+// 處理 Modal 成功
+const handleModalSuccess = () => {
+  // 刷新統計數據
+  fetchStats();
+  
+  // 添加活動記錄
+  const moduleNames = {
+    members: '成員',
+    papers: '論文',
+    projects: '項目',
+    news: '新聞',
+    'research-groups': '課題組'
+  };
+  
+  const actionNames = {
+    create: '新增',
+    edit: '編輯'
+  };
+  
+  const activity = {
+    id: Date.now().toString(),
+    type: modalConfig.actionType === 'create' ? 'create' as const : 'update' as const,
+    title: `${actionNames[modalConfig.actionType]}了${moduleNames[modalConfig.moduleType]}`,
+    time: new Date()
+  };
+  
+  recentActivities.value.unshift(activity);
+  // 只保留最近 10 條記錄
+  if (recentActivities.value.length > 10) {
+    recentActivities.value = recentActivities.value.slice(0, 10);
   }
 };
 
@@ -406,6 +475,10 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
+}
+
+.action-buttons .n-button:nth-child(5) {
+  grid-column: 1 / -1;
 }
 
 .status-items {
