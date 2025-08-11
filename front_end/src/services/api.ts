@@ -58,6 +58,11 @@ api.interceptors.request.use(
 
 // 輸入清理函數
 function sanitizeRequestData(data: any): any {
+    // 跳過 FormData, File, Blob 等二進制數據類型
+    if (data instanceof FormData || data instanceof File || data instanceof Blob) {
+        return data;
+    }
+    
     if (typeof data === 'string') {
         // 移除潛在的腳本標籤和事件處理器
         return data
