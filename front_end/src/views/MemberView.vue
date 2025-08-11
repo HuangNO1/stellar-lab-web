@@ -45,6 +45,7 @@
               :size="60"
               :src="getMemberAvatar(member) || '/default-avatar.svg'"
               :fallback-src="'/default-avatar.svg'"
+              class="member-avatar"
             />
             <div class="member-info">
               <n-tooltip trigger="hover" :disabled="!isNameTruncated(member)">
@@ -78,6 +79,7 @@
               :size="60"
               :src="getMemberAvatar(member) || '/default-avatar.svg'"
               :fallback-src="'/default-avatar.svg'"
+              class="member-avatar"
             />
             <div class="member-info">
               <n-tooltip trigger="hover" :disabled="!isNameTruncated(member)">
@@ -111,6 +113,7 @@
               :size="60"
               :src="getMemberAvatar(member) || '/default-avatar.svg'"
               :fallback-src="'/default-avatar.svg'"
+              class="member-avatar"
             />
             <div class="member-info">
               <n-tooltip trigger="hover" :disabled="!isNameTruncated(member)">
@@ -144,6 +147,7 @@
               :size="60"
               :src="getMemberAvatar(member) || '/default-avatar.svg'"
               :fallback-src="'/default-avatar.svg'"
+              class="member-avatar"
             />
             <div class="member-info">
               <n-tooltip trigger="hover" :disabled="!isNameTruncated(member)">
@@ -177,6 +181,7 @@
               :size="60"
               :src="getMemberAvatar(member) || '/default-avatar.svg'"
               :fallback-src="'/default-avatar.svg'"
+              class="member-avatar"
             />
             <div class="member-info">
               <n-tooltip trigger="hover" :disabled="!isNameTruncated(member)">
@@ -210,6 +215,7 @@
               :size="60"
               :src="getMemberAvatar(member) || '/default-avatar.svg'"
               :fallback-src="'/default-avatar.svg'"
+              class="member-avatar"
             />
             <div class="member-info">
               <n-tooltip trigger="hover" :disabled="!isNameTruncated(member)">
@@ -476,6 +482,37 @@ const toMember = (memberId: number) => {
   }
   50% {
     opacity: 0.8;
+  }
+}
+
+/* 成員頭像固定樣式 */
+.member-avatar {
+  flex-shrink: 0;
+  width: 60px !important;
+  height: 60px !important;
+  border-radius: 50% !important;
+  object-fit: cover;
+}
+
+/* 不同屏幕尺寸下的頭像調整 */
+@media (max-width: 1024px) {
+  .member-card .member-avatar {
+    width: 50px !important;
+    height: 50px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .member-card .member-avatar {
+    width: 45px !important;
+    height: 45px !important;
+  }
+}
+
+@media (max-width: 30rem) {
+  .member-card .member-avatar {
+    width: 40px !important;
+    height: 40px !important;
   }
 }
 
