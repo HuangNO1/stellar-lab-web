@@ -241,11 +241,49 @@ class TestAdminService:
     
     @pytest.mark.unit
     @pytest.mark.service
+    def test_update_admin_cannot_modify_super_admin(self, admin_service):
+        """測試更新管理員 - 不能修改超級管理員"""
+        # Arrange
+        admin_id = 1
+        current_admin_id = 2
+        update_data = {'admin_name': 'new_name'}
+        
+        mock_admin = Mock()
+        mock_admin.admin_id = admin_id
+        mock_admin.is_super = 1  # 目標是超級管理員
+        
+        with patch('app.services.admin_service.Admin') as MockAdmin, \
+             patch.object(admin_service, 'validate_permissions'):
+            
+            MockAdmin.query.get.return_value = mock_admin
+            
+            # Act & Assert
+            with pytest.raises(BusinessLogicError) as exc_info:
+                admin_service.update_admin(admin_id, update_data, current_admin_id)
+            
+            assert '不能修改其他超級管理員的賬戶' in str(exc_info.value)
+    
+    @pytest.mark.unit
+    @pytest.mark.service
     def test_delete_admin_cannot_delete_super_admin(self, admin_service):
         """測試刪除管理員 - 不能刪除超級管理員"""
-        # This test might not be applicable based on actual service logic
-        # Removing since the actual service doesn't seem to have this restriction
-        pass
+        # Arrange
+        admin_id = 1
+        current_admin_id = 2
+        mock_admin = Mock()
+        mock_admin.admin_id = admin_id
+        mock_admin.is_super = 1  # 目標是超級管理員
+        
+        with patch('app.services.admin_service.Admin') as MockAdmin, \
+             patch.object(admin_service, 'validate_permissions'):
+            
+            MockAdmin.query.get.return_value = mock_admin
+            
+            # Act & Assert
+            with pytest.raises(BusinessLogicError) as exc_info:
+                admin_service.delete_admin(admin_id, current_admin_id)
+            
+            assert '不能刪除其他超級管理員的賬戶' in str(exc_info.value)
     
     @pytest.mark.unit
     @pytest.mark.service

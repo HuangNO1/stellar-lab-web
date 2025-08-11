@@ -85,6 +85,10 @@ class AdminService(BaseService):
         if admin_id == current_admin_id:
             raise BusinessLogicError('不能修改自己的賬戶')
         
+        # 只有最高權限的超級管理員才能修改其他超級管理員
+        if admin.is_super == 1:
+            raise BusinessLogicError('不能修改其他超級管理員的賬戶')
+        
         # 數據校驗
         self._validate_admin_data(admin_data, is_create=False)
         
@@ -151,6 +155,10 @@ class AdminService(BaseService):
         # 不能刪除自己
         if admin_id == current_admin_id:
             raise BusinessLogicError('不能刪除自己的賬戶')
+        
+        # 只有最高權限的超級管理員才能刪除其他超級管理員
+        if admin.is_super == 1:
+            raise BusinessLogicError('不能刪除其他超級管理員的賬戶')
         
         def _delete_operation():
             # 軟刪除
