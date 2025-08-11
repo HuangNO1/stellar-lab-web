@@ -640,6 +640,10 @@ const formRules = computed(() => {
         if (value === null || value === undefined || value === '') {
           return new Error(t('admin.members.form.validation.typeRequired'));
         }
+        // 檢查成員類型是否為有效值 (0, 1, 2)
+        if (![0, 1, 2].includes(value)) {
+          return new Error(t('admin.members.form.validation.typeRequired'));
+        }
         return true;
       },
       trigger: 'change'
@@ -659,7 +663,7 @@ const formRules = computed(() => {
     rules.job_type = {
       required: false,
       validator: (rule: any, value: any) => {
-        if (formData.mem_type === 0 && (!value && value !== 0)) {
+        if (formData.mem_type === 0 && (value === null || value === undefined || value === '')) {
           return new Error(t('admin.members.form.validation.jobTypeRequired'));
         }
         return true;
@@ -670,7 +674,7 @@ const formRules = computed(() => {
     rules.student_type = {
       required: false,
       validator: (rule: any, value: any) => {
-        if (formData.mem_type === 1 && (!value && value !== 0)) {
+        if (formData.mem_type === 1 && (value === null || value === undefined || value === '')) {
           return new Error(t('admin.members.form.validation.studentTypeRequired'));
         }
         return true;
@@ -682,11 +686,11 @@ const formRules = computed(() => {
       required: false,
       validator: (rule: any, value: any) => {
         if (formData.mem_type === 1) {
-          if (!value) {
+          if (value === null || value === undefined || value === '') {
             return new Error(t('admin.members.form.validation.studentGradeRequired'));
           }
-          if (value < 1 || value > 10) {
-            return new Error(t('admin.members.form.validation.studentGradeRequired'));
+          if (typeof value === 'number' && (value < 1 || value > 10)) {
+            return new Error(t('admin.members.form.validation.studentGradeRange'));
           }
         }
         return true;
@@ -1128,23 +1132,36 @@ const handleSubmit = async () => {
 
     // 準備提交數據
     let submitData: any;
-    const hasFiles = Object.keys(uploadedFiles).length > 0;
+    // 檢查是否有實際的文件需要上傳
+    const hasFiles = Object.keys(uploadedFiles).some(key => uploadedFiles[key] instanceof File);
     
     // 過濾並清理表單數據，確保不包含函數或無效值
     const cleanFormData = Object.keys(formData).reduce((acc: Record<string, any>, key) => {
       const value = formData[key];
-      // 檢查是否為有效值
-      const isValidValue = value !== null && 
-                          value !== undefined && 
-                          value !== '' &&
-                          typeof value !== 'function';
+      // 檢查是否為有效值 - 明確處理各種數據類型
+      let isValidValue = false;
       
-      // 對於對象類型，只允許數組和日期
-      const isValidObject = typeof value !== 'object' || 
-                           Array.isArray(value) || 
-                           value instanceof Date;
+      if (typeof value === 'number') {
+        // 數值類型（包括 0）都是有效的
+        isValidValue = true;
+      } else if (typeof value === 'string') {
+        // 字符串不能為空
+        isValidValue = value !== '';
+      } else if (typeof value === 'boolean') {
+        // 布爾值都是有效的
+        isValidValue = true;
+      } else if (Array.isArray(value)) {
+        // 數組都是有效的
+        isValidValue = true;
+      } else if (value instanceof Date) {
+        // 日期對象都是有效的
+        isValidValue = true;
+      } else {
+        // null、undefined、function 等都是無效的
+        isValidValue = false;
+      }
       
-      if (isValidValue && isValidObject) {
+      if (isValidValue) {
         acc[key] = value;
       }
       return acc;
