@@ -368,7 +368,10 @@ export default {
           nameEnRequired: 'English name is required',
           emailRequired: 'Email is required',
           typeRequired: 'Member type is required',
-          groupRequired: 'Research group is required'
+          groupRequired: 'Research group is required',
+          jobTypeRequired: 'Job type is required',
+          studentTypeRequired: 'Student type is required',
+          studentGradeRequired: 'Valid grade (1-10) is required'
         }
       }
     },

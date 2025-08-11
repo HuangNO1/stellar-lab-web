@@ -355,7 +355,10 @@ export default {
           nameEnRequired: '請輸入英文姓名',
           emailRequired: '請輸入電子信箱',
           typeRequired: '請選擇成員類型',
-          groupRequired: '請選擇課題組'
+          groupRequired: '請選擇課題組',
+          jobTypeRequired: '請選擇職務類型',
+          studentTypeRequired: '請選擇學生類型',
+          studentGradeRequired: '請輸入有效年級（1-10）'
         }
       }
     },

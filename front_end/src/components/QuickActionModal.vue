@@ -525,16 +525,59 @@ const modalTitle = computed(() => {
   return t(`admin.quickAction.modalTitle.${actionKey}${moduleKey}`);
 });
 
-// Form rules
+// Form rules - 使用固定的规则对象
 const formRules = computed(() => {
   const rules: Record<string, any> = {};
   
   if (props.moduleType === 'members') {
     rules.mem_name_zh = { required: true, message: t('admin.members.form.validation.nameZhRequired'), trigger: 'blur' };
     rules.mem_name_en = { required: true, message: t('admin.members.form.validation.nameEnRequired'), trigger: 'blur' };
-    rules.mem_email = { required: true, message: t('admin.members.form.validation.emailRequired'), trigger: 'blur' };
+    rules.mem_email = [
+      { required: true, message: t('admin.members.form.validation.emailRequired'), trigger: 'blur' },
+      { type: 'email', message: t('admin.common.validationMessages.invalidEmail'), trigger: 'blur' }
+    ];
     rules.mem_type = { required: true, message: t('admin.members.form.validation.typeRequired'), trigger: 'change' };
     rules.research_group_id = { required: true, message: t('admin.members.form.validation.groupRequired'), trigger: 'change' };
+    
+    // 條件性驗證規則 - 使用 validator 函數動態檢查
+    rules.job_type = {
+      required: false,
+      validator: (rule: any, value: any) => {
+        if (formData.mem_type === 0 && (!value && value !== 0)) {
+          return new Error(t('admin.members.form.validation.jobTypeRequired'));
+        }
+        return true;
+      },
+      trigger: ['change', 'blur']
+    };
+    
+    rules.student_type = {
+      required: false,
+      validator: (rule: any, value: any) => {
+        if (formData.mem_type === 1 && (!value && value !== 0)) {
+          return new Error(t('admin.members.form.validation.studentTypeRequired'));
+        }
+        return true;
+      },
+      trigger: ['change', 'blur']
+    };
+    
+    rules.student_grade = {
+      required: false,
+      validator: (rule: any, value: any) => {
+        if (formData.mem_type === 1) {
+          if (!value) {
+            return new Error(t('admin.members.form.validation.studentGradeRequired'));
+          }
+          if (value < 1 || value > 10) {
+            return new Error(t('admin.members.form.validation.studentGradeRequired'));
+          }
+        }
+        return true;
+      },
+      trigger: ['change', 'blur']
+    };
+    
   } else if (props.moduleType === 'papers') {
     rules.paper_title_zh = { required: true, message: t('admin.papers.form.validation.titleZhRequired'), trigger: 'blur' };
     rules.paper_type = { required: true, message: t('admin.papers.form.validation.typeRequired'), trigger: 'change' };
@@ -588,6 +631,11 @@ watch(
           }
           
           Object.assign(formData, editDataCopy);
+          
+          // 數據加載完成後清除驗證錯誤
+          nextTick(() => {
+            formRef.value?.restoreValidation();
+          });
         });
       }
     }
@@ -602,6 +650,33 @@ watch(show, (newValue) => {
 watch(locale, () => {
   if (show.value) {
     loadOptionsData();
+  }
+});
+
+// Watch member type changes to clear conditional fields and revalidate
+watch(() => formData.mem_type, (newType, oldType) => {
+  if (props.moduleType === 'members' && newType !== oldType) {
+    // 清除條件性字段
+    if (oldType === 0) {
+      // 從教師切換到其他類型，清除職務類型
+      delete formData.job_type;
+    } else if (oldType === 1) {
+      // 從學生切換到其他類型，清除學生相關字段
+      delete formData.student_type;
+      delete formData.student_grade;
+    } else if (oldType === 2) {
+      // 從校友切換到其他類型，清除去向字段
+      delete formData.destination_zh;
+      delete formData.destination_en;
+    }
+    
+    // 重新驗證條件性字段來清除錯誤狀態
+    nextTick(() => {
+      if (formRef.value) {
+        // 使用 restoreValidation 來清除特定字段的驗證狀態
+        formRef.value.restoreValidation(['job_type', 'student_type', 'student_grade']);
+      }
+    });
   }
 });
 
