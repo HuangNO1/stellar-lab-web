@@ -243,6 +243,18 @@ export default {
         student: 'Student',
         alumni: 'Alumni'
       },
+      jobTypes: {
+        professor: 'Professor',
+        associateProfessor: 'Associate Professor',
+        lecturer: 'Lecturer',
+        assistantResearcher: 'Assistant Researcher',
+        postdoc: 'Postdoc'
+      },
+      studentTypes: {
+        phd: 'PhD Student',
+        master: 'Master Student',
+        undergraduate: 'Undergraduate'
+      },
       paperTypes: {
         conference: 'Conference',
         journal: 'Journal',
@@ -330,6 +342,11 @@ export default {
         nameEn: 'English Name',
         email: 'Email',
         type: 'Member Type',
+        jobType: 'Job Type',
+        studentType: 'Student Type',
+        studentGrade: 'Grade',
+        destinationZh: 'Destination (Chinese)',
+        destinationEn: 'Destination (English)',
         group: 'Research Group',
         description: 'Description',
         avatar: 'Avatar Upload',
@@ -338,6 +355,11 @@ export default {
           nameEn: 'Enter English name',
           email: 'Enter email address',
           type: 'Select member type',
+          jobType: 'Select job type',
+          studentType: 'Select student type',
+          studentGrade: 'Enter grade (1-10)',
+          destinationZh: 'Enter destination (Chinese)',
+          destinationEn: 'Enter destination (English)',
           group: 'Select research group',
           description: 'Enter member description (supports Markdown syntax)'
         },

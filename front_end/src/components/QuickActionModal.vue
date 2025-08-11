@@ -65,6 +65,60 @@
               style="width: 100%"
             />
           </n-form-item>
+          
+          <!-- 教師職務類型 -->
+          <n-form-item 
+            v-if="formData.mem_type === 0" 
+            :label="t('admin.members.form.jobType')" 
+            path="job_type"
+          >
+            <n-select
+              v-model:value="formData.job_type"
+              :options="jobTypeOptions"
+              :placeholder="t('admin.members.form.placeholders.jobType')"
+              style="width: 100%"
+            />
+          </n-form-item>
+          
+          <!-- 學生類型和年級 -->
+          <template v-if="formData.mem_type === 1">
+            <n-form-item :label="t('admin.members.form.studentType')" path="student_type">
+              <n-select
+                v-model:value="formData.student_type"
+                :options="studentTypeOptions"
+                :placeholder="t('admin.members.form.placeholders.studentType')"
+                style="width: 100%"
+              />
+            </n-form-item>
+            <n-form-item :label="t('admin.members.form.studentGrade')" path="student_grade">
+              <n-input-number
+                v-model:value="formData.student_grade"
+                :placeholder="t('admin.members.form.placeholders.studentGrade')"
+                :min="1"
+                :max="10"
+                style="width: 100%"
+              />
+            </n-form-item>
+          </template>
+          
+          <!-- 校友去向 -->
+          <template v-if="formData.mem_type === 2">
+            <n-form-item :label="t('admin.members.form.destinationZh')" path="destination_zh">
+              <n-input
+                v-model:value="formData.destination_zh"
+                :placeholder="t('admin.members.form.placeholders.destinationZh')"
+                style="width: 100%"
+              />
+            </n-form-item>
+            <n-form-item :label="t('admin.members.form.destinationEn')" path="destination_en">
+              <n-input
+                v-model:value="formData.destination_en"
+                :placeholder="t('admin.members.form.placeholders.destinationEn')"
+                style="width: 100%"
+              />
+            </n-form-item>
+          </template>
+          
           <n-form-item :label="t('admin.members.form.group')" path="research_group_id">
             <n-select
               v-model:value="formData.research_group_id"
@@ -398,6 +452,22 @@ const memberTypeOptions = computed(() => [
   { label: t('admin.common.memberTypes.teacher'), value: 0 },
   { label: t('admin.common.memberTypes.student'), value: 1 },
   { label: t('admin.common.memberTypes.alumni'), value: 2 }
+]);
+
+// 教師職務類型選項
+const jobTypeOptions = computed(() => [
+  { label: t('admin.common.jobTypes.professor'), value: 0 },
+  { label: t('admin.common.jobTypes.associateProfessor'), value: 1 },
+  { label: t('admin.common.jobTypes.lecturer'), value: 2 },
+  { label: t('admin.common.jobTypes.assistantResearcher'), value: 3 },
+  { label: t('admin.common.jobTypes.postdoc'), value: 4 }
+]);
+
+// 學生類型選項
+const studentTypeOptions = computed(() => [
+  { label: t('admin.common.studentTypes.phd'), value: 0 },
+  { label: t('admin.common.studentTypes.master'), value: 1 },
+  { label: t('admin.common.studentTypes.undergraduate'), value: 2 }
 ]);
 
 const paperTypeOptions = computed(() => [

@@ -230,6 +230,18 @@ export default {
         student: '學生',
         alumni: '校友'
       },
+      jobTypes: {
+        professor: '教授',
+        associateProfessor: '副教授',
+        lecturer: '講師',
+        assistantResearcher: '助理研究員',
+        postdoc: '博士後'
+      },
+      studentTypes: {
+        phd: '博士生',
+        master: '碩士生',
+        undergraduate: '本科生'
+      },
       paperTypes: {
         conference: '會議',
         journal: '期刊',
@@ -317,6 +329,11 @@ export default {
         nameEn: '英文姓名',
         email: '電子信箱',
         type: '成員類型',
+        jobType: '職務類型',
+        studentType: '學生類型',
+        studentGrade: '年級',
+        destinationZh: '去向（中文）',
+        destinationEn: '去向（英文）',
         group: '課題組',
         description: '成員描述',
         avatar: '頭像上傳',
@@ -325,6 +342,11 @@ export default {
           nameEn: '請輸入英文姓名',
           email: '請輸入電子信箱',
           type: '請選擇成員類型',
+          jobType: '請選擇職務類型',
+          studentType: '請選擇學生類型',
+          studentGrade: '請輸入年級（1-10）',
+          destinationZh: '請輸入去向（中文）',
+          destinationEn: '請輸入去向（英文）',
           group: '請選擇課題組',
           description: '請輸入成員中文描述（支持 Markdown 語法）'
         },
