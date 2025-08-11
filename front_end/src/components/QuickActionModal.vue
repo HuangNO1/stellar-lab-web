@@ -74,6 +74,17 @@
               :rows="3"
             />
           </n-form-item>
+          <n-form-item label="頭像上傳" path="mem_avatar">
+            <n-upload
+              :default-file-list="getDefaultFileList('mem_avatar')"
+              :max="1"
+              accept="image/*"
+              @change="handleFileChange('mem_avatar', $event)"
+              @remove="handleFileRemove('mem_avatar')"
+            >
+              <n-button>選擇頭像圖片</n-button>
+            </n-upload>
+          </n-form-item>
         </template>
 
         <!-- 論文表單 -->
@@ -123,6 +134,17 @@
               :options="paperAcceptOptions"
               placeholder="請選擇接收狀態"
             />
+          </n-form-item>
+          <n-form-item label="論文文件" path="paper_file">
+            <n-upload
+              :default-file-list="getDefaultFileList('paper_file')"
+              :max="1"
+              accept=".pdf"
+              @change="handleFileChange('paper_file', $event)"
+              @remove="handleFileRemove('paper_file')"
+            >
+              <n-button>選擇 PDF 文件</n-button>
+            </n-upload>
           </n-form-item>
         </template>
 
@@ -294,6 +316,7 @@ const loadingMembers = ref(false);
 
 // Form data
 const formData = reactive<Record<string, any>>({});
+const uploadedFiles = reactive<Record<string, File>>({});
 
 // Options
 const memberTypeOptions = [
@@ -399,6 +422,9 @@ const resetForm = () => {
   Object.keys(formData).forEach(key => {
     delete formData[key];
   });
+  Object.keys(uploadedFiles).forEach(key => {
+    delete uploadedFiles[key];
+  });
   formRef.value?.restoreValidation();
 };
 
@@ -457,21 +483,83 @@ const formatDateForApi = (date: any) => {
   return d.toISOString().split('T')[0];
 };
 
+// 文件處理方法
+const getDefaultFileList = (fieldName: string) => {
+  if (props.actionType === 'edit' && props.editData) {
+    const filePath = props.editData[`${fieldName}_path`];
+    if (filePath) {
+      return [{
+        id: fieldName,
+        name: filePath.split('/').pop() || 'file',
+        status: 'finished',
+        url: `${process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8000'}/api/media/serve/${filePath.replace('/media/', '')}`
+      }];
+    }
+  }
+  return [];
+};
+
+const handleFileChange = (fieldName: string, { fileList }: { fileList: any[] }) => {
+  if (fileList.length > 0) {
+    const file = fileList[0].file;
+    if (file) {
+      uploadedFiles[fieldName] = file;
+    }
+  } else {
+    delete uploadedFiles[fieldName];
+  }
+};
+
+const handleFileRemove = (fieldName: string) => {
+  delete uploadedFiles[fieldName];
+};
+
 const handleSubmit = async () => {
   try {
     await formRef.value?.validate();
     submitting.value = true;
 
-    // 格式化日期欄位
-    const submitData = { ...formData };
-    if (submitData.paper_date) {
-      submitData.paper_date = formatDateForApi(submitData.paper_date);
-    }
-    if (submitData.news_date) {
-      submitData.news_date = formatDateForApi(submitData.news_date);
-    }
-    if (submitData.project_date_start) {
-      submitData.project_date_start = formatDateForApi(submitData.project_date_start);
+    // 準備提交數據
+    let submitData: any;
+    const hasFiles = Object.keys(uploadedFiles).length > 0;
+    
+    if (hasFiles) {
+      // 使用 FormData 處理文件上傳
+      submitData = new FormData();
+      
+      // 添加表單字段
+      Object.keys(formData).forEach(key => {
+        let value = formData[key];
+        
+        // 格式化日期字段
+        if (key.includes('date') && value) {
+          value = formatDateForApi(value);
+        }
+        
+        if (value !== null && value !== undefined && value !== '') {
+          submitData.append(key, value);
+        }
+      });
+      
+      // 添加文件
+      Object.keys(uploadedFiles).forEach(key => {
+        submitData.append(key, uploadedFiles[key]);
+      });
+      
+    } else {
+      // 普通 JSON 提交
+      submitData = { ...formData };
+      
+      // 格式化日期欄位
+      if (submitData.paper_date) {
+        submitData.paper_date = formatDateForApi(submitData.paper_date);
+      }
+      if (submitData.news_date) {
+        submitData.news_date = formatDateForApi(submitData.news_date);
+      }
+      if (submitData.project_date_start) {
+        submitData.project_date_start = formatDateForApi(submitData.project_date_start);
+      }
     }
 
     let response;
