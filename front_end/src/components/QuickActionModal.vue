@@ -25,16 +25,17 @@
         </n-button>
       </template>
 
-      <n-form
-        ref="formRef"
-        :model="formData"
-        :rules="formRules"
-        :label-placement="isMobile ? 'top' : 'left'"
-        :label-width="isMobile ? 'auto' : '160'"
-        require-mark-placement="right-hanging"
-        class="modal-form"
-      >
-        <!-- 成員表單 -->
+      <div class="modal-content">
+        <n-form
+          ref="formRef"
+          :model="formData"
+          :rules="formRules"
+          :label-placement="isMobile ? 'top' : 'left'"
+          :label-width="isMobile ? 'auto' : '160'"
+          require-mark-placement="right-hanging"
+          class="modal-form"
+        >
+          <!-- 成員表單 -->
         <template v-if="moduleType === 'members'">
           <n-form-item :label="t('admin.members.form.nameZh')" path="mem_name_zh">
             <n-input
@@ -143,15 +144,28 @@
             />
           </n-form-item>
           <n-form-item :label="t('admin.members.form.avatar')" path="mem_avatar">
-            <n-upload
-              :default-file-list="getDefaultFileList('mem_avatar')"
-              :max="1"
-              accept="image/*"
-              @change="handleFileChange('mem_avatar', $event)"
-              @remove="handleFileRemove('mem_avatar')"
-            >
-              <n-button>{{ t('admin.common.fileUpload.selectImage') }}</n-button>
-            </n-upload>
+            <div class="image-upload-container">
+              <!-- 已選擇的圖片預覽 -->
+              <div v-if="uploadedFiles['mem_avatar'] || getDefaultFileList('mem_avatar').length" class="image-preview">
+                <img 
+                  :src="getImagePreview('mem_avatar')" 
+                  alt="Avatar preview" 
+                  class="avatar-preview"
+                />
+                <div class="image-actions">
+                  <n-button size="small" @click="openCropper('mem_avatar', 'avatar')">
+                    {{ t('admin.imageCropper.cropAvatar') }}
+                  </n-button>
+                  <n-button size="small" type="error" @click="removeImage('mem_avatar')">
+                    {{ t('admin.common.delete') }}
+                  </n-button>
+                </div>
+              </div>
+              <!-- 上傳按鈕 -->
+              <n-button v-else @click="openCropper('mem_avatar', 'avatar')">
+                {{ t('admin.common.fileUpload.selectImage') }}
+              </n-button>
+            </div>
           </n-form-item>
         </template>
 
@@ -443,6 +457,14 @@
           </template>
         </template>
       </n-form>
+      
+      <!-- 圖片裁切 Modal -->
+      <ImageCropperModal
+        v-model="showCropper"
+        :crop-type="cropType"
+        @cropped="handleCroppedImage"
+      />
+    </div>
 
       <template #footer>
         <div class="modal-footer">
@@ -469,6 +491,7 @@ import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/auth';
 import { memberApi, paperApi, projectApi, newsApi, researchGroupApi, adminApi } from '@/services/api';
 import I18nMdEditor from '@/components/I18nMdEditor.vue';
+import ImageCropperModal from '@/components/ImageCropperModal.vue';
 
 const { t, locale } = useI18n();
 const authStore = useAuthStore();
@@ -507,6 +530,11 @@ const loadingMembers = ref(false);
 // Form data
 const formData = reactive<Record<string, any>>({});
 const uploadedFiles = reactive<Record<string, File>>({});
+
+// Image cropper states
+const showCropper = ref(false);
+const cropType = ref<'avatar' | 'logo' | 'carousel'>('avatar');
+const currentImageField = ref<string>('');
 
 // Options
 const memberTypeOptions = computed(() => [
@@ -945,6 +973,40 @@ const handleFileRemove = (fieldName: string) => {
   delete uploadedFiles[fieldName];
 };
 
+// Image cropper methods
+const openCropper = (fieldName: string, type: 'avatar' | 'logo' | 'carousel') => {
+  currentImageField.value = fieldName;
+  cropType.value = type;
+  showCropper.value = true;
+};
+
+const handleCroppedImage = (croppedFile: File) => {
+  if (currentImageField.value) {
+    uploadedFiles[currentImageField.value] = croppedFile;
+    currentImageField.value = '';
+  }
+};
+
+const removeImage = (fieldName: string) => {
+  delete uploadedFiles[fieldName];
+};
+
+const getImagePreview = (fieldName: string): string => {
+  if (uploadedFiles[fieldName]) {
+    return URL.createObjectURL(uploadedFiles[fieldName]);
+  }
+  
+  // 如果是編輯模式且有現有圖片
+  if (props.actionType === 'edit' && props.editData) {
+    const imagePath = props.editData[`${fieldName}_path`];
+    if (imagePath) {
+      return `${process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8000'}/api/media/serve/${imagePath.replace('/media/', '')}`;
+    }
+  }
+  
+  return '';
+};
+
 const handleSubmit = async () => {
   try {
     // 密碼修改模式的特殊處理
@@ -1256,6 +1318,101 @@ const handleSubmit = async () => {
   }
   
   .modal-form :deep(.n-upload .n-button) {
+    width: 100%;
+  }
+}
+
+/* 圖片上傳容器樣式 */
+.image-upload-container {
+  width: 100%;
+}
+
+.image-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 2px dashed #e0e0e0;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.avatar-preview {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.logo-preview {
+  max-width: 200px;
+  max-height: 100px;
+  object-fit: contain;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+}
+
+.carousel-preview {
+  width: 200px;
+  height: auto;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+}
+
+.image-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* 暗色主題 */
+[data-theme="dark"] .image-preview,
+.dark .image-preview {
+  background-color: #2d2d2d;
+  border-color: #424242;
+}
+
+[data-theme="dark"] .avatar-preview,
+.dark .avatar-preview {
+  border-color: #424242;
+}
+
+[data-theme="dark"] .logo-preview,
+.dark .logo-preview,
+[data-theme="dark"] .carousel-preview,
+.dark .carousel-preview {
+  border-color: #424242;
+}
+
+/* 移動端圖片預覽調整 */
+@media (max-width: 768px) {
+  .image-preview {
+    padding: 0.75rem;
+  }
+  
+  .avatar-preview {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .logo-preview {
+    max-width: 150px;
+    max-height: 80px;
+  }
+  
+  .carousel-preview {
+    width: 150px;
+  }
+  
+  .image-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .image-actions .n-button {
     width: 100%;
   }
 }

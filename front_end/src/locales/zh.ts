@@ -695,6 +695,23 @@ export default {
       backupDesc: '備份和還原系統數據',
       settings: '系統設置',
       settingsDesc: '配置系統參數和選項'
+    },
+    // 圖片裁切翻譯
+    imageCropper: {
+      selectImage: '選擇圖片',
+      supportedFormats: '支持 JPG、PNG、WebP 格式',
+      cropAvatar: '裁切頭像',
+      cropLogo: '裁切Logo',
+      cropCarousel: '裁切輪播圖',
+      avatarHint: '頭像將被裁切為正方形',
+      logoHint: 'Logo 可保持原始比例',
+      carouselHint: '請選擇適合的寬高比例',
+      aspectRatio: '選擇比例',
+      reselect: '重新選擇',
+      cropAndSave: '裁切並保存',
+      cropSuccess: '圖片裁切成功',
+      cropFailed: '圖片裁切失敗',
+      invalidFormat: '請選擇有效的圖片格式'
     }
   }
 }

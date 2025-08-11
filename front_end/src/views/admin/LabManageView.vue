@@ -113,26 +113,20 @@
           <!-- Logo 上傳 -->
           <n-form-item :label="t('admin.lab.logo')" path="lab_logo">
             <div class="upload-section">
-              <div class="upload-area">
-                <n-upload
-                  :file-list="logoFileList"
-                  :max="1"
-                  accept="image/*"
-                  @change="handleLogoChange"
-                  @remove="handleLogoRemove"
-                  :show-file-list="false"
-                >
-                  <n-button>{{ t('admin.common.fileUpload.selectImage') }}</n-button>
-                </n-upload>
-              </div>
-              <div class="image-preview" v-if="logoPreview">
-                <img :src="logoPreview" alt="Logo Preview" class="preview-image" />
+              <div v-if="logoPreview" class="image-preview">
+                <img :src="logoPreview" alt="Logo Preview" class="logo-preview" />
                 <div class="image-actions">
-                  <n-button size="small" @click="handleLogoRemove">
+                  <n-button size="small" @click="openLogoCropper">
+                    {{ t('admin.imageCropper.cropLogo') }}
+                  </n-button>
+                  <n-button size="small" type="error" @click="handleLogoRemove">
                     {{ t('admin.common.delete') }}
                   </n-button>
                 </div>
               </div>
+              <n-button v-else @click="openLogoCropper">
+                {{ t('admin.common.fileUpload.selectImage') }}
+              </n-button>
             </div>
           </n-form-item>
 
@@ -148,26 +142,20 @@
                   <span>{{ t('admin.lab.carouselImage', { number: index + 1 }) }}</span>
                 </div>
                 <div class="upload-section">
-                  <div class="upload-area">
-                    <n-upload
-                      :file-list="carousel.fileList"
-                      :max="1"
-                      accept="image/*"
-                      @change="(data: { fileList: UploadFileInfo[] }) => handleCarouselChange(index, data)"
-                      @remove="() => handleCarouselRemove(index)"
-                      :show-file-list="false"
-                    >
-                      <n-button size="small">{{ t('admin.common.fileUpload.selectImage') }}</n-button>
-                    </n-upload>
-                  </div>
-                  <div class="image-preview" v-if="carousel.preview">
-                    <img :src="carousel.preview" :alt="`Carousel ${index + 1}`" class="preview-image" />
+                  <div v-if="carousel.preview" class="image-preview">
+                    <img :src="carousel.preview" :alt="`Carousel ${index + 1}`" class="carousel-preview" />
                     <div class="image-actions">
-                      <n-button size="small" @click="handleCarouselRemove(index)">
+                      <n-button size="small" @click="openCarouselCropper(index)">
+                        {{ t('admin.imageCropper.cropCarousel') }}
+                      </n-button>
+                      <n-button size="small" type="error" @click="handleCarouselRemove(index)">
                         {{ t('admin.common.delete') }}
                       </n-button>
                     </div>
                   </div>
+                  <n-button v-else size="small" @click="openCarouselCropper(index)">
+                    {{ t('admin.common.fileUpload.selectImage') }}
+                  </n-button>
                 </div>
               </div>
             </div>
@@ -175,6 +163,13 @@
         </n-card>
       </n-form>
     </n-spin>
+    
+    <!-- 圖片裁切 Modal -->
+    <ImageCropperModal
+      v-model="showCropper"
+      :crop-type="cropType"
+      @cropped="handleCroppedImage"
+    />
   </div>
 </template>
 
@@ -183,6 +178,7 @@ import { ref, reactive, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMessage } from 'naive-ui';
 import { labApi } from '@/services/api';
+import ImageCropperModal from '@/components/ImageCropperModal.vue';
 import type { Lab } from '@/types/api';
 import type { FormInst, FormRules, UploadFileInfo } from 'naive-ui';
 
@@ -224,6 +220,12 @@ const carouselImages = ref<CarouselImage[]>([
   { fileList: [], preview: '', file: null, shouldClear: false },
   { fileList: [], preview: '', file: null, shouldClear: false }
 ]);
+
+// Image cropper states
+const showCropper = ref(false);
+const cropType = ref<'avatar' | 'logo' | 'carousel'>('logo');
+const currentImageType = ref<'logo' | 'carousel'>('logo');
+const currentCarouselIndex = ref<number>(-1);
 
 // Form validation rules
 const formRules: FormRules = {
@@ -314,6 +316,32 @@ const handleCarouselRemove = (index: number) => {
   carouselImages.value[index].file = null;
   carouselImages.value[index].preview = '';
   carouselImages.value[index].shouldClear = true;
+};
+
+// Image cropper methods
+const openLogoCropper = () => {
+  currentImageType.value = 'logo';
+  cropType.value = 'logo';
+  showCropper.value = true;
+};
+
+const openCarouselCropper = (index: number) => {
+  currentImageType.value = 'carousel';
+  currentCarouselIndex.value = index;
+  cropType.value = 'carousel';
+  showCropper.value = true;
+};
+
+const handleCroppedImage = (croppedFile: File) => {
+  if (currentImageType.value === 'logo') {
+    logoFile.value = croppedFile;
+    logoPreview.value = URL.createObjectURL(croppedFile);
+  } else if (currentImageType.value === 'carousel' && currentCarouselIndex.value >= 0) {
+    const index = currentCarouselIndex.value;
+    carouselImages.value[index].file = croppedFile;
+    carouselImages.value[index].preview = URL.createObjectURL(croppedFile);
+    carouselImages.value[index].shouldClear = false;
+  }
 };
 
 const handleSave = async () => {
@@ -409,25 +437,37 @@ onMounted(() => {
 
 .image-preview {
   position: relative;
-  border: 1px solid #d1d5db;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 2px dashed #e0e0e0;
   border-radius: 8px;
-  overflow: hidden;
-  background: #f9fafb;
+  background-color: #fafafa;
 }
 
-.preview-image {
-  width: 120px;
-  height: 120px;
+.logo-preview {
+  max-width: 200px;
+  max-height: 100px;
+  object-fit: contain;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  display: block;
+}
+
+.carousel-preview {
+  width: 200px;
+  height: auto;
   object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
   display: block;
 }
 
 .image-actions {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 4px;
+  display: flex;
+  gap: 0.5rem;
 }
 
 .carousel-uploads {
@@ -474,6 +514,15 @@ onMounted(() => {
 .dark-mode .image-preview {
   border-color: rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .logo-preview,
+.dark .logo-preview,
+.dark-mode .logo-preview,
+[data-theme="dark"] .carousel-preview,
+.dark .carousel-preview,
+.dark-mode .carousel-preview {
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 /* 響應式設計 */
