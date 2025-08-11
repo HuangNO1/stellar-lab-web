@@ -427,48 +427,57 @@ onMounted(() => {
 
 /* 暗色主題 */
 [data-theme="dark"] .project-view,
-.dark .project-view {
+.dark .project-view,
+.dark-mode .project-view {
   color: #fff;
 }
 
 [data-theme="dark"] .page-description,
-.dark .page-description {
+.dark .page-description,
+.dark-mode .page-description {
   color: #ccc;
 }
 
 [data-theme="dark"] .project-item,
 [data-theme="dark"] .project-item-skeleton,
 .dark .project-item,
-.dark .project-item-skeleton {
+.dark .project-item-skeleton,
+.dark-mode .project-item,
+.dark-mode .project-item-skeleton {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.1);
   box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.2);
 }
 
 [data-theme="dark"] .project-item:hover,
-.dark .project-item:hover {
+.dark .project-item:hover,
+.dark-mode .project-item:hover {
   background: rgba(255, 255, 255, 0.12);
   box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.3);
   border-left-color: #70a1ff;
 }
 
 [data-theme="dark"] .project-name,
-.dark .project-name {
+.dark .project-name,
+.dark-mode .project-name {
   color: #fff;
 }
 
 [data-theme="dark"] .project-description,
-.dark .project-description {
+.dark .project-description,
+.dark-mode .project-description {
   color: #ccc;
 }
 
 [data-theme="dark"] .project-start-date,
-.dark .project-start-date {
+.dark .project-start-date,
+.dark-mode .project-start-date {
   color: #bbb;
 }
 
 [data-theme="dark"] .pagination-wrapper,
-.dark .pagination-wrapper {
+.dark .pagination-wrapper,
+.dark-mode .pagination-wrapper {
   border-top-color: rgba(255, 255, 255, 0.1);
 }
 

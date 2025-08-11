@@ -422,49 +422,35 @@ const toMember = (memberId: number) => {
 }
 
 /* 暗色主題支持 */
-[data-theme="dark"] .member-card {
+[data-theme="dark"] .member-card,
+.dark .member-card,
+.dark-mode .member-card {
   background: rgba(255, 255, 255, 0.08) !important;
   border-color: transparent !important;
 }
 
-[data-theme="dark"] .member-card:hover {
+[data-theme="dark"] .member-card:hover,
+.dark .member-card:hover,
+.dark-mode .member-card:hover {
   background: rgba(255, 255, 255, 0.12) !important;
   border-color: #70a1ff !important;
 }
 
-[data-theme="dark"] .member-name {
+[data-theme="dark"] .member-name,
+.dark .member-name,
+.dark-mode .member-name {
   color: #fff !important;
 }
 
-[data-theme="dark"] .member-position {
+[data-theme="dark"] .member-position,
+.dark .member-position,
+.dark-mode .member-position {
   color: #ccc !important;
 }
 
-[data-theme="dark"] .section-title {
-  color: #70a1ff !important;
-  border-bottom-color: #70a1ff !important;
-}
-
-/* 另一種暗色主題支持方式 */
-.dark .member-card {
-  background: rgba(255, 255, 255, 0.08) !important;
-  border-color: transparent !important;
-}
-
-.dark .member-card:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border-color: #70a1ff !important;
-}
-
-.dark .member-name {
-  color: #fff !important;
-}
-
-.dark .member-position {
-  color: #ccc !important;
-}
-
-.dark .section-title {
+[data-theme="dark"] .section-title,
+.dark .section-title,
+.dark-mode .section-title {
   color: #70a1ff !important;
   border-bottom-color: #70a1ff !important;
 }
