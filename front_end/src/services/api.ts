@@ -82,6 +82,7 @@ api.interceptors.response.use(
         return response.data;
     },
     (error) => {
+        // 401 未授權處理
         if (error.response?.status === 401) {
             // 清除所有token
             localStorage.removeItem('token');
@@ -94,7 +95,16 @@ api.interceptors.response.use(
                 window.location.href = '/admin/login';
             }
         }
-        return Promise.reject(error);
+        
+        // 創建包含服務器消息的錯誤對象
+        const errorResponse = {
+            code: error.response?.data?.code || error.response?.status || -1,
+            message: error.response?.data?.message || error.response?.statusText || error.message || 'Unknown error',
+            data: error.response?.data?.data || null,
+            status: error.response?.status
+        };
+        
+        return Promise.reject(errorResponse);
     }
 );
 
@@ -108,12 +118,16 @@ export const labApi = {
   },
   
   // 更新實驗室資訊
-  updateLab(data: FormData): Promise<ApiResponse<Lab>> {
-    return api.put('/lab', data, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+  updateLab(data: FormData | Partial<Lab>): Promise<ApiResponse<Lab>> {
+    if (data instanceof FormData) {
+      return api.put('/lab', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    } else {
+      return api.put('/lab', data);
+    }
   },
   
   // 刪除實驗室
@@ -167,21 +181,29 @@ export const memberApi = {
   },
   
   // 創建成員
-  createMember(data: FormData): Promise<ApiResponse<Member>> {
-    return api.post('/members', data, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+  createMember(data: FormData | Partial<Member>): Promise<ApiResponse<Member>> {
+    if (data instanceof FormData) {
+      return api.post('/members', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    } else {
+      return api.post('/members', data);
+    }
   },
   
   // 更新成員
-  updateMember(memberId: number, data: FormData): Promise<ApiResponse<Member>> {
-    return api.put(`/members/${memberId}`, data, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+  updateMember(memberId: number, data: FormData | Partial<Member>): Promise<ApiResponse<Member>> {
+    if (data instanceof FormData) {
+      return api.put(`/members/${memberId}`, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    } else {
+      return api.put(`/members/${memberId}`, data);
+    }
   },
   
   // 刪除成員
@@ -215,17 +237,29 @@ export const paperApi = {
   },
   
   // 創建論文
-  createPaper(data: FormData): Promise<ApiResponse<Paper>> {
-    return api.post('/papers', data, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+  createPaper(data: FormData | Partial<Paper>): Promise<ApiResponse<Paper>> {
+    if (data instanceof FormData) {
+      return api.post('/papers', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    } else {
+      return api.post('/papers', data);
+    }
   },
   
   // 更新論文
-  updatePaper(paperId: number, data: Partial<Paper>): Promise<ApiResponse<Paper>> {
-    return api.put(`/papers/${paperId}`, data);
+  updatePaper(paperId: number, data: FormData | Partial<Paper>): Promise<ApiResponse<Paper>> {
+    if (data instanceof FormData) {
+      return api.put(`/papers/${paperId}`, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    } else {
+      return api.put(`/papers/${paperId}`, data);
+    }
   },
   
   // 刪除論文

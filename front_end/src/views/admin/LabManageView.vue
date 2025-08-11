@@ -351,22 +351,34 @@ const handleSave = async () => {
 
     const formDataToSend = new FormData();
 
-    // 添加基本信息
+    // 清理並添加基本信息，確保不包含函數或無效值
     Object.keys(formData).forEach(key => {
       const value = formData[key as keyof typeof formData];
-      if (value !== null && value !== undefined && value !== '') {
+      
+      // 檢查是否為有效值
+      const isValidValue = value !== null && 
+                          value !== undefined && 
+                          value !== '' &&
+                          typeof value !== 'function';
+      
+      // 對於對象類型，只允許基本數據類型
+      const isValidObject = typeof value !== 'object' || 
+                           Array.isArray(value) || 
+                           value instanceof Date;
+      
+      if (isValidValue && isValidObject) {
         formDataToSend.append(key, String(value));
       }
     });
 
     // 添加 logo 文件
-    if (logoFile.value) {
+    if (logoFile.value && logoFile.value instanceof File) {
       formDataToSend.append('lab_logo', logoFile.value);
     }
 
     // 添加輪播圖文件
     carouselImages.value.forEach((carousel, index) => {
-      if (carousel.file) {
+      if (carousel.file && carousel.file instanceof File) {
         formDataToSend.append(`carousel_img_${index + 1}`, carousel.file);
       } else if (carousel.shouldClear) {
         formDataToSend.append(`clear_carousel_img_${index + 1}`, 'true');

@@ -56,29 +56,12 @@
 
         <!-- 裁切區域 -->
         <div v-if="selectedFile" class="cropper-area">
-          <VuePictureCropper
+          <Cropper
             ref="cropperRef"
-            :boxStyle="{
-              width: '100%',
-              height: '400px',
-              backgroundColor: '#f6f6f6',
-              margin: 'auto',
-            }"
-            :img="previewSrc"
-            :options="{
-              viewMode: 1,
-              dragMode: 'crop',
-              aspectRatio: aspectRatio,
-              autoCropArea: 0.8,
-              restore: false,
-              guides: true,
-              center: true,
-              highlight: false,
-              cropBoxMovable: true,
-              cropBoxResizable: true,
-              toggleDragModeOnDblclick: false,
-            }"
-            @ready="onCropperReady"
+            class="cropper"
+            :src="previewSrc"
+            :stencil-props="stencilProps"
+            @change="onChange"
           />
         </div>
 
@@ -127,7 +110,8 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useMessage } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
-import VuePictureCropper, { cropper } from 'vue-picture-cropper';
+import { Cropper } from 'vue-advanced-cropper';
+import 'vue-advanced-cropper/dist/style.css';
 
 // Props
 interface Props {
@@ -154,26 +138,33 @@ const processing = ref(false);
 const isMobile = ref(window.innerWidth <= 768);
 const cropperRef = ref();
 const selectedAspectRatio = ref<number>(16/9);
-const cropperReady = ref(false);
+const cropResult = ref<any>(null);
 
-// 裁切類型對應的比例
-const aspectRatio = computed(() => {
+// 裁切類型對應的比例和配置
+const stencilProps = computed(() => {
   switch (props.cropType) {
     case 'avatar':
-      return 1; // 正方形
+      return {
+        aspectRatio: 1, // 正方形
+      };
     case 'logo':
-      return NaN; // 不限比例
+      return {
+        aspectRatio: undefined, // 不限比例
+      };
     case 'carousel':
-      return selectedAspectRatio.value;
+      return {
+        aspectRatio: selectedAspectRatio.value,
+      };
     default:
-      return NaN;
+      return {
+        aspectRatio: undefined,
+      };
   }
 });
 
-// Cropper ready handler
-const onCropperReady = () => {
-  console.log('Cropper ready');
-  cropperReady.value = true;
+// Cropper change handler
+const onChange = ({ coordinates, canvas }: any) => {
+  cropResult.value = { coordinates, canvas };
 };
 
 // 輪播圖片比例選項
@@ -241,10 +232,7 @@ const handleFileSelect = (event: { file: { file: File } }) => {
 
 // 處理比例變化
 const handleAspectRatioChange = (ratio: number) => {
-  // Use the global cropper instance to change aspect ratio
-  if (cropper) {
-    cropper.setAspectRatio(ratio);
-  }
+  selectedAspectRatio.value = ratio;
 };
 
 // 重置裁切器
@@ -252,6 +240,12 @@ const resetCropper = () => {
   selectedFile.value = null;
   previewSrc.value = '';
   selectedAspectRatio.value = 16/9;
+  cropResult.value = null;
+  
+  // Clear the preview URL to prevent memory leaks
+  if (previewSrc.value && previewSrc.value.startsWith('blob:')) {
+    URL.revokeObjectURL(previewSrc.value);
+  }
 };
 
 // 處理裁切
@@ -261,65 +255,28 @@ const handleCrop = async () => {
     return;
   }
   
+  if (!cropResult.value?.canvas) {
+    message.error('No crop area selected');
+    return;
+  }
+  
   try {
     processing.value = true;
     
     console.log('Starting crop operation...');
-    console.log('Cropper ready state:', cropperReady.value);
-    console.log('Preview src:', previewSrc.value);
-    console.log('Global cropper instance:', cropper);
+    console.log('Crop result:', cropResult.value);
     
-    // Wait a bit to ensure cropper is fully initialized
-    await new Promise(resolve => setTimeout(resolve, 100));
+    const canvas = cropResult.value.canvas;
     
-    // Check if global cropper instance is available
-    if (!cropper) {
-      throw new Error('Cropper instance not available');
-    }
-    
-    console.log('Attempting to get blob...');
-    
-    // Try different approaches to get the blob
-    let blob;
-    
-    // Method 1: Basic getBlob
-    try {
-      blob = await cropper.getBlob();
-      console.log('Method 1 - Basic getBlob result:', blob);
-    } catch (error) {
-      console.log('Method 1 failed:', error);
-    }
-    
-    // Method 2: getBlob with options
-    if (!blob) {
-      try {
-        blob = await cropper.getBlob({
-          type: 'image/png'
-        });
-        console.log('Method 2 - getBlob with PNG result:', blob);
-      } catch (error) {
-        console.log('Method 2 failed:', error);
-      }
-    }
-    
-    // Method 3: Try getDataURL and convert to blob
-    if (!blob) {
-      try {
-        const dataURL = cropper.getDataURL();
-        console.log('Method 3 - getDataURL result length:', dataURL?.length);
-        if (dataURL) {
-          // Convert dataURL to blob
-          const response = await fetch(dataURL);
-          blob = await response.blob();
-          console.log('Method 3 - Converted blob:', blob);
-        }
-      } catch (error) {
-        console.log('Method 3 failed:', error);
-      }
-    }
+    // Convert canvas to blob
+    const blob: Blob = await new Promise((resolve) => {
+      canvas.toBlob((blob: Blob) => {
+        resolve(blob);
+      }, 'image/jpeg', 0.9);
+    });
     
     if (!blob) {
-      throw new Error('All methods failed to get cropped image blob');
+      throw new Error('Failed to generate cropped image blob');
     }
     
     // 創建新的 File 對象
@@ -357,7 +314,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', checkScreenSize);
   // 清理 URL
-  if (previewSrc.value) {
+  if (previewSrc.value && previewSrc.value.startsWith('blob:')) {
     URL.revokeObjectURL(previewSrc.value);
   }
 });
@@ -384,6 +341,12 @@ onUnmounted(() => {
 
 .cropper-area {
   width: 100%;
+}
+
+.cropper {
+  height: 400px;
+  width: 100%;
+  background: #f6f6f6;
 }
 
 .aspect-ratio-selector {
@@ -425,7 +388,7 @@ onUnmounted(() => {
     padding: 0.75rem 1rem 1rem 1rem;
   }
   
-  .cropper-area :deep(.vue-picture-cropper) {
+  .cropper {
     height: 300px !important;
   }
   
@@ -455,7 +418,7 @@ onUnmounted(() => {
     padding: 0.25rem;
   }
   
-  .cropper-area :deep(.vue-picture-cropper) {
+  .cropper {
     height: 250px !important;
   }
 }
@@ -466,8 +429,8 @@ onUnmounted(() => {
   color: #f9fafb;
 }
 
-[data-theme="dark"] .cropper-area :deep(.vue-picture-cropper),
-.dark .cropper-area :deep(.vue-picture-cropper) {
+[data-theme="dark"] .cropper,
+.dark .cropper {
   background-color: #1f2937 !important;
 }
 </style>

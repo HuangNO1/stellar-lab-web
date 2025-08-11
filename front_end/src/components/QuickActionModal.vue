@@ -640,7 +640,16 @@ const formRules = computed(() => {
       },
       trigger: 'change'
     };
-    rules.research_group_id = { required: true, message: t('admin.members.form.validation.groupRequired'), trigger: 'change' };
+    rules.research_group_id = {
+      required: false,
+      validator: (rule: any, value: any) => {
+        if (value === null || value === undefined || value === '') {
+          return new Error(t('admin.members.form.validation.groupRequired'));
+        }
+        return true;
+      },
+      trigger: 'change'
+    };
     
     // 條件性驗證規則 - 使用 validator 函數動態檢查
     rules.job_type = {
@@ -849,12 +858,17 @@ onUnmounted(() => {
 
 // Methods
 const resetForm = () => {
+  // 清空 formData 對象，但保留響應式特性
   Object.keys(formData).forEach(key => {
     delete formData[key];
   });
+  
+  // 清空上傳文件對象
   Object.keys(uploadedFiles).forEach(key => {
     delete uploadedFiles[key];
   });
+  
+  // 重置表單驗證狀態
   formRef.value?.restoreValidation();
 };
 
@@ -877,15 +891,14 @@ const loadResearchGroups = async () => {
   try {
     loadingGroups.value = true;
     const response = await researchGroupApi.getResearchGroups({ all: 'true' });
-    if (response.code === 0) {
-      researchGroupOptions.value = response.data.items.map((group: any) => ({
-        label: locale.value === 'zh' 
-          ? (group.research_group_name_zh || group.research_group_name_en)
-          : (group.research_group_name_en || group.research_group_name_zh),
-        value: group.research_group_id
-      }));
-    }
-  } catch (error) {
+    // 響應攔截器已經處理成功情況，直接使用 response
+    researchGroupOptions.value = response.items.map((group: any) => ({
+      label: locale.value === 'zh' 
+        ? (group.research_group_name_zh || group.research_group_name_en)
+        : (group.research_group_name_en || group.research_group_name_zh),
+      value: group.research_group_id
+    }));
+  } catch (error: any) {
     console.error(t('admin.quickAction.messages.loadGroupsFailed'), error);
   } finally {
     loadingGroups.value = false;
@@ -899,30 +912,27 @@ const loadMembers = async () => {
     // 獲取所有類型的成員，包括教師、學生、校友
     const response = await memberApi.getMembers({ all: 'true' });
     
-    if (response.code === 0) {
-      memberOptions.value = response.data.items.map((member: any) => {
-        const name = locale.value === 'zh'
-          ? (member.mem_name_zh || member.mem_name_en)
-          : (member.mem_name_en || member.mem_name_zh);
-        
-        // 獲取成員類型標籤
-        const memberTypeLabels = {
-          0: t('admin.common.memberTypes.teacher'),
-          1: t('admin.common.memberTypes.student'),
-          2: t('admin.common.memberTypes.alumni')
-        };
-        const typeLabel = memberTypeLabels[member.mem_type as keyof typeof memberTypeLabels] || '';
-        
-        return {
-          label: `${name} (${member.mem_email}) - ${typeLabel}`,
-          value: member.mem_id
-        };
-      });
-      console.log(`成功加載 ${memberOptions.value.length} 個成員選項`);
-    } else {
-      console.error('API 響應錯誤:', response.message);
-    }
-  } catch (error) {
+    // 響應攔截器已經處理成功情況，直接使用 response
+    memberOptions.value = response.items.map((member: any) => {
+      const name = locale.value === 'zh'
+        ? (member.mem_name_zh || member.mem_name_en)
+        : (member.mem_name_en || member.mem_name_zh);
+      
+      // 獲取成員類型標籤
+      const memberTypeLabels = {
+        0: t('admin.common.memberTypes.teacher'),
+        1: t('admin.common.memberTypes.student'),
+        2: t('admin.common.memberTypes.alumni')
+      };
+      const typeLabel = memberTypeLabels[member.mem_type as keyof typeof memberTypeLabels] || '';
+      
+      return {
+        label: `${name} (${member.mem_email}) - ${typeLabel}`,
+        value: member.mem_id
+      };
+    });
+    console.log(`成功加載 ${memberOptions.value.length} 個成員選項`);
+  } catch (error: any) {
     console.error('加載成員失敗:', error);
   } finally {
     loadingMembers.value = false;
@@ -1082,32 +1092,61 @@ const handleSubmit = async () => {
     let submitData: any;
     const hasFiles = Object.keys(uploadedFiles).length > 0;
     
+    // 過濾並清理表單數據，確保不包含函數或無效值
+    const cleanFormData = Object.keys(formData).reduce((acc: Record<string, any>, key) => {
+      const value = formData[key];
+      // 檢查是否為有效值
+      const isValidValue = value !== null && 
+                          value !== undefined && 
+                          value !== '' &&
+                          typeof value !== 'function';
+      
+      // 對於對象類型，只允許數組和日期
+      const isValidObject = typeof value !== 'object' || 
+                           Array.isArray(value) || 
+                           value instanceof Date;
+      
+      if (isValidValue && isValidObject) {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
+    
     if (hasFiles) {
       // 使用 FormData 處理文件上傳
       submitData = new FormData();
       
-      // 添加表單字段
-      Object.keys(formData).forEach(key => {
-        let value = formData[key];
+      // 添加清理後的表單字段
+      Object.keys(cleanFormData).forEach(key => {
+        let value = cleanFormData[key];
         
         // 格式化日期字段
         if (key.includes('date') && value) {
           value = formatDateForApi(value);
         }
         
-        if (value !== null && value !== undefined && value !== '') {
-          submitData.append(key, value);
+        // 確保值是可序列化的字符串或數字
+        if (Array.isArray(value)) {
+          // 處理數組數據，如authors
+          value.forEach((item, index) => {
+            submitData.append(`${key}[${index}]`, String(item));
+          });
+        } else {
+          submitData.append(key, String(value));
         }
       });
       
       // 添加文件
       Object.keys(uploadedFiles).forEach(key => {
-        submitData.append(key, uploadedFiles[key]);
+        const file = uploadedFiles[key];
+        if (file instanceof File) {
+          submitData.append(key, file);
+        }
       });
       
     } else {
       // 普通 JSON 提交
-      submitData = { ...formData };
+      submitData = { ...cleanFormData };
       
       // 格式化日期欄位
       if (submitData.paper_date) {
@@ -1164,16 +1203,14 @@ const handleSubmit = async () => {
       response = await (api as any)[updateMethods[props.moduleType]](id, submitData);
     }
 
-    if (response.code === 0) {
-      const successMessage = props.actionType === 'create' 
-        ? t('admin.quickAction.messages.createSuccess')
-        : t('admin.quickAction.messages.updateSuccess');
-      message.success(successMessage);
-      emit('success', response.data);
-      show.value = false;
-    } else {
-      message.error(response.message || t('admin.quickAction.messages.operationFailed'));
-    }
+    // API 調用成功會直接返回 response.data（由響應攔截器處理）
+    // 失敗會被 catch 塊捕獲
+    const successMessage = props.actionType === 'create' 
+      ? t('admin.quickAction.messages.createSuccess')
+      : t('admin.quickAction.messages.updateSuccess');
+    message.success(successMessage);
+    emit('success', response);
+    show.value = false;
   } catch (error: any) {
     if (error?.message) {
       message.error(error.message);
