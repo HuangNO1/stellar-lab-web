@@ -606,9 +606,35 @@ onMounted(() => {
 }
 
 /* 響應式設計 */
+@media (max-width: 1024px) {
+  .admin-dashboard {
+    max-width: none;
+    padding: 0 1rem;
+  }
+  
+  .overview-cards {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  
+  .dashboard-content {
+    gap: 1rem;
+  }
+  
+  .action-buttons {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
 @media (max-width: 768px) {
+  .admin-dashboard {
+    padding: 0 0.75rem;
+  }
+  
   .dashboard-content {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
   
   .action-buttons {
@@ -617,6 +643,96 @@ onMounted(() => {
   
   .overview-cards {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .card-content {
+    gap: 0.75rem;
+  }
+  
+  .card-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .card-number {
+    font-size: 1.75rem;
+  }
+  
+  .card-title {
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-dashboard {
+    padding: 0 0.5rem;
+  }
+  
+  .overview-cards {
+    margin-bottom: 1.5rem;
+  }
+  
+  .dashboard-content {
+    gap: 0.75rem;
+  }
+  
+  .left-panel,
+  .right-panel {
+    gap: 1rem;
+  }
+  
+  .card-content {
+    gap: 0.5rem;
+  }
+  
+  .card-icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .card-number {
+    font-size: 1.5rem;
+  }
+  
+  .status-item,
+  .activity-item {
+    gap: 0.5rem;
+  }
+  
+  .status-icon,
+  .activity-icon {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-dashboard {
+    padding: 0 0.25rem;
+  }
+  
+  .overview-cards {
+    gap: 0.5rem;
+  }
+  
+  .card-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .card-info {
+    text-align: left;
+  }
+  
+  .action-buttons {
+    gap: 0.5rem;
+  }
+  
+  .action-buttons .n-button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
   }
 }
 </style>

@@ -1,7 +1,8 @@
 <template>
-  <n-layout class="admin-layout" has-sider>
+  <n-layout class="admin-layout" :class="{ 'mobile-layout': isMobile }" :has-sider="!isMobile">
     <!-- 側邊欄 -->
     <n-layout-sider
+      v-if="!isMobile"
       :collapsed="collapsed"
       :collapsed-width="64"
       :width="240"
@@ -39,11 +40,42 @@
       />
     </n-layout-sider>
 
+    <!-- 移動端側邊欄抽屜 -->
+    <n-drawer
+      v-if="isMobile"
+      v-model:show="showMobileSidebar"
+      :width="280"
+      placement="left"
+      class="mobile-sidebar"
+    >
+      <n-drawer-content :title="$t('admin.layout.title')" :closable="true">
+        <n-menu
+          :options="menuOptions"
+          :value="activeKey"
+          @update:value="handleMobileMenuSelect"
+        />
+      </n-drawer-content>
+    </n-drawer>
+
     <!-- 主內容區 -->
     <n-layout>
       <!-- 頂部欄 -->
       <n-layout-header class="header" bordered>
         <div class="header-left">
+          <!-- 移動端菜單按鈕 -->
+          <n-button
+            v-if="isMobile"
+            text
+            class="mobile-menu-btn"
+            @click="showMobileSidebar = true"
+          >
+            <n-icon size="20">
+              <svg viewBox="0 0 24 24">
+                <path fill="currentColor" d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/>
+              </svg>
+            </n-icon>
+          </n-button>
+          
           <n-breadcrumb>
             <n-breadcrumb-item v-for="item in breadcrumbs" :key="item.path">
               {{ item.title }}
@@ -106,7 +138,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, h } from 'vue';
+import { ref, computed, h, onMounted, onUnmounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useMessage, NIcon } from 'naive-ui';
@@ -122,6 +154,8 @@ const authStore = useAuthStore();
 
 const collapsed = ref(false);
 const isDark = ref(false);
+const isMobile = ref(window.innerWidth <= 1024);
+const showMobileSidebar = ref(false);
 
 // 當前語言
 const currentLang = computed(() => locale.value);
@@ -271,6 +305,30 @@ const handleMenuSelect = (key: string) => {
   }
 };
 
+// 處理移動端菜單選擇
+const handleMobileMenuSelect = (key: string) => {
+  handleMenuSelect(key);
+  showMobileSidebar.value = false; // 選擇後關閉抽屜
+};
+
+// 檢查屏幕尺寸
+const checkScreenSize = () => {
+  isMobile.value = window.innerWidth <= 1024;
+  if (!isMobile.value) {
+    showMobileSidebar.value = false;
+  }
+};
+
+// 監聽窗口大小變化
+onMounted(() => {
+  window.addEventListener('resize', checkScreenSize);
+  checkScreenSize();
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkScreenSize);
+});
+
 // 處理語言切換
 const handleLanguageChange = (key: string) => {
   locale.value = key;
@@ -349,12 +407,57 @@ initTheme();
 
 .header-left {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .header-right {
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+/* 移動端頂部欄調整 */
+@media (max-width: 768px) {
+  .header {
+    padding: 0 1rem;
+    height: 56px;
+  }
+  
+  .header-left {
+    gap: 0.75rem;
+  }
+  
+  .header-right {
+    gap: 0.5rem;
+  }
+  
+  .user-avatar span {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    padding: 0 0.75rem;
+    height: 52px;
+  }
+  
+  .header-left {
+    gap: 0.5rem;
+  }
+  
+  .header-right {
+    gap: 0.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 0 0.5rem;
+    height: 48px;
+  }
 }
 
 .user-avatar {
@@ -376,106 +479,98 @@ initTheme();
   overflow-y: auto;
 }
 
-/* 響應式設計 */
+/* 移動端內容區調整 */
 @media (max-width: 1024px) {
-  .admin-layout :deep(.n-layout-sider) {
-    position: fixed !important;
-    z-index: 1000;
-    height: 100vh;
-  }
-  
-  .admin-layout :deep(.n-layout:not(.n-layout--has-sider)) {
-    margin-left: 0 !important;
-  }
-  
-  .header {
-    padding: 0 1rem;
-  }
-  
-  .header-right {
-    gap: 0.5rem;
-  }
-  
-  .user-avatar span {
-    display: none;
-  }
-}
-
-@media (max-width: 768px) {
-  .admin-layout :deep(.n-layout-sider) {
-    width: 280px !important;
-  }
-  
-  .header {
-    padding: 0 0.75rem;
-  }
-  
-  .header-left {
-    min-width: 0;
-    flex: 1;
-  }
-  
-  .header-left :deep(.n-breadcrumb-item__link) {
-    font-size: 0.875rem;
-  }
-  
   .content {
     padding: 1rem;
   }
 }
 
-@media (max-width: 640px) {
-  .admin-layout :deep(.n-layout-sider) {
-    width: 260px !important;
-  }
-  
-  .header {
-    padding: 0 0.5rem;
-    height: 56px;
-  }
-  
-  .sidebar-header {
-    padding: 0.75rem;
-  }
-  
-  .logo-text {
-    font-size: 0.875rem;
-  }
-  
+@media (max-width: 768px) {
   .content {
     padding: 0.75rem;
-  }
-  
-  .header-right {
-    gap: 0.25rem;
-  }
-  
-  .header-right .n-button {
-    padding: 0.25rem !important;
   }
 }
 
 @media (max-width: 480px) {
-  .admin-layout :deep(.n-layout-sider) {
-    width: 240px !important;
-  }
-  
-  .header {
-    padding: 0 0.5rem;
-    height: 52px;
-  }
-  
-  .sidebar-header {
-    padding: 0.5rem;
-  }
-  
   .content {
     padding: 0.5rem;
   }
-  
-  .header-left :deep(.n-breadcrumb) {
-    font-size: 0.75rem;
-  }
+}
+
+/* 移動端布局 */
+.mobile-layout {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.mobile-layout .header {
+  position: relative;
+  z-index: 10;
+}
+
+.mobile-menu-btn {
+  margin-right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.375rem;
+}
+
+.mobile-menu-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.mobile-sidebar {
+  z-index: 1000;
+}
+
+.mobile-sidebar :deep(.n-drawer-content) {
+  padding: 0;
+}
+
+.mobile-sidebar :deep(.n-drawer-header) {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 1.5rem;
+}
+
+.mobile-sidebar :deep(.n-drawer-body) {
+  padding: 0;
+}
+
+.mobile-sidebar :deep(.n-menu) {
+  padding: 1rem 0;
+}
+
+.mobile-sidebar :deep(.n-menu-item) {
+  margin: 0 1rem 0.5rem 1rem;
+  border-radius: 0.5rem;
+  padding: 0;
+}
+
+.mobile-sidebar :deep(.n-menu-item .n-menu-item-content) {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+}
+
+.mobile-sidebar :deep(.n-menu-item .n-menu-item-content__icon) {
+  margin-right: 0.75rem;
+}
+
+/* 暗色主題下的抽屜樣式 */
+[data-theme="dark"] .mobile-sidebar :deep(.n-drawer-header) {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+  background-color: #1f2937;
+}
+
+[data-theme="dark"] .mobile-sidebar :deep(.n-drawer-body) {
+  background-color: #1f2937;
+}
+
+[data-theme="dark"] .mobile-sidebar :deep(.n-menu-item:hover .n-menu-item-content) {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* 暗色主題 */
@@ -503,5 +598,9 @@ initTheme();
 [data-theme="dark"] .content,
 .dark .content {
   background-color: #111827;
+}
+
+[data-theme="dark"] .mobile-menu-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 </style>
