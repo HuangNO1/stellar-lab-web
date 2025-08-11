@@ -160,8 +160,13 @@ class NewsService(BaseService):
         
         # 新聞類型校驗
         if 'news_type' in news_data:
-            if news_data['news_type'] not in [0, 1, 2]:  # 0=論文發表, 1=獲獎消息, 2=學術活動
-                raise ValidationError('新聞類型無效')
+            try:
+                news_type_value = int(news_data['news_type'])
+                if news_type_value not in [0, 1, 2]:  # 0=論文發表, 1=獲獎消息, 2=學術活動
+                    raise ValidationError('新聞類型無效')
+                news_data['news_type'] = news_type_value
+            except (ValueError, TypeError):
+                raise ValidationError('新聞類型格式錯誤')
         
         # 字符串長度校驗
         string_fields = {

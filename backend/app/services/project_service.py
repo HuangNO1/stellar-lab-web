@@ -204,8 +204,13 @@ class ProjectService(BaseService):
         
         # 項目狀態校驗
         if 'is_end' in project_data:
-            if project_data['is_end'] not in [0, 1]:
-                raise ValidationError('項目狀態無效')
+            try:
+                is_end_value = int(project_data['is_end'])
+                if is_end_value not in [0, 1]:
+                    raise ValidationError('項目狀態無效')
+                project_data['is_end'] = is_end_value
+            except (ValueError, TypeError):
+                raise ValidationError('項目狀態格式錯誤')
         
         # 日期格式校驗
         if 'project_date_start' in project_data and project_data['project_date_start']:

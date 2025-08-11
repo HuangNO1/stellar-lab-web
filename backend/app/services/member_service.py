@@ -398,24 +398,39 @@ class MemberService(BaseService):
         
         # 成員類型校驗
         if 'mem_type' in form_data:
-            if form_data['mem_type'] not in [0, 1, 2]:  # 0=教師, 1=學生, 2=校友
-                raise ValidationError('成員類型無效')
+            try:
+                mem_type = int(form_data['mem_type'])
+                if mem_type not in [0, 1, 2]:  # 0=教師, 1=學生, 2=校友
+                    raise ValidationError('成員類型無效')
+                form_data['mem_type'] = mem_type  # 確保後續使用整數類型
+            except (ValueError, TypeError):
+                raise ValidationError('成員類型格式錯誤')
         
         # 職稱類型校驗（僅教師）
         if 'job_type' in form_data and form_data['job_type'] is not None:
-            if form_data.get('mem_type') == 0:  # 教師
-                if form_data['job_type'] not in [0, 1, 2, 3, 4]:  # 0=教授, 1=副教授, 2=講師, 3=助理研究員, 4=博士後
-                    raise ValidationError('職稱類型無效')
-            else:
-                raise ValidationError('職稱類型僅適用於教師')
+            try:
+                job_type = int(form_data['job_type'])
+                if form_data.get('mem_type') == 0:  # 教師
+                    if job_type not in [0, 1, 2, 3, 4]:  # 0=教授, 1=副教授, 2=講師, 3=助理研究員, 4=博士後
+                        raise ValidationError('職稱類型無效')
+                    form_data['job_type'] = job_type  # 確保後續使用整數類型
+                else:
+                    raise ValidationError('職稱類型僅適用於教師')
+            except (ValueError, TypeError):
+                raise ValidationError('職稱類型格式錯誤')
         
         # 學生類型校驗（僅學生）
         if 'student_type' in form_data and form_data['student_type'] is not None:
-            if form_data.get('mem_type') == 1:  # 學生
-                if form_data['student_type'] not in [0, 1, 2]:  # 0=博士生, 1=碩士生, 2=大學生
-                    raise ValidationError('學生類型無效')
-            else:
-                raise ValidationError('學生類型僅適用於學生')
+            try:
+                student_type = int(form_data['student_type'])
+                if form_data.get('mem_type') == 1:  # 學生
+                    if student_type not in [0, 1, 2]:  # 0=博士生, 1=碩士生, 2=大學生
+                        raise ValidationError('學生類型無效')
+                    form_data['student_type'] = student_type  # 確保後續使用整數類型
+                else:
+                    raise ValidationError('學生類型僅適用於學生')
+            except (ValueError, TypeError):
+                raise ValidationError('學生類型格式錯誤')
         
         # 字符串長度校驗
         string_fields = {
@@ -437,6 +452,50 @@ class MemberService(BaseService):
         for field in update_fields:
             if field not in allowed_batch_fields:
                 raise ValidationError(f'字段 {field} 不允許批量更新')
+        
+        # 類型校驗
+        if 'mem_type' in update_fields:
+            try:
+                mem_type = int(update_fields['mem_type'])
+                if mem_type not in [0, 1, 2]:  # 0=教師, 1=學生, 2=校友
+                    raise ValidationError('成員類型無效')
+                update_fields['mem_type'] = mem_type
+            except (ValueError, TypeError):
+                raise ValidationError('成員類型格式錯誤')
+        
+        if 'job_type' in update_fields:
+            try:
+                job_type = int(update_fields['job_type'])
+                if job_type not in [0, 1, 2, 3, 4]:  # 0=教授, 1=副教授, 2=講師, 3=助理研究員, 4=博士後
+                    raise ValidationError('職稱類型無效')
+                update_fields['job_type'] = job_type
+            except (ValueError, TypeError):
+                raise ValidationError('職稱類型格式錯誤')
+        
+        if 'student_type' in update_fields:
+            try:
+                student_type = int(update_fields['student_type'])
+                if student_type not in [0, 1, 2]:  # 0=博士生, 1=碩士生, 2=大學生
+                    raise ValidationError('學生類型無效')
+                update_fields['student_type'] = student_type
+            except (ValueError, TypeError):
+                raise ValidationError('學生類型格式錯誤')
+        
+        if 'enable' in update_fields:
+            try:
+                enable = int(update_fields['enable'])
+                if enable not in [0, 1]:  # 0=禁用, 1=啟用
+                    raise ValidationError('狀態值無效')
+                update_fields['enable'] = enable
+            except (ValueError, TypeError):
+                raise ValidationError('狀態值格式錯誤')
+        
+        if 'research_group_id' in update_fields:
+            try:
+                research_group_id = int(update_fields['research_group_id'])
+                update_fields['research_group_id'] = research_group_id
+            except (ValueError, TypeError):
+                raise ValidationError('課題組ID格式錯誤')
     
     def _set_member_basic_info(self, member: Member, form_data: Dict[str, Any]) -> None:
         """設置成員基本信息"""

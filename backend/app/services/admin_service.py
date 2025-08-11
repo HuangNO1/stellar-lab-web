@@ -190,10 +190,20 @@ class AdminService(BaseService):
         
         # 超級管理員狀態檢查
         if 'is_super' in admin_data:
-            if admin_data['is_super'] not in [0, 1]:
-                raise ValidationError('is_super參數錯誤')
+            try:
+                is_super_value = int(admin_data['is_super'])
+                if is_super_value not in [0, 1]:
+                    raise ValidationError('is_super參數錯誤')
+                admin_data['is_super'] = is_super_value
+            except (ValueError, TypeError):
+                raise ValidationError('is_super參數格式錯誤')
         
         # 啟用狀態檢查
         if 'enable' in admin_data:
-            if admin_data['enable'] not in [0, 1]:
-                raise ValidationError('enable參數錯誤')
+            try:
+                enable_value = int(admin_data['enable'])
+                if enable_value not in [0, 1]:
+                    raise ValidationError('enable參數錯誤')
+                admin_data['enable'] = enable_value
+            except (ValueError, TypeError):
+                raise ValidationError('enable參數格式錯誤')
