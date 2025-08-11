@@ -72,13 +72,22 @@ def create_member():
     """
     創建成員
     
-    重構前: 需要在路由中處理數據校驗、文件上傳、數據庫操作、審計記錄等
-    重構後: 所有業務邏輯在服務層，路由只處理HTTP相關的邏輯
+    支持兩種請求格式：
+    1. JSON格式（用於API調用）
+    2. FormData格式（用於文件上傳）
     """
     try:
+        # 根據Content-Type選擇數據源
+        if request.is_json:
+            form_data = request.get_json() or {}
+            files_data = None
+        else:
+            form_data = dict(request.form)
+            files_data = dict(request.files) if request.files else None
+            
         member_data = member_service.create_member(
-            form_data=dict(request.form),
-            files_data=dict(request.files) if request.files else None
+            form_data=form_data,
+            files_data=files_data
         )
         return jsonify(success_response(member_data, '成員創建成功')), 201
         
@@ -92,12 +101,26 @@ def create_member():
 @bp.route('/members/<int:mem_id>', methods=['PUT'])
 @admin_required
 def update_member(mem_id):
-    """更新成員信息"""
+    """
+    更新成員信息
+    
+    支持兩種請求格式：
+    1. JSON格式（用於API調用）
+    2. FormData格式（用於文件上傳）
+    """
     try:
+        # 根據Content-Type選擇數據源
+        if request.is_json:
+            form_data = request.get_json() or {}
+            files_data = None
+        else:
+            form_data = dict(request.form)
+            files_data = dict(request.files) if request.files else None
+            
         member_data = member_service.update_member(
             mem_id=mem_id,
-            form_data=dict(request.form),
-            files_data=dict(request.files) if request.files else None
+            form_data=form_data,
+            files_data=files_data
         )
         return jsonify(success_response(member_data, '成員更新成功'))
         

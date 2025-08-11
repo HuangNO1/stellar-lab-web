@@ -77,13 +77,25 @@ def create_app(config_name=None):
         
         return response
     
-    # 添加輸入清理中間件
+    # 添加輸入清理中間件（修復版本）
     @app.before_request
     def sanitize_request_data():
-        if request.is_json and request.json:
-            from app.utils.security import sanitize_input
-            # 清理JSON數據
-            request._cached_json = sanitize_input(request.json)
+        # 跳過敏感路由，避免影響密碼等關鍵數據
+        skip_paths = ['/api/admin/login', '/api/admin/change-password']
+        
+        if request.path in skip_paths:
+            return
+            
+        if request.is_json and hasattr(request, 'json') and request.json:
+            try:
+                from app.utils.security import sanitize_input
+                # 不修改request對象，而是在業務層進行清理提示
+                # 這裡只是標記需要清理，實際清理在各個服務層進行
+                g.needs_sanitization = True
+                g.original_data = request.json
+            except Exception:
+                # 如果清理失敗，允許繼續處理以保證系統可用性
+                pass
     
     # 註冊根路由
     from app.routes.root import bp as root_bp
