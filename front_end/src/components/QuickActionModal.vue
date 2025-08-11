@@ -121,8 +121,10 @@
             <n-select
               v-model:value="formData.authors"
               multiple
+              filterable
               :options="memberOptions"
               :placeholder="t('admin.papers.form.placeholders.authors')"
+              :loading="loadingMembers"
               style="width: 100%"
             />
           </n-form-item>
@@ -496,7 +498,26 @@ watch(
       loadOptionsData();
       if (props.actionType === 'edit' && props.editData) {
         nextTick(() => {
-          Object.assign(formData, { ...props.editData });
+          const editDataCopy = { ...props.editData };
+          
+          // 轉換日期字段為時間戳
+          if (editDataCopy.paper_date) {
+            editDataCopy.paper_date = parseDateForForm(editDataCopy.paper_date);
+          }
+          if (editDataCopy.news_date) {
+            editDataCopy.news_date = parseDateForForm(editDataCopy.news_date);
+          }
+          if (editDataCopy.project_date_start) {
+            editDataCopy.project_date_start = parseDateForForm(editDataCopy.project_date_start);
+          }
+          
+          // 處理論文作者數據：將authors對象數組轉換為mem_id數組
+          if (props.moduleType === 'papers' && editDataCopy.authors && Array.isArray(editDataCopy.authors)) {
+            editDataCopy.authors = editDataCopy.authors.map((author: any) => author.mem_id);
+            console.log('轉換後的作者ID數組:', editDataCopy.authors);
+          }
+          
+          Object.assign(formData, editDataCopy);
         });
       }
     }
@@ -550,7 +571,7 @@ const loadOptionsData = async () => {
   if (props.moduleType === 'members' || props.moduleType === 'research-groups') {
     await loadResearchGroups();
   }
-  if (props.moduleType === 'research-groups') {
+  if (props.moduleType === 'papers' || props.moduleType === 'research-groups') {
     await loadMembers();
   }
 };
@@ -577,17 +598,35 @@ const loadResearchGroups = async () => {
 const loadMembers = async () => {
   try {
     loadingMembers.value = true;
-    const response = await memberApi.getMembers({ all: 'true', type: 0 }); // 只載入教師
+    
+    // 獲取所有類型的成員，包括教師、學生、校友
+    const response = await memberApi.getMembers({ all: 'true' });
+    
     if (response.code === 0) {
-      memberOptions.value = response.data.items.map((member: any) => ({
-        label: locale.value === 'zh'
+      memberOptions.value = response.data.items.map((member: any) => {
+        const name = locale.value === 'zh'
           ? (member.mem_name_zh || member.mem_name_en)
-          : (member.mem_name_en || member.mem_name_zh),
-        value: member.mem_id
-      }));
+          : (member.mem_name_en || member.mem_name_zh);
+        
+        // 獲取成員類型標籤
+        const memberTypeLabels = {
+          0: t('admin.common.memberTypes.teacher'),
+          1: t('admin.common.memberTypes.student'),
+          2: t('admin.common.memberTypes.alumni')
+        };
+        const typeLabel = memberTypeLabels[member.mem_type as keyof typeof memberTypeLabels] || '';
+        
+        return {
+          label: `${name} (${member.mem_email}) - ${typeLabel}`,
+          value: member.mem_id
+        };
+      });
+      console.log(`成功加載 ${memberOptions.value.length} 個成員選項`);
+    } else {
+      console.error('API 響應錯誤:', response.message);
     }
   } catch (error) {
-    console.error(t('admin.quickAction.messages.loadMembersFailed'), error);
+    console.error('加載成員失敗:', error);
   } finally {
     loadingMembers.value = false;
   }
@@ -597,6 +636,13 @@ const formatDateForApi = (date: any) => {
   if (!date) return '';
   const d = new Date(date);
   return d.toISOString().split('T')[0];
+};
+
+// 將字符串日期轉換為時間戳（用於日期選擇器）
+const parseDateForForm = (dateString: string): number | null => {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  return isNaN(date.getTime()) ? null : date.getTime();
 };
 
 // 文件處理方法
