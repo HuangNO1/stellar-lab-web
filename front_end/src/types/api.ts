@@ -154,6 +154,9 @@ export interface BaseQueryParams {
   all?: string; // 新增：設為 'true' 時獲取所有數據
 }
 
+// 管理員查詢參數
+export type AdminQueryParams = BaseQueryParams
+
 // 課題組查詢參數
 export interface ResearchGroupQueryParams extends BaseQueryParams {
   lab_id?: number;

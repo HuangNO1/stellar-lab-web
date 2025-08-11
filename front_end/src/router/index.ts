@@ -103,6 +103,11 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import('@/views/admin/LabManageView.vue')
             },
             {
+                path: 'admins',
+                name: 'admin-admins',
+                component: () => import('@/views/admin/AdminManageView.vue')
+            },
+            {
                 path: 'system',
                 name: 'admin-system',
                 component: () => import('@/views/admin/SystemManageView.vue')

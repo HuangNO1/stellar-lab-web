@@ -260,6 +260,37 @@
             />
           </n-form-item>
         </template>
+
+        <!-- 管理員表單 -->
+        <template v-if="moduleType === 'admins'">
+          <n-form-item :label="t('admin.admins.form.adminName')" path="admin_name">
+            <n-input
+              v-model:value="formData.admin_name"
+              :placeholder="t('admin.admins.form.placeholders.adminName')"
+            />
+          </n-form-item>
+          <n-form-item v-if="actionType === 'create'" :label="t('admin.admins.form.adminPass')" path="admin_pass">
+            <n-input
+              v-model:value="formData.admin_pass"
+              type="password"
+              :placeholder="t('admin.admins.form.placeholders.adminPass')"
+            />
+          </n-form-item>
+          <n-form-item :label="t('admin.admins.form.isSuper')" path="is_super">
+            <n-select
+              v-model:value="formData.is_super"
+              :options="adminTypeOptions"
+              :placeholder="t('admin.admins.form.placeholders.isSuper')"
+            />
+          </n-form-item>
+          <n-form-item v-if="actionType === 'edit'" :label="t('admin.admins.form.enable')" path="enable">
+            <n-select
+              v-model:value="formData.enable"
+              :options="enableOptions"
+              :placeholder="t('admin.admins.form.placeholders.enable')"
+            />
+          </n-form-item>
+        </template>
       </n-form>
 
       <template #footer>
@@ -284,15 +315,17 @@
 import { ref, reactive, computed, watch, nextTick } from 'vue';
 import { useMessage } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
-import { memberApi, paperApi, projectApi, newsApi, researchGroupApi } from '@/services/api';
+import { useAuthStore } from '@/stores/auth';
+import { memberApi, paperApi, projectApi, newsApi, researchGroupApi, adminApi } from '@/services/api';
 import MarkdownEditor from './MarkdownEditor.vue';
 
 const { t, locale } = useI18n();
+const authStore = useAuthStore();
 
 // Props
 interface Props {
   modelValue: boolean;
-  moduleType: 'members' | 'papers' | 'projects' | 'news' | 'research-groups';
+  moduleType: 'members' | 'papers' | 'projects' | 'news' | 'research-groups' | 'admins';
   actionType: 'create' | 'edit';
   editData?: Record<string, any>;
 }
@@ -352,6 +385,16 @@ const newsTypeOptions = computed(() => [
   { label: t('admin.common.newsTypes.activity'), value: 2 }
 ]);
 
+const adminTypeOptions = computed(() => [
+  { label: t('admin.admins.normalAdmin'), value: 0 },
+  { label: t('admin.admins.superAdmin'), value: 1 }
+]);
+
+const enableOptions = computed(() => [
+  { label: t('admin.common.disabled'), value: 0 },
+  { label: t('admin.common.enabled'), value: 1 }
+]);
+
 const researchGroupOptions = ref<Array<{ label: string; value: number }>>([]);
 const memberOptions = ref<Array<{ label: string; value: number }>>([]);
 
@@ -363,7 +406,8 @@ const modalTitle = computed(() => {
     'papers': 'Paper', 
     'projects': 'Project',
     'news': 'News',
-    'research-groups': 'Group'
+    'research-groups': 'Group',
+    'admins': 'Admin'
   };
   
   const actionKey = props.actionType === 'create' ? 'create' : 'edit';
@@ -395,6 +439,11 @@ const formRules = computed(() => {
     rules.news_date = { required: true, message: t('admin.news.form.validation.dateRequired'), trigger: 'change' };
   } else if (props.moduleType === 'research-groups') {
     rules.research_group_name_zh = { required: true, message: t('admin.groups.form.validation.nameZhRequired'), trigger: 'blur' };
+  } else if (props.moduleType === 'admins') {
+    rules.admin_name = { required: true, message: t('admin.admins.form.validation.adminNameRequired'), trigger: 'blur' };
+    if (props.actionType === 'create') {
+      rules.admin_pass = { required: true, message: t('admin.admins.form.validation.adminPassRequired'), trigger: 'blur' };
+    }
   }
   
   return rules;
@@ -531,6 +580,35 @@ const handleFileRemove = (fieldName: string) => {
 
 const handleSubmit = async () => {
   try {
+    // 對於管理員操作，檢查權限
+    if (props.moduleType === 'admins') {
+      // 編輯管理員時，檢查是否為超級管理員且不是編輯其他超級管理員
+      if (props.actionType === 'edit') {
+        if (!authStore.isSuperAdmin) {
+          message.error(t('admin.admins.noEditPermission'));
+          return;
+        }
+        
+        // 不能編輯自己
+        if (formData.admin_id === authStore.admin?.admin_id) {
+          message.error(t('admin.admins.cannotEditSelf'));
+          return;
+        }
+        
+        // 不能編輯其他超級管理員
+        if (props.editData?.is_super === 1) {
+          message.error(t('admin.admins.cannotEditSuperAdmin'));
+          return;
+        }
+      }
+      
+      // 創建管理員時，檢查是否為超級管理員
+      if (props.actionType === 'create' && !authStore.isSuperAdmin) {
+        message.error(t('admin.admins.noCreatePermission'));
+        return;
+      }
+    }
+
     await formRef.value?.validate();
     submitting.value = true;
 
@@ -583,7 +661,8 @@ const handleSubmit = async () => {
       papers: paperApi,
       projects: projectApi,
       news: newsApi,
-      'research-groups': researchGroupApi
+      'research-groups': researchGroupApi,
+      admins: adminApi
     };
 
     const api = apis[props.moduleType];
@@ -594,7 +673,8 @@ const handleSubmit = async () => {
         papers: 'createPaper',
         projects: 'createProject',
         news: 'createNews',
-        'research-groups': 'createResearchGroup'
+        'research-groups': 'createResearchGroup',
+        admins: 'createAdmin'
       };
       response = await (api as any)[createMethods[props.moduleType]](submitData);
     } else {
@@ -603,14 +683,16 @@ const handleSubmit = async () => {
         papers: 'updatePaper',
         projects: 'updateProject',
         news: 'updateNews',
-        'research-groups': 'updateResearchGroup'
+        'research-groups': 'updateResearchGroup',
+        admins: 'updateAdmin'
       };
       const idField = {
         members: 'mem_id',
         papers: 'paper_id',
         projects: 'project_id',
         news: 'news_id',
-        'research-groups': 'research_group_id'
+        'research-groups': 'research_group_id',
+        admins: 'admin_id'
       };
       const id = props.editData[idField[props.moduleType]];
       response = await (api as any)[updateMethods[props.moduleType]](id, submitData);

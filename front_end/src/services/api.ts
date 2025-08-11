@@ -14,6 +14,7 @@ import type {
   Project, 
   ProjectQueryParams,
   Admin,
+  AdminQueryParams,
   LoginResponse
 } from '@/types/api';
 
@@ -320,6 +321,39 @@ export const mediaApi = {
   // 健康檢查
   healthCheck(): Promise<ApiResponse<{ status: string; upload_path: string; disk_space: string }>> {
     return api.get('/media/health');
+  }
+};
+
+/**
+ * 管理員相關 API
+ */
+export const adminApi = {
+  // 獲取管理員列表
+  getAdmins(params?: AdminQueryParams): Promise<ApiResponse<PaginatedResponse<Admin>>> {
+    return api.get('/admins', { params });
+  },
+  
+  // 創建管理員
+  createAdmin(data: {
+    admin_name: string;
+    admin_pass: string;
+    is_super?: number;
+  }): Promise<ApiResponse<Admin>> {
+    return api.post('/admins', data);
+  },
+  
+  // 更新管理員
+  updateAdmin(adminId: number, data: {
+    admin_name?: string;
+    is_super?: number;
+    enable?: number;
+  }): Promise<ApiResponse<Admin>> {
+    return api.put(`/admins/${adminId}`, data);
+  },
+  
+  // 刪除管理員
+  deleteAdmin(adminId: number): Promise<ApiResponse<null>> {
+    return api.delete(`/admins/${adminId}`);
   }
 };
 

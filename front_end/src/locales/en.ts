@@ -170,6 +170,7 @@ export default {
       projects: 'Project Management',
       news: 'News Management',
       lab: 'Lab Management',
+      admins: 'Admin Management',
       system: 'System Management'
     },
     login: {
@@ -231,6 +232,7 @@ export default {
       failed: 'Failed',
       batchEdit: 'Batch Edit',
       batchDelete: 'Batch Delete',
+      noPermission: 'No Permission',
       // Form Options
       memberTypes: {
         teacher: 'Teacher',
@@ -486,7 +488,9 @@ export default {
         createNews: 'Add News',
         editNews: 'Edit News',
         createGroup: 'Add Group',
-        editGroup: 'Edit Group'
+        editGroup: 'Edit Group',
+        createAdmin: 'Add Admin',
+        editAdmin: 'Edit Admin'
       },
       messages: {
         createSuccess: 'Created successfully',
@@ -548,6 +552,42 @@ export default {
         fetchFailed: 'Failed to fetch lab information',
         saveSuccess: 'Saved successfully',
         saveFailed: 'Save failed'
+      }
+    },
+    // Admin Management translations
+    admins: {
+      addAdmin: 'Add Admin',
+      editAdmin: 'Edit Admin',
+      searchPlaceholder: 'Search admin username...',
+      adminName: 'Username',
+      adminType: 'Type',
+      superAdmin: 'Super Admin',
+      normalAdmin: 'Normal Admin',
+      createdAt: 'Created At',
+      fetchError: 'Failed to fetch admin list',
+      deleteConfirmText: 'Are you sure you want to delete this admin? This action cannot be undone.',
+      deleteSuccess: 'Admin deleted successfully',
+      deleteError: 'Failed to delete admin',
+      noEditPermission: 'No permission to edit this admin',
+      noDeletePermission: 'No permission to delete this admin',
+      noCreatePermission: 'No permission to create admin',
+      cannotEditSelf: 'Cannot edit your own account',
+      cannotEditSuperAdmin: 'Cannot edit super admin accounts',
+      form: {
+        adminName: 'Username',
+        adminPass: 'Password',
+        isSuper: 'Admin Type',
+        enable: 'Status',
+        placeholders: {
+          adminName: 'Enter username',
+          adminPass: 'Enter password',
+          isSuper: 'Select admin type',
+          enable: 'Select status'
+        },
+        validation: {
+          adminNameRequired: 'Username is required',
+          adminPassRequired: 'Password is required'
+        }
       }
     }
   }

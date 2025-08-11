@@ -157,6 +157,7 @@ export default {
       projects: '項目管理',
       news: '新聞管理',
       lab: '實驗室管理',
+      admins: '管理員管理',
       system: '系統管理'
     },
     login: {
@@ -218,6 +219,7 @@ export default {
       failed: '失敗',
       batchEdit: '批量編輯',
       batchDelete: '批量刪除',
+      noPermission: '無權限',
       // 表單選項
       memberTypes: {
         teacher: '教師',
@@ -478,7 +480,9 @@ export default {
         createNews: '新增新聞',
         editNews: '編輯新聞',
         createGroup: '新增課題組',
-        editGroup: '編輯課題組'
+        editGroup: '編輯課題組',
+        createAdmin: '新增管理員',
+        editAdmin: '編輯管理員'
       },
       messages: {
         createSuccess: '創建成功',
@@ -540,6 +544,42 @@ export default {
         fetchFailed: '獲取實驗室信息失敗',
         saveSuccess: '保存成功',
         saveFailed: '保存失敗'
+      }
+    },
+    // 管理員管理翻譯
+    admins: {
+      addAdmin: '添加管理員',
+      editAdmin: '編輯管理員',
+      searchPlaceholder: '搜索管理員用戶名...',
+      adminName: '用戶名',
+      adminType: '類型',
+      superAdmin: '超級管理員',
+      normalAdmin: '普通管理員',
+      createdAt: '創建時間',
+      fetchError: '獲取管理員列表失敗',
+      deleteConfirmText: '確定要刪除這個管理員嗎？此操作不可撤銷。',
+      deleteSuccess: '管理員刪除成功',
+      deleteError: '刪除管理員失敗',
+      noEditPermission: '無權限編輯此管理員',
+      noDeletePermission: '無權限刪除此管理員',
+      noCreatePermission: '無權限創建管理員',
+      cannotEditSelf: '不能編輯自己的帳號',
+      cannotEditSuperAdmin: '不能編輯超級管理員',
+      form: {
+        adminName: '用戶名',
+        adminPass: '密碼',
+        isSuper: '管理員類型',
+        enable: '狀態',
+        placeholders: {
+          adminName: '請輸入用戶名',
+          adminPass: '請輸入密碼',
+          isSuper: '請選擇管理員類型',
+          enable: '請選擇狀態'
+        },
+        validation: {
+          adminNameRequired: '用戶名必填',
+          adminPassRequired: '密碼必填'
+        }
       }
     }
   }

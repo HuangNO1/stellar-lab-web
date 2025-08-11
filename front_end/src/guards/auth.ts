@@ -19,8 +19,8 @@ export const adminAuthGuard = (
     return;
   }
   
-  // 檢查超級管理員權限（針對系統管理頁面）
-  if (to.path.startsWith('/admin/system') && !authStore.isSuperAdmin) {
+  // 檢查超級管理員權限（針對系統管理頁面和管理員管理）
+  if ((to.path.startsWith('/admin/system') || to.path.includes('/admin/admins')) && !authStore.isSuperAdmin) {
     // 非超級管理員，跳轉到儀表板
     next('/admin/dashboard');
     return;
