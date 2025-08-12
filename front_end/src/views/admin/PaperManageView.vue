@@ -128,6 +128,7 @@ import { ref, reactive, onMounted, h, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMessage, NButton, NTag, NSpace, zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
 import { paperApi } from '@/services/api';
+import { getMediaUrl } from '@/utils/media';
 import QuickActionModal from '@/components/QuickActionModal.vue';
 import type { Paper } from '@/types/api';
 import type { DataTableColumns } from 'naive-ui';
@@ -266,14 +267,20 @@ const columns: DataTableColumns<Paper> = [
   {
     title: t('admin.common.actions'),
     key: 'actions',
-    width: 200,
+    width: 260,
     render(row) {
       return h(NSpace, [
-        row.paper_file_path ? h(NButton, {
+        row.paper_url ? h(NButton, {
           size: 'small',
           type: 'info',
-          onClick: () => window.open(getFileUrl(row.paper_file_path!), '_blank')
+          onClick: () => window.open(row.paper_url!, '_blank')
         }, { default: () => t('papers.viewOnline') }) : null,
+        row.paper_file_path ? h(NButton, {
+          size: 'small',
+          type: 'primary',
+          ghost: true,
+          onClick: () => window.open(getMediaUrl(row.paper_file_path!), '_blank')
+        }, { default: () => t('papers.download') }) : null,
         h(NButton, {
           size: 'small',
           type: 'primary',
@@ -293,11 +300,6 @@ const columns: DataTableColumns<Paper> = [
 const formatDate = (dateStr: string) => {
   if (!dateStr) return '-';
   return new Date(dateStr).toLocaleDateString();
-};
-
-const getFileUrl = (filePath: string) => {
-  const baseUrl = process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8000';
-  return `${baseUrl}/api/media/serve/${filePath.replace('/media/', '')}`;
 };
 
 // 獲取論文列表

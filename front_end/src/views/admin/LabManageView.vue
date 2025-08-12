@@ -113,8 +113,8 @@
           <!-- Logo 上傳 -->
           <n-form-item :label="t('admin.lab.logo')" path="lab_logo">
             <div class="upload-section">
-              <div v-if="logoPreview" class="image-preview">
-                <img :src="logoPreview" alt="Logo Preview" class="logo-preview" />
+              <div v-if="hasLogoToShow" class="image-preview">
+                <img :src="getLogoPreview()" alt="Logo Preview" class="logo-preview" />
                 <div class="image-actions">
                   <n-button size="small" @click="openLogoCropper">
                     {{ t('admin.imageCropper.cropLogo') }}
@@ -142,8 +142,8 @@
                   <span>{{ t('admin.lab.carouselImage', { number: index + 1 }) }}</span>
                 </div>
                 <div class="upload-section">
-                  <div v-if="carousel.preview" class="image-preview">
-                    <img :src="carousel.preview" :alt="`Carousel ${index + 1}`" class="carousel-preview" />
+                  <div v-if="hasCarouselToShow(index)" class="image-preview">
+                    <img :src="getCarouselPreview(index)" :alt="`Carousel ${index + 1}`" class="carousel-preview" />
                     <div class="image-actions">
                       <n-button size="small" @click="openCarouselCropper(index)">
                         {{ t('admin.imageCropper.cropCarousel') }}
@@ -174,10 +174,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMessage } from 'naive-ui';
 import { labApi } from '@/services/api';
+import { getMediaUrl } from '@/utils/media';
 import ImageCropperModal from '@/components/ImageCropperModal.vue';
 import type { Lab } from '@/types/api';
 import type { FormInst, FormRules, UploadFileInfo } from 'naive-ui';
@@ -201,6 +202,9 @@ const formData = reactive<Partial<Lab>>({
   lab_email: '',
   lab_phone: ''
 });
+
+// 原始實驗室數據（用於比較是否有現有圖片）
+const originalLabData = ref<Partial<Lab>>({});
 
 // Image upload states
 const logoFileList = ref<UploadFileInfo[]>([]);
@@ -228,6 +232,72 @@ const cropType = ref<'avatar' | 'logo' | 'carousel'>('logo');
 const currentImageType = ref<'logo' | 'carousel'>('logo');
 const currentCarouselIndex = ref<number>(-1);
 
+// 計算是否有 Logo 需要顯示
+const hasLogoToShow = computed(() => {
+  // 如果有新上傳的文件
+  if (logoFile.value) {
+    return true;
+  }
+  
+  // 如果有現有的 Logo 且沒有被標記為刪除
+  if (originalLabData.value.lab_logo_path && !logoShouldDelete.value) {
+    return true;
+  }
+  
+  return false;
+});
+
+// 獲取 Logo 預覽 URL
+const getLogoPreview = () => {
+  // 優先顯示新上傳的文件
+  if (logoFile.value) {
+    return URL.createObjectURL(logoFile.value);
+  }
+  
+  // 顯示現有的 Logo
+  if (originalLabData.value.lab_logo_path && !logoShouldDelete.value) {
+    return getMediaUrl(originalLabData.value.lab_logo_path);
+  }
+  
+  return '';
+};
+
+// 檢查輪播圖是否需要顯示
+const hasCarouselToShow = (index: number) => {
+  const carousel = carouselImages.value[index];
+  
+  // 如果有新上傳的文件
+  if (carousel.file) {
+    return true;
+  }
+  
+  // 如果有現有的輪播圖且沒有被標記為清除
+  const carouselField = `carousel_img_${index + 1}` as keyof Lab;
+  if (originalLabData.value[carouselField] && !carousel.shouldClear) {
+    return true;
+  }
+  
+  return false;
+};
+
+// 獲取輪播圖預覽 URL
+const getCarouselPreview = (index: number) => {
+  const carousel = carouselImages.value[index];
+  
+  // 優先顯示新上傳的文件
+  if (carousel.file) {
+    return URL.createObjectURL(carousel.file);
+  }
+  
+  // 顯示現有的輪播圖
+  const carouselField = `carousel_img_${index + 1}` as keyof Lab;
+  if (originalLabData.value[carouselField] && !carousel.shouldClear) {
+    return getMediaUrl(originalLabData.value[carouselField] as string);
+  }
+  
+  return '';
+};
+
 // Form validation rules
 const formRules: FormRules = {
   lab_zh: {
@@ -253,24 +323,24 @@ const fetchLabData = async () => {
     loading.value = true;
     const response = await labApi.getLab();
     if (response.code === 0 && response.data) {
+      // 保存原始數據
+      originalLabData.value = { ...response.data };
+      
+      // 更新表單數據
       Object.assign(formData, response.data);
       
       // 重置刪除標記
       logoShouldDelete.value = false;
       
-      // 設置 logo 預覽
-      if (response.data.lab_logo_path) {
-        logoPreview.value = getImageUrl(response.data.lab_logo_path);
-      } else {
-        logoPreview.value = '';
-      }
+      // 重置輪播圖狀態
+      carouselImages.value.forEach(carousel => {
+        carousel.shouldClear = false;
+      });
       
-      // 設置輪播圖預覽
-      const carouselFields = ['carousel_img_1', 'carousel_img_2', 'carousel_img_3', 'carousel_img_4'];
-      carouselFields.forEach((field, index) => {
-        if (response.data[field as keyof Lab]) {
-          carouselImages.value[index].preview = getImageUrl(response.data[field as keyof Lab] as string);
-        }
+      // 清除之前的預覽（因為現在會通過 computed 屬性自動處理）
+      logoPreview.value = '';
+      carouselImages.value.forEach(carousel => {
+        carousel.preview = '';
       });
     }
   } catch (error) {
@@ -279,11 +349,6 @@ const fetchLabData = async () => {
   } finally {
     loading.value = false;
   }
-};
-
-const getImageUrl = (path: string) => {
-  const baseUrl = process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8000';
-  return `${baseUrl}/api/media/serve/${path.replace('/media/', '')}`;
 };
 
 const handleLogoChange = ({ fileList }: { fileList: UploadFileInfo[] }) => {
@@ -302,7 +367,11 @@ const handleLogoRemove = () => {
   logoFileList.value = [];
   logoFile.value = null;
   logoPreview.value = '';
-  logoShouldDelete.value = true;
+  
+  // 如果有現有的 Logo，標記為刪除
+  if (originalLabData.value.lab_logo_path) {
+    logoShouldDelete.value = true;
+  }
 };
 
 const handleCarouselChange = (index: number, { fileList }: { fileList: UploadFileInfo[] }) => {
@@ -322,7 +391,12 @@ const handleCarouselRemove = (index: number) => {
   carouselImages.value[index].fileList = [];
   carouselImages.value[index].file = null;
   carouselImages.value[index].preview = '';
-  carouselImages.value[index].shouldClear = true;
+  
+  // 如果有現有的輪播圖，標記為清除
+  const carouselField = `carousel_img_${index + 1}` as keyof Lab;
+  if (originalLabData.value[carouselField]) {
+    carouselImages.value[index].shouldClear = true;
+  }
 };
 
 // Image cropper methods
@@ -398,7 +472,7 @@ const handleSave = async () => {
     const response = await labApi.updateLab(formDataToSend);
     if (response.code === 0) {
       message.success(t('admin.lab.messages.saveSuccess'));
-      // 重新獲取數據以更新預覽
+      // 重新獲取數據以更新預覽和原始數據
       await fetchLabData();
     } else {
       message.error(response.message || t('admin.lab.messages.saveFailed'));
