@@ -84,3 +84,7 @@ CMD ["nginx", "-g", "daemon off;"]
 ```
 
 This approach separates the build process from containerization, which is often preferable in production environments.
+
+---
+
+**[中文文档](./DOCKER_ISSUES_zh-CN.md) | English**

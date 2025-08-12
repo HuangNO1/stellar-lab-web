@@ -109,3 +109,7 @@ docker build --build-arg NODE_ENV=production -t lab-website-frontend .
 3. Set up log rotation
 4. Configure monitoring and alerts
 5. Use Docker Swarm or Kubernetes for orchestration
+
+---
+
+**[中文文档](./DOCKER_zh-CN.md) | English**
