@@ -10,13 +10,16 @@ COPY package*.json ./
 # Install dependencies (including dev dependencies for build)
 RUN npm install
 
-# Copy source code
+# Copy source code and environment files
 COPY . .
+
+# Use Docker environment configuration
+COPY .env.docker .env.production
 
 # Build the application with TypeScript compatibility fixes
 ENV CI=false
 ENV NODE_OPTIONS=--max-old-space-size=4096
-RUN npm run build || echo "Build completed with warnings"
+RUN npm run build -- --mode production || echo "Build completed with warnings"
 
 # Production stage
 FROM nginx:stable-alpine as production-stage
