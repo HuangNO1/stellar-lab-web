@@ -176,6 +176,26 @@
             </div>
           </div>
         </n-card>
+        <!-- 待辦事項 -->
+        <n-card :title="$t('admin.dashboard.todoList')" class="todo-list">
+          <div class="todo-items">
+            <div class="todo-item">
+              <n-checkbox>
+                {{ $t('admin.dashboard.reviewPapers') }}
+              </n-checkbox>
+            </div>
+            <div class="todo-item">
+              <n-checkbox>
+                {{ $t('admin.dashboard.updateLabInfo') }}
+              </n-checkbox>
+            </div>
+            <div class="todo-item">
+              <n-checkbox>
+                {{ $t('admin.dashboard.checkNews') }}
+              </n-checkbox>
+            </div>
+          </div>
+        </n-card>
       </div>
 
       <div class="right-panel">
@@ -199,27 +219,6 @@
 
           <div v-if="recentActivities.length === 0" class="empty-activities">
             <n-empty :description="$t('admin.dashboard.noActivities')" />
-          </div>
-        </n-card>
-
-        <!-- 待辦事項 -->
-        <n-card :title="$t('admin.dashboard.todoList')" class="todo-list">
-          <div class="todo-items">
-            <div class="todo-item">
-              <n-checkbox>
-                {{ $t('admin.dashboard.reviewPapers') }}
-              </n-checkbox>
-            </div>
-            <div class="todo-item">
-              <n-checkbox>
-                {{ $t('admin.dashboard.updateLabInfo') }}
-              </n-checkbox>
-            </div>
-            <div class="todo-item">
-              <n-checkbox>
-                {{ $t('admin.dashboard.checkNews') }}
-              </n-checkbox>
-            </div>
           </div>
         </n-card>
       </div>
