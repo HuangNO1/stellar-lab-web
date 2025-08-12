@@ -146,7 +146,7 @@
           <n-form-item :label="t('admin.members.form.avatar')" path="mem_avatar">
             <div class="image-upload-container">
               <!-- 已選擇的圖片預覽 -->
-              <div v-if="uploadedFiles['mem_avatar'] || getDefaultFileList('mem_avatar').length" class="image-preview">
+              <div v-if="hasAvatarToShow" class="image-preview">
                 <img 
                   :src="getImagePreview('mem_avatar')" 
                   alt="Avatar preview" 
@@ -154,7 +154,7 @@
                 />
                 <div class="image-actions">
                   <n-button size="small" @click="openCropper('mem_avatar', 'avatar')">
-                    {{ t('admin.imageCropper.cropAvatar') }}
+                    {{ props.editData && props.editData['mem_avatar_path'] ? t('admin.imageCropper.cropAvatar') : t('admin.common.fileUpload.selectImage') }}
                   </n-button>
                   <n-button size="small" type="error" @click="removeImage('mem_avatar')">
                     {{ t('admin.common.delete') }}
@@ -494,6 +494,7 @@ import { useMessage } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/auth';
 import { memberApi, paperApi, projectApi, newsApi, researchGroupApi, adminApi } from '@/services/api';
+import { getMediaUrl } from '@/utils/media';
 import I18nMdEditor from '@/components/I18nMdEditor.vue';
 import ImageCropperModal from '@/components/ImageCropperModal.vue';
 
@@ -534,6 +535,21 @@ const loadingMembers = ref(false);
 // Form data
 const formData = reactive<Record<string, any>>({});
 const uploadedFiles = reactive<Record<string, File>>({});
+
+// 計算是否有頭像需要顯示
+const hasAvatarToShow = computed(() => {
+  // 如果有新上傳的文件
+  if (uploadedFiles['mem_avatar']) {
+    return true;
+  }
+  
+  // 如果是編輯模式且有現有頭像
+  if (props.actionType === 'edit' && props.editData && props.editData['mem_avatar_path']) {
+    return true;
+  }
+  
+  return false;
+});
 
 // Image cropper states
 const showCropper = ref(false);
@@ -997,13 +1013,21 @@ const parseDateForForm = (dateString: string): number | null => {
 // 文件處理方法
 const getDefaultFileList = (fieldName: string) => {
   if (props.actionType === 'edit' && props.editData) {
-    const filePath = props.editData[`${fieldName}_path`];
+    let filePath;
+    
+    // 特殊處理成員頭像字段
+    if (fieldName === 'mem_avatar') {
+      filePath = props.editData['mem_avatar_path'];
+    } else {
+      filePath = props.editData[`${fieldName}_path`];
+    }
+    
     if (filePath) {
       return [{
         id: fieldName,
         name: filePath.split('/').pop() || 'file',
         status: 'finished',
-        url: `${process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8000'}/api/media/serve/${filePath.replace('/media/', '')}`
+        url: getMediaUrl(filePath)
       }];
     }
   }
@@ -1050,9 +1074,17 @@ const getImagePreview = (fieldName: string): string => {
   
   // 如果是編輯模式且有現有圖片
   if (props.actionType === 'edit' && props.editData) {
-    const imagePath = props.editData[`${fieldName}_path`];
+    let imagePath;
+    
+    // 特殊處理成員頭像字段
+    if (fieldName === 'mem_avatar') {
+      imagePath = props.editData['mem_avatar_path'];
+    } else {
+      imagePath = props.editData[`${fieldName}_path`];
+    }
+    
     if (imagePath) {
-      return `${process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8000'}/api/media/serve/${imagePath.replace('/media/', '')}`;
+      return getMediaUrl(imagePath);
     }
   }
   
