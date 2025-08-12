@@ -113,11 +113,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 import SearchComponent from '@/components/SearchComponent.vue';
 import { projectApi } from '@/services/api';
 import type { Project, SearchFilters } from '@/types/api';
 
 const { t, locale } = useI18n();
+const router = useRouter();
 
 // 響應式數據
 const projectList = ref<Project[]>([]);
@@ -251,8 +253,7 @@ const handlePageSizeChange = (pageSize: number) => {
 
 // 查看項目詳情
 const viewProjectDetail = (project: Project) => {
-  console.log('View project detail:', project);
-  // router.push(`/projects/${project.project_id}`);
+  router.push(`/project/${project.project_id}`);
 };
 
 // 打開項目URL
