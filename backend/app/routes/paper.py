@@ -48,20 +48,27 @@ def get_paper(paper_id):
 def create_paper():
     """創建論文"""
     try:
-        # 獲取表單數據
-        form_data = dict(request.form)
-        
-        # 處理文件數據
-        files_data = dict(request.files) if request.files else {}
-        
-        # 處理作者信息
-        authors_data = []
-        authors_str = request.form.get('authors', '[]')
-        if authors_str:
-            try:
-                authors_data = json.loads(authors_str)
-            except json.JSONDecodeError:
-                return jsonify(error_response(2000, '作者信息格式錯誤')), 400
+        # 根據Content-Type選擇數據源
+        if request.is_json:
+            form_data = request.get_json() or {}
+            files_data = None
+            # 處理作者信息（JSON格式直接包含在數據中）
+            authors_data = form_data.pop('authors', [])
+        else:
+            # 獲取表單數據
+            form_data = dict(request.form)
+            
+            # 處理文件數據
+            files_data = dict(request.files) if request.files else {}
+            
+            # 處理作者信息
+            authors_data = []
+            authors_str = request.form.get('authors', '[]')
+            if authors_str:
+                try:
+                    authors_data = json.loads(authors_str)
+                except json.JSONDecodeError:
+                    return jsonify(error_response(2000, '作者信息格式錯誤')), 400
         
         paper = paper_service.create_paper(form_data, files_data, authors_data)
         return jsonify(success_response(paper, msg.get_success_message('PAPER_CREATE_SUCCESS'))), 201

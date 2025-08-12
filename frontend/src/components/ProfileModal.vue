@@ -139,6 +139,7 @@ import { ref, reactive, computed, watch, nextTick, onMounted, onUnmounted } from
 import { useMessage } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/auth';
+import { authApi } from '@/services/api';
 
 const { t } = useI18n();
 const message = useMessage();
@@ -314,28 +315,16 @@ const handleSubmit = async () => {
     // 先更新个人资料（如果需要）
     if (needsProfileUpdate) {
       try {
-        const response = await fetch('/api/admin/profile', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': authStore.token || ''
-          },
-          body: JSON.stringify(updateData)
-        });
-
-        const result = await response.json();
-        if (result.code !== 0) {
-          throw new Error(result.message || t('admin.profile.messages.updateFailed'));
-        }
-
+        const result = await authApi.updateProfile(updateData);
+        
         // 更新本地存储的管理员信息
         if (authStore.admin) {
           authStore.admin.admin_name = formData.admin_name;
         }
         
         message.success(t('admin.profile.messages.profileUpdateSuccess'));
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : t('admin.profile.messages.updateFailed');
+      } catch (error: any) {
+        const errorMessage = error?.message || t('admin.profile.messages.updateFailed');
         message.error(errorMessage);
         return;
       }
@@ -344,28 +333,10 @@ const handleSubmit = async () => {
     // 然后更改密码（如果需要）
     if (needsPasswordChange) {
       try {
-        const passwordData = {
-          old_password: formData.old_password,
-          new_password: formData.new_password
-        };
-
-        const response = await fetch('/api/admin/change-password', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': authStore.token || ''
-          },
-          body: JSON.stringify(passwordData)
-        });
-
-        const result = await response.json();
-        if (result.code !== 0) {
-          throw new Error(result.message || t('admin.profile.messages.passwordChangeFailed'));
-        }
-
+        await authApi.changePassword(formData.old_password, formData.new_password);
         message.success(t('admin.profile.messages.passwordChangeSuccess'));
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : t('admin.profile.messages.passwordChangeFailed');
+      } catch (error: any) {
+        const errorMessage = error?.message || t('admin.profile.messages.passwordChangeFailed');
         message.error(errorMessage);
         return;
       }

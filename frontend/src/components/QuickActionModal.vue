@@ -494,7 +494,7 @@ import { ref, reactive, computed, watch, nextTick, onMounted, onUnmounted } from
 import { useMessage } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/auth';
-import { memberApi, paperApi, projectApi, newsApi, researchGroupApi, adminApi } from '@/services/api';
+import { memberApi, paperApi, projectApi, newsApi, researchGroupApi, adminApi, authApi } from '@/services/api';
 import { getMediaUrl } from '@/utils/media';
 import I18nMdEditor from '@/components/I18nMdEditor.vue';
 import ImageCropperModal from '@/components/ImageCropperModal.vue';
@@ -1004,6 +1004,7 @@ const resetForm = () => {
   } else if (props.moduleType === 'papers') {
     formData.paper_desc_zh = '';
     formData.paper_desc_en = '';
+    formData.authors = [];
   } else if (props.moduleType === 'projects') {
     formData.project_desc_zh = '';
     formData.project_desc_en = '';
@@ -1252,31 +1253,13 @@ const handleSubmit = async () => {
       submitting.value = true;
 
       try {
-        const passwordData = {
-          old_password: formData.old_password,
-          new_password: formData.new_password
-        };
-
-        const response = await fetch('/api/admin/change-password', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': authStore.token || ''
-          },
-          body: JSON.stringify(passwordData)
-        });
-
-        const result = await response.json();
-        if (result.code !== 0) {
-          throw new Error(result.message || t('admin.profile.messages.passwordChangeFailed'));
-        }
-
+        await authApi.changePassword(formData.old_password as string, formData.new_password as string);
         message.success(t('admin.profile.messages.passwordChangeSuccess'));
-        emit('success', result.data as Record<string, unknown>);
+        emit('success', {} as Record<string, unknown>);
         show.value = false;
         return;
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : t('admin.profile.messages.passwordChangeFailed');
+      } catch (error: any) {
+        const errorMessage = error?.message || t('admin.profile.messages.passwordChangeFailed');
         message.error(errorMessage);
         return;
       } finally {
@@ -1357,6 +1340,16 @@ const handleSubmit = async () => {
       return acc;
     }, {});
     
+    // 特殊处理论文作者格式转换
+    if (props.moduleType === 'papers' && cleanFormData.authors && Array.isArray(cleanFormData.authors)) {
+      // 将简单的 mem_id 数组转换为后端期望的格式
+      cleanFormData.authors = (cleanFormData.authors as number[]).map((mem_id, index) => ({
+        mem_id: mem_id,
+        author_order: index + 1,
+        is_corresponding: index === 0 ? 1 : 0  // 第一个作者默认为通讯作者
+      }));
+    }
+    
     if (hasFiles) {
       // 使用 FormData 处理文件上传
       const formDataObj = new FormData();
@@ -1374,9 +1367,20 @@ const handleSubmit = async () => {
         // 确保值是可序列化的字符串或数字
         if (Array.isArray(value)) {
           // 处理数组数据，如authors
-          value.forEach((item, index) => {
-            formDataObj.append(`${key}[${index}]`, String(item));
-          });
+          if (value.length > 0) {
+            // 特殊处理 authors 数组 - 需要将对象数组序列化为JSON字符串
+            if (key === 'authors' && props.moduleType === 'papers') {
+              formDataObj.append(key, JSON.stringify(value));
+            } else {
+              // 其他数组按索引添加
+              value.forEach((item, index) => {
+                formDataObj.append(`${key}[${index}]`, String(item));
+              });
+            }
+          } else {
+            // 空数组的处理：添加一个特殊标记表示这是一个空数组
+            formDataObj.append(`${key}_empty`, 'true');
+          }
         } else if (value === null) {
           // null 值特殊处理：用空字符串表示
           formDataObj.append(key, '');

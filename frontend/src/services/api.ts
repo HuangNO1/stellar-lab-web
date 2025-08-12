@@ -74,7 +74,9 @@ function sanitizeRequestData(data: unknown): unknown {
     } else if (typeof data === 'object' && data !== null) {
         const sanitized: Record<string, unknown> = {};
         for (const key in data) {
-            sanitized[key] = sanitizeRequestData(data[key]);
+            if (Object.prototype.hasOwnProperty.call(data, key)) {
+                sanitized[key] = sanitizeRequestData((data as Record<string, unknown>)[key]);
+            }
         }
         return sanitized;
     }
