@@ -23,6 +23,7 @@ export default {
     viewDetails: 'View Details',
     fetchError: 'Failed to fetch data',
     goBack: 'Go Back',
+    back: 'Back',
     page: 'Page',
     noData: 'No Data',
     itemsPerPage: 'Items per page'
@@ -75,7 +76,15 @@ export default {
     award: 'Award News',
     academic: 'Academic Activity',
     other: 'Other',
-    viewMore: 'View More'
+    viewMore: 'View More',
+    notFound: 'News not found',
+    invalidId: 'Invalid news ID',
+    fetchError: 'Failed to fetch news details',
+    types: {
+      publication: 'Paper Published',
+      award: 'Award News',
+      activity: 'Academic Activity'
+    }
   },
   about: {
     title: 'About Us',
@@ -107,7 +116,20 @@ export default {
     other: 'Other',
     date: 'Publication Date',
     venue: 'Journal/Conference',
-    andOthers: 'et al.'
+    andOthers: 'et al.',
+    authors: 'Authors',
+    abstract: 'Abstract',
+    correspondingAuthor: 'Corresponding Author',
+    notFound: 'Paper not found',
+    invalidId: 'Invalid paper ID',
+    fetchError: 'Failed to fetch paper details',
+    types: {
+      conference: 'Conference Paper',
+      journal: 'Journal Paper',
+      patent: 'Patent',
+      book: 'Book',
+      other: 'Other'
+    }
   },
   groups: {
     title: 'Research Groups',
@@ -131,7 +153,10 @@ export default {
     empty: 'No projects available',
     ongoing: 'Ongoing',
     completed: 'Completed',
-    name: 'Project Name'
+    name: 'Project Name',
+    notFound: 'Project not found',
+    invalidId: 'Invalid project ID',
+    fetchError: 'Failed to fetch project details'
   },
   search: {
     placeholder: 'Search...',

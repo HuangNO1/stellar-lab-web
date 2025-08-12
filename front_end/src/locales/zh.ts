@@ -23,6 +23,7 @@ export default {
     viewDetails: '查看詳情',
     fetchError: '獲取數據失敗',
     goBack: '返回',
+    back: '返回',
     page: '頁',
     noData: '暫無數據',
     itemsPerPage: '每頁條數'
@@ -75,7 +76,15 @@ export default {
     award: '獲獎消息',
     academic: '學術活動',
     other: '其他',
-    viewMore: '查看更多'
+    viewMore: '查看更多',
+    notFound: '未找到該新聞',
+    invalidId: '無效的新聞ID',
+    fetchError: '獲取新聞詳情失敗',
+    types: {
+      publication: '論文發表',
+      award: '獲獎消息',
+      activity: '學術活動'
+    }
   },
   about: {
     title: '關於我們',
@@ -107,7 +116,20 @@ export default {
     other: '其他',
     date: '發表日期',
     venue: '發表期刊/會議',
-    andOthers: '等'
+    andOthers: '等',
+    authors: '作者',
+    abstract: '摘要',
+    correspondingAuthor: '通訊作者',
+    notFound: '未找到該論文',
+    invalidId: '無效的論文ID',
+    fetchError: '獲取論文詳情失敗',
+    types: {
+      conference: '會議論文',
+      journal: '期刊論文',
+      patent: '專利',
+      book: '書籍',
+      other: '其他'
+    }
   },
   projects: {
     title: '研究項目',
@@ -118,7 +140,10 @@ export default {
     empty: '暫無項目數據',
     ongoing: '進行中',
     completed: '已完成',
-    name: '項目名稱'
+    name: '項目名稱',
+    notFound: '未找到該項目',
+    invalidId: '無效的項目ID',
+    fetchError: '獲取項目詳情失敗'
   },
   groups: {
     title: '研究課題組',
