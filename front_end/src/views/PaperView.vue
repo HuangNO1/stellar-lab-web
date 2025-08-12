@@ -125,12 +125,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 import SearchComponent from '@/components/SearchComponent.vue';
 import { paperApi } from '@/services/api';
 import { getMediaUrl } from '@/utils/media';
 import type { Paper, SearchFilters, PaperAuthor } from '@/types/api';
 
 const { t, locale } = useI18n();
+const router = useRouter();
 
 // 響應式數據
 const paperList = ref<Paper[]>([]);
@@ -313,8 +315,7 @@ const handlePageSizeChange = (pageSize: number) => {
 
 // 查看論文詳情
 const viewPaperDetail = (paper: Paper) => {
-  console.log('View paper detail:', paper);
-  // router.push(`/papers/${paper.paper_id}`);
+  router.push(`/paper/${paper.paper_id}`);
 };
 
 // 打開論文URL
