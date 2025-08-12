@@ -96,7 +96,7 @@ class LabService(BaseService):
         result, update_data = self.execute_with_audit(
             operation_func=_update_operation,
             operation_type='CREATE' if is_create else 'UPDATE',
-            content=update_data
+            content={}
         )
         
         return result

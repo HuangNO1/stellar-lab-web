@@ -53,8 +53,8 @@ def save_file(file, file_type='other', max_size=None):
         try:
             with Image.open(file_path) as img:
                 # 限制最大尺寸
-                max_size = (1920, 1920)
-                img.thumbnail(max_size, Image.Resampling.LANCZOS)
+                max_thumbnail_size = (1920, 1920)
+                img.thumbnail(max_thumbnail_size, Image.Resampling.LANCZOS)
                 img.save(file_path, optimize=True, quality=85)
         except Exception as e:
             os.remove(file_path)

@@ -160,26 +160,13 @@ class MemberService(BaseService):
             association_updates = self._update_member_associations(member, form_data)
             update_data.update(association_updates)
             
-            return member.to_dict()
-        
-        # 先收集更新數據用於審計
-        update_data = {}
-        basic_updates = self._update_member_basic_info(member, form_data)
-        update_data.update(basic_updates)
-        
-        # 處理頭像更新/刪除
-        avatar_update = self._handle_avatar_update(member, files_data, form_data)
-        if avatar_update:
-            update_data.update(avatar_update)
-            
-        association_updates = self._update_member_associations(member, form_data)
-        update_data.update(association_updates)
+            return member.to_dict(), update_data
         
         # 執行操作並記錄審計
-        result = self.execute_with_audit(
+        result, update_data = self.execute_with_audit(
             operation_func=_update_operation,
             operation_type='UPDATE',
-            content=update_data
+            content={}
         )
         
         return result
@@ -437,8 +424,8 @@ class MemberService(BaseService):
         string_fields = {
             'mem_name_zh': 100,
             'mem_name_en': 100,
-            'mem_desc_zh': 1000,
-            'mem_desc_en': 1000
+            'mem_desc_zh': 10000,
+            'mem_desc_en': 10000
         }
         
         for field, max_length in string_fields.items():

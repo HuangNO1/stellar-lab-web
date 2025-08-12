@@ -126,7 +126,7 @@ class NewsService(BaseService):
         result, update_data = self.execute_with_audit(
             operation_func=_update_operation,
             operation_type='UPDATE',
-            content=update_data
+            content={}
         )
         
         return result
@@ -170,8 +170,8 @@ class NewsService(BaseService):
         
         # 字符串長度校驗
         string_fields = {
-            'news_content_zh': 1000,
-            'news_content_en': 1000
+            'news_content_zh': 10000,
+            'news_content_en': 10000
         }
         
         for field, max_length in string_fields.items():

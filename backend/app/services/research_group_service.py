@@ -138,31 +138,13 @@ class ResearchGroupService(BaseService):
             association_updates = self._update_group_associations(group, group_data)
             update_data.update(association_updates)
             
-            return group.to_dict()
-        
-        # 先收集更新數據用於審計
-        update_data = {}
-        basic_fields = [
-            'research_group_name_zh', 'research_group_name_en',
-            'research_group_desc_zh', 'research_group_desc_en'
-        ]
-        
-        for field in basic_fields:
-            if field in group_data:
-                old_value = getattr(group, field)
-                new_value = group_data[field]
-                
-                if old_value != new_value:
-                    update_data[field] = {'old': old_value, 'new': new_value}
-        
-        association_updates = self._update_group_associations(group, group_data)
-        update_data.update(association_updates)
+            return group.to_dict(), update_data
         
         # 執行操作並記錄審計
-        result = self.execute_with_audit(
+        result, update_data = self.execute_with_audit(
             operation_func=_update_operation,
             operation_type='UPDATE',
-            content=update_data
+            content={}
         )
         
         return result
@@ -201,8 +183,8 @@ class ResearchGroupService(BaseService):
         string_fields = {
             'research_group_name_zh': 200,
             'research_group_name_en': 200,
-            'research_group_desc_zh': 1000,
-            'research_group_desc_en': 1000
+            'research_group_desc_zh': 10000,
+            'research_group_desc_en': 10000
         }
         
         for field, max_length in string_fields.items():
