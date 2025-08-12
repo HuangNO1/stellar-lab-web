@@ -91,7 +91,7 @@
           <!-- 個人描述 -->
           <div v-if="member.mem_desc_zh || member.mem_desc_en" class="member-description">
             <h3>{{ $t('members.description') }}</h3>
-            <div class="description-content" v-html="getMemberDescription()"></div>
+            <markdown-it :source="getMemberDescription()" :plugins="markdownPlugins"></markdown-it>
           </div>
           </div>
         </div>
@@ -137,6 +137,7 @@ import { useI18n } from 'vue-i18n';
 import { memberApi, researchGroupApi, paperApi } from '@/services/api';
 import { useMembers } from '@/composables/useMembers';
 import type { Member, ResearchGroup, Paper } from '@/types/api';
+import MarkdownIt from 'vue3-markdown-it';
 
 const route = useRoute();
 const router = useRouter();
@@ -158,9 +159,33 @@ const getCurrentLocale = () => {
 const getMemberDescription = () => {
   if (!member.value) return '';
   const desc = getCurrentLocale() === 'zh' ? member.value.mem_desc_zh : member.value.mem_desc_en;
-  // 簡單的 Markdown 渲染 (基本支持段落和換行)
-  return desc?.replace(/\n/g, '<br>') || '';
+  return desc || '';
 };
+
+// Markdown插件配置
+const markdownPlugins = [
+  {
+    plugin: (md: any) => {
+      // 修改链接渲染规则
+      const defaultRender = md.renderer.rules.link_open || function(tokens: any, idx: any, options: any, env: any, renderer: any) {
+        return renderer.renderToken(tokens, idx, options);
+      };
+
+      md.renderer.rules.link_open = function (tokens: any, idx: any, options: any, env: any, renderer: any) {
+        const token = tokens[idx];
+        const href = token.attrGet('href');
+        
+        // 检查是否为外部链接
+        if (href && (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//') || href.includes('://'))) {
+          token.attrSet('target', '_blank');
+          token.attrSet('rel', 'noopener noreferrer');
+        }
+        
+        return defaultRender(tokens, idx, options, env, renderer);
+      };
+    }
+  }
+];
 
 const getResearchGroupName = () => {
   if (!researchGroup.value) return '';

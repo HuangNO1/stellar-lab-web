@@ -50,7 +50,7 @@
     </div>
     
     <div v-if="isPreviewMode" class="markdown-preview">
-      <div v-html="renderedMarkdown"></div>
+      <markdown-it :source="inputValue" :plugins="markdownPlugins"></markdown-it>
     </div>
     
     <div class="editor-tip" v-if="showTip">
@@ -62,9 +62,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue';
+import { ref, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { NInput, NButton, NIcon, NText } from 'naive-ui';
+import MarkdownIt from 'vue3-markdown-it';
 
 const { t } = useI18n();
 
@@ -101,24 +102,30 @@ const textareaRef = ref<InstanceType<typeof NInput>>();
 const inputValue = ref(props.modelValue);
 const isPreviewMode = ref(false);
 
-// 簡單的 Markdown 渲染器
-const renderedMarkdown = computed(() => {
-  let html = inputValue.value
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // 粗體
-    .replace(/\*(.*?)\*/g, '<em>$1</em>') // 斜體
-    .replace(/^### (.*$)/gim, '<h3>$1</h3>') // H3 標題
-    .replace(/^## (.*$)/gim, '<h2>$1</h2>') // H2 標題
-    .replace(/^# (.*$)/gim, '<h1>$1</h1>') // H1 標題
-    .replace(/^- (.*$)/gim, '<li>$1</li>') // 列表項
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>') // 鏈接
-    .replace(/\n/g, '<br>'); // 換行
-  
-  // 將連續的 li 標籤包裝在 ul 中
-  html = html.replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>');
-  html = html.replace(/<\/ul><ul>/g, ''); // 合併連續的 ul
-  
-  return html;
-});
+// Markdown插件配置
+const markdownPlugins = [
+  {
+    plugin: (md: any) => {
+      // 修改链接渲染规则
+      const defaultRender = md.renderer.rules.link_open || function(tokens: any, idx: any, options: any, env: any, renderer: any) {
+        return renderer.renderToken(tokens, idx, options);
+      };
+
+      md.renderer.rules.link_open = function (tokens: any, idx: any, options: any, env: any, renderer: any) {
+        const token = tokens[idx];
+        const href = token.attrGet('href');
+        
+        // 检查是否为外部链接
+        if (href && (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//') || href.includes('://'))) {
+          token.attrSet('target', '_blank');
+          token.attrSet('rel', 'noopener noreferrer');
+        }
+        
+        return defaultRender(tokens, idx, options, env, renderer);
+      };
+    }
+  }
+];
 
 watch(
   () => props.modelValue,
