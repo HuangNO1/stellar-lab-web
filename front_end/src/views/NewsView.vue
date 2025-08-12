@@ -82,11 +82,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 import SearchComponent from '@/components/SearchComponent.vue';
 import { newsApi } from '@/services/api';
 import type { News, SearchFilters } from '@/types/api';
 
 const { t, locale } = useI18n();
+const router = useRouter();
 
 // 響應式數據
 const newsList = ref<News[]>([]);
@@ -228,9 +230,7 @@ const handlePageSizeChange = (pageSize: number) => {
 
 // 查看新聞詳情
 const viewNewsDetail = (news: News) => {
-  // 這裡可以導航到新聞詳情頁面或打開模態框
-  console.log('View news detail:', news);
-  // router.push(`/news/${news.news_id}`);
+  router.push(`/news/${news.news_id}`);
 };
 
 // 生命週期
