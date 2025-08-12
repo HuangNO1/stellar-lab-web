@@ -34,7 +34,7 @@ class Config:
     
     # 其他配置
     CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 
-        'http://localhost:3000,http://127.0.0.1:3000,http://localhost:5000,http://127.0.0.1:5000,http://localhost:8000,http://127.0.0.1:8000'
+        'http://localhost:3000,http://127.0.0.1:3000,http://localhost:5000,http://127.0.0.1:5000,http://localhost:8000,http://127.0.0.1:8000,http://localhost:8080,http://127.0.0.1:8080'
     ).split(',') if os.environ.get('CORS_ORIGINS') != '*' else '*'
 
 class DevelopmentConfig(Config):
@@ -42,6 +42,9 @@ class DevelopmentConfig(Config):
     # 開發環境允許默認密鑰
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'dev-jwt-secret-please-change-in-production'
     SECRET_KEY = JWT_SECRET_KEY
+    
+    # 開發環境允許所有CORS來源
+    CORS_ORIGINS = '*'
     
 class ProductionConfig(Config):
     DEBUG = False

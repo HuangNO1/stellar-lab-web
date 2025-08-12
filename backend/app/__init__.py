@@ -40,8 +40,9 @@ def create_app(config_name=None):
     
     CORS(app, 
          origins=app.config['CORS_ORIGINS'],
-         allow_headers=['Content-Type', 'Authorization'],
-         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+         allow_headers=['Content-Type', 'Authorization', 'Accept-Language', 'X-Language', 'Accept', 'Origin', 'X-Requested-With'],
+         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+         supports_credentials=True
     )
     
     # 添加安全響應頭
