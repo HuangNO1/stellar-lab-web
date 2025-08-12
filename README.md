@@ -45,20 +45,22 @@ Built with Vue 3 and Flask, this framework offers a complete laboratory website 
 - **Publications**: Complete paper management with search, filtering, and author linking
 - **Projects**: Display ongoing and completed research projects
 - **News & Updates**: Latest laboratory achievements, awards, and announcements
-- **Multilingual Support**: Complete Chinese/English interface switching
-- **Responsive Design**: Perfect display across desktop, tablet, and mobile devices
+- **🌍 Internationalization**: Complete Chinese/English interface switching with localized content
+- **🎨 Theme Support**: Light/Dark mode toggle throughout all pages for enhanced user experience
+- **📱 Responsive Design**: Perfect display across desktop, tablet, and mobile devices
 
 ### 🛠️ Content Management System
-- **Dashboard**: Comprehensive overview with statistics and quick actions
+- **📊 Dashboard**: Comprehensive overview with statistics and quick actions (supports theme switching)
 - **Laboratory Management**: Basic info, contact details, logo, and carousel image management
 - **Member Management**: Complete CRUD operations with avatar cropping and research group assignment
 - **Research Group Management**: Team organization with leader assignment and descriptions
 - **Publication Management**: Paper records with Markdown content editing and file uploads
 - **Project Management**: Research project tracking with status management
 - **News Management**: News publishing with categorization and content editing
-- **Admin Management**: Multi-level administrator accounts with permission control
-- **Operation Logs**: Complete audit trail of all system changes
-- **Media Management**: Centralized file upload and storage system
+- **👥 Admin Management**: Multi-level administrator accounts with permission control
+- **📝 Operation Logs**: Complete audit trail of all system changes with detailed tracking
+- **📁 Media Management**: Centralized file upload and storage system
+- **🌐 Multi-language Admin**: Full internationalization support in admin interface
 
 ### 🔧 Technical Excellence
 - **Modern Architecture**: Vue 3 + TypeScript frontend, Python Flask backend
@@ -66,6 +68,102 @@ Built with Vue 3 and Flask, this framework offers a complete laboratory website 
 - **Performance Optimized**: Database indexing, pagination, caching, and query optimization
 - **Docker Ready**: Complete containerization with one-click deployment
 - **Developer Friendly**: Comprehensive API documentation, testing framework, and clear code structure
+
+## 🎨 Interface Preview
+
+### 🌟 Key Highlights
+- **🌐 International Support**: Complete Chinese/English interface switching
+- **🎨 Theme Switching**: Light/Dark mode toggle for better user experience  
+- **📱 Responsive Design**: Seamless experience across all devices
+- **⚡ Modern UI**: Clean, professional design with intuitive navigation
+
+### 🏠 Public Website Interface
+
+#### Homepage & Core Features
+<div align="center">
+<img src="preview/en/home.png" width="100%" alt="Homepage - Laboratory Introduction"/>
+<p><em>Laboratory homepage with customizable introduction and latest updates</em></p>
+</div>
+
+#### Member & Research Showcase
+<div align="center">
+<table>
+<tr>
+<td width="50%"><img src="preview/en/member.png" width="100%" alt="Member Directory"/></td>
+<td width="50%"><img src="preview/en/memberDetail.png" width="100%" alt="Member Profile"/></td>
+</tr>
+<tr>
+<td align="center"><em>Member directory with organized display</em></td>
+<td align="center"><em>Detailed member profiles with research info</em></td>
+</tr>
+</table>
+</div>
+
+#### Publications & Projects
+<div align="center">
+<table>
+<tr>
+<td width="50%"><img src="preview/en/paper.png" width="100%" alt="Publications List"/></td>
+<td width="50%"><img src="preview/en/project.png" width="100%" alt="Projects Overview"/></td>
+</tr>
+<tr>
+<td align="center"><em>Publication management with search & filtering</em></td>
+<td align="center"><em>Research projects with status tracking</em></td>
+</tr>
+</table>
+</div>
+
+#### News & Updates
+<div align="center">
+<table>
+<tr>
+<td width="50%"><img src="preview/en/news.png" width="100%" alt="News List"/></td>
+<td width="50%"><img src="preview/en/newsDetail.png" width="100%" alt="News Detail"/></td>
+</tr>
+<tr>
+<td align="center"><em>Laboratory news and announcements</em></td>
+<td align="center"><em>Detailed news content with rich text</em></td>
+</tr>
+</table>
+</div>
+
+### 🛠️ Admin Dashboard Interface
+
+#### Dashboard Overview & Theme Switching
+<div align="center">
+<table>
+<tr>
+<td width="50%"><img src="preview/en/admin_dashboard.png" width="100%" alt="Admin Dashboard Light"/></td>
+<td width="50%"><img src="preview/en/admin_dashboard_dark_theme.png" width="100%" alt="Admin Dashboard Dark"/></td>
+</tr>
+<tr>
+<td align="center"><em>Admin dashboard - Light theme</em></td>
+<td align="center"><em>Admin dashboard - Dark theme</em></td>
+</tr>
+</table>
+</div>
+
+#### Management Interfaces
+<div align="center">
+<table>
+<tr>
+<td width="33%"><img src="preview/en/admin_memberManage.png" width="100%" alt="Member Management"/></td>
+<td width="33%"><img src="preview/en/admin_labManage.png" width="100%" alt="Lab Management"/></td>
+<td width="33%"><img src="preview/en/admin_adminManage.png" width="100%" alt="Admin Management"/></td>
+</tr>
+<tr>
+<td align="center"><em>Member management with CRUD operations</em></td>
+<td align="center"><em>Laboratory information management</em></td>
+<td align="center"><em>Administrator account management</em></td>
+</tr>
+</table>
+</div>
+
+#### System Monitoring
+<div align="center">
+<img src="preview/en/admin_operationLogs.png" width="70%" alt="Operation Logs"/>
+<p><em>Comprehensive operation logs for system auditing</em></p>
+</div>
 
 ## 🚀 Quick Start
 

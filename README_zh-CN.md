@@ -45,20 +45,22 @@
 - **學術發表**：完整論文管理，支援搜尋、篩選和作者連結
 - **研究項目**：顯示進行中和已完成的研究項目
 - **新聞動態**：最新實驗室成就、獎項和公告
-- **多語言支援**：完整的中英文界面切換
-- **響應式設計**：在桌面、平板和手機設備上完美顯示
+- **🌍 國際化支援**：完整的中英文界面切換，含在地化內容
+- **🎨 主題支援**：全頁面明/暗主題切換，提升使用體驗
+- **📱 響應式設計**：在桌面、平板和手機設備上完美顯示
 
 ### 🛠️ 內容管理系統
-- **儀表板**：全面概覽，含統計資料和快速操作
+- **📊 儀表板**：全面概覽，含統計資料和快速操作（支援主題切換）
 - **實驗室管理**：基本資訊、聯絡詳情、Logo 和輪播圖片管理
 - **成員管理**：完整 CRUD 操作，含頭像裁切和研究組分配
 - **研究組管理**：團隊組織，含組長指派和描述編輯
 - **論文管理**：學術發表記錄，含 Markdown 內容編輯和檔案上傳
 - **項目管理**：研究項目追蹤，含狀態管理
 - **新聞管理**：新聞發布，含分類和內容編輯
-- **管理員管理**：多層級管理員帳戶，含權限控制
-- **操作日誌**：所有系統變更的完整稽核軌跡
-- **媒體管理**：集中式檔案上傳和儲存系統
+- **👥 管理員管理**：多層級管理員帳戶，含權限控制
+- **📝 操作日誌**：所有系統變更的完整稽核軌跡，含詳細追蹤
+- **📁 媒體管理**：集中式檔案上傳和儲存系統
+- **🌐 多語言後台**：管理界面完全支援國際化
 
 ### 🔧 技術卓越
 - **現代架構**：Vue 3 + TypeScript 前端，Python Flask 後端
@@ -66,6 +68,102 @@
 - **效能優化**：資料庫索引、分頁、快取和查詢優化
 - **Docker 就緒**：完整容器化，一鍵部署
 - **開發友好**：全面 API 文件、測試框架和清晰程式碼結構
+
+## 🎨 界面預覽
+
+### 🌟 主要亮點
+- **🌐 國際化支援**：完整的中英文界面切換
+- **🎨 主題切換**：明/暗主題切換，提升使用體驗
+- **📱 響應式設計**：所有設備上的無縫體驗
+- **⚡ 現代化 UI**：乾淨專業的設計，直覺式導航
+
+### 🏠 公開網站界面
+
+#### 首頁與核心功能
+<div align="center">
+<img src="preview/zh/home.png" width="100%" alt="首頁 - 實驗室介紹"/>
+<p><em>實驗室首頁，可客製化介紹內容和最新動態</em></p>
+</div>
+
+#### 成員與研究展示
+<div align="center">
+<table>
+<tr>
+<td width="50%"><img src="preview/zh/member.png" width="100%" alt="成員目錄"/></td>
+<td width="50%"><img src="preview/zh/memberDetail.png" width="100%" alt="成員檔案"/></td>
+</tr>
+<tr>
+<td align="center"><em>成員目錄，有序展示</em></td>
+<td align="center"><em>詳細成員檔案，含研究資訊</em></td>
+</tr>
+</table>
+</div>
+
+#### 學術發表與研究項目
+<div align="center">
+<table>
+<tr>
+<td width="50%"><img src="preview/zh/paper.png" width="100%" alt="論文列表"/></td>
+<td width="50%"><img src="preview/zh/project.png" width="100%" alt="研究項目概覽"/></td>
+</tr>
+<tr>
+<td align="center"><em>學術發表管理，支援搜尋和篩選</em></td>
+<td align="center"><em>研究項目，含狀態追蹤</em></td>
+</tr>
+</table>
+</div>
+
+#### 新聞動態
+<div align="center">
+<table>
+<tr>
+<td width="50%"><img src="preview/zh/news.png" width="100%" alt="新聞列表"/></td>
+<td width="50%"><img src="preview/zh/newsDetail.png" width="100%" alt="新聞詳情"/></td>
+</tr>
+<tr>
+<td align="center"><em>實驗室新聞和公告</em></td>
+<td align="center"><em>詳細新聞內容，含富文本編輯</em></td>
+</tr>
+</table>
+</div>
+
+### 🛠️ 管理後台界面
+
+#### 儀表板概覽與主題切換
+<div align="center">
+<table>
+<tr>
+<td width="50%"><img src="preview/zh/admin_dashboard.png" width="100%" alt="管理儀表板 明亮主題"/></td>
+<td width="50%"><img src="preview/zh/admin_dashboard_dark_theme.png" width="100%" alt="管理儀表板 深色主題"/></td>
+</tr>
+<tr>
+<td align="center"><em>管理儀表板 - 明亮主題</em></td>
+<td align="center"><em>管理儀表板 - 深色主題</em></td>
+</tr>
+</table>
+</div>
+
+#### 管理界面
+<div align="center">
+<table>
+<tr>
+<td width="33%"><img src="preview/zh/admin_memberManage.png" width="100%" alt="成員管理"/></td>
+<td width="33%"><img src="preview/zh/admin_labManage.png" width="100%" alt="實驗室管理"/></td>
+<td width="33%"><img src="preview/zh/admin_adminManage.png" width="100%" alt="管理員管理"/></td>
+</tr>
+<tr>
+<td align="center"><em>成員管理，含 CRUD 操作</em></td>
+<td align="center"><em>實驗室資訊管理</em></td>
+<td align="center"><em>管理員帳戶管理</em></td>
+</tr>
+</table>
+</div>
+
+#### 系統監控
+<div align="center">
+<img src="preview/zh/admin_operationLogs.png" width="70%" alt="操作日誌"/>
+<p><em>全面的操作日誌，系統稽核軌跡</em></p>
+</div>
 
 ## 🚀 快速開始
 
