@@ -146,8 +146,8 @@ class AuthService(BaseService):
         if not old_password or not new_password:
             raise ValidationError(msg.get_error_message('INVALID_CREDENTIALS'))
         
-        if len(new_password) < 6:
-            raise ValidationError(msg.get_error_message('PASSWORD_TOO_SHORT'))
+        if len(new_password) < 8:
+            raise ValidationError(msg.get_error_message('PASSWORD_LENGTH_INVALID'))
         
         # 查找管理員
         admin = Admin.query.get(admin_id)

@@ -197,7 +197,7 @@ const formRules = computed(() => {
     rules.old_password = [{ required: true, message: t('admin.profile.validation.currentPasswordRequired'), trigger: 'blur' }];
     rules.new_password = [
       { required: true, message: t('admin.profile.validation.newPasswordRequired'), trigger: 'blur' },
-      { min: 6, message: t('admin.profile.validation.passwordMinLength'), trigger: 'blur' }
+      { min: 8, message: t('admin.profile.validation.passwordMinLength'), trigger: 'blur' }
     ];
     rules.confirm_password = [
       { required: true, message: t('admin.profile.validation.confirmPasswordRequired'), trigger: 'blur' },

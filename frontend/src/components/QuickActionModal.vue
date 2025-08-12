@@ -869,7 +869,7 @@ const formRules = computed(() => {
       rules.old_password = [{ required: true, message: t('admin.profile.validation.currentPasswordRequired'), trigger: 'blur' }];
       rules.new_password = [
         { required: true, message: t('admin.profile.validation.newPasswordRequired'), trigger: 'blur' },
-        { min: 6, message: t('admin.profile.validation.passwordMinLength'), trigger: 'blur' }
+        { min: 8, message: t('admin.profile.validation.passwordMinLength'), trigger: 'blur' }
       ];
       rules.confirm_password = [
         { required: true, message: t('admin.profile.validation.confirmPasswordRequired'), trigger: 'blur' },
@@ -888,7 +888,10 @@ const formRules = computed(() => {
       // 正常管理員表單模式的驗證規則
       rules.admin_name = [{ required: true, message: t('admin.admins.form.validation.adminNameRequired'), trigger: 'blur' }];
       if (props.actionType === 'create') {
-        rules.admin_pass = [{ required: true, message: t('admin.admins.form.validation.adminPassRequired'), trigger: 'blur' }];
+        rules.admin_pass = [
+          { required: true, message: t('admin.admins.form.validation.adminPassRequired'), trigger: 'blur' },
+          { min: 8, message: t('admin.profile.validation.passwordMinLength'), trigger: 'blur' }
+        ];
       }
     }
   }
