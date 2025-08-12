@@ -3,6 +3,7 @@ from app.auth import admin_required
 from app.utils.helpers import success_response, error_response
 from app.services import PaperService
 from app.services.base_service import ServiceException
+from app.utils.messages import msg
 import json
 
 bp = Blueprint('paper', __name__)
@@ -63,7 +64,7 @@ def create_paper():
                 return jsonify(error_response(2000, '作者信息格式錯誤')), 400
         
         paper = paper_service.create_paper(form_data, files_data, authors_data)
-        return jsonify(success_response(paper, '論文創建成功')), 201
+        return jsonify(success_response(paper, msg.get_success_message('PAPER_CREATE_SUCCESS'))), 201
     except ServiceException as e:
         error_data = paper_service.format_error_response(e)
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
@@ -82,7 +83,7 @@ def update_paper(paper_id):
             files_data = dict(request.files) if request.files else None
             
         paper = paper_service.update_paper(paper_id, form_data, files_data)
-        return jsonify(success_response(paper, '論文更新成功'))
+        return jsonify(success_response(paper, msg.get_success_message('PAPER_UPDATE_SUCCESS')))
     except ServiceException as e:
         error_data = paper_service.format_error_response(e)
         status_code = 404 if 'NotFoundError' in str(type(e)) else 400
@@ -94,7 +95,7 @@ def delete_paper(paper_id):
     """刪除論文"""
     try:
         paper_service.delete_paper(paper_id)
-        return jsonify(success_response(message='論文刪除成功'))
+        return jsonify(success_response(message=msg.get_success_message('PAPER_DELETE_SUCCESS')))
     except ServiceException as e:
         error_data = paper_service.format_error_response(e)
         status_code = 404 if 'NotFoundError' in str(type(e)) else 400

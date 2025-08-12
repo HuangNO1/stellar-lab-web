@@ -3,6 +3,7 @@ from app.models import Member, ResearchGroup, Paper
 from app.utils.validators import validate_email, validate_string_length
 from app.utils.file_handler import save_file, delete_file
 from app.utils.helpers import get_pagination_params, paginate_query
+from app.utils.messages import msg
 from .base_service import BaseService, ValidationError, NotFoundError, BusinessLogicError
 
 
@@ -64,7 +65,7 @@ class MemberService(BaseService):
         """
         member = Member.query.filter_by(mem_id=mem_id, enable=1).first()
         if not member:
-            raise NotFoundError('成員不存在')
+            raise NotFoundError(msg.get_error_message('MEMBER_NOT_FOUND'))
         
         return member.to_dict()
     
@@ -139,7 +140,7 @@ class MemberService(BaseService):
         
         member = Member.query.filter_by(mem_id=mem_id, enable=1).first()
         if not member:
-            raise NotFoundError('成員不存在')
+            raise NotFoundError(msg.get_error_message('MEMBER_NOT_FOUND'))
         
         # 數據校驗
         self._validate_member_data(form_data, is_create=False)
@@ -183,7 +184,7 @@ class MemberService(BaseService):
         
         member = Member.query.filter_by(mem_id=mem_id, enable=1).first()
         if not member:
-            raise NotFoundError('成員不存在')
+            raise NotFoundError(msg.get_error_message('MEMBER_NOT_FOUND'))
         
         # 檢查是否可以刪除
         self._check_member_deletable(member)
@@ -220,7 +221,7 @@ class MemberService(BaseService):
         self.validate_permissions('BATCH_DELETE')
         
         if not member_ids:
-            raise ValidationError('請選擇要刪除的成員')
+            raise ValidationError(msg.get_error_message('MEMBER_NOT_SELECTED'))
         
         def _batch_delete_operation():
             deleted_count = 0
@@ -284,10 +285,10 @@ class MemberService(BaseService):
         self.validate_permissions('BATCH_UPDATE')
         
         if not member_ids:
-            raise ValidationError('請選擇要更新的成員')
+            raise ValidationError(msg.get_error_message('MEMBER_UPDATE_NOT_SELECTED'))
         
         if not update_fields:
-            raise ValidationError('請指定要更新的字段')
+            raise ValidationError(msg.get_error_message('MEMBER_UPDATE_NO_FIELDS'))
         
         # 校驗更新字段
         self._validate_batch_update_fields(update_fields)
@@ -382,17 +383,17 @@ class MemberService(BaseService):
         # 郵箱格式校驗
         if 'mem_email' in form_data and form_data['mem_email']:
             if not validate_email(form_data['mem_email']):
-                raise ValidationError('郵箱格式不正確')
+                raise ValidationError(msg.get_error_message('EMAIL_FORMAT_INVALID'))
         
         # 成員類型校驗
         if 'mem_type' in form_data:
             try:
                 mem_type = int(form_data['mem_type'])
                 if mem_type not in [0, 1, 2]:  # 0=教師, 1=學生, 2=校友
-                    raise ValidationError('成員類型無效')
+                    raise ValidationError(msg.get_error_message('MEMBER_TYPE_INVALID'))
                 form_data['mem_type'] = mem_type  # 確保後續使用整數類型
             except (ValueError, TypeError):
-                raise ValidationError('成員類型格式錯誤')
+                raise ValidationError(msg.get_error_message('MEMBER_TYPE_FORMAT_ERROR'))
         
         # 職稱類型校驗（僅教師）
         if 'job_type' in form_data and form_data['job_type'] is not None:
@@ -400,12 +401,12 @@ class MemberService(BaseService):
                 job_type = int(form_data['job_type'])
                 if form_data.get('mem_type') == 0:  # 教師
                     if job_type not in [0, 1, 2, 3, 4]:  # 0=教授, 1=副教授, 2=講師, 3=助理研究員, 4=博士後
-                        raise ValidationError('職稱類型無效')
+                        raise ValidationError(msg.get_error_message('TITLE_TYPE_INVALID'))
                     form_data['job_type'] = job_type  # 確保後續使用整數類型
                 else:
-                    raise ValidationError('職稱類型僅適用於教師')
+                    raise ValidationError(msg.get_error_message('TITLE_TYPE_TEACHER_ONLY'))
             except (ValueError, TypeError):
-                raise ValidationError('職稱類型格式錯誤')
+                raise ValidationError(msg.get_error_message('TITLE_TYPE_FORMAT_ERROR'))
         
         # 學生類型校驗（僅學生）
         if 'student_type' in form_data and form_data['student_type'] is not None:
@@ -413,12 +414,12 @@ class MemberService(BaseService):
                 student_type = int(form_data['student_type'])
                 if form_data.get('mem_type') == 1:  # 學生
                     if student_type not in [0, 1, 2]:  # 0=博士生, 1=碩士生, 2=大學生
-                        raise ValidationError('學生類型無效')
+                        raise ValidationError(msg.get_error_message('STUDENT_TYPE_INVALID'))
                     form_data['student_type'] = student_type  # 確保後續使用整數類型
                 else:
-                    raise ValidationError('學生類型僅適用於學生')
+                    raise ValidationError(msg.get_error_message('STUDENT_TYPE_STUDENT_ONLY'))
             except (ValueError, TypeError):
-                raise ValidationError('學生類型格式錯誤')
+                raise ValidationError(msg.get_error_message('STUDENT_TYPE_FORMAT_ERROR'))
         
         # 字符串長度校驗
         string_fields = {
@@ -431,7 +432,7 @@ class MemberService(BaseService):
         for field, max_length in string_fields.items():
             if field in form_data and form_data[field]:
                 if not validate_string_length(form_data[field], max_length):
-                    raise ValidationError(f'{field} 長度不能超過{max_length}字符')
+                    raise ValidationError(msg.format_field_length_error(field, max_length))
     
     def _validate_batch_update_fields(self, update_fields: Dict[str, Any]) -> None:
         """校驗批量更新字段"""
@@ -439,17 +440,17 @@ class MemberService(BaseService):
         
         for field in update_fields:
             if field not in allowed_batch_fields:
-                raise ValidationError(f'字段 {field} 不允許批量更新')
+                raise ValidationError(msg.get_error_message('BATCH_UPDATE_NOT_ALLOWED', field=field))
         
         # 類型校驗
         if 'mem_type' in update_fields:
             try:
                 mem_type = int(update_fields['mem_type'])
                 if mem_type not in [0, 1, 2]:  # 0=教師, 1=學生, 2=校友
-                    raise ValidationError('成員類型無效')
+                    raise ValidationError(msg.get_error_message('MEMBER_TYPE_INVALID'))
                 update_fields['mem_type'] = mem_type
             except (ValueError, TypeError):
-                raise ValidationError('成員類型格式錯誤')
+                raise ValidationError(msg.get_error_message('MEMBER_TYPE_FORMAT_ERROR'))
         
         if 'job_type' in update_fields:
             try:
@@ -458,7 +459,7 @@ class MemberService(BaseService):
                     raise ValidationError('職稱類型無效')
                 update_fields['job_type'] = job_type
             except (ValueError, TypeError):
-                raise ValidationError('職稱類型格式錯誤')
+                raise ValidationError(msg.get_error_message('TITLE_TYPE_FORMAT_ERROR'))
         
         if 'student_type' in update_fields:
             try:
@@ -467,23 +468,23 @@ class MemberService(BaseService):
                     raise ValidationError('學生類型無效')
                 update_fields['student_type'] = student_type
             except (ValueError, TypeError):
-                raise ValidationError('學生類型格式錯誤')
+                raise ValidationError(msg.get_error_message('STUDENT_TYPE_FORMAT_ERROR'))
         
         if 'enable' in update_fields:
             try:
                 enable = int(update_fields['enable'])
                 if enable not in [0, 1]:  # 0=禁用, 1=啟用
-                    raise ValidationError('狀態值無效')
+                    raise ValidationError(msg.get_error_message('STATUS_INVALID'))
                 update_fields['enable'] = enable
             except (ValueError, TypeError):
-                raise ValidationError('狀態值格式錯誤')
+                raise ValidationError(msg.get_error_message('STATUS_FORMAT_ERROR'))
         
         if 'research_group_id' in update_fields:
             try:
                 research_group_id = int(update_fields['research_group_id'])
                 update_fields['research_group_id'] = research_group_id
             except (ValueError, TypeError):
-                raise ValidationError('課題組ID格式錯誤')
+                raise ValidationError(msg.get_error_message('RESEARCH_GROUP_ID_FORMAT_ERROR'))
     
     def _set_member_basic_info(self, member: Member, form_data: Dict[str, Any]) -> None:
         """設置成員基本信息"""
@@ -529,7 +530,7 @@ class MemberService(BaseService):
             avatar_path = save_file(file, 'member_avatar', max_size=5*1024*1024)
             member.mem_avatar_path = avatar_path
         except Exception as e:
-            raise ValidationError(f"頭像上傳失敗: {str(e)}")
+            raise ValidationError(msg.format_file_error('AVATAR_UPLOAD_FAILED', error=str(e)))
     
     def _handle_avatar_update(self, member: Member, files_data: Dict[str, Any] = None, form_data: Dict[str, Any] = None) -> Dict[str, Any]:
         """處理頭像更新/刪除"""
@@ -566,7 +567,7 @@ class MemberService(BaseService):
             return {'avatar_updated': True, 'new_avatar_path': new_avatar_path}
             
         except Exception as e:
-            raise ValidationError(f"頭像更新失敗: {str(e)}")
+            raise ValidationError(msg.format_file_error('AVATAR_UPDATE_FAILED', error=str(e)))
     
     def _set_member_associations(self, member: Member, form_data: Dict[str, Any]) -> None:
         """設置成員關聯信息"""
@@ -578,7 +579,7 @@ class MemberService(BaseService):
             ).first()
             
             if not research_group:
-                raise ValidationError('指定的課題組不存在')
+                raise ValidationError(msg.get_error_message('RESEARCH_GROUP_NOT_FOUND'))
             
             member.research_group_id = research_group_id
             member.lab_id = research_group.lab_id
@@ -617,11 +618,11 @@ class MemberService(BaseService):
         ).first()
         
         if research_group:
-            raise BusinessLogicError(f'該成員是課題組 "{research_group.research_group_name_zh}" 的組長，無法刪除')
+            raise BusinessLogicError(msg.get_error_message('MEMBER_IS_GROUP_LEADER', group_name=research_group.research_group_name_zh))
         
         # 檢查是否有關聯的論文（作為作者）
         from app.models import PaperAuthor
         paper_count = PaperAuthor.query.filter_by(mem_id=member.mem_id).count()
         
         if paper_count > 0:
-            raise BusinessLogicError(f'該成員關聯了 {paper_count} 篇論文，無法刪除')
+            raise BusinessLogicError(msg.get_error_message('MEMBER_HAS_PAPERS', count=paper_count))

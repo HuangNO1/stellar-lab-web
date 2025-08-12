@@ -4,6 +4,7 @@ from app.services import AuthService
 from app.services.base_service import ServiceException
 from app.auth import admin_required
 from app.utils.helpers import success_response, error_response
+from app.utils.messages import msg
 
 bp = Blueprint('auth', __name__)
 
@@ -37,7 +38,7 @@ def admin_login():
         }
         
         result = auth_service.login(admin_name, admin_pass, login_info)
-        return jsonify(success_response(result, '登錄成功'))
+        return jsonify(success_response(result, msg.get_success_message('LOGIN_SUCCESS')))
         
     except ServiceException as e:
         error_data = auth_service.format_error_response(e)
@@ -57,7 +58,7 @@ def admin_logout():
         }
         
         auth_service.logout(g.current_admin.admin_id, logout_info)
-        return jsonify(success_response(message='登出成功'))
+        return jsonify(success_response(message=msg.get_success_message('LOGOUT_SUCCESS')))
         
     except ServiceException as e:
         error_data = auth_service.format_error_response(e)
@@ -83,7 +84,7 @@ def change_password():
             old_password=old_password,
             new_password=new_password
         )
-        return jsonify(success_response(message='密碼修改成功'))
+        return jsonify(success_response(message=msg.get_success_message('PASSWORD_CHANGE_SUCCESS')))
         
     except ServiceException as e:
         error_data = auth_service.format_error_response(e)
@@ -120,7 +121,7 @@ def update_profile():
             admin_id=g.current_admin.admin_id,
             profile_data=data
         )
-        return jsonify(success_response(profile, '個人資料更新成功'))
+        return jsonify(success_response(profile, msg.get_success_message('PROFILE_UPDATE_SUCCESS')))
         
     except ServiceException as e:
         error_data = auth_service.format_error_response(e)

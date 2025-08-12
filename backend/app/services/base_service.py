@@ -3,6 +3,7 @@ from typing import Optional, Dict, Any, List, Union
 from flask import g
 from app import db
 from app.models import EditRecord
+from app.utils.messages import msg
 
 
 class ServiceException(Exception):
@@ -118,7 +119,7 @@ class BaseService(ABC):
             if isinstance(e, ServiceException):
                 raise e
             else:
-                raise ServiceException(f"操作失敗: {str(e)}")
+                raise ServiceException(msg.get_error_message('OPERATION_FAILED') + f": {str(e)}")
     
     def validate_required_fields(self, 
                                 data: Dict[str, Any], 
@@ -139,7 +140,7 @@ class BaseService(ABC):
                 missing_fields.append(field)
         
         if missing_fields:
-            raise ValidationError(f"缺少必填字段: {', '.join(missing_fields)}")
+            raise ValidationError(msg.get_error_message('MISSING_REQUIRED_FIELDS') + f": {', '.join(missing_fields)}")
     
     def validate_permissions(self, 
                            operation: str,
@@ -163,7 +164,7 @@ class BaseService(ABC):
             pass
         
         if not hasattr(g, 'current_admin') or g.current_admin is None:
-            raise PermissionError("未登錄或登錄已過期")
+            raise PermissionError(msg.get_error_message('UNAUTHORIZED'))
         
         # 子類可以重寫此方法實現更複雜的權限控制
         return True
@@ -179,7 +180,7 @@ class BaseService(ABC):
             PermissionError: 未登錄
         """
         if not hasattr(g, 'current_admin') or g.current_admin is None:
-            raise PermissionError("未登錄或登錄已過期")
+            raise PermissionError(msg.get_error_message('UNAUTHORIZED'))
         
         return g.current_admin.admin_id
     
@@ -235,9 +236,9 @@ class BaseService(ABC):
             resource_name: 資源名稱
         """
         if not hasattr(model_instance, 'enable'):
-            raise ServiceException(f"{resource_name}不支持軟刪除")
+            raise ServiceException(msg.get_error_message('SOFT_DELETE_NOT_SUPPORTED', resource=resource_name))
         
         if model_instance.enable == 0:
-            raise NotFoundError(f"{resource_name}不存在或已被刪除")
+            raise NotFoundError(msg.get_error_message('RESOURCE_NOT_FOUND_OR_DELETED', resource=resource_name))
         
         model_instance.enable = 0

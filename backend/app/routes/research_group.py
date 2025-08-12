@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.auth import admin_required
 from app.utils.helpers import success_response, error_response
+from app.utils.messages import msg
 from app.services import ResearchGroupService
 from app.services.base_service import ServiceException
 
@@ -43,7 +44,7 @@ def create_research_group():
     try:
         data = request.get_json()
         group = research_group_service.create_research_group(data)
-        return jsonify(success_response(group, '課題組創建成功')), 201
+        return jsonify(success_response(group, msg.get_success_message('RESEARCH_GROUP_CREATE_SUCCESS'))), 201
     except ServiceException as e:
         error_data = research_group_service.format_error_response(e)
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
@@ -55,7 +56,7 @@ def update_research_group(group_id):
     try:
         data = request.get_json()
         group = research_group_service.update_research_group(group_id, data)
-        return jsonify(success_response(group, '課題組更新成功'))
+        return jsonify(success_response(group, msg.get_success_message('RESEARCH_GROUP_UPDATE_SUCCESS')))
     except ServiceException as e:
         error_data = research_group_service.format_error_response(e)
         status_code = 404 if 'NotFoundError' in str(type(e)) else 400
@@ -67,7 +68,7 @@ def delete_research_group(group_id):
     """刪除課題組"""
     try:
         research_group_service.delete_research_group(group_id)
-        return jsonify(success_response(message='課題組刪除成功'))
+        return jsonify(success_response(message=msg.get_success_message('RESEARCH_GROUP_DELETE_SUCCESS')))
     except ServiceException as e:
         error_data = research_group_service.format_error_response(e)
         status_code = 404 if 'NotFoundError' in str(type(e)) else 400

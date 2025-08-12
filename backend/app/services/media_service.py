@@ -3,6 +3,7 @@ from typing import Dict, Any, Optional
 from flask import current_app
 from werkzeug.utils import secure_filename
 from app.utils.file_handler import save_file, get_file_info, allowed_file
+from app.utils.messages import msg
 from .base_service import BaseService, ValidationError, NotFoundError
 
 
@@ -24,7 +25,7 @@ class MediaService(BaseService):
         
         # 基本校驗
         if not file or file.filename == '':
-            raise ValidationError('沒有選擇文件')
+            raise ValidationError(msg.get_error_message('NO_FILE_SELECTED'))
         
         # 根據類型設置大小限制
         max_sizes = {
@@ -62,7 +63,7 @@ class MediaService(BaseService):
                 raise ValidationError(str(e))
             except Exception as e:
                 current_app.logger.error(f'文件上傳失敗: {str(e)}')
-                raise ValidationError(f'上傳失敗: {str(e)}')
+                raise ValidationError(msg.format_file_error('FILE_UPLOAD_FAILED', error=str(e)))
         
         # 執行操作並記錄審計
         result = self.execute_with_audit(
@@ -81,18 +82,18 @@ class MediaService(BaseService):
         """獲取文件服務信息"""
         # 安全檢查：確保路徑不包含危險字符
         if '..' in file_path or file_path.startswith('/'):
-            raise ValidationError('文件路徑無效')
+            raise ValidationError(msg.get_error_message('FILE_PATH_INVALID'))
         
         upload_folder = current_app.config['UPLOAD_FOLDER']
         full_path = os.path.join(upload_folder, file_path)
         
         # 檢查文件是否存在
         if not os.path.exists(full_path):
-            raise NotFoundError('文件不存在')
+            raise NotFoundError(msg.get_error_message('FILE_NOT_FOUND'))
         
         # 檢查是否為文件
         if not os.path.isfile(full_path):
-            raise ValidationError('路徑不是文件')
+            raise ValidationError(msg.get_error_message('PATH_NOT_FILE'))
         
         # 獲取目錄和文件名
         directory = os.path.dirname(full_path)
@@ -114,13 +115,13 @@ class MediaService(BaseService):
             file_info = get_file_info(file_path)
             
             if not file_info:
-                raise NotFoundError('文件不存在')
+                raise NotFoundError(msg.get_error_message('FILE_NOT_FOUND'))
             
             return file_info
         
         except Exception as e:
             current_app.logger.error(f'獲取文件信息失敗: {str(e)}')
-            raise ValidationError('獲取文件信息失敗')
+            raise ValidationError(msg.get_error_message('FILE_INFO_FAILED'))
     
     def health_check(self) -> Dict[str, Any]:
         """媒體服務健康檢查"""
@@ -147,7 +148,7 @@ class MediaService(BaseService):
             }
         
         except Exception as e:
-            raise ValidationError(f'媒體服務不健康: {str(e)}')
+            raise ValidationError(msg.format_file_error('MEDIA_SERVICE_UNHEALTHY', error=str(e)))
     
     def _get_file_size(self, file) -> int:
         """獲取文件大小"""

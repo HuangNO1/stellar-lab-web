@@ -146,7 +146,19 @@ const routes: Array<RouteRecordRaw> = [
 
 const router = createRouter({
     history: createWebHistory(process.env.BASE_URL),
-    routes
+    routes,
+    scrollBehavior(to, from, savedPosition) {
+        // 如果有保存的位置（例如使用瀏覽器的前進/後退按鈕）
+        if (savedPosition) {
+            return savedPosition
+        }
+        // 對於詳情頁面（包含 id 參數的路由），保持平滑滾動到頂部
+        if (to.name && ['paper-detail', 'project-detail', 'news-detail', 'member', 'group'].includes(to.name as string)) {
+            return { top: 0, behavior: 'smooth' }
+        }
+        // 對於其他頁面切換，立即滾動到頂部
+        return { top: 0 }
+    }
 })
 
 export default router

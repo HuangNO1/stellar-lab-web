@@ -3,6 +3,7 @@ from app.auth import admin_required, super_admin_required
 from app.utils.helpers import success_response, error_response
 from app.services import AdminService
 from app.services.base_service import ServiceException
+from app.utils.messages import msg
 
 bp = Blueprint('admin', __name__)
 admin_service = AdminService()
@@ -32,7 +33,7 @@ def create_admin():
     try:
         data = request.get_json()
         admin = admin_service.create_admin(data)
-        return jsonify(success_response(admin, '管理員創建成功')), 201
+        return jsonify(success_response(admin, msg.get_success_message('ADMIN_CREATE_SUCCESS'))), 201
     except ServiceException as e:
         error_data = admin_service.format_error_response(e)
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
@@ -44,7 +45,7 @@ def update_admin(admin_id):
     try:
         data = request.get_json()
         admin = admin_service.update_admin(admin_id, data, g.current_admin.admin_id)
-        return jsonify(success_response(admin, '管理員更新成功'))
+        return jsonify(success_response(admin, msg.get_success_message('ADMIN_UPDATE_SUCCESS')))
     except ServiceException as e:
         error_data = admin_service.format_error_response(e)
         status_code = 404 if 'NotFoundError' in str(type(e)) else 400
@@ -56,7 +57,7 @@ def delete_admin(admin_id):
     """刪除管理員"""
     try:
         admin_service.delete_admin(admin_id, g.current_admin.admin_id)
-        return jsonify(success_response(message='管理員刪除成功'))
+        return jsonify(success_response(message=msg.get_success_message('ADMIN_DELETE_SUCCESS')))
     except ServiceException as e:
         error_data = admin_service.format_error_response(e)
         status_code = 404 if 'NotFoundError' in str(type(e)) else 400

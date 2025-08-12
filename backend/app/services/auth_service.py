@@ -4,6 +4,7 @@ from flask import request
 from werkzeug.security import check_password_hash, generate_password_hash
 from app import db
 from app.models import Admin
+from app.utils.messages import msg
 from config.config import Config
 from .base_service import BaseService, ValidationError, NotFoundError, PermissionError
 
@@ -44,20 +45,20 @@ class AuthService(BaseService):
         """
         # 數據校驗
         if not admin_name or not admin_pass:
-            raise ValidationError('用戶名和密碼不能為空')
+            raise ValidationError(msg.get_error_message('INVALID_CREDENTIALS'))
         
         # 查找管理員
         admin = Admin.query.filter_by(admin_name=admin_name).first()
         if not admin:
-            raise NotFoundError('用戶名不存在')
+            raise NotFoundError(msg.get_error_message('USER_NOT_FOUND'))
         
         # 檢查賬戶狀態
         if not admin.enable:
-            raise PermissionError('賬戶已被禁用')
+            raise PermissionError(msg.get_error_message('ACCOUNT_DISABLED'))
         
         # 驗證密碼
         if not admin.check_password(admin_pass):
-            raise PermissionError('密碼錯誤')
+            raise PermissionError(msg.get_error_message('WRONG_PASSWORD'))
         
         def _login_operation():
             # 生成JWT令牌 - 使用Flask-JWT-Extended標準格式
@@ -108,7 +109,7 @@ class AuthService(BaseService):
         """
         admin = Admin.query.get(admin_id)
         if not admin:
-            raise NotFoundError('管理員不存在')
+            raise NotFoundError(msg.get_error_message('ADMIN_NOT_FOUND'))
         
         def _logout_operation():
             # 這裡可以添加令牌黑名單邏輯
@@ -143,19 +144,19 @@ class AuthService(BaseService):
         """
         # 數據校驗
         if not old_password or not new_password:
-            raise ValidationError('舊密碼和新密碼不能為空')
+            raise ValidationError(msg.get_error_message('INVALID_CREDENTIALS'))
         
         if len(new_password) < 6:
-            raise ValidationError('新密碼長度至少6位')
+            raise ValidationError(msg.get_error_message('PASSWORD_TOO_SHORT'))
         
         # 查找管理員
         admin = Admin.query.get(admin_id)
         if not admin:
-            raise NotFoundError('管理員不存在')
+            raise NotFoundError(msg.get_error_message('ADMIN_NOT_FOUND'))
         
         # 驗證舊密碼 - 使用admin模型的check_password方法
         if not admin.check_password(old_password):
-            raise PermissionError('舊密碼錯誤')
+            raise PermissionError(msg.get_error_message('OLD_PASSWORD_WRONG'))
         
         def _change_password_operation():
             # 更新密碼 - 使用admin模型的set_password方法
@@ -187,7 +188,7 @@ class AuthService(BaseService):
         """
         admin = Admin.query.get(admin_id)
         if not admin:
-            raise NotFoundError('管理員不存在')
+            raise NotFoundError(msg.get_error_message('ADMIN_NOT_FOUND'))
         
         return admin.to_dict()
     
@@ -205,7 +206,7 @@ class AuthService(BaseService):
         # 不需要權限檢查，因為管理員只能修改自己的資料
         admin = Admin.query.get(admin_id)
         if not admin:
-            raise NotFoundError('管理員不存在')
+            raise NotFoundError(msg.get_error_message('ADMIN_NOT_FOUND'))
         
         def _update_profile_operation():
             update_data = {}
@@ -223,7 +224,7 @@ class AuthService(BaseService):
                         if field == 'admin_name':
                             existing_admin = Admin.query.filter_by(admin_name=new_value).first()
                             if existing_admin and existing_admin.admin_id != admin_id:
-                                raise ValidationError('用戶名已存在')
+                                raise ValidationError(msg.get_error_message('USERNAME_ALREADY_EXISTS'))
                         
                         setattr(admin, field, new_value)
                         update_data[field] = {'old': old_value, 'new': new_value}

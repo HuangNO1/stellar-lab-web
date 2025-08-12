@@ -4,6 +4,7 @@ from datetime import datetime
 from flask import current_app
 from PIL import Image
 import mimetypes
+from .messages import msg
 
 def allowed_file(filename, file_type='image'):
     if not filename or '.' not in filename:
@@ -26,11 +27,11 @@ def save_file(file, file_type='other', max_size=None):
     
     # 檢查文件類型
     if not allowed_file(file.filename, file_type):
-        raise ValueError('不支持的文件類型')
+        raise ValueError(msg.get_error_message('UNSUPPORTED_FILE_TYPE'))
     
     # 檢查文件大小
     if max_size and len(file.read()) > max_size:
-        raise ValueError(f'文件大小超過限制: {max_size} bytes')
+        raise ValueError(msg.get_error_message('FILE_SIZE_EXCEEDED', max_size=max_size))
     
     file.seek(0)  # 重置文件指針
     
@@ -58,7 +59,7 @@ def save_file(file, file_type='other', max_size=None):
                 img.save(file_path, optimize=True, quality=85)
         except Exception as e:
             os.remove(file_path)
-            raise ValueError(f'圖片處理失敗: {str(e)}')
+            raise ValueError(msg.get_error_message('IMAGE_PROCESS_FAILED', error=str(e)))
     
     # 返回相對路徑
     relative_path = os.path.join(file_type, year_month, filename).replace('\\', '/')
@@ -77,7 +78,7 @@ def delete_file(file_path):
         if os.path.exists(full_path):
             os.remove(full_path)
     except Exception as e:
-        current_app.logger.error(f'刪除文件失敗: {str(e)}')
+        current_app.logger.error(msg.get_error_message('FILE_DELETE_FAILED', error=str(e)))
 
 def get_file_info(file_path):
     if not file_path or not file_path.startswith('/media/'):

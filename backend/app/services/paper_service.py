@@ -5,6 +5,7 @@ from app.models import Paper, PaperAuthor, Member, ResearchGroup, Lab
 from app.utils.validators import validate_string_length
 from app.utils.helpers import get_pagination_params, paginate_query
 from app.utils.file_handler import save_file, delete_file
+from app.utils.messages import msg
 from .base_service import BaseService, ValidationError, NotFoundError
 import json
 
@@ -71,7 +72,7 @@ class PaperService(BaseService):
         """獲取論文詳情"""
         paper = Paper.query.filter_by(paper_id=paper_id, enable=1).first()
         if not paper:
-            raise NotFoundError('論文不存在')
+            raise NotFoundError(msg.get_error_message('PAPER_NOT_FOUND'))
         
         return paper.to_dict()
     
@@ -94,7 +95,7 @@ class PaperService(BaseService):
             # 獲取默認實驗室和課題組
             lab = Lab.query.filter_by(enable=1).first()
             if not lab:
-                raise ValidationError('請先設置實驗室信息')
+                raise ValidationError(msg.get_error_message('LAB_SETUP_REQUIRED'))
             
             research_group = ResearchGroup.query.filter_by(enable=1).first()
             
@@ -134,7 +135,7 @@ class PaperService(BaseService):
         
         paper = Paper.query.filter_by(paper_id=paper_id, enable=1).first()
         if not paper:
-            raise NotFoundError('論文不存在')
+            raise NotFoundError(msg.get_error_message('PAPER_NOT_FOUND'))
         
         # 數據校驗
         self._validate_paper_data(paper_data, is_create=False)
@@ -169,7 +170,7 @@ class PaperService(BaseService):
                         update_data['paper_date'] = {'old': str(paper.paper_date), 'new': str(new_date)}
                         paper.paper_date = new_date
                 except ValueError:
-                    raise ValidationError('日期格式錯誤，應為 YYYY-MM-DD')
+                    raise ValidationError(msg.get_error_message('DATE_FORMAT_ERROR'))
             
             # 處理文件更新/刪除
             file_update = self._handle_file_update(paper, files_data, paper_data)
@@ -240,7 +241,7 @@ class PaperService(BaseService):
             return {'paper_file_updated': True, 'new_file_path': new_file_path}
             
         except Exception as e:
-            raise ValidationError(f"論文文件上傳失敗: {str(e)}")
+            raise ValidationError(msg.format_file_error('PAPER_FILE_UPLOAD_FAILED', error=str(e)))
     
     def delete_paper(self, paper_id: int) -> None:
         """刪除論文"""
@@ -249,7 +250,7 @@ class PaperService(BaseService):
         
         paper = Paper.query.filter_by(paper_id=paper_id, enable=1).first()
         if not paper:
-            raise NotFoundError('論文不存在')
+            raise NotFoundError(msg.get_error_message('PAPER_NOT_FOUND'))
         
         def _delete_operation():
             # 軟刪除
@@ -268,7 +269,7 @@ class PaperService(BaseService):
         if is_create:
             # 檢查必填字段
             if not paper_data.get('paper_title_zh') and not paper_data.get('paper_title_en'):
-                raise ValidationError('論文標題不能為空')
+                raise ValidationError(msg.get_error_message('PAPER_TITLE_REQUIRED'))
         
         # 論文類型校驗
         if 'paper_type' in paper_data:
@@ -277,10 +278,10 @@ class PaperService(BaseService):
                 try:
                     paper_type = int(paper_type)
                 except ValueError:
-                    raise ValidationError('論文類型格式錯誤')
+                    raise ValidationError(msg.get_error_message('PAPER_TYPE_FORMAT_ERROR'))
             
             if paper_type not in [0, 1, 2, 3, 4]:
-                raise ValidationError('論文類型無效')
+                raise ValidationError(msg.get_error_message('PAPER_TYPE_INVALID'))
         
         # 接收狀態校驗
         if 'paper_accept' in paper_data:
@@ -289,10 +290,10 @@ class PaperService(BaseService):
                 try:
                     paper_accept = int(paper_accept)
                 except ValueError:
-                    raise ValidationError('接收狀態格式錯誤')
+                    raise ValidationError(msg.get_error_message('PAPER_ACCEPT_FORMAT_ERROR'))
             
             if paper_accept not in [0, 1]:
-                raise ValidationError('接收狀態無效')
+                raise ValidationError(msg.get_error_message('PAPER_ACCEPT_INVALID'))
         
         # 字符串長度校驗
         string_fields = {
@@ -307,14 +308,14 @@ class PaperService(BaseService):
         for field, max_length in string_fields.items():
             if field in paper_data and paper_data[field]:
                 if not validate_string_length(paper_data[field], max_length):
-                    raise ValidationError(f'{field} 長度不能超過{max_length}字符')
+                    raise ValidationError(msg.format_field_length_error(field, max_length))
         
         # 日期格式校驗
         if 'paper_date' in paper_data and paper_data['paper_date']:
             try:
                 datetime.strptime(paper_data['paper_date'], '%Y-%m-%d')
             except ValueError:
-                raise ValidationError('論文日期格式錯誤，應為 YYYY-MM-DD')
+                raise ValidationError(msg.get_error_message('PAPER_DATE_FORMAT_ERROR'))
     
     def _set_paper_fields(self, paper: Paper, paper_data: Dict[str, Any]) -> None:
         """設置論文字段"""

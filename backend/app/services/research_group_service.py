@@ -2,6 +2,7 @@ from typing import Optional, Dict, Any
 from app.models import ResearchGroup, Lab, Member
 from app.utils.validators import validate_string_length
 from app.utils.helpers import get_pagination_params, paginate_query
+from app.utils.messages import msg
 from .base_service import BaseService, ValidationError, NotFoundError, BusinessLogicError
 
 
@@ -59,7 +60,7 @@ class ResearchGroupService(BaseService):
         """獲取課題組詳情"""
         group = ResearchGroup.query.filter_by(research_group_id=group_id, enable=1).first()
         if not group:
-            raise NotFoundError('課題組不存在')
+            raise NotFoundError(msg.get_error_message('RESEARCH_GROUP_NOT_FOUND'))
         
         result = group.to_dict()
         
@@ -111,7 +112,7 @@ class ResearchGroupService(BaseService):
         
         group = ResearchGroup.query.filter_by(research_group_id=group_id, enable=1).first()
         if not group:
-            raise NotFoundError('課題組不存在')
+            raise NotFoundError(msg.get_error_message('RESEARCH_GROUP_NOT_FOUND'))
         
         # 數據校驗
         self._validate_group_data(group_data, is_create=False)
@@ -156,7 +157,7 @@ class ResearchGroupService(BaseService):
         
         group = ResearchGroup.query.filter_by(research_group_id=group_id, enable=1).first()
         if not group:
-            raise NotFoundError('課題組不存在')
+            raise NotFoundError(msg.get_error_message('RESEARCH_GROUP_NOT_FOUND'))
         
         # 檢查是否可以刪除
         self._check_group_deletable(group)
@@ -190,7 +191,7 @@ class ResearchGroupService(BaseService):
         for field, max_length in string_fields.items():
             if field in group_data and group_data[field]:
                 if not validate_string_length(group_data[field], max_length):
-                    raise ValidationError(f'{field} 長度不能超過{max_length}字符')
+                    raise ValidationError(msg.format_field_length_error(field, max_length))
     
     def _set_group_associations(self, group: ResearchGroup, group_data: Dict[str, Any]) -> None:
         """設置課題組關聯信息"""
@@ -198,7 +199,7 @@ class ResearchGroupService(BaseService):
         if 'mem_id' in group_data and group_data['mem_id']:
             member = Member.query.filter_by(mem_id=group_data['mem_id'], enable=1).first()
             if not member:
-                raise ValidationError('指定的組長不存在')
+                raise ValidationError(msg.get_error_message('GROUP_LEADER_NOT_FOUND'))
             
             group.mem_id = group_data['mem_id']
             group.lab_id = member.lab_id
@@ -210,11 +211,11 @@ class ResearchGroupService(BaseService):
                 if lab:
                     group.lab_id = lab.lab_id
                 else:
-                    raise ValidationError('請先創建實驗室或指定組長')
+                    raise ValidationError(msg.get_error_message('LAB_OR_LEADER_REQUIRED'))
             else:
                 lab = Lab.query.filter_by(lab_id=group_data['lab_id'], enable=1).first()
                 if not lab:
-                    raise ValidationError('指定的實驗室不存在')
+                    raise ValidationError(msg.get_error_message('LAB_NOT_FOUND_IN_GROUP'))
                 group.lab_id = group_data['lab_id']
     
     def _update_group_associations(self, group: ResearchGroup, group_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -230,7 +231,7 @@ class ResearchGroupService(BaseService):
                 if new_mem_id:
                     member = Member.query.filter_by(mem_id=new_mem_id, enable=1).first()
                     if not member:
-                        raise ValidationError('指定的組長不存在')
+                        raise ValidationError(msg.get_error_message('GROUP_LEADER_NOT_FOUND'))
                     group.mem_id = new_mem_id
                     # 組長變更時，實驗室也隨之變更
                     if group.lab_id != member.lab_id:
@@ -252,4 +253,4 @@ class ResearchGroupService(BaseService):
         ).count()
         
         if member_count > 0:
-            raise BusinessLogicError(f'該課題組還有 {member_count} 個有效成員，無法刪除')
+            raise BusinessLogicError(msg.get_error_message('GROUP_HAS_MEMBERS', count=member_count))

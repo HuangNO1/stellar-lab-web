@@ -3,6 +3,7 @@ from datetime import datetime
 from app.models import Project
 from app.utils.validators import validate_string_length
 from app.utils.helpers import get_pagination_params, paginate_query
+from app.utils.messages import msg
 from .base_service import BaseService, ValidationError, NotFoundError
 
 
@@ -65,7 +66,7 @@ class ProjectService(BaseService):
         """獲取項目詳情"""
         project = Project.query.filter_by(project_id=project_id, enable=1).first()
         if not project:
-            raise NotFoundError('項目不存在')
+            raise NotFoundError(msg.get_error_message('PROJECT_NOT_FOUND'))
         
         return project.to_dict()
     
@@ -104,7 +105,7 @@ class ProjectService(BaseService):
         
         project = Project.query.filter_by(project_id=project_id, enable=1).first()
         if not project:
-            raise NotFoundError('項目不存在')
+            raise NotFoundError(msg.get_error_message('PROJECT_NOT_FOUND'))
         
         # 數據校驗
         self._validate_project_data(project_data, is_create=False)
@@ -149,7 +150,7 @@ class ProjectService(BaseService):
         
         project = Project.query.filter_by(project_id=project_id, enable=1).first()
         if not project:
-            raise NotFoundError('項目不存在')
+            raise NotFoundError(msg.get_error_message('PROJECT_NOT_FOUND'))
         
         def _delete_operation():
             # 軟刪除
@@ -181,24 +182,24 @@ class ProjectService(BaseService):
         for field, max_length in string_fields.items():
             if field in project_data and project_data[field]:
                 if not validate_string_length(project_data[field], max_length):
-                    raise ValidationError(f'{field} 長度不能超過{max_length}字符')
+                    raise ValidationError(msg.format_field_length_error(field, max_length))
         
         # 項目狀態校驗
         if 'is_end' in project_data:
             try:
                 is_end_value = int(project_data['is_end'])
                 if is_end_value not in [0, 1]:
-                    raise ValidationError('項目狀態無效')
+                    raise ValidationError(msg.get_error_message('PROJECT_STATUS_INVALID'))
                 project_data['is_end'] = is_end_value
             except (ValueError, TypeError):
-                raise ValidationError('項目狀態格式錯誤')
+                raise ValidationError(msg.get_error_message('PROJECT_STATUS_FORMAT_ERROR'))
         
         # 日期格式校驗
         if 'project_date_start' in project_data and project_data['project_date_start']:
             try:
                 datetime.strptime(project_data['project_date_start'], '%Y-%m-%d')
             except ValueError:
-                raise ValidationError('項目開始日期格式錯誤，應為 YYYY-MM-DD')
+                raise ValidationError(msg.get_error_message('PROJECT_START_DATE_FORMAT_ERROR'))
     
     def _set_project_fields(self, project: Project, project_data: Dict[str, Any]) -> None:
         """設置項目字段"""

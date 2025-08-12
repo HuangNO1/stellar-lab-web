@@ -3,6 +3,7 @@ from app.services import LabService
 from app.services.base_service import ServiceException
 from app.auth import admin_required
 from app.utils.helpers import success_response, error_response
+from app.utils.messages import msg
 
 bp = Blueprint('lab', __name__)
 
@@ -45,7 +46,7 @@ def update_lab():
             form_data=dict(request.form),
             files_data=dict(request.files)
         )
-        return jsonify(success_response(lab_info, '實驗室信息更新成功'))
+        return jsonify(success_response(lab_info, msg.get_success_message('LAB_UPDATE_SUCCESS')))
         
     except ServiceException as e:
         error_data = lab_service.format_error_response(e)
@@ -62,7 +63,7 @@ def delete_lab():
     """
     try:
         lab_service.delete_lab()
-        return jsonify(success_response(message='實驗室刪除成功'))
+        return jsonify(success_response(message=msg.get_success_message('LAB_DELETE_SUCCESS')))
         
     except ServiceException as e:
         error_data = lab_service.format_error_response(e)

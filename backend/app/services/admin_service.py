@@ -2,6 +2,7 @@ from typing import Optional, Dict, Any
 from app.models import Admin
 from app.utils.validators import validate_admin_name
 from app.utils.helpers import get_pagination_params, paginate_query
+from app.utils.messages import msg
 from .base_service import BaseService, ValidationError, NotFoundError, BusinessLogicError
 
 
@@ -48,7 +49,7 @@ class AdminService(BaseService):
             # 檢查用戶名是否已存在
             existing_admin = Admin.query.filter_by(admin_name=admin_data['admin_name']).first()
             if existing_admin:
-                raise BusinessLogicError('用戶名已存在')
+                raise BusinessLogicError(msg.get_error_message('USERNAME_ALREADY_EXISTS'))
             
             # 創建管理員
             admin = Admin(
@@ -79,15 +80,15 @@ class AdminService(BaseService):
         
         admin = Admin.query.get(admin_id)
         if not admin:
-            raise NotFoundError('管理員不存在')
+            raise NotFoundError(msg.get_error_message('ADMIN_NOT_FOUND'))
         
         # 不能修改自己
         if admin_id == current_admin_id:
-            raise BusinessLogicError('不能修改自己的賬戶')
+            raise BusinessLogicError(msg.get_error_message('CANNOT_MODIFY_SELF'))
         
         # 只有最高權限的超級管理員才能修改其他超級管理員
         if admin.is_super == 1:
-            raise BusinessLogicError('不能修改其他超級管理員的賬戶')
+            raise BusinessLogicError(msg.get_error_message('CANNOT_MODIFY_SUPER_ADMIN'))
         
         # 數據校驗
         self._validate_admin_data(admin_data, is_create=False)
@@ -105,7 +106,7 @@ class AdminService(BaseService):
                     Admin.admin_id != admin_id
                 ).first()
                 if existing:
-                    raise BusinessLogicError('用戶名已存在')
+                    raise BusinessLogicError(msg.get_error_message('USERNAME_ALREADY_EXISTS'))
                 
                 if admin.admin_name != new_name:
                     update_data['admin_name'] = {'old': admin.admin_name, 'new': new_name}
@@ -150,15 +151,15 @@ class AdminService(BaseService):
         
         admin = Admin.query.get(admin_id)
         if not admin:
-            raise NotFoundError('管理員不存在')
+            raise NotFoundError(msg.get_error_message('ADMIN_NOT_FOUND'))
         
         # 不能刪除自己
         if admin_id == current_admin_id:
-            raise BusinessLogicError('不能刪除自己的賬戶')
+            raise BusinessLogicError(msg.get_error_message('CANNOT_DELETE_SELF'))
         
         # 只有最高權限的超級管理員才能刪除其他超級管理員
         if admin.is_super == 1:
-            raise BusinessLogicError('不能刪除其他超級管理員的賬戶')
+            raise BusinessLogicError(msg.get_error_message('CANNOT_DELETE_SUPER_ADMIN'))
         
         def _delete_operation():
             # 軟刪除
@@ -181,29 +182,29 @@ class AdminService(BaseService):
             
             # 密碼長度檢查
             if len(admin_data['admin_pass']) < 8:
-                raise ValidationError('密碼長度至少8位')
+                raise ValidationError(msg.get_error_message('PASSWORD_LENGTH_INVALID'))
         
         # 用戶名格式檢查
         if 'admin_name' in admin_data:
             if not validate_admin_name(admin_data['admin_name']):
-                raise ValidationError('用戶名格式不正確，只能包含字母、數字、下劃線和連字符，長度3-50位')
+                raise ValidationError(msg.get_error_message('USERNAME_FORMAT_INVALID'))
         
         # 超級管理員狀態檢查
         if 'is_super' in admin_data:
             try:
                 is_super_value = int(admin_data['is_super'])
                 if is_super_value not in [0, 1]:
-                    raise ValidationError('is_super參數錯誤')
+                    raise ValidationError(msg.get_error_message('IS_SUPER_PARAM_ERROR'))
                 admin_data['is_super'] = is_super_value
             except (ValueError, TypeError):
-                raise ValidationError('is_super參數格式錯誤')
+                raise ValidationError(msg.get_error_message('IS_SUPER_FORMAT_ERROR'))
         
         # 啟用狀態檢查
         if 'enable' in admin_data:
             try:
                 enable_value = int(admin_data['enable'])
                 if enable_value not in [0, 1]:
-                    raise ValidationError('enable參數錯誤')
+                    raise ValidationError(msg.get_error_message('ENABLE_PARAM_ERROR'))
                 admin_data['enable'] = enable_value
             except (ValueError, TypeError):
-                raise ValidationError('enable參數格式錯誤')
+                raise ValidationError(msg.get_error_message('ENABLE_FORMAT_ERROR'))

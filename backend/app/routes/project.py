@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.auth import admin_required
 from app.utils.helpers import success_response, error_response
+from app.utils.messages import msg
 from app.services import ProjectService
 from app.services.base_service import ServiceException
 
@@ -47,7 +48,7 @@ def create_project():
     try:
         data = request.get_json()
         project = project_service.create_project(data)
-        return jsonify(success_response(project, '項目創建成功')), 201
+        return jsonify(success_response(project, msg.get_success_message('PROJECT_CREATE_SUCCESS'))), 201
     except ServiceException as e:
         error_data = project_service.format_error_response(e)
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
@@ -59,7 +60,7 @@ def update_project(project_id):
     try:
         data = request.get_json()
         project = project_service.update_project(project_id, data)
-        return jsonify(success_response(project, '項目更新成功'))
+        return jsonify(success_response(project, msg.get_success_message('PROJECT_UPDATE_SUCCESS')))
     except ServiceException as e:
         error_data = project_service.format_error_response(e)
         status_code = 404 if 'NotFoundError' in str(type(e)) else 400
@@ -71,7 +72,7 @@ def delete_project(project_id):
     """刪除項目"""
     try:
         project_service.delete_project(project_id)
-        return jsonify(success_response(message='項目刪除成功'))
+        return jsonify(success_response(message=msg.get_success_message('PROJECT_DELETE_SUCCESS')))
     except ServiceException as e:
         error_data = project_service.format_error_response(e)
         status_code = 404 if 'NotFoundError' in str(type(e)) else 400

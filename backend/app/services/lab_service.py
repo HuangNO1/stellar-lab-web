@@ -3,6 +3,7 @@ from flask import request
 from app.models import Lab
 from app.utils.validators import validate_email, validate_string_length
 from app.utils.file_handler import save_file, delete_file
+from app.utils.messages import msg
 from .base_service import BaseService, ValidationError, NotFoundError
 
 
@@ -114,7 +115,7 @@ class LabService(BaseService):
         
         lab = Lab.query.filter_by(enable=1).first()
         if not lab:
-            raise NotFoundError('實驗室不存在')
+            raise NotFoundError(msg.format_resource_error('實驗室'))
         
         # 檢查是否可以刪除
         self._check_lab_deletable(lab)
@@ -184,7 +185,7 @@ class LabService(BaseService):
             return {'lab_logo_updated': True, 'new_logo_path': new_logo_path}
             
         except Exception as e:
-            raise ValidationError(f"Logo上傳失敗: {str(e)}")
+            raise ValidationError(msg.format_file_error('LOGO_UPLOAD_FAILED', error=str(e)))
     
     def _handle_carousel_images(self, lab: Lab, files_data: Dict[str, Any], form_data: Dict[str, Any]) -> Dict[str, Any]:
         """處理輪播圖片"""
@@ -225,7 +226,7 @@ class LabService(BaseService):
                     return {f'{field_name}_updated': True, f'new_{field_name}_path': new_path}
                     
                 except Exception as e:
-                    raise ValidationError(f"{field_name}上傳失敗: {str(e)}")
+                    raise ValidationError(msg.format_file_error('FILE_UPLOAD_FAILED', error=str(e)))
         
         return {}
     
@@ -257,7 +258,7 @@ class LabService(BaseService):
         # 郵箱格式校驗
         if field == 'lab_email' and value:
             if not validate_email(value):
-                raise ValidationError('郵箱格式不正確')
+                raise ValidationError(msg.get_error_message('EMAIL_FORMAT_INVALID'))
         
         # 長度校驗
         if field.startswith('lab_desc'):
@@ -266,7 +267,7 @@ class LabService(BaseService):
             max_length = 500
         
         if not validate_string_length(value, max_length):
-            raise ValidationError(f'{field} 長度不能超過{max_length}字符')
+            raise ValidationError(msg.format_field_length_error(field, max_length))
     
     def _check_lab_deletable(self, lab: Lab) -> None:
         """檢查實驗室是否可以刪除"""
@@ -275,12 +276,12 @@ class LabService(BaseService):
         # 檢查是否有有效的課題組
         active_groups = ResearchGroup.query.filter_by(lab_id=lab.lab_id, enable=1).count()
         if active_groups > 0:
-            raise ValidationError(f'實驗室下還有{active_groups}個有效課題組，無法刪除')
+            raise ValidationError(msg.get_error_message('LAB_HAS_GROUPS', count=active_groups))
         
         # 檢查是否有有效的成員
         active_members = Member.query.filter_by(lab_id=lab.lab_id, enable=1).count()
         if active_members > 0:
-            raise ValidationError(f'實驗室下還有{active_members}個有效成員，無法刪除')
+            raise ValidationError(msg.get_error_message('LAB_HAS_MEMBERS', count=active_members))
     
     def _cleanup_lab_files(self, lab: Lab) -> None:
         """清理實驗室相關文件"""

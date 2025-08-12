@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.auth import admin_required
 from app.utils.helpers import success_response, error_response
+from app.utils.messages import msg
 from app.services import NewsService
 from app.services.base_service import ServiceException
 
@@ -45,7 +46,7 @@ def create_news():
     try:
         data = request.get_json()
         news = news_service.create_news(data)
-        return jsonify(success_response(news, '新聞創建成功')), 201
+        return jsonify(success_response(news, msg.get_success_message('NEWS_CREATE_SUCCESS'))), 201
     except ServiceException as e:
         error_data = news_service.format_error_response(e)
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
@@ -57,7 +58,7 @@ def update_news(news_id):
     try:
         data = request.get_json()
         news = news_service.update_news(news_id, data)
-        return jsonify(success_response(news, '新聞更新成功'))
+        return jsonify(success_response(news, msg.get_success_message('NEWS_UPDATE_SUCCESS')))
     except ServiceException as e:
         error_data = news_service.format_error_response(e)
         status_code = 404 if 'NotFoundError' in str(type(e)) else 400
@@ -69,7 +70,7 @@ def delete_news(news_id):
     """刪除新聞"""
     try:
         news_service.delete_news(news_id)
-        return jsonify(success_response(message='新聞刪除成功'))
+        return jsonify(success_response(message=msg.get_success_message('NEWS_DELETE_SUCCESS')))
     except ServiceException as e:
         error_data = news_service.format_error_response(e)
         status_code = 404 if 'NotFoundError' in str(type(e)) else 400

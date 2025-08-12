@@ -1,4 +1,5 @@
 from flask import Blueprint, redirect, render_template_string
+from app.utils.messages import msg
 
 bp = Blueprint('root', __name__)
 
@@ -10,7 +11,7 @@ def index():
 @bp.route('/health')
 def health():
     """健康檢查"""
-    return {"status": "healthy", "message": "實驗室網頁框架後端服務正常運行"}
+    return {"status": "healthy", "message": msg.get_success_message('HEALTH_CHECK')}
 
 @bp.route('/api-info')
 def api_info():

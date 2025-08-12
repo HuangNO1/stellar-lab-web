@@ -3,6 +3,7 @@ from app.services import MemberService
 from app.services.base_service import ServiceException
 from app.auth import admin_required
 from app.utils.helpers import success_response, error_response
+from app.utils.messages import msg
 
 bp = Blueprint('member', __name__)
 
@@ -89,7 +90,7 @@ def create_member():
             form_data=form_data,
             files_data=files_data
         )
-        return jsonify(success_response(member_data, '成員創建成功')), 201
+        return jsonify(success_response(member_data, msg.get_success_message('MEMBER_CREATE_SUCCESS'))), 201
         
     except ServiceException as e:
         error_data = member_service.format_error_response(e)
@@ -122,7 +123,7 @@ def update_member(mem_id):
             form_data=form_data,
             files_data=files_data
         )
-        return jsonify(success_response(member_data, '成員更新成功'))
+        return jsonify(success_response(member_data, msg.get_success_message('MEMBER_UPDATE_SUCCESS')))
         
     except ServiceException as e:
         error_data = member_service.format_error_response(e)
@@ -139,7 +140,7 @@ def delete_member(mem_id):
     """刪除成員"""
     try:
         member_service.delete_member(mem_id)
-        return jsonify(success_response(message='成員刪除成功'))
+        return jsonify(success_response(message=msg.get_success_message('MEMBER_DELETE_SUCCESS')))
         
     except ServiceException as e:
         error_data = member_service.format_error_response(e)
@@ -165,7 +166,7 @@ def batch_delete_members():
             return jsonify(error_response(2000, '請提供要刪除的成員ID列表')), 400
         
         result = member_service.batch_delete_members(data['member_ids'])
-        return jsonify(success_response(result, '批量刪除操作完成'))
+        return jsonify(success_response(result, msg.get_success_message('BATCH_DELETE_SUCCESS')))
         
     except ServiceException as e:
         error_data = member_service.format_error_response(e)
@@ -198,7 +199,7 @@ def batch_update_members():
             member_ids=data['member_ids'],
             update_fields=data['updates']
         )
-        return jsonify(success_response(result, '批量更新操作完成'))
+        return jsonify(success_response(result, msg.get_success_message('BATCH_UPDATE_SUCCESS')))
         
     except ServiceException as e:
         error_data = member_service.format_error_response(e)

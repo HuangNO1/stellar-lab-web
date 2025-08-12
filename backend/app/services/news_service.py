@@ -3,6 +3,7 @@ from datetime import datetime
 from app.models import News
 from app.utils.validators import validate_string_length
 from app.utils.helpers import get_pagination_params, paginate_query
+from app.utils.messages import msg
 from .base_service import BaseService, ValidationError, NotFoundError
 
 
@@ -56,7 +57,7 @@ class NewsService(BaseService):
         """獲取新聞詳情"""
         news = News.query.filter_by(news_id=news_id, enable=1).first()
         if not news:
-            raise NotFoundError('新聞不存在')
+            raise NotFoundError(msg.get_error_message('NEWS_NOT_FOUND'))
         
         return news.to_dict()
     
@@ -98,7 +99,7 @@ class NewsService(BaseService):
         
         news = News.query.filter_by(news_id=news_id, enable=1).first()
         if not news:
-            raise NotFoundError('新聞不存在')
+            raise NotFoundError(msg.get_error_message('NEWS_NOT_FOUND'))
         
         # 數據校驗
         self._validate_news_data(news_data, is_create=False)
@@ -138,7 +139,7 @@ class NewsService(BaseService):
         
         news = News.query.filter_by(news_id=news_id, enable=1).first()
         if not news:
-            raise NotFoundError('新聞不存在')
+            raise NotFoundError(msg.get_error_message('NEWS_NOT_FOUND'))
         
         def _delete_operation():
             # 軟刪除
@@ -163,10 +164,10 @@ class NewsService(BaseService):
             try:
                 news_type_value = int(news_data['news_type'])
                 if news_type_value not in [0, 1, 2]:  # 0=論文發表, 1=獲獎消息, 2=學術活動
-                    raise ValidationError('新聞類型無效')
+                    raise ValidationError(msg.get_error_message('NEWS_TYPE_INVALID'))
                 news_data['news_type'] = news_type_value
             except (ValueError, TypeError):
-                raise ValidationError('新聞類型格式錯誤')
+                raise ValidationError(msg.get_error_message('NEWS_TYPE_FORMAT_ERROR'))
         
         # 字符串長度校驗
         string_fields = {
@@ -177,11 +178,11 @@ class NewsService(BaseService):
         for field, max_length in string_fields.items():
             if field in news_data and news_data[field]:
                 if not validate_string_length(news_data[field], max_length):
-                    raise ValidationError(f'{field} 長度不能超過{max_length}字符')
+                    raise ValidationError(msg.format_field_length_error(field, max_length))
         
         # 日期格式校驗
         if 'news_date' in news_data:
             try:
                 datetime.strptime(news_data['news_date'], '%Y-%m-%d')
             except ValueError:
-                raise ValidationError('日期格式錯誤，應為 YYYY-MM-DD')
+                raise ValidationError(msg.get_error_message('NEWS_DATE_FORMAT_ERROR'))

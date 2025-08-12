@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, send_from_directory
 from app.auth import admin_required
 from app.utils.helpers import success_response, error_response
+from app.utils.messages import msg
 from app.services import MediaService
 from app.services.base_service import ServiceException
 
@@ -19,7 +20,7 @@ def upload_file():
         file_type = request.form.get('type', 'other')
         
         result = media_service.upload_file(file, file_type)
-        return jsonify(success_response(result, '文件上傳成功'))
+        return jsonify(success_response(result, msg.get_success_message('FILE_UPLOAD_SUCCESS')))
     except ServiceException as e:
         error_data = media_service.format_error_response(e)
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
