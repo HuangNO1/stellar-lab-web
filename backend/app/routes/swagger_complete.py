@@ -31,6 +31,20 @@ api = Api(
 2. 在请求头中添加: `Authorization: Bearer <token>`
 3. Token 有效期为 24 小时
 
+### 📁 文件管理功能
+**上传支持**:
+- 实验室: Logo图片、轮播图片 (multipart/form-data)
+- 成员: 头像图片 (multipart/form-data)  
+- 论文: PDF文件 (multipart/form-data)
+
+**删除支持**:
+- `lab_logo_delete="true"`: 删除实验室Logo
+- `mem_avatar_delete="true"`: 删除成员头像
+- `paper_file_delete="true"`: 删除论文文件
+- `clear_carousel_img_X="true"`: 清除轮播图片
+
+**注意**: 文件删除操作支持与数据更新同时进行
+
 ### 📊 响应格式
 **成功响应**:
 ```json
@@ -358,6 +372,12 @@ class Lab(Resource):
         支持文件上传：
         - lab_logo: 实验室Logo图片
         - carousel_img_1 到 carousel_img_4: 轮播图片
+        
+        支持文件删除：
+        - lab_logo_delete: 设为 "true" 时删除现有Logo
+        - clear_carousel_img_1 到 clear_carousel_img_4: 设为 "true" 时清除对应轮播图片
+        
+        **请求格式**: multipart/form-data
         """
         pass
     
@@ -452,7 +472,9 @@ class MemberList(Resource):
         创建新成员
         
         支持头像上传：
-        - member_avatar: 成员头像图片文件
+        - mem_avatar: 成员头像图片文件
+        
+        **请求格式**: multipart/form-data
         """
         pass
 
@@ -472,7 +494,17 @@ class Member(Resource):
     @ns_member.response(403, '权限不足')
     @ns_member.response(404, '成员不存在')
     def put(self, member_id):
-        """更新成员信息"""
+        """
+        更新成员信息
+        
+        支持头像上传：
+        - mem_avatar: 成员头像图片文件
+        
+        支持头像删除：
+        - mem_avatar_delete: 设为 "true" 时删除现有头像
+        
+        **请求格式**: multipart/form-data
+        """
         pass
     
     @ns_member.doc('删除成员', security='Bearer')
@@ -538,6 +570,8 @@ class PaperList(Resource):
         
         支持文件上传：
         - paper_file: 论文PDF文件
+        
+        **请求格式**: multipart/form-data
         """
         pass
 
@@ -557,7 +591,19 @@ class Paper(Resource):
     @ns_paper.response(403, '权限不足')
     @ns_paper.response(404, '论文不存在')
     def put(self, paper_id):
-        """更新论文信息"""
+        """
+        更新论文信息
+        
+        支持文件上传：
+        - paper_file: 论文PDF文件
+        
+        支持文件删除：
+        - paper_file_delete: 设为 "true" 时删除现有论文文件
+        
+        **请求格式**: 
+        - 仅更新基本信息: application/json
+        - 包含文件操作: multipart/form-data
+        """
         pass
     
     @ns_paper.doc('删除论文', security='Bearer')
