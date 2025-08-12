@@ -429,18 +429,20 @@ const columns: DataTableColumns<Member> = [
     key: 'actions',
     width: 180,
     render(row) {
-      return h(NSpace, [
-        h(NButton, {
-          size: 'small',
-          type: 'primary',
-          onClick: () => handleEdit(row)
-        }, { default: () => t('admin.common.edit') }),
-        h(NButton, {
-          size: 'small',
-          type: 'error',
-          onClick: () => handleDelete(row)
-        }, { default: () => t('admin.common.delete') })
-      ]);
+      return h(NSpace, {}, {
+        default: () => [
+          h(NButton, {
+            size: 'small',
+            type: 'primary',
+            onClick: () => handleEdit(row)
+          }, { default: () => t('admin.common.edit') }),
+          h(NButton, {
+            size: 'small',
+            type: 'error',
+            onClick: () => handleDelete(row)
+          }, { default: () => t('admin.common.delete') })
+        ]
+      });
     }
   }
 ];

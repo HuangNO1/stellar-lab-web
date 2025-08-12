@@ -261,7 +261,9 @@ const columns: DataTableColumns<Admin> = [
         return h('span', { style: { color: '#999', fontSize: '12px' } }, t('admin.common.noPermission'));
       }
       
-      return h(NSpace, buttons);
+      return h(NSpace, {}, {
+        default: () => buttons
+      });
     }
   }
 ];

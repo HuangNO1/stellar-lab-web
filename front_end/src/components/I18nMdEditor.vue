@@ -1,6 +1,6 @@
 <template>
   <MdEditor 
-    :modelValue="modelValue" 
+    :modelValue="modelValue || ''" 
     :language="currentLanguage"
     :placeholder="placeholder"
     :preview="preview"
@@ -20,7 +20,7 @@ import { getTheme } from '@/locales';
 
 // Props
 interface Props {
-  modelValue: string;
+  modelValue?: string;
   placeholder?: string;
   preview?: boolean;
   toolbars?: string[];
@@ -28,6 +28,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  modelValue: '',
   placeholder: '',
   preview: false,
   toolbars: () => ['bold', 'underline', 'italic', '-', 'title', 'strikeThrough', 'sub', 'sup', 'quote', 'unorderedList', 'orderedList', '-', 'codeRow', 'code', 'link', 'image', '-', 'revoke', 'next', 'save', '=', 'pageFullscreen', 'fullscreen', 'preview', 'previewOnly'],

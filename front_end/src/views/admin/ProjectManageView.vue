@@ -246,23 +246,25 @@ const columns: DataTableColumns<Project> = [
     key: 'actions',
     width: 220,
     render(row) {
-      return h(NSpace, [
-        row.project_url ? h(NButton, {
-          size: 'small',
-          type: 'info',
-          onClick: () => window.open(row.project_url!, '_blank', 'noopener,noreferrer')
-        }, { default: () => t('projects.viewRepository') }) : null,
-        h(NButton, {
-          size: 'small',
-          type: 'primary',
-          onClick: () => handleEdit(row)
-        }, { default: () => t('admin.common.edit') }),
-        h(NButton, {
-          size: 'small',
-          type: 'error',
-          onClick: () => handleDelete(row)
-        }, { default: () => t('admin.common.delete') })
-      ].filter(Boolean));
+      return h(NSpace, {}, {
+        default: () => [
+          row.project_url ? h(NButton, {
+            size: 'small',
+            type: 'info',
+            onClick: () => window.open(row.project_url!, '_blank', 'noopener,noreferrer')
+          }, { default: () => t('projects.viewRepository') }) : null,
+          h(NButton, {
+            size: 'small',
+            type: 'primary',
+            onClick: () => handleEdit(row)
+          }, { default: () => t('admin.common.edit') }),
+          h(NButton, {
+            size: 'small',
+            type: 'error',
+            onClick: () => handleDelete(row)
+          }, { default: () => t('admin.common.delete') })
+        ].filter(Boolean)
+      });
     }
   }
 ];

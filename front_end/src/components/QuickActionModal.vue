@@ -909,6 +909,24 @@ const resetForm = () => {
     delete formData[key];
   });
   
+  // 初始化字符串字段為空字符串，防止 undefined 問題
+  if (props.moduleType === 'members') {
+    formData.mem_desc_zh = '';
+    formData.mem_desc_en = '';
+  } else if (props.moduleType === 'papers') {
+    formData.paper_desc_zh = '';
+    formData.paper_desc_en = '';
+  } else if (props.moduleType === 'projects') {
+    formData.project_desc_zh = '';
+    formData.project_desc_en = '';
+  } else if (props.moduleType === 'news') {
+    formData.news_content_zh = '';
+    formData.news_content_en = '';
+  } else if (props.moduleType === 'research-groups') {
+    formData.research_group_desc_zh = '';
+    formData.research_group_desc_en = '';
+  }
+  
   // 清空上傳文件對象
   Object.keys(uploadedFiles).forEach(key => {
     delete uploadedFiles[key];

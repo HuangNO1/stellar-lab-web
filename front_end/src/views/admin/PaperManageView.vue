@@ -269,29 +269,31 @@ const columns: DataTableColumns<Paper> = [
     key: 'actions',
     width: 260,
     render(row) {
-      return h(NSpace, [
-        row.paper_url ? h(NButton, {
-          size: 'small',
-          type: 'info',
-          onClick: () => window.open(row.paper_url!, '_blank')
-        }, { default: () => t('papers.viewOnline') }) : null,
-        row.paper_file_path ? h(NButton, {
-          size: 'small',
-          type: 'primary',
-          ghost: true,
-          onClick: () => window.open(getMediaUrl(row.paper_file_path!), '_blank')
-        }, { default: () => t('papers.download') }) : null,
-        h(NButton, {
-          size: 'small',
-          type: 'primary',
-          onClick: () => handleEdit(row)
-        }, { default: () => t('admin.common.edit') }),
-        h(NButton, {
-          size: 'small',
-          type: 'error',
-          onClick: () => handleDelete(row)
-        }, { default: () => t('admin.common.delete') })
-      ].filter(Boolean));
+      return h(NSpace, {}, {
+        default: () => [
+          row.paper_url ? h(NButton, {
+            size: 'small',
+            type: 'info',
+            onClick: () => window.open(row.paper_url!, '_blank')
+          }, { default: () => t('papers.viewOnline') }) : null,
+          row.paper_file_path ? h(NButton, {
+            size: 'small',
+            type: 'primary',
+            ghost: true,
+            onClick: () => window.open(getMediaUrl(row.paper_file_path!), '_blank')
+          }, { default: () => t('papers.download') }) : null,
+          h(NButton, {
+            size: 'small',
+            type: 'primary',
+            onClick: () => handleEdit(row)
+          }, { default: () => t('admin.common.edit') }),
+          h(NButton, {
+            size: 'small',
+            type: 'error',
+            onClick: () => handleDelete(row)
+          }, { default: () => t('admin.common.delete') })
+        ].filter(Boolean)
+      });
     }
   }
 ];
