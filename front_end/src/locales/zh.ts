@@ -310,7 +310,8 @@ export default {
         uploadSuccess: '文件上傳成功',
         uploadError: '文件上傳失敗'
       },
-      viewDetails: '查看詳情'
+      viewDetails: '查看詳情',
+      avatarPreview: '頭像預覽'
     },
     members: {
       addMember: '添加成員',
@@ -620,7 +621,9 @@ export default {
         fetchFailed: '獲取實驗室信息失敗',
         saveSuccess: '保存成功',
         saveFailed: '保存失敗'
-      }
+      },
+      logoPreview: 'Logo 預覽',
+      carouselPreview: '輪播圖 {number} 預覽'
     },
     // 管理員管理翻譯
     admins: {
@@ -747,7 +750,9 @@ export default {
       cropAndSave: '裁切並保存',
       cropSuccess: '圖片裁切成功',
       cropFailed: '圖片裁切失敗',
-      invalidFormat: '請選擇有效的圖片格式'
+      invalidFormat: '請選擇有效的圖片格式',
+      noImageSelected: '未選擇圖片進行裁切',
+      noCropAreaSelected: '未選擇裁切區域'
     }
   }
 }

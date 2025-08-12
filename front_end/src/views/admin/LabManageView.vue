@@ -114,7 +114,7 @@
           <n-form-item :label="t('admin.lab.logo')" path="lab_logo">
             <div class="upload-section">
               <div v-if="hasLogoToShow" class="image-preview">
-                <img :src="getLogoPreview()" alt="Logo Preview" class="logo-preview" />
+                <img :src="getLogoPreview()" :alt="t('admin.lab.logoPreview')" class="logo-preview" />
                 <div class="image-actions">
                   <n-button size="small" @click="openLogoCropper">
                     {{ t('admin.imageCropper.cropLogo') }}
@@ -143,7 +143,7 @@
                 </div>
                 <div class="upload-section">
                   <div v-if="hasCarouselToShow(index)" class="image-preview">
-                    <img :src="getCarouselPreview(index)" :alt="`Carousel ${index + 1}`" class="carousel-preview" />
+                    <img :src="getCarouselPreview(index)" :alt="t('admin.lab.carouselPreview', { number: index + 1 })" class="carousel-preview" />
                     <div class="image-actions">
                       <n-button size="small" @click="openCarouselCropper(index)">
                         {{ t('admin.imageCropper.cropCarousel') }}

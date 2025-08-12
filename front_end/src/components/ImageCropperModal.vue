@@ -251,12 +251,12 @@ const resetCropper = () => {
 // 處理裁切
 const handleCrop = async () => {
   if (!selectedFile.value || !previewSrc.value) {
-    message.error('No image selected for cropping');
+    message.error(t('admin.imageCropper.noImageSelected'));
     return;
   }
   
   if (!cropResult.value?.canvas) {
-    message.error('No crop area selected');
+    message.error(t('admin.imageCropper.noCropAreaSelected'));
     return;
   }
   

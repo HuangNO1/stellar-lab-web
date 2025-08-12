@@ -317,7 +317,8 @@ export default {
         uploadSuccess: 'File uploaded successfully',
         uploadError: 'File upload failed'
       },
-      viewDetails: 'View Details'
+      viewDetails: 'View Details',
+      avatarPreview: 'Avatar Preview'
     },
     members: {
       addMember: 'Add Member',
@@ -622,7 +623,28 @@ export default {
         fetchFailed: 'Failed to fetch lab information',
         saveSuccess: 'Saved successfully',
         saveFailed: 'Save failed'
-      }
+      },
+      logoPreview: 'Logo Preview',
+      carouselPreview: 'Carousel Image {number} Preview'
+    },
+    // Image Cropper Modal translations
+    imageCropper: {
+      selectImage: 'Click or drag files to this area to upload',
+      supportedFormats: 'Supports JPG, PNG, GIF formats',
+      aspectRatio: 'Aspect Ratio',
+      cropAvatar: 'Crop Avatar',
+      cropLogo: 'Crop Logo',
+      cropCarousel: 'Crop Carousel Image',
+      avatarHint: 'Recommended 1:1 square ratio',
+      logoHint: 'Supports any ratio, recommended horizontal layout',
+      carouselHint: 'Multiple ratios available, choose as needed',
+      reselect: 'Reselect Image',
+      cropAndSave: 'Crop and Save',
+      invalidFormat: 'Invalid file format, please select an image file',
+      cropSuccess: 'Image cropped successfully',
+      cropFailed: 'Image crop failed',
+      noImageSelected: 'No image selected for cropping',
+      noCropAreaSelected: 'No crop area selected'
     },
     // Admin Management translations
     admins: {

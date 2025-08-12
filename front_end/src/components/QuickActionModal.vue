@@ -149,7 +149,7 @@
               <div v-if="hasAvatarToShow" class="image-preview">
                 <img 
                   :src="getImagePreview('mem_avatar')" 
-                  alt="Avatar preview" 
+                  :alt="t('admin.common.avatarPreview')" 
                   class="avatar-preview"
                 />
                 <div class="image-actions">
