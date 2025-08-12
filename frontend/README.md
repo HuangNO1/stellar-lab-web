@@ -8,7 +8,7 @@ A Vue 3 + TypeScript-based laboratory management system frontend with multi-lang
 - **Language**: TypeScript
 - **UI Library**: Naive UI 2.42+
 - **Router**: Vue Router 4
-- **State Management**: Pinia + Vuex
+- **State Management**: Pinia (Primary) ~~+ Vuex~~ *(Vuex removed)*
 - **Internationalization**: Vue I18n 9.14+
 - **HTTP Client**: Axios 1.11+
 - **Build Tool**: Vue CLI 5
@@ -16,12 +16,41 @@ A Vue 3 + TypeScript-based laboratory management system frontend with multi-lang
 - **Image Processing**: vue-advanced-cropper 2.8+
 - **Markdown Editor**: md-editor-v3 5.8+
 - **Utilities**: js-cookie, highlight.js
+- **Deployment**: Docker + Nginx
 
 ## 📦 Quick Start
 
 ### Requirements
-- Node.js >= 16
+- Node.js >= 16 (Tested with Node.js 20)
 - Yarn or npm
+- Backend service running (for API integration)
+
+### Environment Configuration
+
+The frontend uses environment-specific configurations:
+
+#### Development Environment
+```bash
+# Uses .env.development by default
+NODE_ENV=development
+VUE_APP_API_BASE_URL=http://127.0.0.1:8000/api
+```
+
+#### Production Environment  
+```bash
+# Uses .env.production
+NODE_ENV=production
+VUE_APP_API_BASE_URL=/api  # Relative path for nginx proxy
+```
+
+#### Custom Local Configuration
+Create `.env.local` for personal development settings:
+```bash
+# Custom API endpoint (overrides other files)
+VUE_APP_API_BASE_URL=https://your-domain.com/api
+```
+
+**📋 See [Environment Configuration Guide](./ENVIRONMENT.md) for detailed setup instructions.**
 
 ### Install Dependencies
 ```bash
@@ -37,6 +66,8 @@ yarn serve
 npm run serve
 ```
 Access the application at http://localhost:8080
+
+**Note**: Ensure the backend service is running at http://localhost:8000 for API connectivity.
 
 ### Build for Production
 ```bash

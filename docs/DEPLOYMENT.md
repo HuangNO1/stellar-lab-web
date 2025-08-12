@@ -70,7 +70,39 @@ cp .env.example .env
 
 ## Environment Setup
 
-### Environment Variables
+### Frontend Environment Configuration
+
+The frontend supports different environment configurations for various deployment scenarios:
+
+#### Development Environment
+- **File**: `frontend/.env.development`
+- **API Base URL**: `http://127.0.0.1:8000/api`
+- **Use Case**: Local development with direct backend connection
+
+```env
+NODE_ENV=development
+VUE_APP_API_BASE_URL=http://127.0.0.1:8000/api
+```
+
+#### Production/Docker Environment
+- **File**: `frontend/.env.production` (production), `frontend/.env.docker` (Docker builds)
+- **API Base URL**: `/api` (relative path through nginx proxy)
+- **Use Case**: Docker containers, production deployments
+
+```env
+NODE_ENV=production
+VUE_APP_API_BASE_URL=/api
+```
+
+#### Custom Environment
+Create `frontend/.env.local` for custom configurations (this file is ignored by Docker and git):
+
+```env
+NODE_ENV=development
+VUE_APP_API_BASE_URL=https://your-custom-api-domain.com/api
+```
+
+### Backend Environment Variables
 
 Copy `.env.example` to `.env` and customize:
 
@@ -193,11 +225,31 @@ make dev
 
 ### Frontend Configuration
 
+#### Environment Files Priority
+The frontend loads environment variables in this order:
+1. `.env.local` (highest priority, not committed to git)
+2. `.env.production` / `.env.development` (mode-specific)
+3. `.env` (general fallback)
+
+#### API Configuration
+- **Development**: Frontend connects directly to backend at `http://127.0.0.1:8000/api`
+- **Docker/Production**: Frontend uses nginx proxy with relative path `/api`
+- **Custom**: Override with `.env.local` for specific domain requirements
+
+#### Nginx Configuration
 Edit `frontend/docker/nginx.conf` for:
 - Server settings
-- Proxy configurations  
+- API proxy configurations (routes `/api` to backend container)
+- Media proxy configurations (routes `/media` to backend container)
 - Security headers
 - Cache policies
+
+#### Code Changes Impact
+Recent improvements include:
+- ✅ **Removed unused Vuex store** (now uses Pinia exclusively)
+- ✅ **Cleaned up environment files** (removed empty `.env.prod`, `.env.test`)
+- ✅ **Updated TypeScript configuration** to handle build compatibility
+- ✅ **Improved Docker networking** (frontend connects to `lab_web_app` container)
 
 ### Backend Configuration
 

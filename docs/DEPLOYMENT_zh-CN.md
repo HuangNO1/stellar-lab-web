@@ -70,7 +70,39 @@ cp .env.example .env
 
 ## 環境配置
 
-### 環境變數
+### 前端環境配置
+
+前端支援不同部署場景的環境配置：
+
+#### 開發環境
+- **檔案**: `frontend/.env.development`
+- **API 基底 URL**: `http://127.0.0.1:8000/api`
+- **使用場景**: 本地開發，直接連接後端
+
+```env
+NODE_ENV=development
+VUE_APP_API_BASE_URL=http://127.0.0.1:8000/api
+```
+
+#### 生產/Docker 環境
+- **檔案**: `frontend/.env.production` (生產), `frontend/.env.docker` (Docker 構建)
+- **API 基底 URL**: `/api` (通過 nginx 代理的相對路徑)
+- **使用場景**: Docker 容器、生產部署
+
+```env
+NODE_ENV=production
+VUE_APP_API_BASE_URL=/api
+```
+
+#### 自訂環境
+建立 `frontend/.env.local` 用於自訂配置（此檔案被 Docker 和 git 忽略）：
+
+```env
+NODE_ENV=development
+VUE_APP_API_BASE_URL=https://your-custom-api-domain.com/api
+```
+
+### 後端環境變數
 
 複製 `.env.example` 到 `.env` 並自訂：
 
