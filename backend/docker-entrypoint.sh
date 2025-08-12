@@ -73,9 +73,9 @@ fi
 # 設置 Flask 環境
 export FLASK_CONFIG=${FLASK_CONFIG:-production}
 
-# 運行現有的數據庫初始化腳本
-echo "🔧 初始化數據庫和示例數據..."
-cd /app && FORCE_RECREATE=1 python scripts/development/init_db.py
+# 運行現有的數據庫初始化腳本（只在數據庫為空時初始化）
+echo "🔧 檢查數據庫狀態..."
+cd /app && python scripts/development/init_db.py
 
 if [ $? -eq 0 ]; then
     echo "✅ 數據庫初始化完成"

@@ -417,6 +417,14 @@ def init_database():
         db.create_all()
         print("✓ 數據庫表創建成功")
         
+        # 檢查是否已經有數據（檢查管理員表是否有數據）
+        existing_admin = Admin.query.first()
+        if existing_admin and not force_recreate:
+            print("✓ 數據庫已有數據，跳過示例數據創建")
+            print(f"  現有管理員: {existing_admin.admin_name}")
+            return
+        
+        print("🔧 開始創建示例數據...")
         # 創建數據
         admin = create_admin_data()
         lab = create_lab_data()
