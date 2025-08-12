@@ -1,175 +1,233 @@
-# 實驗室通用網頁框架
+<!-- Language Switcher -->
 
-## 項目簡介
+<div align="right">
 
-這是一個專為實驗室設計的通用網頁框架，可以自定義學校、實驗室 logo 等資訊，便於不同實驗室使用。系統采用前後端分離架構，具有良好的可擴展性和維護性。
+[简体中文](README_zh-CN.md)
 
-## 技術棧
+</div>
 
-### 前端
-- Vue 3 + TypeScript
-- Naive UI 組件庫
-- Vue Router 4
-- Pinia 狀態管理
-- Vite 構建工具
+<!-- Header -->
 
-### 後端
-- Python + Flask
-- SQLAlchemy ORM
-- JWT 認證
-- MySQL 數據庫
-- bcrypt 密碼加密
+<div align="center">
 
-## 主要功能
+<img src="frontend/src/assets/logo.png" width="128"/>
 
-### 用戶端功能
-- **首頁展示**：實驗室介紹、課題組展示、最新新聞
-- **論文管理**：論文列表、搜索、分頁展示
-- **成員展示**：按類型（教師、學生、校友）分類展示
-- **新聞資訊**：新聞列表展示和搜索
-- **項目展示**：項目列表和搜索功能
-- **多語言支持**：中英文切換
-- **主題切換**：明暗主題切換
+# Lab Website Framework
 
-### 管理端功能
-- **管理員系統**：超級管理員可管理普通管理員
-- **實驗室管理**：logo、基本信息設置
-- **課題組管理**：課題組信息的增刪改查
-- **成員管理**：成員信息的完整管理
-- **論文管理**：論文信息和文件上傳管理
-- **新聞管理**：新聞內容的發布和管理
-- **項目管理**：項目信息的管理
-- **編輯記錄**：操作審計和日誌記錄
+A modern, universal laboratory website framework with content management system.
 
-## 項目結構
+<!-- Shields/Badges -->
+
+<p>
+<a href="https://vuejs.org/"><img alt="Vue.js" src="https://img.shields.io/badge/Frontend-Vue%203-4FC08D?style=for-the-badge&logo=vue.js"></a>
+<a href="https://flask.palletsprojects.com/"><img alt="Flask" src="https://img.shields.io/badge/Backend-Flask-000000?style=for-the-badge&logo=flask"></a>
+<a href="https://www.mysql.com/"><img alt="MySQL" src="https://img.shields.io/badge/Database-MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white"></a>
+<a href="https://www.docker.com/"><img alt="Docker" src="https://img.shields.io/badge/Deploy-Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"></a>
+<br/>
+<img alt="License" src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge">
+<img alt="Status" src="https://img.shields.io/badge/Status-Production%20Ready-success?style=for-the-badge">
+</p>
+
+</div>
+
+## ✨ Introduction
+
+This laboratory website framework was born out of frustration with existing solutions. Many labs rely on static GitHub Pages that are cumbersome to update and lack proper content management capabilities. Our framework addresses these pain points by providing a modern, feature-rich solution that any laboratory can easily adopt and customize.
+
+Built with Vue 3 and Flask, this framework offers a complete laboratory website solution with both public-facing pages and a comprehensive admin dashboard. It's designed to be universal - allowing easy customization of school logos, laboratory information, and branding to suit different institutions.
+
+## 🎯 Key Features
+
+### 🌐 Public Website
+- **Dynamic Homepage**: Customizable laboratory introduction with carousel images and latest news
+- **Member Showcase**: Organized display of faculty, students, and alumni with detailed profiles
+- **Research Groups**: Showcase different research teams with their focuses and members
+- **Publications**: Complete paper management with search, filtering, and author linking
+- **Projects**: Display ongoing and completed research projects
+- **News & Updates**: Latest laboratory achievements, awards, and announcements
+- **Multilingual Support**: Complete Chinese/English interface switching
+- **Responsive Design**: Perfect display across desktop, tablet, and mobile devices
+
+### 🛠️ Content Management System
+- **Dashboard**: Comprehensive overview with statistics and quick actions
+- **Laboratory Management**: Basic info, contact details, logo, and carousel image management
+- **Member Management**: Complete CRUD operations with avatar cropping and research group assignment
+- **Research Group Management**: Team organization with leader assignment and descriptions
+- **Publication Management**: Paper records with Markdown content editing and file uploads
+- **Project Management**: Research project tracking with status management
+- **News Management**: News publishing with categorization and content editing
+- **Admin Management**: Multi-level administrator accounts with permission control
+- **Operation Logs**: Complete audit trail of all system changes
+- **Media Management**: Centralized file upload and storage system
+
+### 🔧 Technical Excellence
+- **Modern Architecture**: Vue 3 + TypeScript frontend, Python Flask backend
+- **Security First**: JWT authentication, bcrypt encryption, XSS protection, CSRF prevention
+- **Performance Optimized**: Database indexing, pagination, caching, and query optimization
+- **Docker Ready**: Complete containerization with one-click deployment
+- **Developer Friendly**: Comprehensive API documentation, testing framework, and clear code structure
+
+## 🚀 Quick Start
+
+### Option 1: Docker Deployment (Recommended)
+
+```bash
+# Clone the repository
+git clone [your-repo-url]
+cd lab_web
+
+# Start all services with Docker Compose
+docker-compose up -d --build
+
+# Access the application
+# Frontend: http://localhost:3000
+# Backend API: http://localhost:8000
+# Admin Panel: http://localhost:3000/admin
+```
+
+### Option 2: Manual Setup
+
+```bash
+# Backend setup
+cd backend
+pip install -r requirements.txt
+python run.py
+
+# Frontend setup (new terminal)
+cd frontend
+npm install
+npm run serve
+```
+
+## 📊 System Overview
+
+### Architecture
+- **Frontend**: Vue 3 + TypeScript + Naive UI + Vue Router + Pinia
+- **Backend**: Python + Flask + SQLAlchemy + JWT + MySQL
+- **Database**: MySQL with complete relational design
+- **Deployment**: Docker + Docker Compose + Nginx
+- **Storage**: Local filesystem with organized media management
+
+### Default Credentials
+- **Admin Username**: `admin`
+- **Admin Password**: `admin123`
+- **Database**: Automatically initialized with sample data
+
+⚠️ **Important**: Change the default password immediately in production!
+
+## 💡 Use Cases
+
+### Perfect for:
+- **Academic Laboratories**: Research groups in universities and institutes
+- **Corporate R&D Teams**: Company research and development divisions
+- **Medical Labs**: Hospital and clinical research laboratories
+- **Government Research**: Public sector research institutions
+- **Startup Labs**: Emerging technology companies and incubators
+
+### Migration from GitHub Pages
+This framework is specifically designed for laboratories currently using GitHub Pages who want:
+- **Easy Content Updates**: No more manual HTML/Markdown editing
+- **Dynamic Content**: Real-time updates without rebuilding
+- **Rich Media Support**: Image uploads, PDF papers, member photos
+- **Search Functionality**: Find papers, members, and projects easily
+- **Admin Controls**: Multiple administrators with different permission levels
+
+## 📁 Project Structure
 
 ```
 lab_web/
-├── frontend/          # Vue 3 前端應用
-│   ├── src/
-│   │   ├── components/    # 可複用組件
-│   │   ├── views/        # 頁面組件
-│   │   ├── router/       # 路由配置
-│   │   ├── store/        # 狀態管理
-│   │   ├── utils/        # 工具函數
-│   │   ├── types/        # TypeScript 類型定義
-│   │   └── assets/       # 靜態資源
-│   └── public/           # 公共資源
-├── backend/           # Flask 後端應用
-│   ├── app/
-│   │   ├── models/       # 數據模型
-│   │   ├── routes/       # API 路由
-│   │   └── utils/        # 工具函數
-│   ├── config/           # 配置文件
-│   ├── migrations/       # 數據庫遷移
-│   └── tests/           # 測試文件
-└── docs/             # 項目文檔
+├── frontend/          # Vue 3 Frontend Application
+│   ├── src/          # Source code
+│   ├── public/       # Static assets
+│   └── dist/         # Built files
+├── backend/           # Flask Backend Application  
+│   ├── app/          # Application code
+│   ├── docs/         # API documentation
+│   ├── scripts/      # Deployment & maintenance scripts
+│   └── tests/        # Test suites
+├── docs/             # Project documentation
+├── docker-compose.yml # Full-stack deployment
+└── deploy/           # Deployment scripts
 ```
 
-## 快速開始
+For detailed technical information, refer to:
+- Frontend: [frontend/README.md](frontend/README.md)
+- Backend: [backend/README.md](backend/README.md)
+- Deployment: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 
-### 前端設置
+## 🔐 Security Features
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+- **Enterprise-grade Authentication**: JWT tokens with secure expiration
+- **Multi-level Authorization**: Super admin and regular admin roles
+- **Complete Audit Trail**: All operations logged with timestamp and user
+- **XSS/CSRF Protection**: Modern web security implementations
+- **Secure File Uploads**: Type validation and size restrictions
+- **Soft Delete System**: Data safety with recovery capabilities
 
-### 後端設置
+## 🌐 Multilingual Support
 
-```bash
-cd backend
-pip install -r requirements.txt
-python app.py
-```
+Complete interface available in:
+- **Chinese (Simplified)**: 简体中文界面
+- **English**: Full English interface
+- **Extensible**: Easy to add more languages
 
-### 數據庫設置
+Content management supports bilingual editing for all text fields.
 
-1. 創建 MySQL 數據庫
-2. 配置數據庫連接
-3. 運行數據庫初始化腳本
-4. 創建超級管理員賬戶
+## 📱 Device Compatibility
 
-## 數據庫設計
+- **Desktop**: Full-featured interface (1024px+)
+- **Tablet**: Touch-optimized experience (768-1024px)
+- **Mobile**: Mobile-first responsive design (<768px)
+- **Cross-browser**: Compatible with modern browsers
 
-項目包含以下主要數據表：
+## 🛠️ Customization
 
-- `admins` - 管理員表
-- `lab` - 實驗室信息表  
-- `research_groups` - 課題組表
-- `members` - 成員表
-- `papers` - 論文表
-- `paper_authors` - 論文作者關聯表
-- `projects` - 項目表
-- `news` - 新聞表
-- `edit_records` - 編輯記錄表
+### Branding
+- Upload your institution's logo
+- Customize color schemes and themes
+- Set laboratory name and contact information
+- Add carousel images for homepage
 
-詳細的數據庫結構請參考需求文檔。
+### Content Structure
+- Define research groups and their focuses
+- Organize members by categories (faculty/students/alumni)
+- Categorize publications by type and venue
+- Manage project portfolios with timelines
 
-## API 接口
+## 📚 Documentation
 
-系統提供完整的 RESTful API，包括：
+- **[Deployment Guide](docs/DEPLOYMENT.md)**: Complete setup instructions
+- **[API Documentation](backend/docs/api/)**: Full REST API reference
+- **[User Manual](docs/USER_MANUAL.md)**: Admin panel usage guide
+- **[Development Guide](docs/DEVELOPMENT.md)**: Contributing and customization
 
-- 認證鑒權接口
-- 實驗室信息管理
-- 課題組管理
-- 成員管理  
-- 論文管理
-- 新聞管理
-- 項目管理
-- 文件上傳接口
+## 🤝 Contributing
 
-所有接口都有完整的權限控制和輸入驗證。
+We welcome contributions from the research community:
 
-## 開發指南
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-### 前端開發
-- 使用 Composition API
-- 遵循 TypeScript 類型規範
-- 使用 Naive UI 組件庫
-- 響應式設計，支持多設備
+## 📧 Support
 
-### 後端開發
-- 遵循 RESTful API 設計原則
-- 使用軟刪除（enable 字段）
-- 所有操作記錄審計日誌
-- 文件存儲使用服務器路徑，不存 BLOB
+For questions, issues, or feature requests:
+- Open an [issue](../../issues) on GitHub
+- Check our [documentation](docs/)
+- Contact the development team
 
-### 安全考慮
-- JWT token 認證
-- bcrypt 密碼加密
-- 輸入驗證和 XSS 防護
-- 文件上傳安全檢查
-- HTTPS 強制使用
+## 📄 License
 
-## 部署說明
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### 生產環境部署
-1. 構建前端項目：`npm run build`
-2. 配置 Web 服務器（Nginx）
-3. 設置 HTTPS 證書
-4. 配置數據庫連接
-5. 設置文件上傳路徑權限
-6. 配置日誌和監控
+---
 
-### 環境變量配置
-- `DATABASE_URL` - 數據庫連接字符串
-- `JWT_SECRET` - JWT 簽名密鑰
-- `UPLOAD_FOLDER` - 文件上傳路徑
-- `DEBUG` - 調試模式開關
+<div align="center">
 
-## 貢獻指南
+**Transform your laboratory's online presence today!**
 
-1. Fork 項目
-2. 創建功能分支
-3. 提交變更
-4. 發起 Pull Request
+*From static pages to dynamic, manageable content in minutes.*
 
-## 許可證
-
-本項目采用 MIT 許可證。
-
-## 技術支持
-
-如有問題或建議，請提交 Issue 或聯繫項目維護者。
+</div>

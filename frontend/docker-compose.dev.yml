@@ -1,0 +1,29 @@
+# Frontend Development Environment
+# This docker-compose file is for development with hot reloading
+
+version: '3.8'
+
+services:
+  frontend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: lab-website-frontend:dev
+    container_name: lab_frontend_dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    networks:
+      - lab-network
+    restart: unless-stopped
+    command: npm run serve
+
+networks:
+  lab-network:
+    external: true
+    name: lab_web_default

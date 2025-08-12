@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: lab-website-frontend:latest
+    container_name: lab_frontend
+    ports:
+      - "3000:80"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      # Mount custom nginx config (optional override)
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - lab-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  lab-network:
+    external: true
+    name: lab_web_default
+
+# To connect to backend, ensure backend is running and accessible
+# Example usage:
+# 1. Build and start: docker-compose up --build -d
+# 2. View logs: docker-compose logs -f
+# 3. Stop: docker-compose down
