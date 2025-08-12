@@ -26,6 +26,12 @@ A modern, universal laboratory website framework with content management system.
 <br/>
 <img alt="License" src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge">
 <img alt="Status" src="https://img.shields.io/badge/Status-Production%20Ready-success?style=for-the-badge">
+<br/>
+<a href="#"><img alt="CI" src="https://img.shields.io/badge/CI-Configured-success?style=for-the-badge&logo=github"></a>
+<a href="#"><img alt="Release" src="https://img.shields.io/badge/Release-Ready-success?style=for-the-badge&logo=github"></a>
+<a href="#"><img alt="GitHub release" src="https://img.shields.io/badge/Version-v1.0.0-blue?style=for-the-badge&logo=github"></a>
+<a href="#"><img alt="Frontend Image" src="https://img.shields.io/badge/ghcr.io-frontend-blue?style=for-the-badge&logo=docker"></a>
+<a href="#"><img alt="Backend Image" src="https://img.shields.io/badge/ghcr.io-backend-blue?style=for-the-badge&logo=docker"></a>
 </p>
 
 </div>
@@ -167,7 +173,47 @@ Built with Vue 3 and Flask, this framework offers a complete laboratory website 
 
 ## 🚀 Quick Start
 
-### Option 1: Docker Deployment (Recommended)
+### Option 1: Using Released Docker Images (Recommended)
+
+```bash
+# Download configuration examples
+curl -L https://github.com/your-repo/lab_web/archive/main.tar.gz | tar xz
+cd lab_web-main/examples
+
+# Copy and customize environment file
+cp .env.example .env
+# Edit .env with your configuration
+
+# Deploy with released images
+docker-compose -f docker-compose.standalone.yml up -d
+
+# Access the application
+# Frontend: http://localhost:3000
+# Backend API: http://localhost:8000
+# Admin Panel: http://localhost:3000/admin
+```
+
+### Option 2: Flexible Deployment
+
+**Frontend Only (Connect to External Backend):**
+```bash
+docker run -d -p 3000:80 \
+  -e BACKEND_URL=https://your-api.com \
+  -e API_BASE_URL=https://your-api.com/api \
+  -e APP_TITLE="Your Lab" \
+  ghcr.io/your-repo/frontend:latest
+```
+
+**Backend Only (Standalone API):**
+```bash
+docker run -d -p 8000:8000 \
+  -e DATABASE_URL="mysql+pymysql://user:pass@host:3306/db" \
+  -e SECRET_KEY="your-secret" \
+  -e CORS_ORIGINS="https://your-frontend.com" \
+  ghcr.io/your-repo/backend:latest
+```
+
+### Option 3: Build from Source
 
 ```bash
 # Clone the repository
@@ -183,7 +229,7 @@ docker-compose up -d --build
 # Admin Panel: http://localhost:3000/admin
 ```
 
-### Option 2: Manual Setup
+### Option 4: Manual Setup
 
 ```bash
 # Backend setup

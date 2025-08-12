@@ -26,6 +26,12 @@
 <br/>
 <img alt="License" src="https://img.shields.io/badge/許可證-MIT-green?style=for-the-badge">
 <img alt="Status" src="https://img.shields.io/badge/狀態-生產就緒-success?style=for-the-badge">
+<br/>
+<a href="#"><img alt="CI" src="https://img.shields.io/badge/持續整合-已配置-success?style=for-the-badge&logo=github"></a>
+<a href="#"><img alt="Release" src="https://img.shields.io/badge/發布-就緒-success?style=for-the-badge&logo=github"></a>
+<a href="#"><img alt="GitHub release" src="https://img.shields.io/badge/版本-v1.0.0-blue?style=for-the-badge&logo=github"></a>
+<a href="#"><img alt="Frontend Image" src="https://img.shields.io/badge/ghcr.io-前端鏡像-blue?style=for-the-badge&logo=docker"></a>
+<a href="#"><img alt="Backend Image" src="https://img.shields.io/badge/ghcr.io-後端鏡像-blue?style=for-the-badge&logo=docker"></a>
 </p>
 
 </div>
@@ -167,7 +173,47 @@
 
 ## 🚀 快速開始
 
-### 方法一：Docker 部署（推薦）
+### 方法一：使用發布的 Docker 鏡像（推薦）
+
+```bash
+# 下載配置範例
+curl -L https://github.com/your-repo/lab_web/archive/main.tar.gz | tar xz
+cd lab_web-main/examples
+
+# 複製並客製化環境文件
+cp .env.example .env
+# 編輯 .env 文件以配置您的設定
+
+# 使用發布的鏡像部署
+docker-compose -f docker-compose.standalone.yml up -d
+
+# 存取應用程式
+# 前端：http://localhost:3000
+# 後端 API：http://localhost:8000
+# 管理面板：http://localhost:3000/admin
+```
+
+### 方法二：靈活部署
+
+**僅前端（連接外部後端）：**
+```bash
+docker run -d -p 3000:80 \
+  -e BACKEND_URL=https://your-api.com \
+  -e API_BASE_URL=https://your-api.com/api \
+  -e APP_TITLE="您的實驗室" \
+  ghcr.io/your-repo/frontend:latest
+```
+
+**僅後端（獨立 API）：**
+```bash
+docker run -d -p 8000:8000 \
+  -e DATABASE_URL="mysql+pymysql://user:pass@host:3306/db" \
+  -e SECRET_KEY="your-secret" \
+  -e CORS_ORIGINS="https://your-frontend.com" \
+  ghcr.io/your-repo/backend:latest
+```
+
+### 方法三：從原始碼建構
 
 ```bash
 # 複製儲存庫
@@ -183,7 +229,7 @@ docker-compose up -d --build
 # 管理面板：http://localhost:3000/admin
 ```
 
-### 方法二：手動設定
+### 方法四：手動設定
 
 ```bash
 # 後端設定

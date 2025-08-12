@@ -26,4 +26,4 @@ services:
 networks:
   lab-network:
     external: true
-    name: lab_web_default
+    name: backend_lab_web_network

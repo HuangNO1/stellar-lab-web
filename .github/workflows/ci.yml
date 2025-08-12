@@ -1,0 +1,287 @@
+name: CI - Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'frontend/**'
+      - 'backend/**'
+      - 'docker-compose*.yml'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'frontend/**'
+      - 'backend/**'
+      - 'docker-compose*.yml'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository }}
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.changes.outputs.frontend }}
+      backend: ${{ steps.changes.outputs.backend }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Check for changes
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+            backend:
+              - 'backend/**'
+
+  test-backend:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: test_password
+          MYSQL_DATABASE: lab_web_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Cache Python dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            
+      - name: Install Python dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+          
+      - name: Wait for MySQL
+        run: |
+          while ! mysqladmin ping -h127.0.0.1 -P3306 -uroot -ptest_password --silent; do
+            sleep 1
+          done
+          
+      - name: Run backend tests
+        env:
+          DATABASE_URL: mysql+pymysql://root:test_password@127.0.0.1:3306/lab_web_test
+          FLASK_CONFIG: testing
+          SECRET_KEY: test-secret-key
+          JWT_SECRET_KEY: test-jwt-key
+        run: |
+          cd backend
+          python -m pytest tests/ -v --cov=app --cov-report=xml
+          
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: backend/coverage.xml
+          flags: backend
+          name: backend-coverage
+
+  test-frontend:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+          
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+          
+      - name: Lint frontend code
+        run: |
+          cd frontend
+          npm run lint
+          
+      - name: Type check
+        run: |
+          cd frontend
+          npx vue-tsc --noEmit
+          
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+  build-images:
+    needs: [changes]
+    if: always() && (needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      
+    strategy:
+      matrix:
+        include:
+          - name: frontend
+            context: ./frontend
+            dockerfile: ./frontend/Dockerfile
+            condition: ${{ needs.changes.outputs.frontend == 'true' }}
+          - name: backend
+            context: ./backend
+            dockerfile: ./backend/Dockerfile
+            condition: ${{ needs.changes.outputs.backend == 'true' }}
+    
+    steps:
+      - name: Checkout repository
+        if: matrix.condition == 'true'
+        uses: actions/checkout@v4
+        
+      - name: Set up Docker Buildx
+        if: matrix.condition == 'true'
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Log in to Container Registry
+        if: matrix.condition == 'true' && github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Extract metadata
+        if: matrix.condition == 'true'
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.name }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=dev,enable={{is_default_branch}}
+          labels: |
+            org.opencontainers.image.title=Lab Website ${{ matrix.name }} (Development)
+            org.opencontainers.image.description=Modern laboratory website framework - ${{ matrix.name }} service (Development Build)
+            
+      - name: Build and push Docker image
+        if: matrix.condition == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          platforms: linux/amd64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  integration-test:
+    needs: [test-backend, test-frontend, build-images]
+    if: always() && !cancelled()
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Create test environment file
+        run: |
+          cat > .env << EOF
+          # Test environment configuration
+          MYSQL_ROOT_PASSWORD=test_root_password_123
+          MYSQL_DATABASE=lab_web_test
+          SECRET_KEY=test-secret-key-for-integration
+          JWT_SECRET_KEY=test-jwt-secret-key-for-integration
+          
+          FRONTEND_PORT=3000
+          BACKEND_PORT=8000
+          MYSQL_PORT=3307
+          PHPMYADMIN_PORT=8081
+          
+          CORS_ORIGINS=http://localhost:3000
+          EOF
+          
+      - name: Start services with Docker Compose
+        run: |
+          docker-compose -f docker-compose.yml up -d --build
+          
+      - name: Wait for services to be ready
+        run: |
+          echo "Waiting for backend to be ready..."
+          for i in {1..30}; do
+            if curl -f http://localhost:8000/health 2>/dev/null; then
+              echo "Backend is ready!"
+              break
+            fi
+            echo "Attempt $i: Backend not ready yet..."
+            sleep 10
+          done
+          
+          echo "Waiting for frontend to be ready..."
+          for i in {1..30}; do
+            if curl -f http://localhost:3000/health 2>/dev/null; then
+              echo "Frontend is ready!"
+              break
+            fi
+            echo "Attempt $i: Frontend not ready yet..."
+            sleep 5
+          done
+          
+      - name: Run integration tests
+        run: |
+          # Test backend health
+          echo "Testing backend health..."
+          curl -f http://localhost:8000/health || exit 1
+          
+          # Test frontend health  
+          echo "Testing frontend health..."
+          curl -f http://localhost:3000/health || exit 1
+          
+          # Test API endpoints
+          echo "Testing API endpoints..."
+          curl -f http://localhost:3000/api/health || exit 1
+          
+          # Test frontend loads
+          echo "Testing frontend loads..."
+          response=$(curl -s http://localhost:3000/)
+          if [[ $response == *"<title>"* ]]; then
+            echo "Frontend loads successfully!"
+          else
+            echo "Frontend failed to load properly"
+            exit 1
+          fi
+          
+      - name: Clean up
+        if: always()
+        run: |
+          docker-compose -f docker-compose.yml down -v
+          docker system prune -af

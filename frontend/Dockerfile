@@ -24,8 +24,12 @@ RUN npm run build -- --mode production || echo "Build completed with warnings"
 # Production stage
 FROM nginx:stable-alpine as production-stage
 
-# Copy custom nginx configuration
-COPY docker/nginx.conf /etc/nginx/nginx.conf
+# Install envsubst for environment variable substitution
+RUN apk add --no-cache gettext
+
+# Copy nginx configuration template and entrypoint script
+COPY docker/nginx.conf.template /etc/nginx/nginx.conf.template
+COPY docker/docker-entrypoint.sh /docker-entrypoint.sh
 
 # Copy built application from build stage
 COPY --from=build-stage /app/dist /usr/share/nginx/html
@@ -39,7 +43,15 @@ RUN mkdir -p /var/cache/nginx/client_temp \
     && chown -R nginx:nginx /var/cache/nginx \
     && chmod -R 755 /var/cache/nginx
 
-# Don't switch to nginx user - run as root to avoid permission issues
+# Make entrypoint script executable
+RUN chmod +x /docker-entrypoint.sh
+
+# Set default environment variables
+ENV BACKEND_URL=http://lab_web_app:8000
+ENV API_BASE_URL=/api
+ENV CORS_ORIGIN=*
+ENV APP_TITLE="Lab Website Framework"
+ENV APP_DESCRIPTION="Modern laboratory website framework"
 
 # Expose port
 EXPOSE 80
@@ -47,6 +59,9 @@ EXPOSE 80
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --quiet --tries=1 --spider http://localhost/ || exit 1
+
+# Use custom entrypoint
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]

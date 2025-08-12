@@ -5,6 +5,29 @@ set -e
 
 echo "🚀 正在啟動實驗室網頁框架..."
 
+# Default environment variables with flexible configuration
+export DATABASE_URL=${DATABASE_URL:-"mysql+pymysql://root:lab_web_root_123@db:3306/lab_web?charset=utf8mb4"}
+export MYSQL_HOST=${MYSQL_HOST:-"db"}
+export MYSQL_PORT=${MYSQL_PORT:-"3306"}
+export MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-"lab_web_root_123"}
+export MYSQL_DATABASE=${MYSQL_DATABASE:-"lab_web"}
+export SECRET_KEY=${SECRET_KEY:-"change_me_in_production"}
+export JWT_SECRET_KEY=${JWT_SECRET_KEY:-"change_me_jwt_in_production"}
+export FLASK_CONFIG=${FLASK_CONFIG:-"production"}
+export UPLOAD_FOLDER=${UPLOAD_FOLDER:-"/app/media"}
+export CORS_ORIGINS=${CORS_ORIGINS:-"*"}
+
+# Log configuration
+echo "=== Backend Configuration ==="
+echo "DATABASE_URL: $DATABASE_URL"
+echo "MYSQL_HOST: $MYSQL_HOST"
+echo "MYSQL_PORT: $MYSQL_PORT"
+echo "MYSQL_DATABASE: $MYSQL_DATABASE"
+echo "FLASK_CONFIG: $FLASK_CONFIG"
+echo "UPLOAD_FOLDER: $UPLOAD_FOLDER"
+echo "CORS_ORIGINS: $CORS_ORIGINS"
+echo "================================"
+
 # 等待數據庫連接
 echo "📡 等待數據庫服務..."
 

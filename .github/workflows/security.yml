@@ -1,0 +1,183 @@
+name: Code Quality & Security
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run security scans weekly on Sundays at 2 AM UTC
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install Python linting tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 black isort mypy bandit safety
+          
+      - name: Install Node.js dependencies
+        run: |
+          cd frontend
+          npm ci
+          
+      - name: Lint Python code (Backend)
+        run: |
+          cd backend
+          echo "Running flake8..."
+          flake8 app/ --max-line-length=88 --extend-ignore=E203,W503
+          
+          echo "Checking code formatting with black..."
+          black --check app/
+          
+          echo "Checking import sorting with isort..."
+          isort --check-only app/
+          
+      - name: Lint TypeScript/Vue code (Frontend)
+        run: |
+          cd frontend
+          npm run lint
+          
+      - name: Type check frontend
+        run: |
+          cd frontend
+          npx vue-tsc --noEmit
+          
+      - name: Security check - Python (Bandit)
+        run: |
+          cd backend
+          bandit -r app/ -f json -o bandit-results.json || true
+          
+      - name: Security check - Python dependencies (Safety)
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          safety check --json --output safety-results.json || true
+          
+      - name: Security check - Node.js (npm audit)
+        run: |
+          cd frontend
+          npm audit --audit-level=moderate --json > npm-audit-results.json || true
+
+  dependency-review:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v3
+        with:
+          fail-on-severity: moderate
+          
+  codeql-analysis:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+      
+    strategy:
+      matrix:
+        language: [python, javascript]
+        
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          
+      - name: Set up Python (for Python analysis)
+        if: matrix.language == 'python'
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Install Python dependencies (for Python analysis)
+        if: matrix.language == 'python'
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Set up Node.js (for JavaScript analysis)
+        if: matrix.language == 'javascript'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install Node.js dependencies (for JavaScript analysis)
+        if: matrix.language == 'javascript'
+        run: |
+          cd frontend
+          npm ci
+          
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+  docker-security-scan:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+      security-events: write
+      
+    strategy:
+      matrix:
+        service: [frontend, backend]
+        
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Build Docker image for scanning
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ matrix.service }}
+          file: ./${{ matrix.service }}/Dockerfile
+          load: true
+          tags: lab-website-${{ matrix.service }}:security-scan
+          cache-from: type=gha
+          
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: lab-website-${{ matrix.service }}:security-scan
+          format: sarif
+          output: trivy-results-${{ matrix.service }}.sarif
+          
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results-${{ matrix.service }}.sarif
