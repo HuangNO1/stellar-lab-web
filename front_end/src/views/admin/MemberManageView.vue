@@ -139,10 +139,10 @@
             />
           </n-form-item>
           
-          <n-form-item :label="$t('admin.members.form.group')">
+          <n-form-item :label="$t('admin.members.form.group.label')">
             <n-select
               v-model:value="batchFormData.research_group_id"
-              :options="groupOptions"
+              :options="groupOptionsWithNone"
               :placeholder="$t('admin.members.form.placeholders.group')"
               clearable
             />
@@ -245,7 +245,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, h, computed } from 'vue';
+import { ref, reactive, onMounted, h, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMessage, NButton, NTag, NAvatar, NSpace, zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
 import { memberApi, researchGroupApi } from '@/services/api';
@@ -306,6 +306,15 @@ const pagination = reactive({
 
 // 課題組選項
 const groupOptions = ref<Array<{ label: string; value: number; nameEn?: string }>>([]);
+
+// 包含「無」選項的課題組選擇列表
+const groupOptionsWithNone = computed(() => {
+  const noneOption = {
+    label: t('admin.members.form.group.none'),
+    value: null
+  };
+  return [noneOption, ...groupOptions.value];
+});
 
 // 選項數據
 const typeOptions = computed(() => [

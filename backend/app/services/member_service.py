@@ -377,7 +377,7 @@ class MemberService(BaseService):
     def _validate_member_data(self, form_data: Dict[str, Any], is_create: bool = True) -> None:
         """校驗成員數據"""
         if is_create:
-            required_fields = ['mem_name_zh', 'mem_name_en', 'mem_email', 'mem_type', 'research_group_id']
+            required_fields = ['mem_name_zh', 'mem_name_en', 'mem_email', 'mem_type']
             self.validate_required_fields(form_data, required_fields)
         
         # 郵箱格式校驗
@@ -480,11 +480,15 @@ class MemberService(BaseService):
                 raise ValidationError(msg.get_error_message('STATUS_FORMAT_ERROR'))
         
         if 'research_group_id' in update_fields:
-            try:
-                research_group_id = int(update_fields['research_group_id'])
-                update_fields['research_group_id'] = research_group_id
-            except (ValueError, TypeError):
-                raise ValidationError(msg.get_error_message('RESEARCH_GROUP_ID_FORMAT_ERROR'))
+            # Allow null values for research_group_id (meaning no group assignment)
+            if update_fields['research_group_id'] is None or update_fields['research_group_id'] == '':
+                update_fields['research_group_id'] = None
+            else:
+                try:
+                    research_group_id = int(update_fields['research_group_id'])
+                    update_fields['research_group_id'] = research_group_id
+                except (ValueError, TypeError):
+                    raise ValidationError(msg.get_error_message('RESEARCH_GROUP_ID_FORMAT_ERROR'))
     
     def _set_member_basic_info(self, member: Member, form_data: Dict[str, Any]) -> None:
         """設置成員基本信息"""
@@ -572,7 +576,15 @@ class MemberService(BaseService):
     def _set_member_associations(self, member: Member, form_data: Dict[str, Any]) -> None:
         """設置成員關聯信息"""
         if 'research_group_id' in form_data:
-            research_group_id = int(form_data['research_group_id'])
+            research_group_id = form_data['research_group_id']
+            
+            # 如果research_group_id為空、None或0，則不設置課題組
+            if not research_group_id or research_group_id == 0:
+                member.research_group_id = None
+                member.lab_id = None
+                return
+            
+            research_group_id = int(research_group_id)
             research_group = ResearchGroup.query.filter_by(
                 research_group_id=research_group_id, 
                 enable=1
@@ -588,24 +600,35 @@ class MemberService(BaseService):
         """更新成員關聯信息"""
         update_data = {}
         
+        # 處理課題組關聯更新
         if 'research_group_id' in form_data:
-            new_group_id = int(form_data['research_group_id'])
+            new_group_id = form_data['research_group_id']
             old_group_id = member.research_group_id
             
+            # 處理空值情況
+            if not new_group_id or new_group_id == 0:
+                new_group_id = None
+            else:
+                new_group_id = int(new_group_id)
+            
             if new_group_id != old_group_id:
-                research_group = ResearchGroup.query.filter_by(
-                    research_group_id=new_group_id, 
-                    enable=1
-                ).first()
-                
-                if not research_group:
-                    raise ValidationError('指定的課題組不存在')
-                
-                member.research_group_id = new_group_id
-                member.lab_id = research_group.lab_id
+                if new_group_id:
+                    research_group = ResearchGroup.query.filter_by(
+                        research_group_id=new_group_id, 
+                        enable=1
+                    ).first()
+                    
+                    if not research_group:
+                        raise ValidationError(msg.get_error_message('RESEARCH_GROUP_NOT_FOUND'))
+                    
+                    member.research_group_id = new_group_id
+                    member.lab_id = research_group.lab_id
+                else:
+                    # 清空課題組關聯
+                    member.research_group_id = None
+                    member.lab_id = None
                 
                 update_data['research_group_id'] = {'old': old_group_id, 'new': new_group_id}
-                update_data['lab_id'] = {'old': member.lab_id, 'new': research_group.lab_id}
         
         return update_data
     

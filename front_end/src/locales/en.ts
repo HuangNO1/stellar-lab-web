@@ -378,7 +378,10 @@ export default {
         studentGrade: 'Grade',
         destinationZh: 'Destination (Chinese)',
         destinationEn: 'Destination (English)',
-        group: 'Research Group',
+        group: {
+          label: 'Research Group',
+          none: 'None'
+        },
         description: 'Description (Chinese)',
         descriptionEn: 'Description (English)',
         avatar: 'Avatar Upload',

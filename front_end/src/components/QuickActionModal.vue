@@ -120,10 +120,11 @@
             </n-form-item>
           </template>
           
-          <n-form-item :label="t('admin.members.form.group')" path="research_group_id">
+          <!-- 課題組選擇，所有類型都可以選擇「無」 -->
+          <n-form-item :label="t('admin.members.form.group.label')" path="research_group_id">
             <n-select
               v-model:value="formData.research_group_id"
-              :options="researchGroupOptions"
+              :options="researchGroupOptionsWithNone"
               :placeholder="t('admin.members.form.placeholders.group')"
               :loading="loadingGroups"
               style="width: 100%"
@@ -620,6 +621,15 @@ const enableOptions = computed(() => [
 const researchGroupOptions = ref<Array<{ label: string; value: number }>>([]);
 const memberOptions = ref<Array<{ label: string; value: number }>>([]);
 
+// 包含「無」選項的課題組選擇列表
+const researchGroupOptionsWithNone = computed(() => {
+  const noneOption = {
+    label: t('admin.members.form.group.none'),
+    value: null
+  };
+  return [noneOption, ...researchGroupOptions.value];
+});
+
 // Computed
 const modalTitle = computed(() => {
   // 如果是僅密碼修改模式
@@ -668,16 +678,7 @@ const formRules = computed(() => {
       },
       trigger: 'change'
     };
-    rules.research_group_id = {
-      required: false,
-      validator: (rule: any, value: any) => {
-        if (value === null || value === undefined || value === '') {
-          return new Error(t('admin.members.form.validation.groupRequired'));
-        }
-        return true;
-      },
-      trigger: 'change'
-    };
+    // research_group_id is now optional for all member types - removed validation
     
     // 條件性驗證規則 - 使用 validator 函數動態檢查
     rules.job_type = {
@@ -1242,6 +1243,9 @@ const handleSubmit = async () => {
       } else if (value instanceof Date) {
         // 日期對象都是有效的
         isValidValue = true;
+      } else if (key === 'research_group_id' && value === null) {
+        // 特殊處理：research_group_id 的 null 值是有效的（代表選擇了「無」）
+        isValidValue = true;
       } else {
         // null、undefined、function 等都是無效的
         isValidValue = false;
@@ -1272,6 +1276,9 @@ const handleSubmit = async () => {
           value.forEach((item, index) => {
             submitData.append(`${key}[${index}]`, String(item));
           });
+        } else if (value === null) {
+          // null 值特殊處理：用空字符串表示
+          submitData.append(key, '');
         } else {
           submitData.append(key, String(value));
         }

@@ -371,7 +371,10 @@ export default {
         studentGrade: '年級',
         destinationZh: '去向（中文）',
         destinationEn: '去向（英文）',
-        group: '課題組',
+        group: {
+          label: '課題組',
+          none: '無'
+        },
         description: '成員描述（中文）',
         descriptionEn: '成員描述（英文）',
         avatar: '頭像上傳',
