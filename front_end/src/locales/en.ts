@@ -74,7 +74,8 @@ export default {
     paperPublished: 'Paper Published',
     award: 'Award News',
     academic: 'Academic Activity',
-    other: 'Other'
+    other: 'Other',
+    viewMore: 'View More'
   },
   about: {
     title: 'About Us',

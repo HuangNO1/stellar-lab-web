@@ -74,7 +74,8 @@ export default {
     paperPublished: '論文發表',
     award: '獲獎消息',
     academic: '學術活動',
-    other: '其他'
+    other: '其他',
+    viewMore: '查看更多'
   },
   about: {
     title: '關於我們',

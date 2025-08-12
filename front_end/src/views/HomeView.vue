@@ -80,7 +80,7 @@
                   </n-tag>
                 </template>
                 <div class="card-description">
-                  {{ getCurrentLocale() === 'zh' ? group.research_group_desc_zh : group.research_group_desc_en }}
+                  {{ stripMarkdown(getCurrentLocale() === 'zh' ? group.research_group_desc_zh : group.research_group_desc_en) }}
                 </div>
                 <template #action>
                   <n-button size="small" type="primary" ghost>
@@ -144,7 +144,7 @@
                 </div>
                 <div class="news-content-compact">
                   <span class="news-title-compact">
-                    {{ getCurrentLocale() === 'zh' ? news.news_content_zh : (news.news_content_en || news.news_content_zh) }}
+                    {{ stripMarkdown(getCurrentLocale() === 'zh' ? news.news_content_zh : (news.news_content_en || news.news_content_zh)) }}
                   </span>
                 </div>
               </div>
@@ -200,6 +200,7 @@ import { useRouter } from "vue-router";
 import { useI18n } from 'vue-i18n';
 import { useResearchGroupsWithAutoFetch } from '@/composables/useResearchGroups';
 import { getMediaUrl, hasCarouselImages as checkCarouselImages } from '@/utils/media';
+import { stripMarkdown } from '@/utils/text';
 import { newsApi } from '@/services/api';
 import type { ResearchGroup, Lab, News } from '@/types/api';
 
