@@ -174,7 +174,7 @@ class LabService(BaseService):
         old_logo_path = lab.lab_logo_path
         
         try:
-            new_logo_path = save_file(file, 'lab_logo', max_size=5*1024*1024)
+            new_logo_path = save_file(file, 'image', max_size=5*1024*1024)
             lab.lab_logo_path = new_logo_path
             
             # 刪除舊文件
@@ -215,7 +215,7 @@ class LabService(BaseService):
             file = files_data[field_name]
             if file and file.filename:
                 try:
-                    new_path = save_file(file, field_name, max_size=5*1024*1024)
+                    new_path = save_file(file, 'image', max_size=5*1024*1024)
                     setattr(lab, field_name, new_path)
                     
                     # 刪除舊文件

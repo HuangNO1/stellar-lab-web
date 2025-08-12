@@ -89,7 +89,7 @@ class PaperService(BaseService):
             if files_data and 'paper_file' in files_data:
                 file = files_data['paper_file']
                 if file and file.filename:
-                    file_path = save_file(file, 'paper', max_size=50*1024*1024)
+                    file_path = save_file(file, 'document', max_size=50*1024*1024)
             
             # 獲取默認實驗室和課題組
             lab = Lab.query.filter_by(enable=1).first()
@@ -230,7 +230,7 @@ class PaperService(BaseService):
         old_file_path = paper.paper_file_path
         
         try:
-            new_file_path = save_file(file, 'paper', max_size=50*1024*1024)
+            new_file_path = save_file(file, 'document', max_size=50*1024*1024)
             paper.paper_file_path = new_file_path
             
             # 刪除舊文件

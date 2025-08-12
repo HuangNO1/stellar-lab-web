@@ -1026,7 +1026,8 @@ PUT /api/papers/{paper_id}
 **請求頭**
 ```
 Authorization: Bearer <token>
-Content-Type: application/json
+Content-Type: multipart/form-data （當包含文件或文件刪除操作時）
+Content-Type: application/json （僅更新基本信息時）
 ```
 
 **路徑參數**
@@ -1048,6 +1049,8 @@ Content-Type: application/json
 | paper_url | string | - | 論文URL | https://new-url.com |
 | research_group_id | integer | - | 所屬課題組ID | 2 |
 | authors | array | - | 作者列表 | 見範例 |
+| paper_file | file | - | 論文文件 | paper.pdf |
+| paper_file_delete | string | - | 刪除論文文件（值為"true"時刪除） | true |
 
 **請求範例**
 ```json
