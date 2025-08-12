@@ -42,7 +42,29 @@
 ```
 Authorization: Bearer <token>
 Content-Type: application/json
+Accept-Language: zh  # 或 en，指定返回消息的語言
+X-Language: zh       # 自定義語言頭，優先級高於 Accept-Language
 ```
+
+### 國際化支持
+
+API 支持中英文響應消息，語言檢測優先級：
+1. **X-Language** 請求頭 (`zh` | `en`)
+2. **Accept-Language** 請求頭
+3. **默認中文** (`zh`)
+
+**前端集成範例**：
+```javascript
+// 自動從用戶設置獲取語言
+const currentLanguage = Cookies.get('language') || 'zh';
+
+axios.defaults.headers['Accept-Language'] = currentLanguage;
+axios.defaults.headers['X-Language'] = currentLanguage;
+```
+
+**支持的語言**：
+- `zh`: 繁體中文（默認）
+- `en`: English
 
 ### 權限級別
 - **普通管理員**: `@admin_required`
@@ -66,6 +88,26 @@ Content-Type: application/json
 {
   "code": 2000,
   "message": "參數錯誤",
+  "data": null
+}
+```
+
+**國際化錯誤消息範例**：
+
+中文請求 (`X-Language: zh`):
+```json
+{
+  "code": 3000,
+  "message": "成員不存在",
+  "data": null
+}
+```
+
+英文請求 (`X-Language: en`):
+```json
+{
+  "code": 3000,
+  "message": "Member not found",
   "data": null
 }
 ```
@@ -151,15 +193,23 @@ GET /api/members?all=false&page=2&per_page=5
 
 ## 錯誤碼說明
 
-| 錯誤碼 | 說明 | HTTP狀態碼 |
-|-------|------|-----------|
-| 0 | 成功 | 200 |
-| 1000 | 認證錯誤（使用者名稱密碼錯誤） | 401 |
-| 1001 | 權限不足 | 403 |
-| 2000 | 參數校驗錯誤 | 400 |
-| 3000 | 資源不存在 | 404 |
-| 4000 | 操作衝突 | 409 |
-| 5000 | 伺服器內部錯誤 | 500 |
+| 錯誤碼 | 說明 | HTTP狀態碼 | 國際化支持 |
+|-------|------|-----------|-----------|
+| 0 | 成功 | 200 | ✅ |
+| 1000 | 認證錯誤（使用者名稱密碼錯誤） | 401 | ✅ |
+| 1001 | 權限不足 | 403 | ✅ |
+| 2000 | 參數校驗錯誤 | 400 | ✅ |
+| 3000 | 資源不存在 | 404 | ✅ |
+| 4000 | 操作衝突 | 409 | ✅ |
+| 5000 | 伺服器內部錯誤 | 500 | ✅ |
+
+**國際化錯誤消息類型**：
+- **成功消息**: 創建成功、更新成功、刪除成功等
+- **驗證錯誤**: 參數格式錯誤、必填字段缺失等  
+- **業務邏輯錯誤**: 關聯約束、權限限制等
+- **系統錯誤**: 服務不可用、內部處理異常等
+
+所有錯誤消息根據請求語言自動返回中文或英文。
 
 ## API 介面
 

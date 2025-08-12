@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 import type { 
   ApiResponse, 
   PaginatedResponse, 
@@ -43,6 +44,11 @@ api.interceptors.request.use(
         if (token) {
             config.headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
         }
+        
+        // 添加語言設置頭部
+        const currentLanguage = Cookies.get('language') || 'zh';
+        config.headers['Accept-Language'] = currentLanguage;
+        config.headers['X-Language'] = currentLanguage;
         
         // 安全檢查：清理請求數據中的潛在XSS
         if (config.data && typeof config.data === 'object') {

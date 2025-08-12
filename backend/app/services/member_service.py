@@ -244,10 +244,10 @@ class MemberService(BaseService):
                         
                         deleted_count += 1
                     else:
-                        failed_members.append(f"成員ID {mem_id} 不存在")
+                        failed_members.append(f"Member ID {mem_id} not found")
                         
                 except Exception as e:
-                    failed_members.append(f"成員ID {mem_id}: {str(e)}")
+                    failed_members.append(f"Member ID {mem_id}: {str(e)}")
             
             result = {
                 'deleted_count': deleted_count,
@@ -308,10 +308,10 @@ class MemberService(BaseService):
                         
                         updated_count += 1
                     else:
-                        failed_members.append(f"成員ID {mem_id} 不存在")
+                        failed_members.append(f"Member ID {mem_id} not found")
                         
                 except Exception as e:
-                    failed_members.append(f"成員ID {mem_id}: {str(e)}")
+                    failed_members.append(f"Member ID {mem_id}: {str(e)}")
             
             result = {
                 'updated_count': updated_count,

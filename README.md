@@ -230,6 +230,89 @@ This framework is specifically designed for laboratories currently using GitHub 
 - **Search Functionality**: Find papers, members, and projects easily
 - **Admin Controls**: Multiple administrators with different permission levels
 
+## 🌏 Localization Configuration
+
+### Chinese Language Support (Traditional vs Simplified)
+
+The system currently uses **Traditional Chinese (繁體中文)** as the default Chinese localization. If you need **Simplified Chinese (简体中文)** support, you'll need to modify the following files:
+
+#### Backend Localization
+**File**: `/backend/app/utils/messages_zh.py`
+- **Current**: Traditional Chinese (繁體中文)
+- **Contains**: Error messages, success notifications, validation messages
+
+**To switch to Simplified Chinese:**
+```python
+# Replace Traditional Chinese characters with Simplified equivalents
+# Example changes:
+'LOGIN_SUCCESS': '登录成功',        # was: '登錄成功'
+'CREATE_SUCCESS': '创建成功',       # was: '創建成功' 
+'LAB_UPDATE_SUCCESS': '实验室信息更新成功',  # was: '實驗室信息更新成功'
+'RESEARCH_GROUP_CREATE_SUCCESS': '研究组创建成功',  # was: '課題組創建成功'
+```
+
+#### Frontend Localization  
+**File**: `/frontend/src/locales/zh.ts`
+- **Current**: Traditional Chinese (繁體中文)
+- **Contains**: UI labels, navigation, form labels, system messages
+
+**To switch to Simplified Chinese:**
+```typescript
+export default {
+  nav: {
+    home: '首页',        // was: '首頁'
+    members: '成员',     // was: '成員' 
+    projects: '项目',    // was: '項目'
+    papers: '论文',      // was: '論文'
+    news: '新闻',        // was: '新聞'
+  },
+  common: {
+    loading: '加载中...',  // was: '載入中...'
+    error: '错误',         // was: '錯誤'
+    confirm: '确认',       // was: '確認'
+    cancel: '取消',        // same in both
+    fetchError: '获取数据失败',  // was: '獲取數據失敗'
+    // ... continue with other translations
+  }
+  // ... rest of the translation object
+}
+```
+
+#### Conversion Tools & Tips
+
+1. **Automatic Conversion**: Use online tools like [OpenCC](https://github.com/BYVoid/OpenCC) for batch conversion
+2. **Manual Review**: Always review automated conversions for context-specific terms
+3. **Technical Terms**: Some technical terms may remain the same in both variants
+4. **Testing**: Test the interface thoroughly after making changes
+
+#### Supporting Both Variants
+
+If you need to support both Traditional and Simplified Chinese:
+
+1. **Create separate locale files:**
+   - `zh-TW.ts` (Traditional Chinese)
+   - `zh-CN.ts` (Simplified Chinese)
+
+2. **Update frontend i18n configuration:**
+```typescript
+// In src/locales/index.ts
+import zhTW from './zh-TW'
+import zhCN from './zh-CN'
+
+const messages = {
+  en,
+  'zh-TW': zhTW,
+  'zh-CN': zhCN
+}
+```
+
+3. **Add language selector in UI** to let users choose their preferred variant
+
+#### Notes
+- The current preview images in `/preview/zh/` show Traditional Chinese interface
+- Remember to rebuild the frontend after making localization changes
+- Consider your target audience when choosing the Chinese variant
+
 ## 📁 Project Structure
 
 ```

@@ -42,7 +42,29 @@ Interfaces requiring authentication use JWT (JSON Web Token) for identity verifi
 ```
 Authorization: Bearer <token>
 Content-Type: application/json
+Accept-Language: en  # or zh, specify language for response messages
+X-Language: en       # custom language header, higher priority than Accept-Language
 ```
+
+### Internationalization Support
+
+The API supports bilingual response messages (Chinese and English). Language detection priority:
+1. **X-Language** request header (`zh` | `en`)
+2. **Accept-Language** request header
+3. **Default Chinese** (`zh`)
+
+**Frontend Integration Example**:
+```javascript
+// Automatically get language from user settings
+const currentLanguage = Cookies.get('language') || 'zh';
+
+axios.defaults.headers['Accept-Language'] = currentLanguage;
+axios.defaults.headers['X-Language'] = currentLanguage;
+```
+
+**Supported Languages**:
+- `zh`: Traditional Chinese (default)
+- `en`: English
 
 ### Permission Levels
 - **Regular Administrator**: `@admin_required`
@@ -66,6 +88,26 @@ Content-Type: application/json
 {
   "code": 2000,
   "message": "Parameter error",
+  "data": null
+}
+```
+
+**Internationalized Error Message Examples**:
+
+Chinese request (`X-Language: zh`):
+```json
+{
+  "code": 3000,
+  "message": "成員不存在",
+  "data": null
+}
+```
+
+English request (`X-Language: en`):
+```json
+{
+  "code": 3000,
+  "message": "Member not found",
   "data": null
 }
 ```
@@ -151,15 +193,23 @@ GET /api/members?all=false&page=2&per_page=5
 
 ## Error Code Description
 
-| Error Code | Description | HTTP Status Code |
-|-----------|-------------|------------------|
-| 0 | Success | 200 |
-| 1000 | Authentication error (wrong username/password) | 401 |
-| 1001 | Insufficient permissions | 403 |
-| 2000 | Parameter validation error | 400 |
-| 3000 | Resource not found | 404 |
-| 4000 | Operation conflict | 409 |
-| 5000 | Internal server error | 500 |
+| Error Code | Description | HTTP Status Code | I18n Support |
+|-----------|-------------|------------------|--------------|
+| 0 | Success | 200 | ✅ |
+| 1000 | Authentication error (wrong username/password) | 401 | ✅ |
+| 1001 | Insufficient permissions | 403 | ✅ |
+| 2000 | Parameter validation error | 400 | ✅ |
+| 3000 | Resource not found | 404 | ✅ |
+| 4000 | Operation conflict | 409 | ✅ |
+| 5000 | Internal server error | 500 | ✅ |
+
+**Internationalized Error Message Types**:
+- **Success Messages**: Created successfully, Updated successfully, Deleted successfully, etc.
+- **Validation Errors**: Invalid parameter format, Missing required fields, etc.
+- **Business Logic Errors**: Association constraints, Permission restrictions, etc.
+- **System Errors**: Service unavailable, Internal processing exceptions, etc.
+
+All error messages are automatically returned in Chinese or English based on request language.
 
 ## API Interfaces
 
