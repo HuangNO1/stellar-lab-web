@@ -498,6 +498,92 @@ import { memberApi, paperApi, projectApi, newsApi, researchGroupApi, adminApi } 
 import { getMediaUrl } from '@/utils/media';
 import I18nMdEditor from '@/components/I18nMdEditor.vue';
 import ImageCropperModal from '@/components/ImageCropperModal.vue';
+import type { ApiResponse, Member, ResearchGroup } from '@/types/api';
+
+// Form data interfaces based on module types
+interface MemberFormData {
+  mem_name_zh?: string;
+  mem_name_en?: string;
+  mem_email?: string;
+  mem_type?: number;
+  job_type?: number;
+  student_type?: number;
+  student_grade?: number;
+  destination_zh?: string;
+  destination_en?: string;
+  research_group_id?: number | null;
+  mem_desc_zh?: string;
+  mem_desc_en?: string;
+  mem_avatar?: string;
+  mem_avatar_delete?: boolean;
+}
+
+interface PaperFormData {
+  paper_title_zh?: string;
+  paper_title_en?: string;
+  paper_desc_zh?: string;
+  paper_desc_en?: string;
+  authors?: number[];
+  paper_venue?: string;
+  paper_type?: number;
+  paper_date?: number | null;
+  paper_accept?: number;
+  paper_url?: string;
+  paper_file?: string;
+  paper_file_delete?: boolean;
+}
+
+interface ProjectFormData {
+  project_name_zh?: string;
+  project_name_en?: string;
+  project_desc_zh?: string;
+  project_desc_en?: string;
+  project_url?: string;
+  project_date_start?: number | null;
+  is_end?: number;
+}
+
+interface NewsFormData {
+  news_type?: number;
+  news_content_zh?: string;
+  news_content_en?: string;
+  news_date?: number | null;
+}
+
+interface ResearchGroupFormData {
+  research_group_name_zh?: string;
+  research_group_name_en?: string;
+  research_group_desc_zh?: string;
+  research_group_desc_en?: string;
+  mem_id?: number;
+}
+
+interface AdminFormData {
+  admin_name?: string;
+  admin_pass?: string;
+  is_super?: number;
+  enable?: number;
+  old_password?: string;
+  new_password?: string;
+  confirm_password?: string;
+  admin_id?: number;
+}
+
+type FormData = MemberFormData | PaperFormData | ProjectFormData | NewsFormData | ResearchGroupFormData | AdminFormData;
+
+interface SelectOption {
+  label: string;
+  value: number | string | null;
+}
+
+interface FormRule {
+  required?: boolean;
+  message?: string;
+  trigger: string | string[];
+  min?: number;
+  type?: string;
+  validator?: (rule: unknown, value: unknown) => boolean | Error;
+}
 
 const { t, locale } = useI18n();
 const authStore = useAuthStore();
@@ -507,8 +593,8 @@ interface Props {
   modelValue: boolean;
   moduleType: 'members' | 'papers' | 'projects' | 'news' | 'research-groups' | 'admins';
   actionType: 'create' | 'edit';
-  editData?: Record<string, any>;
-  passwordOnly?: boolean; // 新增：僅密碼修改模式
+  editData?: Record<string, unknown>;
+  passwordOnly?: boolean; // 新增：仅密码修改模式
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -519,12 +605,12 @@ const props = withDefaults(defineProps<Props>(), {
 // Emits
 const emit = defineEmits<{
   'update:modelValue': [value: boolean];
-  'success': [data: any];
+  'success': [data: Record<string, unknown>];
 }>();
 
 // Reactive data
 const show = ref(props.modelValue);
-const formRef = ref();
+const formRef = ref<{ validate: () => Promise<void>; restoreValidation: (fields?: string[]) => void } | null>(null);
 const submitting = ref(false);
 const message = useMessage();
 const isMobile = ref(window.innerWidth <= 768);
@@ -533,8 +619,8 @@ const isMobile = ref(window.innerWidth <= 768);
 const loadingGroups = ref(false);
 const loadingMembers = ref(false);
 
-// Form data
-const formData = reactive<Record<string, any>>({});
+// Form data - using a generic Record type that can be narrowed based on module type
+const formData = reactive<Record<string, unknown>>({});
 const uploadedFiles = reactive<Record<string, File>>({});
 
 // 計算是否有頭像需要顯示
@@ -618,12 +704,12 @@ const enableOptions = computed(() => [
   { label: t('admin.common.enabled'), value: 1 }
 ]);
 
-const researchGroupOptions = ref<Array<{ label: string; value: number }>>([]);
-const memberOptions = ref<Array<{ label: string; value: number }>>([]);
+const researchGroupOptions = ref<SelectOption[]>([]);
+const memberOptions = ref<SelectOption[]>([]);
 
 // 包含「無」選項的課題組選擇列表
 const researchGroupOptionsWithNone = computed(() => {
-  const noneOption = {
+  const noneOption: SelectOption = {
     label: t('admin.members.form.group.none'),
     value: null
   };
@@ -655,58 +741,58 @@ const modalTitle = computed(() => {
 
 // Form rules - 使用固定的规则对象
 const formRules = computed(() => {
-  const rules: Record<string, any> = {};
+  const rules: Record<string, FormRule[]> = {};
   
   if (props.moduleType === 'members') {
-    rules.mem_name_zh = { required: true, message: t('admin.members.form.validation.nameZhRequired'), trigger: 'blur' };
-    rules.mem_name_en = { required: true, message: t('admin.members.form.validation.nameEnRequired'), trigger: 'blur' };
+    rules.mem_name_zh = [{ required: true, message: t('admin.members.form.validation.nameZhRequired'), trigger: 'blur' }];
+    rules.mem_name_en = [{ required: true, message: t('admin.members.form.validation.nameEnRequired'), trigger: 'blur' }];
     rules.mem_email = [
       { required: true, message: t('admin.members.form.validation.emailRequired'), trigger: 'blur' },
       { type: 'email', message: t('admin.common.validationMessages.invalidEmail'), trigger: 'blur' }
     ];
-    rules.mem_type = {
+    rules.mem_type = [{
       required: false,
-      validator: (rule: any, value: any) => {
+      validator: (rule: unknown, value: unknown) => {
         if (value === null || value === undefined || value === '') {
           return new Error(t('admin.members.form.validation.typeRequired'));
         }
         // 檢查成員類型是否為有效值 (0, 1, 2)
-        if (![0, 1, 2].includes(value)) {
+        if (![0, 1, 2].includes(value as number)) {
           return new Error(t('admin.members.form.validation.typeRequired'));
         }
         return true;
       },
       trigger: 'change'
-    };
+    }];
     // research_group_id is now optional for all member types - removed validation
     
     // 條件性驗證規則 - 使用 validator 函數動態檢查
-    rules.job_type = {
+    rules.job_type = [{
       required: false,
-      validator: (rule: any, value: any) => {
-        if (formData.mem_type === 0 && (value === null || value === undefined || value === '')) {
+      validator: (rule: unknown, value: unknown) => {
+        if ((formData as MemberFormData).mem_type === 0 && (value === null || value === undefined || value === '')) {
           return new Error(t('admin.members.form.validation.jobTypeRequired'));
         }
         return true;
       },
       trigger: ['change', 'blur']
-    };
+    }];
     
-    rules.student_type = {
+    rules.student_type = [{
       required: false,
-      validator: (rule: any, value: any) => {
-        if (formData.mem_type === 1 && (value === null || value === undefined || value === '')) {
+      validator: (rule: unknown, value: unknown) => {
+        if ((formData as MemberFormData).mem_type === 1 && (value === null || value === undefined || value === '')) {
           return new Error(t('admin.members.form.validation.studentTypeRequired'));
         }
         return true;
       },
       trigger: ['change', 'blur']
-    };
+    }];
     
-    rules.student_grade = {
+    rules.student_grade = [{
       required: false,
-      validator: (rule: any, value: any) => {
-        if (formData.mem_type === 1) {
+      validator: (rule: unknown, value: unknown) => {
+        if ((formData as MemberFormData).mem_type === 1) {
           if (value === null || value === undefined || value === '') {
             return new Error(t('admin.members.form.validation.studentGradeRequired'));
           }
@@ -717,70 +803,70 @@ const formRules = computed(() => {
         return true;
       },
       trigger: ['change', 'blur']
-    };
+    }];
     
   } else if (props.moduleType === 'papers') {
-    rules.paper_title_zh = { required: true, message: t('admin.papers.form.validation.titleZhRequired'), trigger: 'blur' };
-    rules.paper_type = {
+    rules.paper_title_zh = [{ required: true, message: t('admin.papers.form.validation.titleZhRequired'), trigger: 'blur' }];
+    rules.paper_type = [{
       required: false,
-      validator: (rule: any, value: any) => {
+      validator: (rule: unknown, value: unknown) => {
         if (value === null || value === undefined || value === '') {
           return new Error(t('admin.papers.form.validation.typeRequired'));
         }
         return true;
       },
       trigger: 'change'
-    };
-    rules.paper_accept = {
+    }];
+    rules.paper_accept = [{
       required: false,
-      validator: (rule: any, value: any) => {
+      validator: (rule: unknown, value: unknown) => {
         if (value === null || value === undefined || value === '') {
           return new Error(t('admin.papers.form.validation.statusRequired'));
         }
         return true;
       },
       trigger: 'change'
-    };
-    rules.paper_date = {
+    }];
+    rules.paper_date = [{
       required: false,
-      validator: (rule: any, value: any) => {
+      validator: (rule: unknown, value: unknown) => {
         if (value === null || value === undefined || value === '') {
           return new Error(t('admin.papers.form.validation.dateRequired'));
         }
         return true;
       },
       trigger: 'change'
-    };
+    }];
   } else if (props.moduleType === 'projects') {
-    rules.project_name_zh = { required: true, message: t('admin.projects.form.validation.nameZhRequired'), trigger: 'blur' };
+    rules.project_name_zh = [{ required: true, message: t('admin.projects.form.validation.nameZhRequired'), trigger: 'blur' }];
   } else if (props.moduleType === 'news') {
-    rules.news_type = {
+    rules.news_type = [{
       required: false,
-      validator: (rule: any, value: any) => {
+      validator: (rule: unknown, value: unknown) => {
         if (value === null || value === undefined || value === '') {
           return new Error(t('admin.news.form.validation.typeRequired'));
         }
         return true;
       },
       trigger: 'change'
-    };
-    rules.news_content_zh = { required: true, message: t('admin.news.form.validation.contentZhRequired'), trigger: 'blur' };
-    rules.news_date = {
+    }];
+    rules.news_content_zh = [{ required: true, message: t('admin.news.form.validation.contentZhRequired'), trigger: 'blur' }];
+    rules.news_date = [{
       required: false,
-      validator: (rule: any, value: any) => {
+      validator: (rule: unknown, value: unknown) => {
         if (value === null || value === undefined || value === '') {
           return new Error(t('admin.news.form.validation.dateRequired'));
         }
         return true;
       },
       trigger: 'change'
-    };
+    }];
   } else if (props.moduleType === 'research-groups') {
-    rules.research_group_name_zh = { required: true, message: t('admin.groups.form.validation.nameZhRequired'), trigger: 'blur' };
+    rules.research_group_name_zh = [{ required: true, message: t('admin.groups.form.validation.nameZhRequired'), trigger: 'blur' }];
   } else if (props.moduleType === 'admins') {
     if (props.passwordOnly) {
       // 密碼修改模式的驗證規則
-      rules.old_password = { required: true, message: t('admin.profile.validation.currentPasswordRequired'), trigger: 'blur' };
+      rules.old_password = [{ required: true, message: t('admin.profile.validation.currentPasswordRequired'), trigger: 'blur' }];
       rules.new_password = [
         { required: true, message: t('admin.profile.validation.newPasswordRequired'), trigger: 'blur' },
         { min: 6, message: t('admin.profile.validation.passwordMinLength'), trigger: 'blur' }
@@ -788,8 +874,9 @@ const formRules = computed(() => {
       rules.confirm_password = [
         { required: true, message: t('admin.profile.validation.confirmPasswordRequired'), trigger: 'blur' },
         {
-          validator: (rule: any, value: string) => {
-            if (value !== formData.new_password) {
+          message: t('admin.profile.validation.passwordNotMatch'),
+          validator: (rule: unknown, value: unknown) => {
+            if (typeof value === 'string' && value !== (formData as AdminFormData).new_password) {
               return new Error(t('admin.profile.validation.passwordNotMatch'));
             }
             return true;
@@ -799,9 +886,9 @@ const formRules = computed(() => {
       ];
     } else {
       // 正常管理員表單模式的驗證規則
-      rules.admin_name = { required: true, message: t('admin.admins.form.validation.adminNameRequired'), trigger: 'blur' };
+      rules.admin_name = [{ required: true, message: t('admin.admins.form.validation.adminNameRequired'), trigger: 'blur' }];
       if (props.actionType === 'create') {
-        rules.admin_pass = { required: true, message: t('admin.admins.form.validation.adminPassRequired'), trigger: 'blur' };
+        rules.admin_pass = [{ required: true, message: t('admin.admins.form.validation.adminPassRequired'), trigger: 'blur' }];
       }
     }
   }
@@ -822,19 +909,19 @@ watch(
           const editDataCopy = { ...props.editData };
           
           // 轉換日期字段為時間戳
-          if (editDataCopy.paper_date) {
+          if (editDataCopy.paper_date && typeof editDataCopy.paper_date === 'string') {
             editDataCopy.paper_date = parseDateForForm(editDataCopy.paper_date);
           }
-          if (editDataCopy.news_date) {
+          if (editDataCopy.news_date && typeof editDataCopy.news_date === 'string') {
             editDataCopy.news_date = parseDateForForm(editDataCopy.news_date);
           }
-          if (editDataCopy.project_date_start) {
+          if (editDataCopy.project_date_start && typeof editDataCopy.project_date_start === 'string') {
             editDataCopy.project_date_start = parseDateForForm(editDataCopy.project_date_start);
           }
           
           // 處理論文作者數據：將authors對象數組轉換為mem_id數組
           if (props.moduleType === 'papers' && editDataCopy.authors && Array.isArray(editDataCopy.authors)) {
-            editDataCopy.authors = editDataCopy.authors.map((author: any) => author.mem_id);
+            editDataCopy.authors = editDataCopy.authors.map((author: { mem_id: number }) => author.mem_id);
             console.log('轉換後的作者ID數組:', editDataCopy.authors);
           }
           
@@ -862,7 +949,7 @@ watch(locale, () => {
 });
 
 // Watch member type changes to clear conditional fields and revalidate
-watch(() => formData.mem_type, (newType, oldType) => {
+watch(() => (formData as MemberFormData).mem_type, (newType, oldType) => {
   if (props.moduleType === 'members' && newType !== oldType) {
     // 清除條件性字段
     if (oldType === 0) {
@@ -961,14 +1048,14 @@ const loadResearchGroups = async () => {
     const response = await researchGroupApi.getResearchGroups({ all: 'true' });
     // 檢查響應結構，處理實際的 API 返回格式
     if (response.code === 0 && response.data) {
-      researchGroupOptions.value = response.data.items.map((group: any) => ({
+      researchGroupOptions.value = response.data.items.map((group: ResearchGroup) => ({
         label: locale.value === 'zh' 
           ? (group.research_group_name_zh || group.research_group_name_en)
           : (group.research_group_name_en || group.research_group_name_zh),
         value: group.research_group_id
       }));
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error(t('admin.quickAction.messages.loadGroupsFailed'), error);
   } finally {
     loadingGroups.value = false;
@@ -984,7 +1071,7 @@ const loadMembers = async () => {
     
     // 檢查響應結構，處理實際的 API 返回格式
     if (response.code === 0 && response.data) {
-      memberOptions.value = response.data.items.map((member: any) => {
+      memberOptions.value = response.data.items.map((member: Member) => {
         const name = locale.value === 'zh'
           ? (member.mem_name_zh || member.mem_name_en)
           : (member.mem_name_en || member.mem_name_zh);
@@ -1004,7 +1091,7 @@ const loadMembers = async () => {
       });
       console.log(`成功加載 ${memberOptions.value.length} 個成員選項`);
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error('加載成員失敗:', error);
   } finally {
     loadingMembers.value = false;
@@ -1012,7 +1099,7 @@ const loadMembers = async () => {
 };
 
 // 成員選項過濾函數
-const filterMemberOption = (pattern: string, option: { label: string; value: number }) => {
+const filterMemberOption = (pattern: string, option: SelectOption) => {
   const searchPattern = pattern.toLowerCase();
   const label = option.label.toLowerCase();
   
@@ -1020,9 +1107,9 @@ const filterMemberOption = (pattern: string, option: { label: string; value: num
   return label.includes(searchPattern);
 };
 
-const formatDateForApi = (date: any) => {
+const formatDateForApi = (date: unknown) => {
   if (!date) return '';
-  const d = new Date(date);
+  const d = new Date(date as string | number | Date);
   return d.toISOString().split('T')[0];
 };
 
@@ -1034,18 +1121,29 @@ const parseDateForForm = (dateString: string): number | null => {
 };
 
 // 文件處理方法
-const getDefaultFileList = (fieldName: string) => {
+interface FileListItem {
+  id: string;
+  name: string;
+  status: string;
+  url: string;
+}
+
+interface FileChangeEvent {
+  fileList: Array<{ file?: File }>;
+}
+
+const getDefaultFileList = (fieldName: string): FileListItem[] => {
   if (props.actionType === 'edit' && props.editData) {
-    let filePath;
+    let filePath: string | undefined;
     
     // 特殊處理成員頭像字段
     if (fieldName === 'mem_avatar') {
-      filePath = props.editData['mem_avatar_path'];
+      filePath = props.editData['mem_avatar_path'] as string | undefined;
     } else {
-      filePath = props.editData[`${fieldName}_path`];
+      filePath = props.editData[`${fieldName}_path`] as string | undefined;
     }
     
-    if (filePath) {
+    if (filePath && typeof filePath === 'string') {
       return [{
         id: fieldName,
         name: filePath.split('/').pop() || 'file',
@@ -1057,7 +1155,7 @@ const getDefaultFileList = (fieldName: string) => {
   return [];
 };
 
-const handleFileChange = (fieldName: string, { fileList }: { fileList: any[] }) => {
+const handleFileChange = (fieldName: string, { fileList }: FileChangeEvent) => {
   if (fileList.length > 0) {
     const file = fileList[0].file;
     if (file) {
@@ -1125,20 +1223,20 @@ const getImagePreview = (fieldName: string): string => {
   
   // 如果是編輯模式且有現有圖片
   if (props.actionType === 'edit' && props.editData) {
-    let imagePath;
+    let imagePath: string | undefined;
     
     // 特殊處理成員頭像字段
     if (fieldName === 'mem_avatar') {
-      imagePath = props.editData['mem_avatar_path'];
+      imagePath = props.editData['mem_avatar_path'] as string | undefined;
       // 如果被標記為刪除，不顯示
       if (formData['mem_avatar_delete']) {
         return '';
       }
     } else {
-      imagePath = props.editData[`${fieldName}_path`];
+      imagePath = props.editData[`${fieldName}_path`] as string | undefined;
     }
     
-    if (imagePath) {
+    if (imagePath && typeof imagePath === 'string') {
       return getMediaUrl(imagePath);
     }
   }
@@ -1174,11 +1272,12 @@ const handleSubmit = async () => {
         }
 
         message.success(t('admin.profile.messages.passwordChangeSuccess'));
-        emit('success', result.data);
+        emit('success', result.data as Record<string, unknown>);
         show.value = false;
         return;
-      } catch (error: any) {
-        message.error(error.message || t('admin.profile.messages.passwordChangeFailed'));
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : t('admin.profile.messages.passwordChangeFailed');
+        message.error(errorMessage);
         return;
       } finally {
         submitting.value = false;
@@ -1218,12 +1317,13 @@ const handleSubmit = async () => {
     submitting.value = true;
 
     // 準備提交數據
-    let submitData: any;
-    // 檢查是否有實際的文件需要上傳
+    // 准备提交数据
+    let submitData: FormData | Record<string, unknown>;
+    // 检查是否有实际的文件需要上传
     const hasFiles = Object.keys(uploadedFiles).some(key => uploadedFiles[key] instanceof File);
     
-    // 過濾並清理表單數據，確保不包含函數或無效值
-    const cleanFormData = Object.keys(formData).reduce((acc: Record<string, any>, key) => {
+    // 过滤并清理表单数据，确保不包含函数或无效值
+    const cleanFormData = Object.keys(formData).reduce((acc: Record<string, unknown>, key) => {
       const value = formData[key];
       // 檢查是否為有效值 - 明確處理各種數據類型
       let isValidValue = false;
@@ -1258,10 +1358,11 @@ const handleSubmit = async () => {
     }, {});
     
     if (hasFiles) {
-      // 使用 FormData 處理文件上傳
-      submitData = new FormData();
+      // 使用 FormData 处理文件上传
+      const formDataObj = new FormData();
+      submitData = formDataObj as FormData;
       
-      // 添加清理後的表單字段
+      // 添加清理后的表单字段
       Object.keys(cleanFormData).forEach(key => {
         let value = cleanFormData[key];
         
@@ -1270,17 +1371,17 @@ const handleSubmit = async () => {
           value = formatDateForApi(value);
         }
         
-        // 確保值是可序列化的字符串或數字
+        // 确保值是可序列化的字符串或数字
         if (Array.isArray(value)) {
-          // 處理數組數據，如authors
+          // 处理数组数据，如authors
           value.forEach((item, index) => {
-            submitData.append(`${key}[${index}]`, String(item));
+            formDataObj.append(`${key}[${index}]`, String(item));
           });
         } else if (value === null) {
-          // null 值特殊處理：用空字符串表示
-          submitData.append(key, '');
+          // null 值特殊处理：用空字符串表示
+          formDataObj.append(key, '');
         } else {
-          submitData.append(key, String(value));
+          formDataObj.append(key, String(value));
         }
       });
       
@@ -1288,7 +1389,7 @@ const handleSubmit = async () => {
       Object.keys(uploadedFiles).forEach(key => {
         const file = uploadedFiles[key];
         if (file instanceof File) {
-          submitData.append(key, file);
+          formDataObj.append(key, file);
         }
       });
       
@@ -1297,18 +1398,19 @@ const handleSubmit = async () => {
       submitData = { ...cleanFormData };
       
       // 格式化日期欄位
-      if (submitData.paper_date) {
-        submitData.paper_date = formatDateForApi(submitData.paper_date);
+      const submitDataObj = submitData as Record<string, unknown>;
+      if (submitDataObj.paper_date) {
+        submitDataObj.paper_date = formatDateForApi(submitDataObj.paper_date);
       }
-      if (submitData.news_date) {
-        submitData.news_date = formatDateForApi(submitData.news_date);
+      if (submitDataObj.news_date) {
+        submitDataObj.news_date = formatDateForApi(submitDataObj.news_date);
       }
-      if (submitData.project_date_start) {
-        submitData.project_date_start = formatDateForApi(submitData.project_date_start);
+      if (submitDataObj.project_date_start) {
+        submitDataObj.project_date_start = formatDateForApi(submitDataObj.project_date_start);
       }
     }
 
-    let response;
+    let response: ApiResponse<unknown>;
     const apis = {
       members: memberApi,
       papers: paperApi,
@@ -1329,7 +1431,7 @@ const handleSubmit = async () => {
         'research-groups': 'createResearchGroup',
         admins: 'createAdmin'
       };
-      response = await (api as any)[createMethods[props.moduleType]](submitData);
+      response = await (api as unknown as Record<string, (data: FormData | Record<string, unknown>) => Promise<ApiResponse<unknown>>>)[createMethods[props.moduleType]](submitData);
     } else {
       const updateMethods = {
         members: 'updateMember',
@@ -1347,8 +1449,8 @@ const handleSubmit = async () => {
         'research-groups': 'research_group_id',
         admins: 'admin_id'
       };
-      const id = props.editData[idField[props.moduleType]];
-      response = await (api as any)[updateMethods[props.moduleType]](id, submitData);
+      const id = props.editData?.[idField[props.moduleType]];
+      response = await (api as unknown as Record<string, (id: number, data: FormData | Record<string, unknown>) => Promise<ApiResponse<unknown>>>)[updateMethods[props.moduleType]](id as number, submitData);
     }
 
     // 檢查 API 響應結構
@@ -1357,13 +1459,13 @@ const handleSubmit = async () => {
         ? t('admin.quickAction.messages.createSuccess')
         : t('admin.quickAction.messages.updateSuccess');
       message.success(successMessage);
-      emit('success', response.data);
+      emit('success', response.data as Record<string, unknown>);
       show.value = false;
     } else {
       message.error(response.message || t('admin.quickAction.messages.operationFailed'));
     }
-  } catch (error: any) {
-    if (error?.message) {
+  } catch (error) {
+    if (error instanceof Error && error.message) {
       message.error(error.message);
     } else {
       message.error(t('admin.quickAction.messages.checkInput'));

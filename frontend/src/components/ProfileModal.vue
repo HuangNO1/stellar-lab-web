@@ -154,14 +154,14 @@ const props = defineProps<Props>();
 // Emits
 const emit = defineEmits<{
   'update:modelValue': [value: boolean];
-  'success': [data: any];
+  'success': [data: Record<string, unknown>];
 }>();
 
 // Reactive data
 const show = ref(props.modelValue);
 const editMode = ref(false);
 const changePassword = ref(false);
-const formRef = ref();
+const formRef = ref<{ validate: () => Promise<void>; restoreValidation: () => void } | null>(null);
 const submitting = ref(false);
 const isMobile = ref(window.innerWidth <= 768);
 
@@ -188,12 +188,12 @@ const modalTitle = computed(() => {
 
 // Form rules
 const formRules = computed(() => {
-  const rules: Record<string, any> = {
-    admin_name: { required: true, message: t('admin.admins.form.validation.adminNameRequired'), trigger: 'blur' }
+  const rules: Record<string, { required?: boolean; message: string; trigger: string | string[]; min?: number; validator?: (rule: unknown, value: string) => boolean | Error }[]> = {
+    admin_name: [{ required: true, message: t('admin.admins.form.validation.adminNameRequired'), trigger: 'blur' }]
   };
 
   if (changePassword.value) {
-    rules.old_password = { required: true, message: t('admin.profile.validation.currentPasswordRequired'), trigger: 'blur' };
+    rules.old_password = [{ required: true, message: t('admin.profile.validation.currentPasswordRequired'), trigger: 'blur' }];
     rules.new_password = [
       { required: true, message: t('admin.profile.validation.newPasswordRequired'), trigger: 'blur' },
       { min: 6, message: t('admin.profile.validation.passwordMinLength'), trigger: 'blur' }
@@ -201,7 +201,8 @@ const formRules = computed(() => {
     rules.confirm_password = [
       { required: true, message: t('admin.profile.validation.confirmPasswordRequired'), trigger: 'blur' },
       {
-        validator: (rule: any, value: string) => {
+        message: t('admin.profile.validation.passwordNotMatch'),
+        validator: (rule: unknown, value: string) => {
           if (value !== formData.new_password) {
             return new Error(t('admin.profile.validation.passwordNotMatch'));
           }
@@ -295,7 +296,7 @@ const handleSubmit = async () => {
     submitting.value = true;
 
     // 构建请求数据
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     let needsProfileUpdate = false;
     let needsPasswordChange = false;
 
@@ -333,8 +334,9 @@ const handleSubmit = async () => {
         }
         
         message.success(t('admin.profile.messages.profileUpdateSuccess'));
-      } catch (error: any) {
-        message.error(error.message || t('admin.profile.messages.updateFailed'));
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : t('admin.profile.messages.updateFailed');
+        message.error(errorMessage);
         return;
       }
     }
@@ -362,8 +364,9 @@ const handleSubmit = async () => {
         }
 
         message.success(t('admin.profile.messages.passwordChangeSuccess'));
-      } catch (error: any) {
-        message.error(error.message || t('admin.profile.messages.passwordChangeFailed'));
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : t('admin.profile.messages.passwordChangeFailed');
+        message.error(errorMessage);
         return;
       }
     }
@@ -374,12 +377,12 @@ const handleSubmit = async () => {
       return;
     }
 
-    emit('success', authStore.admin);
+    emit('success', authStore.admin as Record<string, unknown>);
     show.value = false;
     resetForm();
 
-  } catch (error: any) {
-    if (error?.message) {
+  } catch (error) {
+    if (error instanceof Error && error.message) {
       message.error(error.message);
     } else {
       message.error(t('admin.profile.messages.updateFailed'));

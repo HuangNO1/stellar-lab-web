@@ -129,8 +129,6 @@ import type { DataTableColumns } from 'naive-ui';
 const { t, locale } = useI18n();
 const message = useMessage();
 
-// 當前語言環境
-const currentLocale = computed(() => locale.value);
 
 // Naive UI 語言包配置
 const naiveLocale = computed(() => {
@@ -152,7 +150,7 @@ const deleteTarget = ref<Project | null>(null);
 // Modal 狀態
 const showCreateModal = ref(false);
 const modalActionType = ref<'create' | 'edit'>('create');
-const editData = ref<any>({});
+const editData = ref<Partial<Project>>({});
 
 // 搜索和篩選
 const searchQuery = ref('');
@@ -251,7 +249,7 @@ const columns: DataTableColumns<Project> = [
           row.project_url ? h(NButton, {
             size: 'small',
             type: 'info',
-            onClick: () => window.open(row.project_url!, '_blank', 'noopener,noreferrer')
+            onClick: () => row.project_url && window.open(row.project_url, '_blank', 'noopener,noreferrer')
           }, { default: () => t('projects.viewRepository') }) : null,
           h(NButton, {
             size: 'small',

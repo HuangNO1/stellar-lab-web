@@ -136,8 +136,6 @@ import type { DataTableColumns } from 'naive-ui';
 const { t, locale } = useI18n();
 const message = useMessage();
 
-// 當前語言環境
-const currentLocale = computed(() => locale.value);
 
 // Naive UI 語言包配置
 const naiveLocale = computed(() => {
@@ -159,7 +157,7 @@ const deleteTarget = ref<Paper | null>(null);
 // Modal 狀態
 const showCreateModal = ref(false);
 const modalActionType = ref<'create' | 'edit'>('create');
-const editData = ref<any>({});
+const editData = ref<Partial<Paper>>({});
 
 // 搜索和篩選
 const searchQuery = ref('');
@@ -274,13 +272,13 @@ const columns: DataTableColumns<Paper> = [
           row.paper_url ? h(NButton, {
             size: 'small',
             type: 'info',
-            onClick: () => window.open(row.paper_url!, '_blank')
+            onClick: () => row.paper_url && window.open(row.paper_url, '_blank')
           }, { default: () => t('papers.viewOnline') }) : null,
           row.paper_file_path ? h(NButton, {
             size: 'small',
             type: 'primary',
             ghost: true,
-            onClick: () => window.open(getMediaUrl(row.paper_file_path!), '_blank')
+            onClick: () => row.paper_file_path && window.open(getMediaUrl(row.paper_file_path), '_blank')
           }, { default: () => t('papers.download') }) : null,
           h(NButton, {
             size: 'small',

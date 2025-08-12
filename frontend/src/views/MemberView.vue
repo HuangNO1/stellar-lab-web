@@ -251,6 +251,7 @@
 import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
 import { useMembersWithAutoFetch } from '@/composables/useMembers';
+import type { Member } from '@/types/api';
 
 const { locale } = useI18n();
 const router = useRouter();
@@ -278,14 +279,14 @@ const getCurrentLocale = () => {
 };
 
 // 判断名字是否被截断
-const isNameTruncated = (member: any) => {
+const isNameTruncated = (member: Member) => {
   const name = getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en;
   // 更新判断条件：英文名字超过15字符或中文超过7字符
   return getCurrentLocale() === 'zh' ? (name?.length || 0) > 7 : (name?.length || 0) > 15;
 };
 
 // 判断職位是否被截断
-const isPositionTruncated = (member: any) => {
+const isPositionTruncated = (member: Member) => {
   const position = getMemberPosition(member, getCurrentLocale());
   // 更新判断条件：英文職位超过18字符或中文超过8字符
   return getCurrentLocale() === 'zh' ? (position?.length || 0) > 8 : (position?.length || 0) > 18;

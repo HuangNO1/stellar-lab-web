@@ -138,7 +138,7 @@ const processing = ref(false);
 const isMobile = ref(window.innerWidth <= 768);
 const cropperRef = ref();
 const selectedAspectRatio = ref<number>(16/9);
-const cropResult = ref<any>(null);
+const cropResult = ref<{ coordinates: unknown; canvas: unknown } | null>(null);
 
 // 裁切類型對應的比例和配置
 const stencilProps = computed(() => {
@@ -163,7 +163,7 @@ const stencilProps = computed(() => {
 });
 
 // Cropper change handler
-const onChange = ({ coordinates, canvas }: any) => {
+const onChange = ({ coordinates, canvas }: { coordinates: unknown; canvas: unknown }) => {
   cropResult.value = { coordinates, canvas };
 };
 

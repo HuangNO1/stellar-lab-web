@@ -127,8 +127,6 @@ import type { DataTableColumns } from 'naive-ui';
 const { t, locale } = useI18n();
 const message = useMessage();
 
-// 當前語言環境
-const currentLocale = computed(() => locale.value);
 
 // Naive UI 語言包配置
 const naiveLocale = computed(() => {
@@ -150,7 +148,7 @@ const deleteTarget = ref<News | null>(null);
 // Modal 狀態
 const showCreateModal = ref(false);
 const modalActionType = ref<'create' | 'edit'>('create');
-const editData = ref<any>({});
+const editData = ref<Partial<News>>({});
 
 // 搜索和篩選
 const searchQuery = ref('');

@@ -19,21 +19,14 @@ import 'md-editor-v3/lib/style.css';
 import { getTheme } from '@/locales';
 
 // Props
-interface Props {
+defineProps<{
   modelValue?: string;
   placeholder?: string;
   preview?: boolean;
   toolbars?: string[];
-  style?: string | Record<string, any>;
-}
+  style?: string | Record<string, unknown>;
+}>();
 
-const props = withDefaults(defineProps<Props>(), {
-  modelValue: '',
-  placeholder: '',
-  preview: false,
-  toolbars: () => ['bold', 'underline', 'italic', '-', 'title', 'strikeThrough', 'sub', 'sup', 'quote', 'unorderedList', 'orderedList', '-', 'codeRow', 'code', 'link', 'image', '-', 'revoke', 'next', 'save', '=', 'pageFullscreen', 'fullscreen', 'preview', 'previewOnly'],
-  style: 'height: 200px; width: 100%'
-});
 
 // Emits
 defineEmits<{

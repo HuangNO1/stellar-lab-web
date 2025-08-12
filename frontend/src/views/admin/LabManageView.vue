@@ -351,17 +351,6 @@ const fetchLabData = async () => {
   }
 };
 
-const handleLogoChange = ({ fileList }: { fileList: UploadFileInfo[] }) => {
-  logoFileList.value = fileList;
-  if (fileList.length > 0 && fileList[0].file) {
-    logoFile.value = fileList[0].file;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      logoPreview.value = e.target?.result as string;
-    };
-    reader.readAsDataURL(fileList[0].file);
-  }
-};
 
 const handleLogoRemove = () => {
   logoFileList.value = [];
@@ -374,18 +363,6 @@ const handleLogoRemove = () => {
   }
 };
 
-const handleCarouselChange = (index: number, { fileList }: { fileList: UploadFileInfo[] }) => {
-  carouselImages.value[index].fileList = fileList;
-  if (fileList.length > 0 && fileList[0].file) {
-    carouselImages.value[index].file = fileList[0].file;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      carouselImages.value[index].preview = e.target?.result as string;
-    };
-    reader.readAsDataURL(fileList[0].file);
-  }
-  carouselImages.value[index].shouldClear = false;
-};
 
 const handleCarouselRemove = (index: number) => {
   carouselImages.value[index].fileList = [];

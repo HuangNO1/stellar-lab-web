@@ -62,7 +62,7 @@ hljs.registerLanguage('json', json);
 interface Props {
   show: boolean;
   title?: string;
-  content?: Record<string, any> | null;
+  content?: Record<string, unknown> | null;
 }
 
 interface Emits {

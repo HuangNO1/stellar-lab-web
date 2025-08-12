@@ -245,7 +245,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, h, computed, watch } from 'vue';
+import { ref, reactive, onMounted, h, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMessage, NButton, NTag, NAvatar, NSpace, zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
 import { memberApi, researchGroupApi } from '@/services/api';
@@ -257,8 +257,6 @@ import type { DataTableColumns } from 'naive-ui';
 const { t, locale } = useI18n();
 const message = useMessage();
 
-// 當前語言環境
-const currentLocale = computed(() => locale.value);
 
 // Naive UI 語言包配置
 const naiveLocale = computed(() => {
@@ -282,13 +280,13 @@ const deleteType = ref<'single' | 'batch'>('single');
 const showCreateModal = ref(false);
 const showBatchModal = ref(false);
 const modalActionType = ref<'create' | 'edit'>('create');
-const editData = ref<any>({});
+const editData = ref<Partial<Member>>({});
 
 // 批量操作
 const selectedRowKeys = ref<number[]>([]);
 const batchLoading = ref(false);
 const batchFormRef = ref();
-const batchFormData = reactive<Record<string, any>>({});
+const batchFormData = reactive<Record<string, unknown>>({});
 
 // 搜索和篩選
 const searchQuery = ref('');
@@ -591,7 +589,7 @@ const handleBatchUpdate = async () => {
       .reduce((acc, key) => {
         acc[key] = batchFormData[key];
         return acc;
-      }, {} as Record<string, any>);
+      }, {} as Record<string, unknown>);
     
     if (Object.keys(updates).length === 0) {
       message.warning(t('admin.members.noUpdatesSelected'));

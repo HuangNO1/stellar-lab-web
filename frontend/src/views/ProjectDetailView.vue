@@ -128,20 +128,26 @@ const getProjectDescription = () => {
 // Markdown插件配置
 const markdownPlugins = [
   {
-    plugin: (md: any) => {
+    plugin: (md: Record<string, unknown>) => {
       // 修改链接渲染规则
-      const defaultRender = md.renderer.rules.link_open || function(tokens: any, idx: any, options: any, env: any, renderer: any) {
-        return renderer.renderToken(tokens, idx, options);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const defaultRender = (md as any).renderer.rules.link_open || function(tokens: Record<string, unknown>[], idx: number, options: Record<string, unknown>, env: Record<string, unknown>, renderer: Record<string, unknown>) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return (renderer as any).renderToken(tokens, idx, options);
       };
 
-      md.renderer.rules.link_open = function (tokens: any, idx: any, options: any, env: any, renderer: any) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (md as any).renderer.rules.link_open = function (tokens: Record<string, unknown>[], idx: number, options: Record<string, unknown>, env: Record<string, unknown>, renderer: Record<string, unknown>) {
         const token = tokens[idx];
-        const href = token.attrGet('href');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const href = (token as any).attrGet('href');
         
         // 检查是否为外部链接
         if (href && (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//') || href.includes('://'))) {
-          token.attrSet('target', '_blank');
-          token.attrSet('rel', 'noopener noreferrer');
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (token as any).attrSet('target', '_blank');
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (token as any).attrSet('rel', 'noopener noreferrer');
         }
         
         return defaultRender(tokens, idx, options, env, renderer);

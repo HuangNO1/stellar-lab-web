@@ -57,7 +57,7 @@ api.interceptors.request.use(
 );
 
 // 輸入清理函數
-function sanitizeRequestData(data: any): any {
+function sanitizeRequestData(data: unknown): unknown {
     // 跳過 FormData, File, Blob 等二進制數據類型
     if (data instanceof FormData || data instanceof File || data instanceof Blob) {
         return data;
@@ -72,7 +72,7 @@ function sanitizeRequestData(data: any): any {
     } else if (Array.isArray(data)) {
         return data.map(sanitizeRequestData);
     } else if (typeof data === 'object' && data !== null) {
-        const sanitized: any = {};
+        const sanitized: Record<string, unknown> = {};
         for (const key in data) {
             sanitized[key] = sanitizeRequestData(data[key]);
         }

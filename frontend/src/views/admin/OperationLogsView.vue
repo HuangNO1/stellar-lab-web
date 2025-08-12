@@ -134,7 +134,7 @@ const adminList = ref<Admin[]>([]);
 // JSON 詳情 modal
 const showJsonModal = ref(false);
 const jsonModalTitle = ref('');
-const jsonModalContent = ref<Record<string, any> | null>(null);
+const jsonModalContent = ref<Record<string, unknown> | null>(null);
 
 // 篩選條件
 const filters = ref<EditRecordQueryParams>({
@@ -205,7 +205,7 @@ const moduleOptions = computed(() => [
 ]);
 
 // 顯示 JSON 詳情
-const showJsonDetail = (content: Record<string, any> | undefined, title: string) => {
+const showJsonDetail = (content: Record<string, unknown> | undefined, title: string) => {
   if (!content || Object.keys(content).length === 0) return;
   
   jsonModalContent.value = content;

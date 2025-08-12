@@ -179,7 +179,7 @@ const isMobile = ref(window.innerWidth <= 1024);
 const showMobileSidebar = ref(false);
 const showProfileModal = ref(false);
 const showPasswordModal = ref(false);
-const passwordEditData = ref<any>({});
+const passwordEditData = ref<Record<string, unknown>>({});
 
 // 當前語言
 const currentLang = computed(() => locale.value);

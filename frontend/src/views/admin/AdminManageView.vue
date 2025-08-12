@@ -120,8 +120,6 @@ const { t, locale } = useI18n();
 const message = useMessage();
 const authStore = useAuthStore();
 
-// 當前語言環境
-const currentLocale = computed(() => locale.value);
 
 // Naive UI 語言包配置
 const naiveLocale = computed(() => {
@@ -143,7 +141,7 @@ const deleteTarget = ref<Admin | null>(null);
 // Modal 狀態
 const showCreateModal = ref(false);
 const modalActionType = ref<'create' | 'edit'>('create');
-const editData = ref<any>({});
+const editData = ref<Partial<Admin>>({});
 
 // 搜索
 const searchQuery = ref('');

@@ -133,9 +133,9 @@ const handleLogin = async () => {
     } else {
       message.error(result.message || t('admin.login.loginFailed'));
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('登錄驗證失敗:', error);
-    message.error(error.message || t('admin.login.loginFailed'));
+    message.error(error instanceof Error ? error.message : t('admin.login.loginFailed'));
   } finally {
     loading.value = false;
   }
