@@ -1,0 +1,87 @@
+# Development environment with hot reloading
+version: '3.8'
+
+services:
+  # MySQL Database (same as production)
+  db:
+    image: mysql:8.0
+    container_name: lab_web_db_dev
+    environment:
+      MYSQL_ROOT_PASSWORD: lab_web_root_123
+      MYSQL_DATABASE: lab_web
+      MYSQL_USER: lab_web_user
+      MYSQL_PASSWORD: lab_web_pass_123
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data_dev:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - lab_web_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-plab_web_root_123"]
+      timeout: 20s
+      retries: 10
+
+  # Backend Development Mode
+  backend-dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    image: lab-website-backend:dev
+    container_name: lab_web_backend_dev
+    environment:
+      DATABASE_URL: mysql+pymysql://root:lab_web_root_123@db:3306/lab_web?charset=utf8mb4
+      FLASK_APP: run.py
+      FLASK_CONFIG: development
+      FLASK_DEBUG: 1
+      SECRET_KEY: development_secret_key
+      JWT_SECRET_KEY: development_jwt_secret
+      UPLOAD_FOLDER: /app/media
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - media_data_dev:/app/media
+      - ./logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - lab_web_network
+    command: ["python", "run.py"]
+
+  # Frontend Development Mode with Hot Reloading
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    image: lab-website-frontend:dev
+    container_name: lab_web_frontend_dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - backend-dev
+    networks:
+      - lab_web_network
+    command: npm run serve
+
+volumes:
+  mysql_data_dev:
+    driver: local
+  media_data_dev:
+    driver: local
+
+networks:
+  lab_web_network:
+    driver: bridge
+    name: lab_web_dev_default

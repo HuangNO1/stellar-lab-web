@@ -1,0 +1,122 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: lab_web_db
+    environment:
+      MYSQL_ROOT_PASSWORD: lab_web_root_123
+      MYSQL_DATABASE: lab_web
+      MYSQL_USER: lab_web_user
+      MYSQL_PASSWORD: lab_web_pass_123
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/scripts/development/init_data.sql:/docker-entrypoint-initdb.d/init_data.sql:ro
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - lab_web_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-plab_web_root_123"]
+      timeout: 20s
+      retries: 10
+    restart: unless-stopped
+
+  # Backend Flask Application
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: lab-website-backend:latest
+    container_name: lab_web_backend
+    environment:
+      # Database Configuration
+      DATABASE_URL: mysql+pymysql://root:lab_web_root_123@db:3306/lab_web?charset=utf8mb4
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+      MYSQL_ROOT_PASSWORD: lab_web_root_123
+      MYSQL_DATABASE: lab_web
+      
+      # Flask Configuration
+      FLASK_APP: run.py
+      FLASK_CONFIG: production
+      SECRET_KEY: lab_web_secret_key_change_in_production
+      JWT_SECRET_KEY: lab_web_jwt_secret_change_in_production
+      
+      # Application Configuration
+      UPLOAD_FOLDER: /app/media
+      CORS_ORIGINS: "http://localhost:3000,http://localhost:80"
+    ports:
+      - "8000:8000"
+    volumes:
+      - media_data:/app/media
+      - ./logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - lab_web_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # Frontend Vue.js Application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: lab-website-frontend:latest
+    container_name: lab_web_frontend
+    ports:
+      - "3000:80"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./frontend/docker/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+    networks:
+      - lab_web_network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+
+  # Optional: phpMyAdmin Database Management
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: lab_web_phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: lab_web_root_123
+      MYSQL_ROOT_PASSWORD: lab_web_root_123
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    networks:
+      - lab_web_network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+    driver: local
+  media_data:
+    driver: local
+
+networks:
+  lab_web_network:
+    driver: bridge
+    name: lab_web_default

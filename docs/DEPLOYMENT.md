@@ -1,0 +1,655 @@
+# Lab Website Deployment Guide
+
+Complete deployment guide for the Lab Website Framework with Docker containerization.
+
+## 📋 Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Environment Setup](#environment-setup)
+- [Production Deployment](#production-deployment)
+- [Development Environment](#development-environment)
+- [Configuration](#configuration)
+- [Database Management](#database-management)
+- [SSL/HTTPS Setup](#ssl-https-setup)
+- [Backup and Recovery](#backup-and-recovery)
+- [Monitoring and Logs](#monitoring-and-logs)
+- [Troubleshooting](#troubleshooting)
+- [Maintenance](#maintenance)
+
+## Prerequisites
+
+### System Requirements
+- **Operating System**: Linux (Ubuntu 20.04+, CentOS 8+, etc.), macOS, or Windows with WSL2
+- **RAM**: Minimum 2GB, Recommended 4GB+
+- **Storage**: Minimum 10GB free space
+- **CPU**: 2+ cores recommended
+
+### Software Requirements
+- **Docker**: Version 20.10+
+- **Docker Compose**: Version 2.0+
+- **Git**: For cloning the repository
+- **Make**: Optional, for convenience commands
+
+### Network Requirements
+- **Ports**: 3000 (Frontend), 8000 (Backend), 3307 (MySQL), 8081 (phpMyAdmin)
+- **Internet Access**: Required for downloading Docker images and dependencies
+
+## Quick Start
+
+### 1. Clone and Setup
+
+```bash
+# Clone the repository
+git clone <your-repository-url>
+cd lab_web
+
+# Quick deployment with Make (recommended)
+make deploy
+
+# Or manual deployment
+cp .env.example .env
+./deploy.sh prod build
+./deploy.sh prod start -d
+./deploy.sh prod db-init
+```
+
+### 2. Access the Application
+
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+- **API Documentation**: http://localhost:8000/api/docs
+- **Database Admin**: http://localhost:8081
+
+### 3. Default Login
+
+- **Username**: `admin`
+- **Password**: `admin123`
+
+⚠️ **Important**: Change the default password immediately in production!
+
+## Environment Setup
+
+### Environment Variables
+
+Copy `.env.example` to `.env` and customize:
+
+```bash
+cp .env.example .env
+```
+
+Key variables to modify for production:
+
+```env
+# Security - MUST CHANGE
+SECRET_KEY=your_very_secure_secret_key_here
+JWT_SECRET_KEY=your_jwt_secret_key_here
+MYSQL_ROOT_PASSWORD=your_secure_db_password
+
+# Ports (if needed)
+FRONTEND_PORT=3000
+BACKEND_PORT=8000
+MYSQL_PORT=3307
+PHPMYADMIN_PORT=8081
+
+# CORS (adjust for your domain)
+CORS_ORIGINS=https://your-domain.com,https://api.your-domain.com
+```
+
+## Production Deployment
+
+### Standard Deployment
+
+```bash
+# Build all services
+./deploy.sh prod build
+
+# Start in production mode
+./deploy.sh prod start -d
+
+# Initialize database with sample data
+./deploy.sh prod db-init
+
+# Check service status
+./deploy.sh prod status
+```
+
+### Advanced Production Setup
+
+#### 1. Custom Network Configuration
+
+```bash
+# Create custom network (optional)
+docker network create --driver bridge lab_web_network
+```
+
+#### 2. Resource Limits
+
+Create `docker-compose.override.yml` for resource limits:
+
+```yaml
+version: '3.8'
+
+services:
+  backend:
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+  
+  frontend:
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+  
+  db:
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+```
+
+#### 3. Persistent Volumes
+
+Data is automatically persisted in Docker volumes:
+- `mysql_data`: Database files
+- `media_data`: Uploaded files (images, papers, etc.)
+
+## Development Environment
+
+### Start Development Mode
+
+```bash
+# Start with hot reloading
+./deploy.sh dev start -d
+
+# Or with Make
+make dev
+
+# View logs
+./deploy.sh dev logs -f
+```
+
+### Development URLs
+
+- **Frontend Dev Server**: http://localhost:8080 (hot reload)
+- **Backend**: http://localhost:8000
+- **Database**: localhost:3307
+
+### Development Features
+
+- **Hot Reloading**: Frontend automatically reloads on file changes
+- **Debug Mode**: Backend runs in debug mode with detailed error messages
+- **Volume Mounting**: Source code is mounted for live editing
+
+## Configuration
+
+### Frontend Configuration
+
+Edit `frontend/docker/nginx.conf` for:
+- Server settings
+- Proxy configurations  
+- Security headers
+- Cache policies
+
+### Backend Configuration
+
+Backend configuration is handled through environment variables and `backend/config/config.py`.
+
+### Database Configuration
+
+MySQL is configured with:
+- UTF8MB4 character set for full Unicode support
+- Optimized settings for small to medium workloads
+- Health checks and automatic restart
+
+## Database Management
+
+### Initialize Database
+
+```bash
+# Create tables and sample data
+./deploy.sh prod db-init
+
+# Or with Make
+make db-init
+```
+
+### Database Operations
+
+```bash
+# Backup database
+./deploy.sh prod db-backup
+
+# Access MySQL shell
+./deploy.sh prod shell --service=db
+# Or: make db-shell
+
+# Custom SQL execution
+docker exec -it lab_web_db mysql -u root -plab_web_root_123 lab_web -e "SELECT COUNT(*) FROM admins;"
+```
+
+### Database Migrations
+
+```bash
+# Access backend container
+./deploy.sh prod shell --service=backend
+
+# Inside container, run migrations
+flask db upgrade
+```
+
+## SSL/HTTPS Setup
+
+### Using Reverse Proxy (Recommended)
+
+#### Option 1: Nginx Reverse Proxy
+
+Create `/etc/nginx/sites-available/lab-website`:
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name your-domain.com;
+    
+    ssl_certificate /path/to/your/certificate.crt;
+    ssl_certificate_key /path/to/your/private.key;
+    
+    # Frontend
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    
+    # Backend API
+    location /api {
+        proxy_pass http://localhost:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+#### Option 2: Traefik (Docker-based)
+
+Add to `docker-compose.yml`:
+
+```yaml
+services:
+  traefik:
+    image: traefik:v2.9
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.myresolver.acme.httpchallenge=true
+      - --certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web
+      - --certificatesresolvers.myresolver.acme.email=your-email@example.com
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt:/letsencrypt
+    labels:
+      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.http-catchall.entrypoints=web"
+      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+  frontend:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`your-domain.com`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=myresolver"
+
+volumes:
+  letsencrypt:
+```
+
+## Backup and Recovery
+
+### Automated Backups
+
+Create backup script `/etc/cron.daily/lab-website-backup`:
+
+```bash
+#!/bin/bash
+BACKUP_DIR="/opt/backups/lab-website"
+DATE=$(date +%Y%m%d_%H%M%S)
+
+mkdir -p "$BACKUP_DIR"
+
+# Database backup
+docker exec lab_web_db mysqldump -u root -plab_web_root_123 lab_web > "$BACKUP_DIR/db_$DATE.sql"
+
+# Media files backup
+docker run --rm -v lab_web_media_data:/data -v "$BACKUP_DIR":/backup alpine tar czf "/backup/media_$DATE.tar.gz" -C /data .
+
+# Keep only last 7 days
+find "$BACKUP_DIR" -name "*.sql" -mtime +7 -delete
+find "$BACKUP_DIR" -name "*.tar.gz" -mtime +7 -delete
+
+echo "Backup completed: $DATE"
+```
+
+### Manual Backup/Restore
+
+```bash
+# Create backup
+./deploy.sh prod db-backup
+
+# Restore from backup
+./deploy.sh prod db-restore --backup-file=backup_20231201_120000.sql
+
+# Backup media files
+docker run --rm -v lab_web_media_data:/data -v $(pwd):/backup alpine tar czf /backup/media_backup.tar.gz -C /data .
+
+# Restore media files
+docker run --rm -v lab_web_media_data:/data -v $(pwd):/backup alpine tar xzf /backup/media_backup.tar.gz -C /data
+```
+
+## Monitoring and Logs
+
+### View Logs
+
+```bash
+# All services
+./deploy.sh prod logs -f
+
+# Specific service
+./deploy.sh prod logs --service=backend -f
+./deploy.sh prod logs --service=frontend -f
+
+# Or with Make
+make logs
+make backend-logs
+make frontend-logs
+```
+
+### Health Monitoring
+
+```bash
+# Check all services health
+./deploy.sh prod health
+
+# Individual service status
+./deploy.sh prod status
+
+# Or with Make
+make health
+make status
+```
+
+### Log Management
+
+Configure log rotation in `/etc/logrotate.d/lab-website`:
+
+```
+/path/to/lab_web/logs/*.log {
+    daily
+    missingok
+    rotate 30
+    compress
+    notifempty
+    create 644 root root
+    postrotate
+        docker exec lab_web_backend kill -USR1 1 2>/dev/null || true
+    endscript
+}
+```
+
+## Troubleshooting
+
+### Common Issues
+
+#### 1. Port Conflicts
+
+```bash
+# Check what's using ports
+sudo netstat -tulpn | grep :3000
+sudo netstat -tulpn | grep :8000
+
+# Change ports in .env file
+FRONTEND_PORT=3001
+BACKEND_PORT=8001
+```
+
+#### 2. Database Connection Issues
+
+```bash
+# Check database container
+docker logs lab_web_db
+
+# Test database connection
+docker exec lab_web_db mysqladmin ping -h localhost
+
+# Reset database
+./deploy.sh prod stop --service=db
+docker volume rm lab_web_mysql_data
+./deploy.sh prod start --service=db
+./deploy.sh prod db-init
+```
+
+#### 3. Permission Issues
+
+```bash
+# Fix media directory permissions
+docker exec lab_web_backend chown -R www-data:www-data /app/media
+
+# Fix log directory permissions
+sudo chown -R $USER:$USER logs/
+```
+
+#### 4. Build Failures
+
+```bash
+# Clean build cache
+./deploy.sh prod build --no-cache --rebuild
+
+# Remove all containers and rebuild
+./deploy.sh prod clean
+./deploy.sh prod build
+```
+
+#### 5. Frontend Not Loading
+
+```bash
+# Check nginx logs
+docker logs lab_web_frontend
+
+# Rebuild frontend with fresh modules
+cd frontend
+docker build --no-cache -t lab-website-frontend .
+```
+
+### Debug Mode
+
+Enable debug mode in development:
+
+```bash
+# Start in development mode
+./deploy.sh dev start -d
+
+# View detailed backend logs
+./deploy.sh dev logs --service=backend-dev -f
+```
+
+### Container Shell Access
+
+```bash
+# Backend shell
+./deploy.sh prod shell --service=backend
+# Or: make backend-shell
+
+# Frontend shell  
+./deploy.sh prod shell --service=frontend
+# Or: make frontend-shell
+
+# Database shell
+./deploy.sh prod shell --service=db
+# Or: make db-shell
+```
+
+## Maintenance
+
+### Updates
+
+#### Update Application
+
+```bash
+# Pull latest code
+git pull origin main
+
+# Rebuild and restart
+./deploy.sh prod stop
+./deploy.sh prod build --rebuild
+./deploy.sh prod start -d
+
+# Run any new migrations
+./deploy.sh prod shell --service=backend
+flask db upgrade
+```
+
+#### Update Docker Images
+
+```bash
+# Pull latest base images
+docker pull node:18-alpine
+docker pull python:3.9-slim
+docker pull mysql:8.0
+docker pull nginx:stable-alpine
+
+# Rebuild with updated images
+./deploy.sh prod build --no-cache --rebuild
+./deploy.sh prod restart
+```
+
+### Security Updates
+
+1. **Update base Docker images regularly**
+2. **Monitor security advisories for dependencies**
+3. **Update passwords and secrets**
+4. **Review and update CORS settings**
+5. **Keep SSL certificates current**
+
+### Performance Tuning
+
+#### Database Optimization
+
+Edit MySQL configuration:
+
+```yaml
+# In docker-compose.yml, add command parameters
+command: >
+  --character-set-server=utf8mb4
+  --collation-server=utf8mb4_unicode_ci
+  --innodb-buffer-pool-size=512M
+  --innodb-log-file-size=128M
+  --max-connections=200
+```
+
+#### Frontend Optimization
+
+Update `frontend/docker/nginx.conf`:
+
+```nginx
+# Enable gzip compression
+gzip on;
+gzip_vary on;
+gzip_min_length 10240;
+gzip_types text/plain text/css application/json application/javascript text/xml application/xml;
+
+# Browser caching
+location ~* \.(css|js|png|jpg|jpeg|gif|ico|svg)$ {
+    expires 1y;
+    add_header Cache-Control "public, immutable";
+}
+```
+
+### Scaling
+
+For high-traffic deployments:
+
+1. **Use multiple frontend replicas**
+2. **Implement Redis caching**  
+3. **Set up database read replicas**
+4. **Use CDN for static assets**
+5. **Implement load balancing**
+
+Example scaling configuration:
+
+```yaml
+services:
+  frontend:
+    deploy:
+      replicas: 3
+    
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+      
+  nginx-lb:
+    image: nginx:alpine
+    volumes:
+      - ./nginx-lb.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+      - "443:443"
+```
+
+## Production Checklist
+
+Before going live:
+
+- [ ] Change all default passwords
+- [ ] Update environment variables for production
+- [ ] Configure SSL/HTTPS
+- [ ] Set up automated backups
+- [ ] Configure log rotation
+- [ ] Set up monitoring
+- [ ] Test backup and recovery procedures
+- [ ] Configure firewall rules
+- [ ] Set up domain and DNS
+- [ ] Test all functionality
+- [ ] Update CORS settings
+- [ ] Review security headers
+- [ ] Set up error tracking
+- [ ] Configure email notifications (if implemented)
+- [ ] Document custom configurations
+
+## Support
+
+For additional help:
+
+- Check the [main README](../README.md) for feature overview
+- Review [backend documentation](../backend/README.md) for API details
+- Check [frontend documentation](../frontend/README.md) for UI information
+- Create an issue on the project repository
+- Check Docker and container logs for error details
+
+---
+
+*This deployment guide is maintained alongside the Lab Website Framework. For the latest updates, check the project repository.*
