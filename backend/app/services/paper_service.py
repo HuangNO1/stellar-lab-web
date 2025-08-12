@@ -127,7 +127,7 @@ class PaperService(BaseService):
         
         return result
     
-    def update_paper(self, paper_id: int, paper_data: Dict[str, Any]) -> Dict[str, Any]:
+    def update_paper(self, paper_id: int, paper_data: Dict[str, Any], files_data: Dict[str, Any] = None) -> Dict[str, Any]:
         """更新論文"""
         # 驗證權限
         self.validate_permissions('UPDATE')
@@ -170,6 +170,11 @@ class PaperService(BaseService):
                         paper.paper_date = new_date
                 except ValueError:
                     raise ValidationError('日期格式錯誤，應為 YYYY-MM-DD')
+            
+            # 處理文件更新/刪除
+            file_update = self._handle_file_update(paper, files_data, paper_data)
+            if file_update:
+                update_data.update(file_update)
             
             # 更新課題組
             if 'research_group_id' in paper_data:
@@ -220,6 +225,11 @@ class PaperService(BaseService):
             except ValueError:
                 raise ValidationError('日期格式錯誤，應為 YYYY-MM-DD')
         
+        # 收集文件更新信息
+        file_update = self._handle_file_update(paper, files_data, paper_data)
+        if file_update:
+            update_data.update(file_update)
+        
         if 'research_group_id' in paper_data:
             research_group_id = paper_data['research_group_id']
             if research_group_id and ResearchGroup.query.get(research_group_id):
@@ -240,6 +250,41 @@ class PaperService(BaseService):
         )
         
         return result
+    
+    def _handle_file_update(self, paper: 'Paper', files_data: Dict[str, Any] = None, form_data: Dict[str, Any] = None) -> Dict[str, Any]:
+        """處理論文文件更新/刪除"""
+        
+        # 檢查是否有刪除標記
+        if form_data and form_data.get('paper_file_delete'):
+            old_file_path = paper.paper_file_path
+            if old_file_path:
+                delete_file(old_file_path)
+                paper.paper_file_path = None
+                return {'paper_file_deleted': True, 'old_file_path': old_file_path}
+            return {}
+        
+        # 檢查是否有新文件上傳
+        if not files_data or 'paper_file' not in files_data:
+            return {}
+        
+        file = files_data['paper_file']
+        if not file or not file.filename:
+            return {}
+        
+        old_file_path = paper.paper_file_path
+        
+        try:
+            new_file_path = save_file(file, 'paper', max_size=50*1024*1024)
+            paper.paper_file_path = new_file_path
+            
+            # 刪除舊文件
+            if old_file_path and old_file_path != new_file_path:
+                delete_file(old_file_path)
+            
+            return {'paper_file_updated': True, 'new_file_path': new_file_path}
+            
+        except Exception as e:
+            raise ValidationError(f"論文文件上傳失敗: {str(e)}")
     
     def delete_paper(self, paper_id: int) -> None:
         """刪除論文"""

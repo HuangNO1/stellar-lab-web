@@ -151,11 +151,10 @@ class MemberService(BaseService):
             basic_updates = self._update_member_basic_info(member, form_data)
             update_data.update(basic_updates)
             
-            # 處理頭像更新
-            if files_data:
-                avatar_update = self._handle_avatar_update(member, files_data)
-                if avatar_update:
-                    update_data.update(avatar_update)
+            # 處理頭像更新/刪除
+            avatar_update = self._handle_avatar_update(member, files_data, form_data)
+            if avatar_update:
+                update_data.update(avatar_update)
             
             # 更新關聯信息
             association_updates = self._update_member_associations(member, form_data)
@@ -167,10 +166,12 @@ class MemberService(BaseService):
         update_data = {}
         basic_updates = self._update_member_basic_info(member, form_data)
         update_data.update(basic_updates)
-        if files_data:
-            avatar_update = self._handle_avatar_update(member, files_data)
-            if avatar_update:
-                update_data.update(avatar_update)
+        
+        # 處理頭像更新/刪除
+        avatar_update = self._handle_avatar_update(member, files_data, form_data)
+        if avatar_update:
+            update_data.update(avatar_update)
+            
         association_updates = self._update_member_associations(member, form_data)
         update_data.update(association_updates)
         
@@ -543,9 +544,22 @@ class MemberService(BaseService):
         except Exception as e:
             raise ValidationError(f"頭像上傳失敗: {str(e)}")
     
-    def _handle_avatar_update(self, member: Member, files_data: Dict[str, Any]) -> Dict[str, Any]:
-        """處理頭像更新"""
-        if 'mem_avatar' not in files_data:
+    def _handle_avatar_update(self, member: Member, files_data: Dict[str, Any] = None, form_data: Dict[str, Any] = None) -> Dict[str, Any]:
+        """處理頭像更新/刪除"""
+        
+        # 檢查是否有刪除標記
+        if form_data and form_data.get('mem_avatar_delete'):
+            old_avatar_path = member.mem_avatar_path
+            if old_avatar_path:
+                # 刪除舊頭像文件
+                delete_file(old_avatar_path)
+                # 清空數據庫中的頭像路徑
+                member.mem_avatar_path = None
+                return {'avatar_deleted': True, 'old_avatar_path': old_avatar_path}
+            return {}
+        
+        # 檢查是否有新文件上傳
+        if not files_data or 'mem_avatar' not in files_data:
             return {}
         
         file = files_data['mem_avatar']

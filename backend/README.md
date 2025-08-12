@@ -1065,116 +1065,87 @@ Usage: ./run_service_tests.sh [選項]
 
 ## 🐳 Docker 部署
 
-### 快速部署
+### 📖 完整部署指南
 
-使用提供的部署腳本快速部署完整的實驗室網頁框架：
+詳細的 Docker 部署說明請參考：**[docs/deployment/DOCKER_DEPLOY.md](docs/deployment/DOCKER_DEPLOY.md)**
 
-```bash
-# 賦予執行權限
-chmod +x scripts/deployment/deploy.sh
+該指南包含：
+- 🚀 一鍵部署指令
+- 📋 服務配置說明  
+- 🔧 常用操作命令
+- 🗄️ 數據初始化流程
+- 📁 數據持久化說明
+- 🐛 完整故障排除指南
 
-# 啟動所有服務
-./scripts/deployment/deploy.sh start
-
-# 查看服務狀態
-./scripts/deployment/deploy.sh status
-
-# 查看服務日誌
-./scripts/deployment/deploy.sh logs
-
-# 重啟服務
-./scripts/deployment/deploy.sh restart
-
-# 停止服務
-./scripts/deployment/deploy.sh stop
-```
-
-### 重新部署最新版本
-
-當你對後端代碼進行了修改（如新增功能、修復bug等），需要重新部署到Docker容器：
-
-#### 方法1: 使用部署腳本（推薦）
+### 快速開始
 
 ```bash
-# 停止現有服務
-./scripts/deployment/deploy.sh stop
+# 1. 構建並啟動所有服務
+docker-compose up --build -d
 
-# 重新構建並啟動（會自動構建最新代碼）
-./scripts/deployment/deploy.sh restart
-```
+# 2. 查看服務狀態
+docker-compose ps
 
-#### 方法2: 使用Docker Compose命令
-
-```bash
-# 停止並移除現有容器
-docker-compose --project-name lab_web down
-
-# 重新構建鏡像並啟動
-docker-compose --project-name lab_web up --build -d
-
-# 查看服務狀態
-docker-compose --project-name lab_web ps
-```
-
-#### 方法3: 強制重新構建
-
-如果遇到緩存問題，可以強制重新構建：
-
-```bash
-# 停止服務並移除容器
-docker-compose --project-name lab_web down
-
-# 移除舊鏡像
-docker rmi lab_web_app 2>/dev/null || true
-
-# 清理構建緩存
-docker builder prune -f
-
-# 重新構建並啟動
-docker-compose --project-name lab_web up --build -d
+# 3. 測試服務
+curl http://localhost:8000/health
 ```
 
 ### 重要提醒
 
-1. **數據持久化**: 數據庫和媒體文件使用Docker volumes存儲，重新部署不會丟失數據
-2. **數據庫遷移**: 新版本如果包含數據庫schema變更，會在容器啟動時自動執行遷移
-3. **環境變量**: 確保`.env.docker`文件包含所有必要配置
+#### 🔄 代碼更新部署
+
+當修改後端代碼後，**必須重新構建Docker鏡像**：
+
+```bash
+# 方法1: 完全重新構建（推薦）
+docker-compose down
+docker-compose up --build -d
+
+# 方法2: 強制重新構建（如遇緩存問題）
+docker-compose build --no-cache app
+docker-compose up -d
+```
+
+⚠️ **重要**：簡單的 `docker-compose restart` 不會加載代碼更新！
+
+#### 📊 數據持久化
+
+- ✅ **數據庫數據**: 使用 `mysql_data` volume 持久化
+- ✅ **媒體文件**: 使用 `media_data` volume 持久化  
+- ✅ **日誌文件**: 掛載到 `./logs` 目錄
+
+重新部署不會丟失數據，包括：
+- 數據庫中的所有記錄
+- 上傳的圖片和文件
+- 應用日誌
 
 ### 服務地址
 
-部署成功後，服務將在以下地址可用：
+部署成功後可訪問：
 
-- **後端API**: http://localhost:8000
-- **API文檔**: http://localhost:8000/api/docs
-- **數據庫管理**: http://localhost:8081
+- **後端API**: [http://localhost:8000](http://localhost:8000)
+- **API文檔**: [http://localhost:8000/api/docs](http://localhost:8000/api/docs)
+- **數據庫管理**: [http://localhost:8081](http://localhost:8081)
 
-### Docker 環境要求
+### 默認賬戶
 
-- Docker 20.0+
-- Docker Compose 1.28+
-- 至少2GB可用內存
-- 至少5GB可用磁盤空間
+- **管理員**: `admin` / `admin123`
+- **MySQL Root**: `root` / `lab_web_root_123`
 
 ### 故障排除
 
-如果部署遇到問題：
-
 ```bash
-# 查看詳細日誌
-./scripts/deployment/deploy.sh logs
+# 查看服務日誌
+docker-compose logs app
 
-# 檢查服務狀態
-docker-compose --project-name lab_web ps
-
-# 檢查容器資源使用
-docker stats
+# 檢查服務狀態  
+docker-compose ps
 
 # 進入容器調試
-docker exec -it lab_web_app bash
-
-# 使用診斷腳本
-./scripts/maintenance/diagnose.sh
+docker-compose exec app bash
 ```
+
+更多詳細說明請參考 **[Docker 部署指南](docs/deployment/DOCKER_DEPLOY.md)**
 
 ## 🚦 部署指南
 

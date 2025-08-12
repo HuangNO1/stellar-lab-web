@@ -140,7 +140,7 @@ class LabService(BaseService):
         updates = {}
         
         # 處理logo上傳
-        logo_update = self._handle_logo_upload(lab, files_data)
+        logo_update = self._handle_logo_upload(lab, files_data, form_data)
         if logo_update:
             updates.update(logo_update)
         
@@ -151,9 +151,20 @@ class LabService(BaseService):
         
         return updates
     
-    def _handle_logo_upload(self, lab: Lab, files_data: Dict[str, Any]) -> Dict[str, Any]:
-        """處理logo上傳"""
-        if 'lab_logo' not in files_data:
+    def _handle_logo_upload(self, lab: Lab, files_data: Dict[str, Any], form_data: Dict[str, Any] = None) -> Dict[str, Any]:
+        """處理logo上傳/刪除"""
+        
+        # 檢查是否有刪除標記
+        if form_data and form_data.get('lab_logo_delete'):
+            old_logo_path = lab.lab_logo_path
+            if old_logo_path:
+                delete_file(old_logo_path)
+                lab.lab_logo_path = None
+                return {'lab_logo_deleted': True, 'old_logo_path': old_logo_path}
+            return {}
+        
+        # 檢查是否有新文件上傳
+        if not files_data or 'lab_logo' not in files_data:
             return {}
         
         file = files_data['lab_logo']

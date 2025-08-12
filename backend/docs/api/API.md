@@ -542,6 +542,7 @@ Content-Type: multipart/form-data
 | lab_email | string | - | 實驗室聯繫信箱 | contact@lab.edu.cn |
 | lab_phone | string | - | 實驗室聯絡電話 | +86-10-12345678 |
 | lab_logo | file | - | 實驗室Logo文件 | logo.png |
+| lab_logo_delete | string | - | 刪除Logo（值為"true"時刪除） | true |
 | carousel_img_1 | file | - | 輪播圖片1 | carousel1.jpg |
 | carousel_img_2 | file | - | 輪播圖片2 | carousel2.jpg |
 | carousel_img_3 | file | - | 輪播圖片3 | carousel3.jpg |
@@ -801,6 +802,7 @@ Content-Type: multipart/form-data
 | destination_zh | string | - | 去向中文 | 清華大學 |
 | destination_en | string | - | 去向英文 | Tsinghua University |
 | mem_avatar | file | - | 頭像文件 | avatar.jpg |
+| mem_avatar_delete | string | - | 刪除頭像（值為"true"時刪除） | true |
 
 ### 更新成員
 ```

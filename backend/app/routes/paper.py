@@ -73,8 +73,15 @@ def create_paper():
 def update_paper(paper_id):
     """更新論文"""
     try:
-        data = request.get_json()
-        paper = paper_service.update_paper(paper_id, data)
+        # 根據Content-Type選擇數據源
+        if request.is_json:
+            form_data = request.get_json() or {}
+            files_data = None
+        else:
+            form_data = dict(request.form)
+            files_data = dict(request.files) if request.files else None
+            
+        paper = paper_service.update_paper(paper_id, form_data, files_data)
         return jsonify(success_response(paper, '論文更新成功'))
     except ServiceException as e:
         error_data = paper_service.format_error_response(e)
