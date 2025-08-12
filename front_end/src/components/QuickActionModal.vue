@@ -1043,6 +1043,10 @@ const handleFileChange = (fieldName: string, { fileList }: { fileList: any[] }) 
     const file = fileList[0].file;
     if (file) {
       uploadedFiles[fieldName] = file;
+      // 如果用戶上傳新文件，清除刪除標記
+      if (fieldName === 'paper_file') {
+        delete formData[`${fieldName}_delete`];
+      }
     }
   } else {
     delete uploadedFiles[fieldName];
@@ -1050,7 +1054,16 @@ const handleFileChange = (fieldName: string, { fileList }: { fileList: any[] }) 
 };
 
 const handleFileRemove = (fieldName: string) => {
+  // 刪除新上傳的文件
   delete uploadedFiles[fieldName];
+  
+  // 如果是編輯模式且有現有文件，標記為刪除
+  if (props.actionType === 'edit' && props.editData) {
+    if (fieldName === 'paper_file' && props.editData['paper_file_path']) {
+      // 在formData中設置刪除標記
+      formData[`${fieldName}_delete`] = true;
+    }
+  }
 };
 
 // Image cropper methods

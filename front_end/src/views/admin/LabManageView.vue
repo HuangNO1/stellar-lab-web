@@ -372,7 +372,7 @@ const handleSave = async () => {
       // 對於對象類型，只允許基本數據類型
       const isValidObject = typeof value !== 'object' || 
                            Array.isArray(value) || 
-                           value instanceof Date;
+                           (value != null && typeof value === 'object' && (value as object) instanceof Date);
       
       if (isValidValue && isValidObject) {
         formDataToSend.append(key, String(value));
@@ -380,7 +380,7 @@ const handleSave = async () => {
     });
 
     // 添加 logo 文件或刪除標記
-    if (logoFile.value && logoFile.value instanceof File) {
+    if (logoFile.value !== null && logoFile.value instanceof File) {
       formDataToSend.append('lab_logo', logoFile.value);
     } else if (logoShouldDelete.value) {
       formDataToSend.append('lab_logo_delete', 'true');
@@ -388,7 +388,7 @@ const handleSave = async () => {
 
     // 添加輪播圖文件
     carouselImages.value.forEach((carousel, index) => {
-      if (carousel.file && carousel.file instanceof File) {
+      if (carousel.file !== null && carousel.file instanceof File) {
         formDataToSend.append(`carousel_img_${index + 1}`, carousel.file);
       } else if (carousel.shouldClear) {
         formDataToSend.append(`clear_carousel_img_${index + 1}`, 'true');
