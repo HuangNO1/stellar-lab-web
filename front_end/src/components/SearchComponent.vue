@@ -37,95 +37,100 @@
     <!-- 高級搜索 -->
     <n-collapse-transition :show="showAdvanced">
       <div class="advanced-search">
-        <n-form label-placement="left" label-width="80" label-align="left">
-          <!-- 日期範圍 -->
-          <n-form-item :label="$t('search.dateRange')" v-if="config.dateRange">
-            <n-date-picker
-              :key="`date-picker-${currentLocale}`"
-              v-model:value="dateRange"
-              type="daterange"
-              @update:value="handleDateChange"
-              :format="currentLocale === 'zh' ? 'yyyy年MM月dd日' : 'yyyy-MM-dd'"
-              value-format="yyyy-MM-dd"
-              clearable
-              :style="{ width: currentLocale === 'zh' ? '350px' : '300px' }"
-            />
-          </n-form-item>
+        <n-form label-placement="left" label-width="6.25rem" label-align="left">
+          <div class="form-row">
+            <!-- 日期範圍 -->
+            <n-form-item :label="$t('search.dateRange')" v-if="config.dateRange" class="form-item-wide">
+              <n-date-picker
+                :key="`date-picker-${currentLocale}`"
+                v-model:value="dateRange"
+                type="daterange"
+                @update:value="handleDateChange"
+                :format="currentLocale === 'zh' ? 'yyyy年MM月dd日' : 'yyyy-MM-dd'"
+                value-format="yyyy-MM-dd"
+                clearable
+              />
+            </n-form-item>
+          </div>
 
           <!-- 論文特定篩選 -->
           <template v-if="config.type === 'papers'">
-            <n-form-item :label="$t('papers.type')">
-              <n-select
-                v-model:value="localFilters.paper_type"
-                :options="paperTypeOptions"
-                :placeholder="$t('search.all')"
-                clearable
-                style="width: 200px"
-                @update:value="handleSearch"
-              />
-            </n-form-item>
-            <n-form-item :label="$t('papers.status')">
-              <n-select
-                v-model:value="localFilters.paper_accept"
-                :options="paperStatusOptions"
-                :placeholder="$t('search.all')"
-                clearable
-                style="width: 200px"
-                @update:value="handleSearch"
-              />
-            </n-form-item>
+            <div class="form-row">
+              <n-form-item :label="$t('papers.type')" class="form-item">
+                <n-select
+                  v-model:value="localFilters.paper_type"
+                  :options="paperTypeOptions"
+                  :placeholder="$t('search.all')"
+                  clearable
+                  @update:value="handleSearch"
+                />
+              </n-form-item>
+              <n-form-item :label="$t('papers.status')" class="form-item">
+                <n-select
+                  v-model:value="localFilters.paper_accept"
+                  :options="paperStatusOptions"
+                  :placeholder="$t('search.all')"
+                  clearable
+                  @update:value="handleSearch"
+                />
+              </n-form-item>
+            </div>
           </template>
 
           <!-- 新聞特定篩選 -->
           <template v-if="config.type === 'news'">
-            <n-form-item :label="$t('news.type')">
-              <n-select
-                v-model:value="localFilters.news_type"
-                :options="newsTypeOptions"
-                :placeholder="$t('search.all')"
-                clearable
-                style="width: 200px"
-                @update:value="handleSearch"
-              />
-            </n-form-item>
+            <div class="form-row">
+              <n-form-item :label="$t('news.type')" class="form-item">
+                <n-select
+                  v-model:value="localFilters.news_type"
+                  :options="newsTypeOptions"
+                  :placeholder="$t('search.all')"
+                  clearable
+                  @update:value="handleSearch"
+                />
+              </n-form-item>
+            </div>
           </template>
 
           <!-- 項目特定篩選 -->
           <template v-if="config.type === 'projects'">
-            <n-form-item :label="$t('projects.status')">
-              <n-select
-                v-model:value="localFilters.is_end"
-                :options="projectStatusOptions"
-                :placeholder="$t('search.all')"
-                clearable
-                style="width: 200px"
-                @update:value="handleSearch"
-              />
-            </n-form-item>
+            <div class="form-row">
+              <n-form-item :label="$t('projects.status')" class="form-item">
+                <n-select
+                  v-model:value="localFilters.is_end"
+                  :options="projectStatusOptions"
+                  :placeholder="$t('search.all')"
+                  clearable
+                  @update:value="handleSearch"
+                />
+              </n-form-item>
+            </div>
           </template>
 
           <!-- 排序 -->
           <template v-if="config.sorting">
-            <n-form-item :label="$t('search.sortBy')">
-              <n-space>
-                <n-select
-                  v-model:value="localFilters.sort_by"
-                  :options="sortOptions"
-                  :placeholder="$t('search.default')"
-                  clearable
-                  style="width: 200px"
-                  @update:value="handleSearch"
-                />
-                <n-select
-                  v-model:value="localFilters.order"
-                  :options="orderOptions"
-                  :placeholder="$t('search.desc')"
-                  clearable
-                  style="width: 120px"
-                  @update:value="handleSearch"
-                />
-              </n-space>
-            </n-form-item>
+            <div class="form-row">
+              <n-form-item :label="$t('search.sortBy')" class="form-item-wide">
+                <div class="sort-controls">
+                  <n-select
+                    v-model:value="localFilters.sort_by"
+                    :options="sortOptions"
+                    :placeholder="$t('search.default')"
+                    clearable
+                    @update:value="handleSearch"
+                    class="sort-field"
+                  />
+                  <n-select
+                    v-model:value="localFilters.order"
+                    :options="orderOptions"
+                    :placeholder="$t('search.desc')"
+                    clearable
+                    @update:value="handleSearch"
+                    class="sort-order"
+                  />
+                </div>
+              </n-form-item>
+            </div>
           </template>
         </n-form>
       </div>
@@ -331,6 +336,51 @@ if (localFilters.value.start_date && localFilters.value.end_date) {
   border-color: rgba(112, 161, 255, 0.2);
 }
 
+/* 统一网格布局 */
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  align-items: start;
+}
+
+.form-row:last-child {
+  margin-bottom: 0;
+}
+
+/* 日期和排序占满一行 */
+.form-item-wide {
+  grid-column: 1 / -1;
+}
+
+/* 重置表单项的默认margin */
+:deep(.form-row .n-form-item) {
+  margin-bottom: 0 !important;
+}
+
+/* 统一所有输入控件宽度 */
+:deep(.form-row .n-select),
+:deep(.form-row .n-date-picker) {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* 排序控件特殊布局 */
+.sort-controls {
+  display: flex;
+  gap: 1rem;
+}
+
+.sort-field {
+  flex: 2;
+}
+
+.sort-order {
+  flex: 1;
+  min-width: 7rem;
+}
+
 /* 表單項樣式 */
 :deep(.n-form-item) {
   margin-bottom: 1rem;
@@ -358,8 +408,24 @@ if (localFilters.value.start_date && localFilters.value.end_date) {
     padding: 1rem;
   }
 
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .sort-controls {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .sort-field,
+  .sort-order {
+    flex: none;
+    min-width: unset;
+  }
+
   :deep(.n-form) {
-    --n-label-width: 70px;
+    --n-label-width: 4.375rem; /* 70px */
   }
 
   :deep(.n-form-item-label) {
