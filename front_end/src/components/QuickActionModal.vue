@@ -543,8 +543,12 @@ const hasAvatarToShow = computed(() => {
     return true;
   }
   
-  // 如果是編輯模式且有現有頭像
+  // 如果是編輯模式且有現有頭像，但沒有被標記為刪除
   if (props.actionType === 'edit' && props.editData && props.editData['mem_avatar_path']) {
+    // 檢查是否被標記為刪除
+    if (formData['mem_avatar_delete']) {
+      return false;
+    }
     return true;
   }
   
@@ -1059,12 +1063,27 @@ const openCropper = (fieldName: string, type: 'avatar' | 'logo' | 'carousel') =>
 const handleCroppedImage = (croppedFile: File) => {
   if (currentImageField.value) {
     uploadedFiles[currentImageField.value] = croppedFile;
+    
+    // 如果用戶上傳新圖片，清除刪除標記
+    if (currentImageField.value === 'mem_avatar') {
+      delete formData['mem_avatar_delete'];
+    }
+    
     currentImageField.value = '';
   }
 };
 
 const removeImage = (fieldName: string) => {
+  // 刪除新上傳的文件
   delete uploadedFiles[fieldName];
+  
+  // 如果是編輯模式且有現有圖片，標記為刪除
+  if (props.actionType === 'edit' && props.editData) {
+    if (fieldName === 'mem_avatar' && props.editData['mem_avatar_path']) {
+      // 在formData中設置刪除標記
+      formData[`${fieldName}_delete`] = true;
+    }
+  }
 };
 
 const getImagePreview = (fieldName: string): string => {
@@ -1079,6 +1098,10 @@ const getImagePreview = (fieldName: string): string => {
     // 特殊處理成員頭像字段
     if (fieldName === 'mem_avatar') {
       imagePath = props.editData['mem_avatar_path'];
+      // 如果被標記為刪除，不顯示
+      if (formData['mem_avatar_delete']) {
+        return '';
+      }
     } else {
       imagePath = props.editData[`${fieldName}_path`];
     }
