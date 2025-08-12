@@ -1,3 +1,11 @@
+<!-- Language Switcher -->
+
+<div align="right">
+
+[English](SWAGGER_MIGRATION_GUIDE_EN.md)
+
+</div>
+
 """
 Swagger 文檔系統升級指南
 

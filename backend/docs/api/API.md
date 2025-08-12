@@ -1,3 +1,11 @@
+<!-- Language Switcher -->
+
+<div align="right">
+
+[English](API_EN.md)
+
+</div>
+
 # 實驗室網頁框架 API 文件
 
 ## 目錄

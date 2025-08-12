@@ -1,3 +1,11 @@
+<!-- Language Switcher -->
+
+<div align="right">
+
+[English](PYCHARM_TESTING_GUIDE_EN.md)
+
+</div>
+
 # PyCharm 測試運行配置指南
 
 ## 📊 測試用例統計

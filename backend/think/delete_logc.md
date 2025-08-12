@@ -1,3 +1,11 @@
+<!-- Language Switcher -->
+
+<div align="right">
+
+[English](delete_logc_EN.md)
+
+</div>
+
 ！現在所有的軟刪除關聯性約束都已實現：
 
   📋 軟刪除關聯性約束總結

@@ -1,3 +1,11 @@
+<!-- Language Switcher -->
+
+<div align="right">
+
+[English](PROJECT_STRUCTURE_EN.md)
+
+</div>
+
 # 項目結構說明
 
 ## 📁 整理後的目錄結構

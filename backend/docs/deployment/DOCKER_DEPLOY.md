@@ -1,3 +1,11 @@
+<!-- Language Switcher -->
+
+<div align="right">
+
+[English](DOCKER_DEPLOY_EN.md)
+
+</div>
+
 # 🐳 Docker 部署指南
 
 本指南将帮助您在本地 Docker 容器中部署實驗室網頁框架後端服務。

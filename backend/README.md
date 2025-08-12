@@ -1,3 +1,11 @@
+<!-- Language Switcher -->
+
+<div align="right">
+
+[English](README_EN.md)
+
+</div>
+
 # 實驗室通用網頁框架 - 後端
 
 這是一個專為實驗室設計的通用網頁框架後端，採用**現代化三層架構** (Routes → Services → Models) + Flask + SQLAlchemy + JWT，支持自定義學校、實驗室logo等資訊。

@@ -1,3 +1,11 @@
+<!-- Language Switcher -->
+
+<div align="right">
+
+[English](messages_usage_guide_EN.md)
+
+</div>
+
 # 統一文本管理使用指南
 
 ## 概述
