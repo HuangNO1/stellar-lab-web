@@ -1,0 +1,98 @@
+# 前後端分離部署模式
+# 前端可以連接任意後端 API，支持跨域部署
+
+version: '3.8'
+
+services:
+  # 僅部署前端，連接外部後端
+  frontend:
+    image: ${FRONTEND_IMAGE:-ghcr.io/your-repo/frontend:latest}
+    container_name: lab_web_frontend_only
+    environment:
+      # 靈活的後端配置
+      BACKEND_URL: ${BACKEND_URL:-https://api.your-domain.com}
+      API_BASE_URL: ${API_BASE_URL:-https://api.your-domain.com/api}
+      CORS_ORIGIN: ${CORS_ORIGINS:-*}
+      APP_TITLE: ${APP_TITLE:-Lab Website Framework}
+      APP_DESCRIPTION: ${APP_DESCRIPTION:-Modern laboratory website framework}
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+---
+# 僅部署後端的示例配置
+version: '3.8'
+
+services:
+  # MySQL Database (如果需要)
+  db:
+    image: mysql:8.0
+    container_name: lab_web_backend_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-secure_password_123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-lab_web}
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
+    ports:
+      - "${MYSQL_PORT:-3307}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - backend_network
+    restart: unless-stopped
+
+  # 僅部署後端
+  backend:
+    image: ${BACKEND_IMAGE:-ghcr.io/your-repo/backend:latest}
+    container_name: lab_web_backend_only
+    environment:
+      # 數據庫配置
+      DATABASE_URL: ${DATABASE_URL:-mysql+pymysql://root:secure_password_123@db:3306/lab_web?charset=utf8mb4}
+      MYSQL_HOST: ${MYSQL_HOST:-db}
+      MYSQL_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-secure_password_123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-lab_web}
+      
+      # Flask 配置
+      FLASK_CONFIG: ${FLASK_CONFIG:-production}
+      SECRET_KEY: ${SECRET_KEY:-your_very_secure_secret_key_here}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-your_jwt_secret_key_here}
+      
+      # 跨域配置 (重要！)
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://your-frontend-domain.com,http://localhost:3000}
+      
+      # 其他配置
+      UPLOAD_FOLDER: /app/media
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - media_data:/app/media
+      - ./logs:/app/logs
+    depends_on:
+      - db
+    networks:
+      - backend_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+    driver: local
+  media_data:
+    driver: local
+
+networks:
+  backend_network:
+    driver: bridge
+    name: lab_web_backend

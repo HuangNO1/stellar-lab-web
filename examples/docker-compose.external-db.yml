@@ -1,0 +1,73 @@
+# 外部數據庫部署模式
+# 使用現有的 MySQL 數據庫服務器
+
+version: '3.8'
+
+services:
+  # Backend Flask Application
+  backend:
+    image: ${BACKEND_IMAGE:-ghcr.io/your-repo/backend:latest}
+    container_name: lab_web_backend_external_db
+    environment:
+      # 外部數據庫配置
+      DATABASE_URL: ${DATABASE_URL:-mysql+pymysql://username:password@external-db-host:3306/lab_web?charset=utf8mb4}
+      MYSQL_HOST: ${MYSQL_HOST:-external-db-host}
+      MYSQL_PORT: ${MYSQL_PORT:-3306}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-your_db_password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-lab_web}
+      
+      # Flask 配置
+      FLASK_CONFIG: ${FLASK_CONFIG:-production}
+      SECRET_KEY: ${SECRET_KEY:-your_production_secret_key}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-your_production_jwt_key}
+      
+      # 應用配置
+      UPLOAD_FOLDER: /app/media
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://your-domain.com}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - media_data:/app/media
+      - ./logs:/app/logs
+    networks:
+      - lab_web_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # Frontend Vue.js Application
+  frontend:
+    image: ${FRONTEND_IMAGE:-ghcr.io/your-repo/frontend:latest}
+    container_name: lab_web_frontend_external_db
+    environment:
+      # 運行時配置
+      BACKEND_URL: http://backend:8000
+      API_BASE_URL: /api
+      CORS_ORIGIN: ${CORS_ORIGINS:-https://your-domain.com}
+      APP_TITLE: ${APP_TITLE:-Your Lab Name}
+      APP_DESCRIPTION: ${APP_DESCRIPTION:-Your lab description}
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      - backend
+    networks:
+      - lab_web_network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  media_data:
+    driver: local
+
+networks:
+  lab_web_network:
+    driver: bridge
+    name: lab_web_external_db

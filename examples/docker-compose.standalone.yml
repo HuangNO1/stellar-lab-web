@@ -1,0 +1,122 @@
+# 獨立部署模式
+# 使用發布的 Docker 鏡像進行完整部署
+# 適用於快速部署和測試
+
+version: '3.8'
+
+services:
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: lab_web_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-lab_web_root_123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-lab_web}
+      MYSQL_USER: ${MYSQL_USER:-lab_web_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-lab_web_pass_123}
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
+    ports:
+      - "${MYSQL_PORT:-3307}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - lab_web_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-lab_web_root_123}"]
+      timeout: 20s
+      retries: 10
+    restart: unless-stopped
+
+  # Backend Flask Application (使用發布的鏡像)
+  backend:
+    image: ${BACKEND_IMAGE:-ghcr.io/your-repo/backend:latest}
+    container_name: lab_web_backend
+    environment:
+      # 數據庫配置
+      DATABASE_URL: mysql+pymysql://root:${MYSQL_ROOT_PASSWORD:-lab_web_root_123}@db:3306/${MYSQL_DATABASE:-lab_web}?charset=utf8mb4
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-lab_web_root_123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-lab_web}
+      
+      # Flask 配置
+      FLASK_APP: run.py
+      FLASK_CONFIG: ${FLASK_CONFIG:-production}
+      SECRET_KEY: ${SECRET_KEY:-change_me_in_production}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change_me_jwt_in_production}
+      
+      # 應用配置
+      UPLOAD_FOLDER: /app/media
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://localhost:80}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - media_data:/app/media
+      - ./logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - lab_web_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # Frontend Vue.js Application (使用發布的鏡像)
+  frontend:
+    image: ${FRONTEND_IMAGE:-ghcr.io/your-repo/frontend:latest}
+    container_name: lab_web_frontend
+    environment:
+      # 運行時配置
+      BACKEND_URL: http://backend:8000
+      API_BASE_URL: /api
+      CORS_ORIGIN: ${CORS_ORIGINS:-*}
+      APP_TITLE: ${APP_TITLE:-實驗室網頁框架}
+      APP_DESCRIPTION: ${APP_DESCRIPTION:-現代化實驗室網站解決方案}
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      - backend
+    networks:
+      - lab_web_network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+
+  # Optional: phpMyAdmin Database Management
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: lab_web_phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD:-lab_web_root_123}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-lab_web_root_123}
+    ports:
+      - "${PHPMYADMIN_PORT:-8081}:80"
+    depends_on:
+      - db
+    networks:
+      - lab_web_network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+    driver: local
+  media_data:
+    driver: local
+
+networks:
+  lab_web_network:
+    driver: bridge
+    name: lab_web_standalone
