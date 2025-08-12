@@ -238,8 +238,9 @@ watch(() => route.params.id, () => {
 
 <style scoped>
 .group-view {
-  padding: 1.5rem;
-  max-width: 87.5rem;
+  padding: 0.5rem 1rem;
+  max-width: 120rem;
+  min-width: 20rem;
   margin: 0 auto;
 }
 
@@ -547,6 +548,7 @@ watch(() => route.params.id, () => {
 @media (max-width: 50rem) {
   .group-view {
     padding: 1rem;
+    min-width: auto;
   }
   
   .group-header {

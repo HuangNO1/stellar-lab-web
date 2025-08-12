@@ -606,10 +606,10 @@ html:has(#user-app.dark-mode) {
 }
 
 .main-content {
-  padding: 24px;
+  padding: 1.5rem;
   min-height: calc(100vh - 4.5rem);
-  width: 100%;
-  max-width: 1400px;
+  min-width: 70rem;
+  max-width: 120rem;
   margin: 0 auto;
   background: transparent;
 }
@@ -678,7 +678,7 @@ html:has(#user-app.dark-mode) {
   }
   
   .main-content {
-    padding: 16px;
+    padding: 1rem;
     min-height: calc(100vh - 4rem);
   }
 }
@@ -700,7 +700,7 @@ html:has(#user-app.dark-mode) {
   }
   
   .main-content {
-    padding: 12px;
+    padding: 0.75rem;
     min-height: calc(100vh - 3.5rem);
   }
 }
@@ -726,7 +726,7 @@ html:has(#user-app.dark-mode) {
   }
   
   .main-content {
-    padding: 8px;
+    padding: 0.5rem;
     min-height: calc(100vh - 3rem);
   }
 }

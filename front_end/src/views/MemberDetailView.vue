@@ -43,6 +43,20 @@
 
     <!-- 成員詳情 -->
     <div v-else-if="member" class="member-detail-content">
+      <!-- 返回按鈕 -->
+      <div class="back-button-section">
+        <n-button @click="goBack" ghost size="large">
+          <template #icon>
+            <n-icon>
+              <svg viewBox="0 0 24 24">
+                <path fill="currentColor" d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+              </svg>
+            </n-icon>
+          </template>
+          {{ $t('common.back') }}
+        </n-button>
+      </div>
+      
       <div class="member-layout">
         <!-- 左側：頭像 -->
         <div class="avatar-section">
@@ -265,6 +279,10 @@ const formatDate = (dateStr: string) => {
   return date.toLocaleDateString(getCurrentLocale() === 'zh' ? 'zh-CN' : 'en-US');
 };
 
+const goBack = () => {
+  router.back();
+};
+
 // 生命週期
 onMounted(() => {
   fetchMemberDetail();
@@ -278,8 +296,9 @@ watch(() => route.params.id, () => {
 
 <style scoped>
 .member-detail-view {
-  padding: 1.5rem;
-  max-width: 87.5rem;
+  padding: 0.5rem 1rem;
+  max-width: 160rem;
+  min-width: 20rem;
   margin: 0 auto;
   width: 100%;
 }
@@ -293,6 +312,13 @@ watch(() => route.params.id, () => {
 .not-found-state {
   text-align: center;
   padding: 5rem 1.25rem;
+}
+
+/* 返回按鈕區域 */
+.back-button-section {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 /* Flex 布局容器 */
@@ -482,6 +508,11 @@ watch(() => route.params.id, () => {
 }
 
 /* 暗色主題支持 */
+[data-theme="dark"] .back-button-section,
+.dark .back-button-section {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
 [data-theme="dark"] .member-detail-view,
 .dark .member-detail-view,
 .dark-mode .member-detail-view {
@@ -566,6 +597,7 @@ watch(() => route.params.id, () => {
 @media (max-width: 48rem) {
   .member-detail-view {
     padding: 1rem;
+    min-width: auto;
   }
   
   .member-layout {
