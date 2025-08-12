@@ -130,7 +130,7 @@
                 v-for="news in latestNews" 
                 :key="news.news_id" 
                 class="news-item-compact" 
-                @click="toNewsPage"
+                @click="() => toNewsDetail(news)"
               >
                 <div class="news-item-header">
                   <n-tag 
@@ -314,6 +314,11 @@ const fetchLatestNews = async () => {
 // 跳轉到新聞頁面
 const toNewsPage = () => {
   router.push('/news');
+};
+
+// 跳轉到新聞詳情頁面
+const toNewsDetail = (news: News) => {
+  router.push(`/news/${news.news_id}`);
 };
 
 // 生命週期
@@ -991,6 +996,8 @@ onMounted(() => {
 .news-content-compact {
   flex: 1;
   min-width: 0;
+  display: flex;
+  align-items: center;
 }
 
 .news-title-compact {
