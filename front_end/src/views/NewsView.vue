@@ -45,7 +45,7 @@
           </div>
           <div class="news-content-text">
             <h3 class="news-title">
-              {{ getCurrentLocale() === 'zh' ? news.news_content_zh : (news.news_content_en || news.news_content_zh) }}
+              {{ stripMarkdown(getCurrentLocale() === 'zh' ? news.news_content_zh : (news.news_content_en || news.news_content_zh)) }}
             </h3>
           </div>
           <div class="news-actions">
@@ -85,6 +85,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import SearchComponent from '@/components/SearchComponent.vue';
 import { newsApi } from '@/services/api';
+import { stripMarkdown } from '@/utils/text';
 import type { News, SearchFilters } from '@/types/api';
 
 const { t, locale } = useI18n();

@@ -206,6 +206,7 @@ const formData = reactive<Partial<Lab>>({
 const logoFileList = ref<UploadFileInfo[]>([]);
 const logoPreview = ref<string>('');
 const logoFile = ref<File | null>(null);
+const logoShouldDelete = ref<boolean>(false);
 
 interface CarouselImage {
   fileList: UploadFileInfo[];
@@ -254,9 +255,14 @@ const fetchLabData = async () => {
     if (response.code === 0 && response.data) {
       Object.assign(formData, response.data);
       
+      // 重置刪除標記
+      logoShouldDelete.value = false;
+      
       // 設置 logo 預覽
       if (response.data.lab_logo_path) {
         logoPreview.value = getImageUrl(response.data.lab_logo_path);
+      } else {
+        logoPreview.value = '';
       }
       
       // 設置輪播圖預覽
@@ -296,6 +302,7 @@ const handleLogoRemove = () => {
   logoFileList.value = [];
   logoFile.value = null;
   logoPreview.value = '';
+  logoShouldDelete.value = true;
 };
 
 const handleCarouselChange = (index: number, { fileList }: { fileList: UploadFileInfo[] }) => {
@@ -336,6 +343,7 @@ const handleCroppedImage = (croppedFile: File) => {
   if (currentImageType.value === 'logo') {
     logoFile.value = croppedFile;
     logoPreview.value = URL.createObjectURL(croppedFile);
+    logoShouldDelete.value = false; // 上傳新文件時清除刪除標記
   } else if (currentImageType.value === 'carousel' && currentCarouselIndex.value >= 0) {
     const index = currentCarouselIndex.value;
     carouselImages.value[index].file = croppedFile;
@@ -371,9 +379,11 @@ const handleSave = async () => {
       }
     });
 
-    // 添加 logo 文件
+    // 添加 logo 文件或刪除標記
     if (logoFile.value && logoFile.value instanceof File) {
       formDataToSend.append('lab_logo', logoFile.value);
+    } else if (logoShouldDelete.value) {
+      formDataToSend.append('lab_logo_delete', 'true');
     }
 
     // 添加輪播圖文件

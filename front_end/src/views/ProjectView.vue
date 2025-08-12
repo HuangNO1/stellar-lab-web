@@ -53,7 +53,7 @@
           </div>
           
           <div v-if="project.project_desc_zh || project.project_desc_en" class="project-description">
-            {{ getCurrentLocale() === 'zh' ? project.project_desc_zh : (project.project_desc_en || project.project_desc_zh) }}
+            {{ stripMarkdown(getCurrentLocale() === 'zh' ? project.project_desc_zh : (project.project_desc_en || project.project_desc_zh)) }}
           </div>
           
           <div class="project-meta">
@@ -116,6 +116,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import SearchComponent from '@/components/SearchComponent.vue';
 import { projectApi } from '@/services/api';
+import { stripMarkdown } from '@/utils/text';
 import type { Project, SearchFilters } from '@/types/api';
 
 const { t, locale } = useI18n();

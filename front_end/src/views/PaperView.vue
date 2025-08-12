@@ -51,7 +51,7 @@
           </div>
           
           <div v-if="paper.paper_desc_zh || paper.paper_desc_en" class="paper-description">
-            {{ getCurrentLocale() === 'zh' ? paper.paper_desc_zh : (paper.paper_desc_en || paper.paper_desc_zh) }}
+            {{ stripMarkdown(getCurrentLocale() === 'zh' ? paper.paper_desc_zh : (paper.paper_desc_en || paper.paper_desc_zh)) }}
           </div>
           
           <div class="paper-meta">
@@ -129,6 +129,7 @@ import { useRouter } from 'vue-router';
 import SearchComponent from '@/components/SearchComponent.vue';
 import { paperApi } from '@/services/api';
 import { getMediaUrl } from '@/utils/media';
+import { stripMarkdown } from '@/utils/text';
 import type { Paper, SearchFilters, PaperAuthor } from '@/types/api';
 
 const { t, locale } = useI18n();

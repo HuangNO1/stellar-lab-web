@@ -609,7 +609,7 @@ html:has(#user-app.dark-mode) {
   padding: 1.5rem;
   min-height: calc(100vh - 4.5rem);
   min-width: 70rem;
-  max-width: 120rem;
+  max-width: 80rem;
   margin: 0 auto;
   background: transparent;
 }
