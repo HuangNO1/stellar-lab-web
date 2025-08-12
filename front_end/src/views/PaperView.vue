@@ -106,26 +106,29 @@
 
       <!-- 分頁 -->
       <div v-if="pagination && pagination.pages > 1" class="pagination-wrapper">
-        <n-pagination
-          v-model:page="currentPage"
-          :page-count="pagination.pages"
-          :page-size="pagination.per_page"
-          :item-count="pagination.total"
-          show-size-picker
-          :page-sizes="[10, 20, 50]"
-          show-quick-jumper
-          @update:page="handlePageChange"
-          @update:page-size="handlePageSizeChange"
-        />
+        <n-config-provider :locale="naiveLocale" :date-locale="dateLocale">
+          <n-pagination
+            v-model:page="currentPage"
+            :page-count="pagination.pages"
+            :page-size="pagination.per_page"
+            :item-count="pagination.total"
+            show-size-picker
+            :page-sizes="[10, 20, 50]"
+            show-quick-jumper
+            @update:page="handlePageChange"
+            @update:page-size="handlePageSizeChange"
+          />
+        </n-config-provider>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
+import { NConfigProvider, zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
 import SearchComponent from '@/components/SearchComponent.vue';
 import { paperApi } from '@/services/api';
 import { getMediaUrl } from '@/utils/media';
@@ -134,6 +137,16 @@ import type { Paper, SearchFilters, PaperAuthor } from '@/types/api';
 
 const { t, locale } = useI18n();
 const router = useRouter();
+
+// Naive UI 語言包配置
+const naiveLocale = computed(() => {
+  return locale.value === 'zh' ? zhCN : enUS;
+});
+
+// 日期選擇器的國際化配置
+const dateLocale = computed(() => {
+  return locale.value === 'zh' ? dateZhCN : dateEnUS;
+});
 
 // 響應式數據
 const paperList = ref<Paper[]>([]);
