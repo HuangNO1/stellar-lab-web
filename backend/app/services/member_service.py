@@ -191,7 +191,7 @@ class MemberService(BaseService):
         
         def _delete_operation():
             # 軟刪除
-            self.soft_delete(member, "成員")
+            self.soft_delete(member, "member")
             
             # 清理頭像文件
             if member.mem_avatar_path:
@@ -235,7 +235,7 @@ class MemberService(BaseService):
                         self._check_member_deletable(member)
                         
                         # 軟刪除
-                        self.soft_delete(member, "成員")
+                        self.soft_delete(member, "member")
                         
                         # 清理頭像文件
                         if member.mem_avatar_path:
@@ -456,7 +456,7 @@ class MemberService(BaseService):
             try:
                 job_type = int(update_fields['job_type'])
                 if job_type not in [0, 1, 2, 3, 4]:  # 0=教授, 1=副教授, 2=講師, 3=助理研究員, 4=博士後
-                    raise ValidationError('職稱類型無效')
+                    raise ValidationError(msg.get_error_message('TITLE_TYPE_INVALID'))
                 update_fields['job_type'] = job_type
             except (ValueError, TypeError):
                 raise ValidationError(msg.get_error_message('TITLE_TYPE_FORMAT_ERROR'))
@@ -465,7 +465,7 @@ class MemberService(BaseService):
             try:
                 student_type = int(update_fields['student_type'])
                 if student_type not in [0, 1, 2]:  # 0=博士生, 1=碩士生, 2=大學生
-                    raise ValidationError('學生類型無效')
+                    raise ValidationError(msg.get_error_message('STUDENT_TYPE_INVALID'))
                 update_fields['student_type'] = student_type
             except (ValueError, TypeError):
                 raise ValidationError(msg.get_error_message('STUDENT_TYPE_FORMAT_ERROR'))

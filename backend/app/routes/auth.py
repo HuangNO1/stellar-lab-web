@@ -25,7 +25,7 @@ def admin_login():
     try:
         data = request.get_json()
         if not data:
-            return jsonify(error_response(2000, '請提供登錄數據')), 400
+            return jsonify(error_response(2000, msg.get_error_message('INVALID_CREDENTIALS'))), 400
         
         admin_name = data.get('admin_name', '').strip()
         admin_pass = data.get('admin_pass', '')
@@ -45,7 +45,7 @@ def admin_login():
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
         
     except Exception as e:
-        return jsonify(error_response(5000, '登錄失敗')), 500
+        return jsonify(error_response(5000, msg.get_error_message('OPERATION_FAILED'))), 500
 
 @bp.route('/admin/logout', methods=['POST'])
 @admin_required
@@ -65,7 +65,7 @@ def admin_logout():
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
         
     except Exception as e:
-        return jsonify(error_response(5000, '登出失敗')), 500
+        return jsonify(error_response(5000, msg.get_error_message('OPERATION_FAILED'))), 500
 
 @bp.route('/admin/change-password', methods=['POST'])
 @admin_required
@@ -74,7 +74,7 @@ def change_password():
     try:
         data = request.get_json()
         if not data:
-            return jsonify(error_response(2000, '請提供密碼數據')), 400
+            return jsonify(error_response(2000, msg.get_error_message('MISSING_REQUIRED_FIELDS'))), 400
         
         old_password = data.get('old_password', '')
         new_password = data.get('new_password', '')
@@ -91,7 +91,7 @@ def change_password():
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
         
     except Exception as e:
-        return jsonify(error_response(5000, '修改密碼失敗')), 500
+        return jsonify(error_response(5000, msg.get_error_message('OPERATION_FAILED'))), 500
 
 @bp.route('/admin/profile', methods=['GET'])
 @admin_required
@@ -106,7 +106,7 @@ def get_profile():
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
         
     except Exception as e:
-        return jsonify(error_response(5000, '獲取個人資料失敗')), 500
+        return jsonify(error_response(5000, msg.get_error_message('OPERATION_FAILED'))), 500
 
 @bp.route('/admin/profile', methods=['PUT'])
 @admin_required
@@ -115,7 +115,7 @@ def update_profile():
     try:
         data = request.get_json()
         if not data:
-            return jsonify(error_response(2000, '請提供要更新的資料')), 400
+            return jsonify(error_response(2000, msg.get_error_message('MISSING_REQUIRED_FIELDS'))), 400
         
         profile = auth_service.update_profile(
             admin_id=g.current_admin.admin_id,
@@ -128,4 +128,4 @@ def update_profile():
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
         
     except Exception as e:
-        return jsonify(error_response(5000, '更新個人資料失敗')), 500
+        return jsonify(error_response(5000, msg.get_error_message('OPERATION_FAILED'))), 500

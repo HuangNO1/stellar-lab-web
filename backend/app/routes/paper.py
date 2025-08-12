@@ -68,7 +68,7 @@ def create_paper():
                 try:
                     authors_data = json.loads(authors_str)
                 except json.JSONDecodeError:
-                    return jsonify(error_response(2000, '作者信息格式錯誤')), 400
+                    return jsonify(error_response(2000, msg.get_error_message('INVALID_INPUT'))), 400
         
         paper = paper_service.create_paper(form_data, files_data, authors_data)
         return jsonify(success_response(paper, msg.get_success_message('PAPER_CREATE_SUCCESS'))), 201

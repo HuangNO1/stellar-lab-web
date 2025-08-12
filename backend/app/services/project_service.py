@@ -154,7 +154,7 @@ class ProjectService(BaseService):
         
         def _delete_operation():
             # 軟刪除
-            self.soft_delete(project, "項目")
+            self.soft_delete(project, "project")
             return {'deleted_project_id': project_id}
         
         # 執行操作並記錄審計

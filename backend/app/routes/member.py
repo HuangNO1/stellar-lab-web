@@ -46,7 +46,7 @@ def get_members():
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
         
     except Exception as e:
-        return jsonify(error_response(5000, '獲取成員列表失敗')), 500
+        return jsonify(error_response(5000, msg.get_error_message('OPERATION_FAILED'))), 500
 
 @bp.route('/members/<int:mem_id>', methods=['GET'])
 def get_member_detail(mem_id):
@@ -65,7 +65,7 @@ def get_member_detail(mem_id):
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
         
     except Exception as e:
-        return jsonify(error_response(5000, '獲取成員詳情失敗')), 500
+        return jsonify(error_response(5000, msg.get_error_message('OPERATION_FAILED'))), 500
 
 @bp.route('/members', methods=['POST'])
 @admin_required
@@ -97,7 +97,7 @@ def create_member():
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
         
     except Exception as e:
-        return jsonify(error_response(5000, '創建成員失敗')), 500
+        return jsonify(error_response(5000, msg.get_error_message('OPERATION_FAILED'))), 500
 
 @bp.route('/members/<int:mem_id>', methods=['PUT'])
 @admin_required
@@ -132,7 +132,7 @@ def update_member(mem_id):
     except Exception as e:
         import traceback
         traceback.print_exc()
-        return jsonify(error_response(5000, '更新成員失敗')), 500
+        return jsonify(error_response(5000, msg.get_error_message('OPERATION_FAILED'))), 500
 
 @bp.route('/members/<int:mem_id>', methods=['DELETE'])
 @admin_required
@@ -147,7 +147,7 @@ def delete_member(mem_id):
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
         
     except Exception as e:
-        return jsonify(error_response(5000, '刪除成員失敗')), 500
+        return jsonify(error_response(5000, msg.get_error_message('OPERATION_FAILED'))), 500
 
 @bp.route('/members/batch', methods=['DELETE'])
 @admin_required
@@ -163,7 +163,7 @@ def batch_delete_members():
     try:
         data = request.get_json()
         if not data or 'member_ids' not in data:
-            return jsonify(error_response(2000, '請提供要刪除的成員ID列表')), 400
+            return jsonify(error_response(2000, msg.get_error_message('MEMBER_NOT_SELECTED'))), 400
         
         result = member_service.batch_delete_members(data['member_ids'])
         return jsonify(success_response(result, msg.get_success_message('BATCH_DELETE_SUCCESS')))
@@ -173,7 +173,7 @@ def batch_delete_members():
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
         
     except Exception as e:
-        return jsonify(error_response(5000, '批量刪除失敗')), 500
+        return jsonify(error_response(5000, msg.get_error_message('OPERATION_FAILED'))), 500
 
 @bp.route('/members/batch', methods=['PUT'])
 @admin_required
@@ -193,7 +193,7 @@ def batch_update_members():
     try:
         data = request.get_json()
         if not data or 'member_ids' not in data or 'updates' not in data:
-            return jsonify(error_response(2000, '請提供成員ID列表和更新字段')), 400
+            return jsonify(error_response(2000, msg.get_error_message('MEMBER_UPDATE_NO_FIELDS'))), 400
         
         result = member_service.batch_update_members(
             member_ids=data['member_ids'],
@@ -206,4 +206,4 @@ def batch_update_members():
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
         
     except Exception as e:
-        return jsonify(error_response(5000, '批量更新失敗')), 500
+        return jsonify(error_response(5000, msg.get_error_message('OPERATION_FAILED'))), 500

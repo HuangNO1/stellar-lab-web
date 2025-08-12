@@ -143,7 +143,7 @@ class NewsService(BaseService):
         
         def _delete_operation():
             # 軟刪除
-            self.soft_delete(news, "新聞")
+            self.soft_delete(news, "news")
             return {'deleted_news_id': news_id}
         
         # 執行操作並記錄審計

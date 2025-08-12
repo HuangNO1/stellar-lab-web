@@ -14,7 +14,7 @@ def upload_file():
     """上傳媒體文件"""
     try:
         if 'file' not in request.files:
-            return jsonify(error_response(2000, '沒有選擇文件')), 400
+            return jsonify(error_response(2000, msg.get_error_message('NO_FILE_SELECTED'))), 400
         
         file = request.files['file']
         file_type = request.form.get('type', 'other')

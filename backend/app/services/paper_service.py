@@ -254,7 +254,7 @@ class PaperService(BaseService):
         
         def _delete_operation():
             # 軟刪除
-            self.soft_delete(paper, "論文")
+            self.soft_delete(paper, "paper")
             return {'deleted_paper_id': paper_id}
         
         # 執行操作並記錄審計

@@ -164,7 +164,7 @@ class ResearchGroupService(BaseService):
         
         def _delete_operation():
             # 軟刪除
-            self.soft_delete(group, "課題組")
+            self.soft_delete(group, "research_group")
             return {'deleted_group_id': group_id}
         
         # 執行操作並記錄審計

@@ -3,6 +3,7 @@ from flask import g
 from app import db
 from app.models import EditRecord
 from .base_service import BaseService
+from app.utils.messages import msg
 
 
 class AuditService(BaseService):
@@ -53,7 +54,7 @@ class AuditService(BaseService):
             ValueError: 未知的模組名稱
         """
         if module_name not in cls.MODULE_MAPPING:
-            raise ValueError(f"未知的模組名稱: {module_name}")
+            raise ValueError(msg.get_error_message('UNKNOWN_MODULE', module_name=module_name))
         
         return cls.MODULE_MAPPING[module_name]
     
@@ -79,7 +80,7 @@ class AuditService(BaseService):
         """
         # 校驗操作類型
         if operation not in self.OPERATION_TYPES:
-            raise ValueError(f"未知的操作類型: {operation}")
+            raise ValueError(msg.get_error_message('UNKNOWN_OPERATION', operation=operation))
         
         # 獲取模組ID
         module_id = self.get_module_id_by_name(module_name)

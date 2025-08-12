@@ -29,7 +29,7 @@ def get_lab():
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
         
     except Exception as e:
-        return jsonify(error_response(5000, '獲取實驗室信息失敗')), 500
+        return jsonify(error_response(5000, msg.get_error_message('OPERATION_FAILED'))), 500
 
 @bp.route('/lab', methods=['PUT', 'POST'])
 @admin_required
@@ -53,7 +53,7 @@ def update_lab():
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
         
     except Exception as e:
-        return jsonify(error_response(5000, '更新實驗室信息失敗')), 500
+        return jsonify(error_response(5000, msg.get_error_message('OPERATION_FAILED'))), 500
 
 @bp.route('/lab', methods=['DELETE'])
 @admin_required
@@ -70,4 +70,4 @@ def delete_lab():
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
         
     except Exception as e:
-        return jsonify(error_response(5000, '刪除實驗室失敗')), 500
+        return jsonify(error_response(5000, msg.get_error_message('OPERATION_FAILED'))), 500

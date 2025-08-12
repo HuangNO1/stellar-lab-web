@@ -115,14 +115,14 @@ class LabService(BaseService):
         
         lab = Lab.query.filter_by(enable=1).first()
         if not lab:
-            raise NotFoundError(msg.format_resource_error('實驗室'))
+            raise NotFoundError(msg.get_error_message('LAB_NOT_FOUND'))
         
         # 檢查是否可以刪除
         self._check_lab_deletable(lab)
         
         def _delete_operation():
             # 軟刪除
-            self.soft_delete(lab, "實驗室")
+            self.soft_delete(lab, "lab")
             
             # 清理相關文件
             self._cleanup_lab_files(lab)

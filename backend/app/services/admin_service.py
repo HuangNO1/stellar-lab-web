@@ -163,7 +163,7 @@ class AdminService(BaseService):
         
         def _delete_operation():
             # 軟刪除
-            self.soft_delete(admin, "管理員")
+            self.soft_delete(admin, "admin")
             return {'deleted_admin_id': admin_id}
         
         # 執行操作並記錄審計

@@ -225,9 +225,9 @@ class BaseService(ABC):
         elif isinstance(error, BusinessLogicError):
             return {"code": 4000, "message": str(error)}
         else:
-            return {"code": 5000, "message": "伺服器內部錯誤"}
+            return {"code": 5000, "message": msg.get_error_message('SYSTEM_ERROR')}
     
-    def soft_delete(self, model_instance, resource_name: str = "資源") -> None:
+    def soft_delete(self, model_instance, resource_name: str = "resource") -> None:
         """
         軟刪除資源
         
