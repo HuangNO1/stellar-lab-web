@@ -10,6 +10,7 @@
 - [快速開始](#快速開始)
 - [環境配置](#環境配置)
 - [生產環境部署](#生產環境部署)
+- [部署優化與單服務管理](#部署優化與單服務管理)
 - [開發環境](#開發環境)
 - [配置說明](#配置說明)
 - [資料庫管理](#資料庫管理)
@@ -196,6 +197,118 @@ services:
 資料會自動持久化在 Docker 資料卷中：
 - `mysql_data`: 資料庫檔案
 - `media_data`: 上傳的檔案（圖片、論文等）
+
+## 部署優化與單服務管理
+
+### 構建緩存優化
+
+deploy.sh 腳本支持 Docker 層緩存，可大幅提升部署速度：
+
+#### 快速部署（推薦）
+```bash
+# 利用 Docker 緩存，快速構建（1-3分鐘）
+./deploy.sh prod build --service=backend
+./deploy.sh prod build --service=frontend
+
+# 快速重啟單個服務
+./deploy.sh prod restart --service=backend   # 重啟後端
+./deploy.sh prod restart --service=frontend  # 重啟前端
+```
+
+#### 完全重建（較慢但徹底）
+```bash
+# 強制重建，無緩存（8-12分鐘）
+./deploy.sh prod build --service=backend --no-cache
+./deploy.sh prod build --service=frontend --no-cache
+
+# 重建所有服務
+./deploy.sh prod build --no-cache
+```
+
+### 單服務管理
+
+#### 支持的服務操作
+
+| 服務名稱 | 描述 | 構建時間（緩存/無緩存） |
+|----------|------|------------------------|
+| `backend` | Flask 後端 API | ~2分鐘 / ~10分鐘 |
+| `frontend` | Vue.js 前端 | ~3分鐘 / ~8分鐘 |
+| `db` | MySQL 資料庫 | 無需構建 |
+| `phpmyadmin` | 資料庫管理 | 無需構建 |
+
+#### 常用單服務命令
+
+```bash
+# 📊 監控服務
+./deploy.sh prod status                        # 查看所有服務狀態
+./deploy.sh prod health                        # 健康檢查
+./deploy.sh prod logs --service=backend -f    # 實時查看後端日誌
+./deploy.sh prod logs --service=frontend -f   # 實時查看前端日誌
+
+# 🔄 重啟服務
+./deploy.sh prod restart --service=backend    # 僅重啟後端
+./deploy.sh prod restart --service=frontend   # 僅重啟前端
+./deploy.sh prod restart                       # 重啟所有服務
+
+# 🛠️ 構建服務
+./deploy.sh prod build --service=backend      # 僅構建後端
+./deploy.sh prod build --service=frontend     # 僅構建前端
+
+# 🚀 啟動/停止服務
+./deploy.sh prod start --service=backend -d   # 後台啟動後端
+./deploy.sh prod stop --service=backend       # 停止後端
+```
+
+### 部署最佳實踐
+
+#### 日常開發流程
+```bash
+# 1. 修改代碼後快速重新部署
+./deploy.sh prod restart --service=backend
+
+# 2. 查看日誌確認更新
+./deploy.sh prod logs --service=backend -f
+
+# 3. 健康檢查
+./deploy.sh prod health
+```
+
+#### 依賴更新流程
+```bash
+# 1. 當修改 requirements.txt 或 package.json 時
+./deploy.sh prod build --service=backend --no-cache
+
+# 2. 重啟服務
+./deploy.sh prod start --service=backend -d
+
+# 3. 驗證部署
+./deploy.sh prod status
+```
+
+#### Docker 層緩存機制
+
+- **後端構建層**：
+  1. `apt-get install` - 系統依賴（很少變動，會被緩存）
+  2. `pip install` - Python 依賴（只有 requirements.txt 變動時重新執行）
+  3. 複製應用代碼（經常變動，但構建快速）
+
+- **前端構建層**：
+  1. `npm install` - Node.js 依賴（只有 package.json 變動時重新執行）
+  2. `npm run build` - Vue.js 編譯（代碼變動時執行）
+  3. Nginx 配置（很少變動）
+
+#### 何時使用 --no-cache
+
+✅ **建議使用情況**：
+- 第一次部署
+- 修改了 `requirements.txt` 或 `package.json`
+- 修改了 Dockerfile
+- 構建出現異常問題
+
+❌ **不建議使用情況**：
+- 日常代碼更新
+- 僅修改業務邏輯代碼
+- 配置文件小幅修改
 
 ## 開發環境
 

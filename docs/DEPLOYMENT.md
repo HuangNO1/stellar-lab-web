@@ -10,6 +10,7 @@ Complete deployment guide for the Lab Website Framework with Docker containeriza
 - [Quick Start](#quick-start)
 - [Environment Setup](#environment-setup)
 - [Production Deployment](#production-deployment)
+- [Deployment Optimization & Service Management](#deployment-optimization--service-management)
 - [Development Environment](#development-environment)
 - [Configuration](#configuration)
 - [Database Management](#database-management)
@@ -196,6 +197,118 @@ services:
 Data is automatically persisted in Docker volumes:
 - `mysql_data`: Database files
 - `media_data`: Uploaded files (images, papers, etc.)
+
+## Deployment Optimization & Service Management
+
+### Build Cache Optimization
+
+The deploy.sh script supports Docker layer caching for significantly faster deployment speeds:
+
+#### Quick Deployment (Recommended)
+```bash
+# Utilize Docker cache for fast builds (1-3 minutes)
+./deploy.sh prod build --service=backend
+./deploy.sh prod build --service=frontend
+
+# Quick restart individual services
+./deploy.sh prod restart --service=backend   # Restart backend
+./deploy.sh prod restart --service=frontend  # Restart frontend
+```
+
+#### Full Rebuild (Slower but Thorough)
+```bash
+# Force rebuild without cache (8-12 minutes)
+./deploy.sh prod build --service=backend --no-cache
+./deploy.sh prod build --service=frontend --no-cache
+
+# Rebuild all services
+./deploy.sh prod build --no-cache
+```
+
+### Service Management
+
+#### Supported Service Operations
+
+| Service | Description | Build Time (Cached/No-Cache) |
+|---------|-------------|-------------------------------|
+| `backend` | Flask Backend API | ~2 min / ~10 min |
+| `frontend` | Vue.js Frontend | ~3 min / ~8 min |
+| `db` | MySQL Database | No build needed |
+| `phpmyadmin` | Database Admin | No build needed |
+
+#### Common Service Commands
+
+```bash
+# 📊 Monitor Services
+./deploy.sh prod status                        # Check all service status
+./deploy.sh prod health                        # Health check
+./deploy.sh prod logs --service=backend -f    # Real-time backend logs
+./deploy.sh prod logs --service=frontend -f   # Real-time frontend logs
+
+# 🔄 Restart Services
+./deploy.sh prod restart --service=backend    # Restart backend only
+./deploy.sh prod restart --service=frontend   # Restart frontend only
+./deploy.sh prod restart                       # Restart all services
+
+# 🛠️ Build Services
+./deploy.sh prod build --service=backend      # Build backend only
+./deploy.sh prod build --service=frontend     # Build frontend only
+
+# 🚀 Start/Stop Services
+./deploy.sh prod start --service=backend -d   # Start backend in background
+./deploy.sh prod stop --service=backend       # Stop backend
+```
+
+### Deployment Best Practices
+
+#### Daily Development Workflow
+```bash
+# 1. Quick redeploy after code changes
+./deploy.sh prod restart --service=backend
+
+# 2. Check logs to confirm updates
+./deploy.sh prod logs --service=backend -f
+
+# 3. Health check
+./deploy.sh prod health
+```
+
+#### Dependency Update Workflow
+```bash
+# 1. When modifying requirements.txt or package.json
+./deploy.sh prod build --service=backend --no-cache
+
+# 2. Restart service
+./deploy.sh prod start --service=backend -d
+
+# 3. Verify deployment
+./deploy.sh prod status
+```
+
+#### Docker Layer Cache Mechanism
+
+- **Backend Build Layers**:
+  1. `apt-get install` - System dependencies (rarely changes, cached)
+  2. `pip install` - Python dependencies (only rebuilds when requirements.txt changes)
+  3. Copy application code (changes frequently but builds quickly)
+
+- **Frontend Build Layers**:
+  1. `npm install` - Node.js dependencies (only rebuilds when package.json changes)
+  2. `npm run build` - Vue.js compilation (rebuilds when code changes)
+  3. Nginx configuration (rarely changes)
+
+#### When to Use --no-cache
+
+✅ **Recommended Usage**:
+- First-time deployment
+- Modified `requirements.txt` or `package.json`
+- Modified Dockerfile
+- Build issues or anomalies
+
+❌ **Not Recommended**:
+- Daily code updates
+- Business logic modifications only
+- Minor configuration changes
 
 ## Development Environment
 
