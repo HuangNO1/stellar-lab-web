@@ -27,11 +27,11 @@ A modern, universal laboratory website framework with content management system.
 <img alt="License" src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge">
 <img alt="Status" src="https://img.shields.io/badge/Status-Production%20Ready-success?style=for-the-badge">
 <br/>
-<a href="#"><img alt="CI" src="https://img.shields.io/badge/CI-Configured-success?style=for-the-badge&logo=github"></a>
-<a href="#"><img alt="Release" src="https://img.shields.io/badge/Release-Ready-success?style=for-the-badge&logo=github"></a>
-<a href="#"><img alt="GitHub release" src="https://img.shields.io/badge/Version-v1.0.0-blue?style=for-the-badge&logo=github"></a>
-<a href="#"><img alt="Frontend Image" src="https://img.shields.io/badge/ghcr.io-frontend-blue?style=for-the-badge&logo=docker"></a>
-<a href="#"><img alt="Backend Image" src="https://img.shields.io/badge/ghcr.io-backend-blue?style=for-the-badge&logo=docker"></a>
+<a href="https://github.com/HuangNO1/stellar-lab-web/actions"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/HuangNO1/stellar-lab-web/ci.yml?style=for-the-badge&logo=github&label=CI"></a>
+<a href="https://github.com/HuangNO1/stellar-lab-web/releases"><img alt="Release" src="https://img.shields.io/github/v/release/HuangNO1/stellar-lab-web?style=for-the-badge&logo=github"></a>
+<a href="https://github.com/HuangNO1/stellar-lab-web/releases"><img alt="GitHub release" src="https://img.shields.io/github/v/release/HuangNO1/stellar-lab-web?style=for-the-badge&logo=github&label=Version"></a>
+<a href="https://github.com/HuangNO1/stellar-lab-web/pkgs/container/stellar-lab-web-frontend"><img alt="Frontend Image" src="https://img.shields.io/badge/ghcr.io-frontend-blue?style=for-the-badge&logo=docker"></a>
+<a href="https://github.com/HuangNO1/stellar-lab-web/pkgs/container/stellar-lab-web-backend"><img alt="Backend Image" src="https://img.shields.io/badge/ghcr.io-backend-blue?style=for-the-badge&logo=docker"></a>
 </p>
 
 </div>
