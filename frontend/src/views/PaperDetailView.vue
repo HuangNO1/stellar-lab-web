@@ -152,7 +152,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { paperApi } from '@/services/api';
 import { getMediaUrl } from '@/utils/media';
-import type { Paper } from '@/types/api';
+import type { Paper, ApiError } from '@/types/api';
 import MarkdownIt from 'vue3-markdown-it';
 
 const route = useRoute();
@@ -224,9 +224,10 @@ const fetchPaperDetail = async () => {
     } else {
       error.value = response.message;
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Failed to fetch paper detail:', err);
-    error.value = err?.message || t('papers.fetchError');
+    const apiError = err as ApiError;
+    error.value = apiError?.message || t('papers.fetchError');
   } finally {
     loading.value = false;
   }

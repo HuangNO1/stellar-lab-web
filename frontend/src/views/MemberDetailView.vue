@@ -150,7 +150,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { memberApi, researchGroupApi, paperApi } from '@/services/api';
 import { useMembers } from '@/composables/useMembers';
-import type { Member, ResearchGroup, Paper } from '@/types/api';
+import type { Member, ResearchGroup, Paper, ApiError } from '@/types/api';
 import MarkdownIt from 'vue3-markdown-it';
 
 const route = useRoute();
@@ -236,7 +236,7 @@ const fetchMemberDetail = async () => {
           if (groupResponse.code === 0) {
             researchGroup.value = groupResponse.data;
           }
-        } catch (err: any) {
+        } catch (err: unknown) {
           console.warn('Failed to fetch research group:', err);
         }
       }
@@ -254,16 +254,17 @@ const fetchMemberDetail = async () => {
             paper.authors && paper.authors.some(author => author.mem_id === memberId)
           );
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.warn('Failed to fetch related papers:', err);
       }
       
     } else {
       error.value = memberResponse.message;
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Failed to fetch member detail:', err);
-    error.value = err?.message || t('errorMessages.fetchMemberDetail');
+    const apiError = err as ApiError;
+    error.value = apiError?.message || t('errorMessages.fetchMemberDetail');
   } finally {
     loading.value = false;
   }

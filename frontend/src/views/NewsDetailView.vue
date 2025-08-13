@@ -79,7 +79,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { newsApi } from '@/services/api';
-import type { News } from '@/types/api';
+import type { News, ApiError } from '@/types/api';
 import MarkdownIt from 'vue3-markdown-it';
 
 const route = useRoute();
@@ -151,9 +151,10 @@ const fetchNewsDetail = async () => {
     } else {
       error.value = response.message;
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Failed to fetch news detail:', err);
-    error.value = err?.message || t('news.fetchError');
+    const apiError = err as ApiError;
+    error.value = apiError?.message || t('news.fetchError');
   } finally {
     loading.value = false;
   }

@@ -132,7 +132,7 @@ import { useMessage, NButton, NTag, NSpace, zhCN, enUS, dateZhCN, dateEnUS } fro
 import { paperApi } from '@/services/api';
 import { getMediaUrl } from '@/utils/media';
 import QuickActionModal from '@/components/QuickActionModal.vue';
-import type { Paper } from '@/types/api';
+import type { Paper, ApiError } from '@/types/api';
 import type { DataTableColumns } from 'naive-ui';
 
 const { t, locale } = useI18n();
@@ -323,9 +323,10 @@ const fetchPapers = async () => {
     } else {
       message.error(response.message || t('admin.papers.fetchError'));
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('獲取論文列表失敗:', error);
-    const errorMessage = error?.message || t('admin.papers.fetchError');
+    const apiError = error as ApiError;
+    const errorMessage = apiError?.message || t('admin.papers.fetchError');
     message.error(errorMessage);
   } finally {
     loading.value = false;
@@ -389,9 +390,10 @@ const confirmDelete = async () => {
     } else {
       message.error(response.message || t('admin.papers.deleteError'));
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('刪除論文失敗:', error);
-    const errorMessage = error?.message || t('admin.papers.deleteError');
+    const apiError = error as ApiError;
+    const errorMessage = apiError?.message || t('admin.papers.deleteError');
     message.error(errorMessage);
   } finally {
     deleteLoading.value = false;

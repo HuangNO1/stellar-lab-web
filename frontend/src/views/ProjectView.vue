@@ -120,7 +120,7 @@ import { NConfigProvider, zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
 import SearchComponent from '@/components/SearchComponent.vue';
 import { projectApi } from '@/services/api';
 import { stripMarkdown } from '@/utils/text';
-import type { Project, SearchFilters } from '@/types/api';
+import type { Project, SearchFilters, ApiError } from '@/types/api';
 
 const { t, locale } = useI18n();
 const router = useRouter();
@@ -238,9 +238,10 @@ const fetchProjects = async (resetPage = false) => {
     } else {
       error.value = response.message || t('common.fetchError');
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Failed to fetch projects:', err);
-    error.value = err?.message || t('common.networkError');
+    const apiError = err as ApiError;
+    error.value = apiError?.message || t('common.networkError');
   } finally {
     loading.value = false;
   }

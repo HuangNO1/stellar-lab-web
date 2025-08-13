@@ -89,7 +89,7 @@ import { NConfigProvider, zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
 import SearchComponent from '@/components/SearchComponent.vue';
 import { newsApi } from '@/services/api';
 import { stripMarkdown } from '@/utils/text';
-import type { News, SearchFilters } from '@/types/api';
+import type { News, SearchFilters, ApiError } from '@/types/api';
 
 const { t, locale } = useI18n();
 const router = useRouter();
@@ -215,9 +215,10 @@ const fetchNews = async (resetPage = false) => {
     } else {
       error.value = response.message || t('common.fetchError');
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Failed to fetch news:', err);
-    error.value = err?.message || t('common.networkError');
+    const apiError = err as ApiError;
+    error.value = apiError?.message || t('common.networkError');
   } finally {
     loading.value = false;
   }

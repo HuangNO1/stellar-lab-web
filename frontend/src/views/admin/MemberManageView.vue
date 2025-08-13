@@ -253,7 +253,7 @@ import { useMessage, NButton, NTag, NAvatar, NSpace, zhCN, enUS, dateZhCN, dateE
 import { memberApi, researchGroupApi } from '@/services/api';
 import { getMediaUrl } from '@/utils/media';
 import QuickActionModal from '@/components/QuickActionModal.vue';
-import type { Member, ResearchGroup } from '@/types/api';
+import type { Member, ResearchGroup, ApiError } from '@/types/api';
 import type { DataTableColumns } from 'naive-ui';
 
 const { t, locale } = useI18n();
@@ -475,9 +475,10 @@ const fetchMembers = async () => {
     } else {
       message.error(response.message || t('admin.members.fetchError'));
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('獲取成員列表失敗:', error);
-    const errorMessage = error?.message || t('admin.members.fetchError');
+    const apiError = error as ApiError;
+    const errorMessage = apiError?.message || t('admin.members.fetchError');
     message.error(errorMessage);
   } finally {
     loading.value = false;
@@ -573,9 +574,10 @@ const confirmDelete = async () => {
     
     showDeleteModal.value = false;
     fetchMembers();
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('刪除成員失敗:', error);
-    const errorMessage = error?.message || t('admin.members.deleteError');
+    const apiError = error as ApiError;
+    const errorMessage = apiError?.message || t('admin.members.deleteError');
     message.error(errorMessage);
   } finally {
     deleteLoading.value = false;
@@ -612,9 +614,10 @@ const handleBatchUpdate = async () => {
     } else {
       message.error(response.message || t('admin.members.updateError'));
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('批量更新失敗:', error);
-    const errorMessage = error?.message || t('admin.members.updateError');
+    const apiError = error as ApiError;
+    const errorMessage = apiError?.message || t('admin.members.updateError');
     message.error(errorMessage);
   } finally {
     batchLoading.value = false;

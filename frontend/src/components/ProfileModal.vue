@@ -140,6 +140,7 @@ import { useMessage } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/auth';
 import { authApi } from '@/services/api';
+import type { ApiError } from '@/types/api';
 
 const { t } = useI18n();
 const message = useMessage();
@@ -315,7 +316,7 @@ const handleSubmit = async () => {
     // 先更新个人资料（如果需要）
     if (needsProfileUpdate) {
       try {
-        const result = await authApi.updateProfile(updateData);
+        await authApi.updateProfile(updateData);
         
         // 更新本地存储的管理员信息
         if (authStore.admin) {
@@ -323,8 +324,9 @@ const handleSubmit = async () => {
         }
         
         message.success(t('admin.profile.messages.profileUpdateSuccess'));
-      } catch (error: any) {
-        const errorMessage = error?.message || t('admin.profile.messages.updateFailed');
+      } catch (error: unknown) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError?.message || t('admin.profile.messages.updateFailed');
         message.error(errorMessage);
         return;
       }
@@ -335,8 +337,9 @@ const handleSubmit = async () => {
       try {
         await authApi.changePassword(formData.old_password, formData.new_password);
         message.success(t('admin.profile.messages.passwordChangeSuccess'));
-      } catch (error: any) {
-        const errorMessage = error?.message || t('admin.profile.messages.passwordChangeFailed');
+      } catch (error: unknown) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError?.message || t('admin.profile.messages.passwordChangeFailed');
         message.error(errorMessage);
         return;
       }

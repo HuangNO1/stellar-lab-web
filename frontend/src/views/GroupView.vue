@@ -115,7 +115,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { researchGroupApi, memberApi } from '@/services/api';
 import { useMembers } from '@/composables/useMembers';
-import type { ResearchGroup, Member } from '@/types/api';
+import type { ResearchGroup, Member, ApiError } from '@/types/api';
 import MarkdownIt from 'vue3-markdown-it';
 
 const route = useRoute();
@@ -211,7 +211,7 @@ const fetchGroupDetail = async () => {
         if (membersResponse.code === 0) {
           groupMembers.value = membersResponse.data.items;
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.warn('Failed to fetch group members:', err);
         // 成員獲取失敗不阻止課題組信息顯示
       }
@@ -219,9 +219,10 @@ const fetchGroupDetail = async () => {
     } else {
       error.value = groupResponse.message;
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Failed to fetch group detail:', err);
-    error.value = err?.message || t('errorMessages.fetchGroupDetail');
+    const apiError = err as ApiError;
+    error.value = apiError?.message || t('errorMessages.fetchGroupDetail');
   } finally {
     loading.value = false;
   }

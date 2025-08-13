@@ -202,7 +202,7 @@ import { useResearchGroupsWithAutoFetch } from '@/composables/useResearchGroups'
 import { getMediaUrl, hasCarouselImages as checkCarouselImages } from '@/utils/media';
 import { stripMarkdown } from '@/utils/text';
 import { newsApi } from '@/services/api';
-import type { ResearchGroup, Lab, News } from '@/types/api';
+import type { ResearchGroup, Lab, News, ApiError } from '@/types/api';
 
 const router = useRouter();
 const { t, locale } = useI18n();
@@ -303,9 +303,10 @@ const fetchLatestNews = async () => {
     } else {
       newsError.value = response.message || t('common.fetchError');
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Failed to fetch latest news:', err);
-    newsError.value = err?.message || t('common.networkError');
+    const apiError = err as ApiError;
+    newsError.value = apiError?.message || t('common.networkError');
   } finally {
     newsLoading.value = false;
   }

@@ -102,7 +102,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { projectApi } from '@/services/api';
-import type { Project } from '@/types/api';
+import type { Project, ApiError } from '@/types/api';
 import MarkdownIt from 'vue3-markdown-it';
 
 const route = useRoute();
@@ -174,9 +174,10 @@ const fetchProjectDetail = async () => {
     } else {
       error.value = response.message;
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Failed to fetch project detail:', err);
-    error.value = err?.message || t('projects.fetchError');
+    const apiError = err as ApiError;
+    error.value = apiError?.message || t('projects.fetchError');
   } finally {
     loading.value = false;
   }

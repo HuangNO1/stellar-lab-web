@@ -123,7 +123,7 @@ import { useI18n } from 'vue-i18n';
 import { useMessage, NButton, NTag, NSpace, zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
 import { newsApi } from '@/services/api';
 import QuickActionModal from '@/components/QuickActionModal.vue';
-import type { News } from '@/types/api';
+import type { News, ApiError } from '@/types/api';
 import type { DataTableColumns } from 'naive-ui';
 
 const { t, locale } = useI18n();
@@ -299,9 +299,10 @@ const fetchNews = async () => {
     } else {
       message.error(response.message || t('admin.news.fetchError'));
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('獲取新聞列表失敗:', error);
-    const errorMessage = error?.message || t('admin.news.fetchError');
+    const apiError = error as ApiError;
+    const errorMessage = apiError?.message || t('admin.news.fetchError');
     message.error(errorMessage);
   } finally {
     loading.value = false;
@@ -365,9 +366,10 @@ const confirmDelete = async () => {
     } else {
       message.error(response.message || t('admin.news.deleteError'));
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('刪除新聞失敗:', error);
-    const errorMessage = error?.message || t('admin.news.deleteError');
+    const apiError = error as ApiError;
+    const errorMessage = apiError?.message || t('admin.news.deleteError');
     message.error(errorMessage);
   } finally {
     deleteLoading.value = false;

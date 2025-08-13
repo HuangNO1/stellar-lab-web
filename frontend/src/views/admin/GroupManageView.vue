@@ -110,7 +110,7 @@ import { useI18n } from 'vue-i18n';
 import { useMessage, NButton, NTag, NSpace, zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
 import { researchGroupApi } from '@/services/api';
 import QuickActionModal from '@/components/QuickActionModal.vue';
-import type { ResearchGroup } from '@/types/api';
+import type { ResearchGroup, ApiError } from '@/types/api';
 import type { DataTableColumns } from 'naive-ui';
 
 const { t, locale } = useI18n();
@@ -248,9 +248,10 @@ const fetchGroups = async () => {
     } else {
       message.error(response.message || t('admin.groups.fetchError'));
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('獲取課題組列表失敗:', error);
-    const errorMessage = error?.message || t('admin.groups.fetchError');
+    const apiError = error as ApiError;
+    const errorMessage = apiError?.message || t('admin.groups.fetchError');
     message.error(errorMessage);
   } finally {
     loading.value = false;
@@ -314,9 +315,10 @@ const confirmDelete = async () => {
     } else {
       message.error(response.message || t('admin.groups.deleteError'));
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('刪除課題組失敗:', error);
-    const errorMessage = error?.message || t('admin.groups.deleteError');
+    const apiError = error as ApiError;
+    const errorMessage = apiError?.message || t('admin.groups.deleteError');
     message.error(errorMessage);
   } finally {
     deleteLoading.value = false;

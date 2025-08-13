@@ -125,7 +125,7 @@ import { useI18n } from 'vue-i18n';
 import { useMessage, NButton, NTag, NSpace, zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
 import { projectApi } from '@/services/api';
 import QuickActionModal from '@/components/QuickActionModal.vue';
-import type { Project } from '@/types/api';
+import type { Project, ApiError } from '@/types/api';
 import type { DataTableColumns } from 'naive-ui';
 
 const { t, locale } = useI18n();
@@ -293,9 +293,10 @@ const fetchProjects = async () => {
     } else {
       message.error(response.message || t('admin.projects.fetchError'));
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('獲取項目列表失敗:', error);
-    const errorMessage = error?.message || t('admin.projects.fetchError');
+    const apiError = error as ApiError;
+    const errorMessage = apiError?.message || t('admin.projects.fetchError');
     message.error(errorMessage);
   } finally {
     loading.value = false;
@@ -359,9 +360,10 @@ const confirmDelete = async () => {
     } else {
       message.error(response.message || t('admin.projects.deleteError'));
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('刪除項目失敗:', error);
-    const errorMessage = error?.message || t('admin.projects.deleteError');
+    const apiError = error as ApiError;
+    const errorMessage = apiError?.message || t('admin.projects.deleteError');
     message.error(errorMessage);
   } finally {
     deleteLoading.value = false;

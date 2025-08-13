@@ -498,7 +498,7 @@ import { memberApi, paperApi, projectApi, newsApi, researchGroupApi, adminApi, a
 import { getMediaUrl } from '@/utils/media';
 import I18nMdEditor from '@/components/I18nMdEditor.vue';
 import ImageCropperModal from '@/components/ImageCropperModal.vue';
-import type { ApiResponse, Member, ResearchGroup } from '@/types/api';
+import type { ApiResponse, Member, ResearchGroup, ApiError } from '@/types/api';
 
 // Form data interfaces based on module types
 interface MemberFormData {
@@ -1261,8 +1261,9 @@ const handleSubmit = async () => {
         emit('success', {} as Record<string, unknown>);
         show.value = false;
         return;
-      } catch (error: any) {
-        const errorMessage = error?.message || t('admin.profile.messages.passwordChangeFailed');
+      } catch (error: unknown) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError?.message || t('admin.profile.messages.passwordChangeFailed');
         message.error(errorMessage);
         return;
       } finally {

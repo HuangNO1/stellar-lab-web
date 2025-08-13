@@ -5,6 +5,14 @@ export interface ApiResponse<T = any> {
   data: T;
 }
 
+// API 錯誤格式
+export interface ApiError {
+  code?: number;
+  message?: string;
+  status?: number;
+  data?: any;
+}
+
 // 分頁響應格式
 export interface PaginatedResponse<T = any> {
   items: T[];

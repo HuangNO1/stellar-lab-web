@@ -115,7 +115,7 @@ import { useMessage, NButton, NTag, NSpace, zhCN, enUS, dateZhCN, dateEnUS } fro
 import { adminApi } from '@/services/api';
 import { useAuthStore } from '@/stores/auth';
 import QuickActionModal from '@/components/QuickActionModal.vue';
-import type { Admin } from '@/types/api';
+import type { Admin, ApiError } from '@/types/api';
 import type { DataTableColumns } from 'naive-ui';
 
 const { t, locale } = useI18n();
@@ -300,9 +300,10 @@ const fetchAdmins = async () => {
     } else {
       message.error(response.message || t('admin.admins.fetchError'));
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('獲取管理員列表失敗:', error);
-    const errorMessage = error?.message || t('admin.admins.fetchError');
+    const apiError = error as ApiError;
+    const errorMessage = apiError?.message || t('admin.admins.fetchError');
     message.error(errorMessage);
   } finally {
     loading.value = false;
@@ -378,9 +379,10 @@ const confirmDelete = async () => {
     } else {
       message.error(response.message || t('admin.admins.deleteError'));
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('刪除管理員失敗:', error);
-    const errorMessage = error?.message || t('admin.admins.deleteError');
+    const apiError = error as ApiError;
+    const errorMessage = apiError?.message || t('admin.admins.deleteError');
     message.error(errorMessage);
   } finally {
     deleteLoading.value = false;
