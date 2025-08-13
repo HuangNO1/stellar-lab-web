@@ -6,11 +6,14 @@ set -e
 echo "🚀 正在啟動實驗室網頁框架..."
 
 # Default environment variables with flexible configuration
-export DATABASE_URL=${DATABASE_URL:-"mysql+pymysql://root:lab_web_root_123@db:3306/lab_web?charset=utf8mb4"}
+export DATABASE_URL=${DATABASE_URL:-"mysql+pymysql://${MYSQL_USER:-lab_web_user}:${MYSQL_PASSWORD:-LabWeb2024User\$%^SecurePass}@${MYSQL_HOST:-db}:${MYSQL_PORT:-3306}/${MYSQL_DATABASE:-lab_web}?charset=utf8mb4"}
 export MYSQL_HOST=${MYSQL_HOST:-"db"}
 export MYSQL_PORT=${MYSQL_PORT:-"3306"}
-export MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-"lab_web_root_123"}
+export MYSQL_USER=${MYSQL_USER:-"lab_web_user"}
+export MYSQL_PASSWORD=${MYSQL_PASSWORD:-"LabWeb2024User\$%^SecurePass"}
+export MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-"LabWeb2024Root!@#SecurePass"}
 export MYSQL_DATABASE=${MYSQL_DATABASE:-"lab_web"}
+export BACKEND_PORT=${BACKEND_PORT:-"8000"}
 export SECRET_KEY=${SECRET_KEY:-"change_me_in_production"}
 export JWT_SECRET_KEY=${JWT_SECRET_KEY:-"change_me_jwt_in_production"}
 export FLASK_CONFIG=${FLASK_CONFIG:-"production"}
@@ -110,12 +113,12 @@ fi
 # 啟動應用
 echo "🎯 啟動 Flask 應用..."
 echo "   - 工作進程: 4"
-echo "   - 綁定地址: 0.0.0.0:8000" 
+echo "   - 綁定地址: 0.0.0.0:${BACKEND_PORT}" 
 echo "   - 環境: ${FLASK_CONFIG}"
 
 exec gunicorn \
     --workers 4 \
-    --bind 0.0.0.0:8000 \
+    --bind 0.0.0.0:${BACKEND_PORT} \
     --timeout 120 \
     --keep-alive 2 \
     --max-requests 1000 \

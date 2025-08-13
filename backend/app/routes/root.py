@@ -9,9 +9,20 @@ def index():
     return redirect('/api/docs')
 
 @bp.route('/health')
-def health():
-    """健康檢查"""
+def root_health():
+    """根路徑健康檢查"""
     return {"status": "healthy", "message": msg.get_success_message('HEALTH_CHECK')}
+
+@bp.route('/api/health')
+def api_health():
+    """API路徑健康檢查"""
+    import datetime
+    return {
+        "status": "healthy", 
+        "timestamp": datetime.datetime.now().isoformat(),
+        "version": "1.0.0",
+        "message": msg.get_success_message('HEALTH_CHECK')
+    }
 
 @bp.route('/api-info')
 def api_info():

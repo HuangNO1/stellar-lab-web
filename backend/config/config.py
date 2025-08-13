@@ -13,7 +13,7 @@ class Config:
     
     # 數據庫配置
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'mysql+pymysql://root:password@localhost/lab_web?charset=utf8mb4'
+        'mysql+pymysql://lab_web_user:password@localhost/lab_web?charset=utf8mb4'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,

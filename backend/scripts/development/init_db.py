@@ -42,11 +42,11 @@ def create_database_if_not_exists():
     db_uri = config_obj.SQLALCHEMY_DATABASE_URI
     parsed = urlparse(db_uri)
     
-    # 提取連接信息
-    host = parsed.hostname or 'localhost'
-    port = parsed.port or 3306
-    username = parsed.username or 'root'
-    password = parsed.password or ''
+    # 提取連接信息  
+    host = parsed.hostname or os.environ.get('MYSQL_HOST', 'localhost')
+    port = parsed.port or int(os.environ.get('MYSQL_PORT', '3306'))
+    username = parsed.username or os.environ.get('MYSQL_USER', 'root')
+    password = parsed.password or os.environ.get('MYSQL_PASSWORD', '')
     database = parsed.path.lstrip('/')
     
     # 移除可能的查詢參數（如 charset）

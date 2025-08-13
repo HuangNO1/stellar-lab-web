@@ -167,20 +167,25 @@ package_images() {
     
     local start_time=$(date +%s)
     
+    # 創建臨時部署目錄
+    local deploy_dir="${OUTPUT_DIR}/deploy"
+    mkdir -p "$deploy_dir"
+    
+    # 直接打包到 deploy 目錄，避免重複
     # 打包後端鏡像
     log_info "打包後端鏡像..."
-    docker save -o "${OUTPUT_DIR}/${BACKEND_IMAGE}-${VERSION_TAG}.tar" \
+    docker save -o "${deploy_dir}/${BACKEND_IMAGE}-${VERSION_TAG}.tar" \
         "${BACKEND_IMAGE}:${VERSION_TAG}" "${BACKEND_IMAGE}:latest"
     
     # 打包前端鏡像  
     log_info "打包前端鏡像..."
-    docker save -o "${OUTPUT_DIR}/${FRONTEND_IMAGE}-${VERSION_TAG}.tar" \
+    docker save -o "${deploy_dir}/${FRONTEND_IMAGE}-${VERSION_TAG}.tar" \
         "${FRONTEND_IMAGE}:${VERSION_TAG}" "${FRONTEND_IMAGE}:latest"
     
     # 壓縮打包文件
     log_info "壓縮鏡像文件..."
-    gzip -f "${OUTPUT_DIR}/${BACKEND_IMAGE}-${VERSION_TAG}.tar" &
-    gzip -f "${OUTPUT_DIR}/${FRONTEND_IMAGE}-${VERSION_TAG}.tar" &
+    gzip -f "${deploy_dir}/${BACKEND_IMAGE}-${VERSION_TAG}.tar" &
+    gzip -f "${deploy_dir}/${FRONTEND_IMAGE}-${VERSION_TAG}.tar" &
     wait
     
     local end_time=$(date +%s)
@@ -191,7 +196,7 @@ package_images() {
     # 顯示文件信息
     echo ""
     echo "========== 打包文件信息 =========="
-    ls -lh "${OUTPUT_DIR}"/*.tar.gz 2>/dev/null || true
+    ls -lh "${deploy_dir}"/*.tar.gz 2>/dev/null || true
     echo "==============================="
     echo ""
 }
@@ -220,17 +225,49 @@ create_deployment_package() {
     
     log_info "創建部署包..."
     
-    # 創建臨時部署目錄
+    # 部署目錄已在 package_images 中創建
     local deploy_dir="${OUTPUT_DIR}/deploy"
-    mkdir -p "$deploy_dir"
     
     # 加載端口配置
     load_env_ports
     
     # 複製必要文件
     cp .env "$deploy_dir/" 2>/dev/null || log_warning ".env 文件不存在，跳過"
-    cp docker-compose.yml "$deploy_dir/"
     cp deploy.sh "$deploy_dir/"
+    
+    # 複製 MySQL 初始化脚本
+    mkdir -p "$deploy_dir/scripts"
+    cp scripts/mysql-init.sql "$deploy_dir/scripts/" 2>/dev/null || log_warning "MySQL 初始化脚本不存在"
+    
+    # nginx.conf 不需要複製，前端容器會動態生成
+    
+    # 創建適用於部署的 docker-compose.yml
+    # 移除 nginx.conf 掛載，使用模板系統
+    sed '/nginx.conf:\/etc\/nginx\/nginx.conf:ro/d' docker-compose.yml > "$deploy_dir/docker-compose.yml.tmp"
+    
+    # 然後移除空的 volumes: 標籤（當 volumes 下只有 nginx.conf 時）
+    awk '
+    BEGIN { skip_empty_volumes = 0 }
+    /^[[:space:]]*volumes:[[:space:]]*$/ {
+        volumes_line = $0
+        getline next_line
+        if (next_line ~ /^[[:space:]]*depends_on:/ || next_line ~ /^[[:space:]]*networks:/ || next_line ~ /^[[:space:]]*healthcheck:/ || next_line ~ /^[[:space:]]*restart:/) {
+            # 如果下一行是其他配置項，說明 volumes 是空的，跳過 volumes 行
+            print next_line
+        } else {
+            # 否則保留 volumes 行和下一行
+            print volumes_line
+            print next_line
+        }
+        next
+    }
+    { print }
+    ' "$deploy_dir/docker-compose.yml.tmp" > "$deploy_dir/docker-compose.yml"
+    
+    # 清理臨時文件
+    rm "$deploy_dir/docker-compose.yml.tmp"
+    
+    # 鏡像文件已經在 deploy 目錄中，無需創建符號連結
     
     # 創建服務器部署腳本
     cat > "${deploy_dir}/server-deploy.sh" << 'EOF'
@@ -246,11 +283,112 @@ FRONTEND_IMAGE="lab-website-frontend"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
 NC='\033[0m'
 
 log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
+log_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+
+# 解析命令行參數
+parse_args() {
+    USE_CHINA_MIRROR="false"
+    
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --china)
+                USE_CHINA_MIRROR="true"
+                shift
+                ;;
+            --help|-h)
+                show_help
+                exit 0
+                ;;
+            *)
+                if [[ "$1" =~ ^- ]]; then
+                    log_error "未知選項: $1"
+                    exit 1
+                else
+                    # 這是版本標籤，保存它
+                    VERSION_TAG="$1"
+                fi
+                shift
+                ;;
+        esac
+    done
+}
+
+# 顯示幫助信息
+show_help() {
+    cat << 'HELP_EOF'
+服務器端部署腳本
+
+用法: $0 [版本標籤] [選項]
+
+參數:
+  版本標籤      鏡像版本標籤 (默認: latest)
+
+選項:
+  --china       使用中國鏡像源加速（適用於中國服務器）
+  --help, -h    顯示此幫助信息
+
+示例:
+  $0                # 部署 latest 版本
+  $0 v1.0.0         # 部署 v1.0.0 版本
+  $0 --china        # 使用中國鏡像源加速
+
+HELP_EOF
+}
+
+# 配置 Docker 鏡像加速器
+setup_docker_mirrors() {
+    log_info "配置 Docker 鏡像加速器..."
+    
+    # 備份原配置
+    if [ -f /etc/docker/daemon.json ]; then
+        log_info "備份原有 Docker 配置..."
+        cp /etc/docker/daemon.json /etc/docker/daemon.json.backup.$(date +%Y%m%d_%H%M%S)
+    fi
+    
+    # 創建 Docker 配置目錄
+    mkdir -p /etc/docker
+    
+    # 配置鏡像加速器
+    cat > /etc/docker/daemon.json << 'DAEMON_EOF'
+{
+  "registry-mirrors": [
+    "https://mirror.ccs.tencentyun.com",
+    "https://docker.mirrors.ustc.edu.cn", 
+    "https://reg-mirror.qiniu.com",
+    "https://hub-mirror.c.163.com"
+  ],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m",
+    "max-file": "3"
+  },
+  "insecure-registries": [],
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "live-restore": true
+}
+DAEMON_EOF
+    
+    # 重啟 Docker 服務
+    log_info "重啟 Docker 服務應用配置..."
+    systemctl daemon-reload
+    systemctl restart docker
+    
+    # 等待 Docker 啟動
+    sleep 5
+    
+    # 驗證配置
+    if docker info | grep -A 10 "Registry Mirrors" | grep -q "mirror" 2>/dev/null; then
+        log_success "Docker 鏡像加速器配置成功"
+    else
+        log_warning "無法確認鏡像加速器是否生效，但配置文件已更新"
+    fi
+}
 
 # 從 .env 文件讀取端口配置
 load_env_ports() {
@@ -274,6 +412,14 @@ echo "=========================================="
 echo "版本: $VERSION_TAG"
 echo "時間: $(date)"
 echo ""
+
+# 解析參數
+parse_args "$@"
+
+# 配置中國鏡像源（如果指定）
+if [[ "$USE_CHINA_MIRROR" == "true" ]]; then
+    setup_docker_mirrors
+fi
 
 # 載入鏡像
 load_env_ports
@@ -342,12 +488,10 @@ upload_to_server() {
     case "$UPLOAD_METHOD" in
         "rsync")
             log_info "使用 rsync 上傳..."
-            rsync -avz --progress "${OUTPUT_DIR}/"*.tar.gz "${SSH_USER}@${SERVER}:${SERVER_PATH}/"
             rsync -avz --progress "${OUTPUT_DIR}/deploy/" "${SSH_USER}@${SERVER}:${SERVER_PATH}/"
             ;;
         *)
             log_info "使用 SCP 上傳..."
-            scp "${OUTPUT_DIR}"/*.tar.gz "${SSH_USER}@${SERVER}:${SERVER_PATH}/"
             scp -r "${OUTPUT_DIR}/deploy/"* "${SSH_USER}@${SERVER}:${SERVER_PATH}/"
             ;;
     esac
@@ -369,6 +513,11 @@ upload_to_server() {
 
 # 清理臨時文件
 cleanup() {
+    if [[ "$PACKAGE_ONLY" == "true" ]]; then
+        log_info "打包模式，保留部署包目錄"
+        return
+    fi
+    
     log_info "清理臨時文件..."
     rm -rf "${OUTPUT_DIR}/deploy" 2>/dev/null || true
     log_success "清理完成"

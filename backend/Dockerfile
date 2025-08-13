@@ -38,12 +38,19 @@ RUN chmod -R 755 /app/media
 COPY docker-entrypoint.sh /app/
 RUN chmod +x /app/docker-entrypoint.sh
 
-# 暴露端口
+# 设置默认后端端口环境变量
+ENV BACKEND_PORT=8000
+
+# 暴露默认端口 8000 (运行时可通过环境变量动态配置)
+# 注意：EXPOSE 指令仅用于文档目的，实际端口由环境变量决定
 EXPOSE 8000
 
-# 健康检查
+# 创建健康检查脚本
+RUN echo '#!/bin/bash\ncurl -f http://localhost:${BACKEND_PORT:-8000}/health || exit 1' > /healthcheck.sh && chmod +x /healthcheck.sh
+
+# 健康检查 - 使用脚本以支持环境变量
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+    CMD /healthcheck.sh
 
 # 启动应用
 ENTRYPOINT ["/app/docker-entrypoint.sh"]

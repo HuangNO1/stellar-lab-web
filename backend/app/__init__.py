@@ -98,7 +98,7 @@ def create_app(config_name=None):
                 # 如果清理失敗，允許繼續處理以保證系統可用性
                 pass
     
-    # 註冊根路由
+    # 註冊根路由（不帶 /api 前綴）
     from app.routes.root import bp as root_bp
     app.register_blueprint(root_bp)
     

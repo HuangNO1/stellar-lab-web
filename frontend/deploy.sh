@@ -9,7 +9,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_NAME="lab-frontend"
 FRONTEND_IMAGE="lab-website-frontend:latest"
-FRONTEND_PORT="3000"
+FRONTEND_PORT="${FRONTEND_PORT:-3000}"
 
 # Colors for output
 RED='\033[0;31m'

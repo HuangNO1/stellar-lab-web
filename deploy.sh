@@ -84,6 +84,14 @@ Examples:
 EOF
 }
 
+# Load environment variables
+load_env_variables() {
+    if [[ -f ".env" ]]; then
+        export $(grep -v '^#' .env | xargs)
+        log_info "Loaded environment variables from .env"
+    fi
+}
+
 # Get compose file based on environment
 get_compose_file() {
     local env="$1"
@@ -153,10 +161,10 @@ start_services() {
     
     if [[ "$detach" == "true" ]]; then
         log_success "Services started in background"
-        log_info "Frontend: http://localhost:3000"
-        log_info "Backend API: http://localhost:8000"
-        log_info "phpMyAdmin: http://localhost:8081"
-        log_info "API Documentation: http://localhost:8000/api/docs"
+        log_info "Frontend: http://localhost:${FRONTEND_PORT:-3000}"
+        log_info "Backend API: http://localhost:${BACKEND_PORT:-8000}"
+        log_info "phpMyAdmin: http://localhost:${PHPMYADMIN_PORT:-8081}"
+        log_info "API Documentation: http://localhost:${BACKEND_PORT:-8000}/api/docs"
     fi
 }
 
@@ -281,7 +289,7 @@ backup_database() {
     log_info "Creating database backup: $backup_file"
     
     docker-compose -f "$compose_file" -p "$COMPOSE_PROJECT_NAME" exec db mysqldump \
-        -u root -plab_web_root_123 lab_web > "$backup_file"
+        -u "${MYSQL_USER:-lab_web_user}" -p"${MYSQL_PASSWORD:-LabWeb2024User\$%^SecurePass}" "${MYSQL_DATABASE:-lab_web}" > "$backup_file"
     
     log_success "Database backed up to $backup_file"
 }
@@ -304,7 +312,7 @@ restore_database() {
         log_info "Restoring database from $backup_file..."
         
         docker-compose -f "$compose_file" -p "$COMPOSE_PROJECT_NAME" exec -T db mysql \
-            -u root -plab_web_root_123 lab_web < "$backup_file"
+            -u "${MYSQL_USER:-lab_web_user}" -p"${MYSQL_PASSWORD:-LabWeb2024User\$%^SecurePass}" "${MYSQL_DATABASE:-lab_web}" < "$backup_file"
         
         log_success "Database restored from $backup_file"
     else
@@ -330,7 +338,7 @@ open_shell() {
             docker-compose -f "$compose_file" -p "$COMPOSE_PROJECT_NAME" exec "$service" /bin/bash
             ;;
         db)
-            docker-compose -f "$compose_file" -p "$COMPOSE_PROJECT_NAME" exec "$service" mysql -u root -plab_web_root_123 lab_web
+            docker-compose -f "$compose_file" -p "$COMPOSE_PROJECT_NAME" exec "$service" mysql -u "${MYSQL_USER:-lab_web_user}" -p"${MYSQL_PASSWORD:-LabWeb2024User\$%^SecurePass}" "${MYSQL_DATABASE:-lab_web}"
             ;;
         *)
             docker-compose -f "$compose_file" -p "$COMPOSE_PROJECT_NAME" exec "$service" /bin/bash
@@ -345,14 +353,14 @@ check_health() {
     log_info "Checking service health..."
     
     # Frontend health check
-    if curl -sf http://localhost:3000/health > /dev/null 2>&1; then
+    if curl -sf http://localhost:${FRONTEND_PORT:-3000}/health > /dev/null 2>&1; then
         log_success "Frontend is healthy"
     else
         log_error "Frontend health check failed"
     fi
     
     # Backend health check
-    if curl -sf http://localhost:8000/health > /dev/null 2>&1; then
+    if curl -sf http://localhost:${BACKEND_PORT:-8000}/health > /dev/null 2>&1; then
         log_success "Backend is healthy"
     else
         log_error "Backend health check failed"
@@ -433,6 +441,7 @@ parse_args() {
 # Main script logic
 main() {
     parse_args "$@"
+    load_env_variables
     
     local compose_file
     compose_file=$(get_compose_file "$ENVIRONMENT")

@@ -46,7 +46,7 @@ fi
 
 # 檢查端口佔用
 echo "5. 檢查端口佔用..."
-ports=(3307 8000 8081)
+ports=(${MYSQL_PORT:-3306} ${BACKEND_PORT:-8000} ${PHPMYADMIN_PORT:-8081})
 for port in "${ports[@]}"; do
     if netstat -tlnp 2>/dev/null | grep -q ":$port "; then
         echo "⚠️  端口 $port 已被佔用:"

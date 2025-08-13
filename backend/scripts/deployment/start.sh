@@ -30,7 +30,7 @@ python scripts/init_db.py
 
 # 啟動應用
 echo "✅ 啟動Flask應用..."
-echo "📍 API地址: http://localhost:8000"
+echo "📍 API地址: http://localhost:${BACKEND_PORT:-8000}"
 echo "📖 默認管理員: admin / admin123"
 echo ""
 

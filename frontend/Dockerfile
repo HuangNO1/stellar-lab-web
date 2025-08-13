@@ -47,7 +47,7 @@ RUN mkdir -p /var/cache/nginx/client_temp \
 RUN chmod +x /docker-entrypoint.sh
 
 # Set default environment variables
-ENV BACKEND_URL=http://lab_web_app:8000
+ENV BACKEND_PORT=8000
 ENV API_BASE_URL=/api
 ENV CORS_ORIGIN=*
 ENV APP_TITLE="Lab Website Framework"

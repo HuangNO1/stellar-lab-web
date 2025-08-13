@@ -40,6 +40,7 @@ show_help() {
   --no-health-check  跳過健康檢查
   --keep-old         保留舊鏡像
   --force-recreate   強制重新創建容器
+  --china            使用中國鏡像源加速（適用於中國服務器）
   --help, -h         顯示此幫助信息
 
 部署流程:
@@ -53,6 +54,7 @@ show_help() {
   $0                    # 部署 latest 版本
   $0 v1.0.0            # 部署 v1.0.0 版本
   $0 --no-health-check # 跳過健康檢查
+  $0 --china           # 使用中國鏡像源加速
 
 EOF
 }
@@ -62,6 +64,7 @@ parse_args() {
     HEALTH_CHECK="true"
     KEEP_OLD="false"
     FORCE_RECREATE=""
+    USE_CHINA_MIRROR="false"
     
     while [[ $# -gt 0 ]]; do
         case $1 in
@@ -77,6 +80,10 @@ parse_args() {
                 FORCE_RECREATE="--force-recreate"
                 shift
                 ;;
+            --china)
+                USE_CHINA_MIRROR="true"
+                shift
+                ;;
             --help|-h)
                 show_help
                 exit 0
@@ -85,6 +92,9 @@ parse_args() {
                 if [[ "$1" =~ ^- ]]; then
                     log_error "未知選項: $1"
                     exit 1
+                else
+                    # 這是版本標籤，保存它
+                    VERSION_TAG="$1"
                 fi
                 shift
                 ;;
@@ -98,7 +108,7 @@ load_env_ports() {
         # 讀取端口配置，使用默認值作為備用
         FRONTEND_PORT=$(grep "^FRONTEND_PORT=" .env 2>/dev/null | cut -d'=' -f2 | tr -d ' "' || echo "3000")
         BACKEND_PORT=$(grep "^BACKEND_PORT=" .env 2>/dev/null | cut -d'=' -f2 | tr -d ' "' || echo "8000")
-        MYSQL_PORT=$(grep "^MYSQL_PORT=" .env 2>/dev/null | cut -d'=' -f2 | tr -d ' "' || echo "3307")
+        MYSQL_PORT=$(grep "^MYSQL_PORT=" .env 2>/dev/null | cut -d'=' -f2 | tr -d ' "' || echo "3306")
         PHPMYADMIN_PORT=$(grep "^PHPMYADMIN_PORT=" .env 2>/dev/null | cut -d'=' -f2 | tr -d ' "' || echo "8081")
         
         log_info "從 .env 讀取端口配置: 前端=$FRONTEND_PORT, 後端=$BACKEND_PORT"
@@ -106,7 +116,7 @@ load_env_ports() {
         # 使用默認值
         FRONTEND_PORT="3000"
         BACKEND_PORT="8000"
-        MYSQL_PORT="3307" 
+        MYSQL_PORT="3306" 
         PHPMYADMIN_PORT="8081"
         
         log_warning ".env 文件不存在，使用默認端口: 前端=$FRONTEND_PORT, 後端=$BACKEND_PORT"
@@ -138,6 +148,11 @@ check_environment() {
         exit 1
     fi
     
+    # 配置中國鏡像源（如果指定）
+    if [[ "$USE_CHINA_MIRROR" == "true" ]]; then
+        setup_docker_mirrors
+    fi
+    
     # 檢查必要文件
     local required_files=("docker-compose.yml" ".env")
     
@@ -149,6 +164,55 @@ check_environment() {
     done
     
     log_success "環境檢查完成"
+}
+
+# 配置 Docker 鏡像加速器
+setup_docker_mirrors() {
+    log_info "配置 Docker 鏡像加速器..."
+    
+    # 備份原配置
+    if [ -f /etc/docker/daemon.json ]; then
+        log_info "備份原有 Docker 配置..."
+        cp /etc/docker/daemon.json /etc/docker/daemon.json.backup.$(date +%Y%m%d_%H%M%S)
+    fi
+    
+    # 創建 Docker 配置目錄
+    mkdir -p /etc/docker
+    
+    # 配置鏡像加速器
+    cat > /etc/docker/daemon.json << 'EOF'
+{
+  "registry-mirrors": [
+    "https://mirror.ccs.tencentyun.com",
+    "https://docker.mirrors.ustc.edu.cn", 
+    "https://reg-mirror.qiniu.com",
+    "https://hub-mirror.c.163.com"
+  ],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m",
+    "max-file": "3"
+  },
+  "insecure-registries": [],
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "live-restore": true
+}
+EOF
+    
+    # 重啟 Docker 服務
+    log_info "重啟 Docker 服務應用配置..."
+    systemctl daemon-reload
+    systemctl restart docker
+    
+    # 等待 Docker 啟動
+    sleep 5
+    
+    # 驗證配置
+    if docker info | grep -A 10 "Registry Mirrors" | grep -q "mirror" 2>/dev/null; then
+        log_success "Docker 鏡像加速器配置成功"
+    else
+        log_warning "無法確認鏡像加速器是否生效，但配置文件已更新"
+    fi
 }
 
 # 載入 Docker 鏡像

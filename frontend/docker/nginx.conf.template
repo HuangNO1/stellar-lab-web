@@ -55,57 +55,26 @@ http {
         }
 
         # Handle API requests by proxying to backend
-        # Use environment variables for flexible configuration
         location /api {
-            proxy_pass ${BACKEND_URL};
+            proxy_pass http://backend:${BACKEND_PORT};
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
-            
-            # CORS headers for cross-origin requests
-            add_header Access-Control-Allow-Origin ${CORS_ORIGIN} always;
-            add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS" always;
-            add_header Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization" always;
-            
-            if ($request_method = 'OPTIONS') {
-                return 204;
-            }
         }
 
         # Media files proxy
         location /media {
-            proxy_pass ${BACKEND_URL};
+            proxy_pass http://backend:${BACKEND_PORT};
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
-        }
-
-        # Configuration endpoint for frontend runtime config
-        location /config.js {
-            add_header Content-Type application/javascript;
-            add_header Cache-Control "no-cache, no-store, must-revalidate";
-            add_header Pragma "no-cache";
-            add_header Expires "0";
-            return 200 'window.APP_CONFIG = {
-                API_BASE_URL: "${API_BASE_URL}",
-                BACKEND_URL: "${BACKEND_URL}",
-                APP_TITLE: "${APP_TITLE}",
-                APP_DESCRIPTION: "${APP_DESCRIPTION}"
-            };';
         }
 
         # Security: deny access to sensitive files
         location ~ /\. {
             deny all;
-        }
-
-        # Health check endpoint
-        location /health {
-            access_log off;
-            return 200 "healthy\n";
-            add_header Content-Type text/plain;
         }
 
         # Error pages
