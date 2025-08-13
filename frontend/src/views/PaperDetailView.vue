@@ -224,9 +224,9 @@ const fetchPaperDetail = async () => {
     } else {
       error.value = response.message;
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Failed to fetch paper detail:', err);
-    error.value = t('papers.fetchError');
+    error.value = err?.message || t('papers.fetchError');
   } finally {
     loading.value = false;
   }

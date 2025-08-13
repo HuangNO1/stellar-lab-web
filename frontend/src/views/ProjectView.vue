@@ -238,9 +238,9 @@ const fetchProjects = async (resetPage = false) => {
     } else {
       error.value = response.message || t('common.fetchError');
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Failed to fetch projects:', err);
-    error.value = t('common.networkError');
+    error.value = err?.message || t('common.networkError');
   } finally {
     loading.value = false;
   }

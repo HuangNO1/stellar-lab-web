@@ -211,7 +211,7 @@ const fetchGroupDetail = async () => {
         if (membersResponse.code === 0) {
           groupMembers.value = membersResponse.data.items;
         }
-      } catch (err) {
+      } catch (err: any) {
         console.warn('Failed to fetch group members:', err);
         // 成員獲取失敗不阻止課題組信息顯示
       }
@@ -219,9 +219,9 @@ const fetchGroupDetail = async () => {
     } else {
       error.value = groupResponse.message;
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Failed to fetch group detail:', err);
-    error.value = t('errorMessages.fetchGroupDetail');
+    error.value = err?.message || t('errorMessages.fetchGroupDetail');
   } finally {
     loading.value = false;
   }

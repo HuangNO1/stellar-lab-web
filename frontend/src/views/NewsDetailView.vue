@@ -151,9 +151,9 @@ const fetchNewsDetail = async () => {
     } else {
       error.value = response.message;
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Failed to fetch news detail:', err);
-    error.value = t('news.fetchError');
+    error.value = err?.message || t('news.fetchError');
   } finally {
     loading.value = false;
   }

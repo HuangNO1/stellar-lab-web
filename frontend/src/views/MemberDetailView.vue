@@ -236,7 +236,7 @@ const fetchMemberDetail = async () => {
           if (groupResponse.code === 0) {
             researchGroup.value = groupResponse.data;
           }
-        } catch (err) {
+        } catch (err: any) {
           console.warn('Failed to fetch research group:', err);
         }
       }
@@ -254,16 +254,16 @@ const fetchMemberDetail = async () => {
             paper.authors && paper.authors.some(author => author.mem_id === memberId)
           );
         }
-      } catch (err) {
+      } catch (err: any) {
         console.warn('Failed to fetch related papers:', err);
       }
       
     } else {
       error.value = memberResponse.message;
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Failed to fetch member detail:', err);
-    error.value = t('errorMessages.fetchMemberDetail');
+    error.value = err?.message || t('errorMessages.fetchMemberDetail');
   } finally {
     loading.value = false;
   }

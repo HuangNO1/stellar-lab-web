@@ -174,9 +174,9 @@ const fetchProjectDetail = async () => {
     } else {
       error.value = response.message;
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Failed to fetch project detail:', err);
-    error.value = t('projects.fetchError');
+    error.value = err?.message || t('projects.fetchError');
   } finally {
     loading.value = false;
   }

@@ -303,9 +303,9 @@ const fetchLatestNews = async () => {
     } else {
       newsError.value = response.message || t('common.fetchError');
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Failed to fetch latest news:', err);
-    newsError.value = t('common.networkError');
+    newsError.value = err?.message || t('common.networkError');
   } finally {
     newsLoading.value = false;
   }
