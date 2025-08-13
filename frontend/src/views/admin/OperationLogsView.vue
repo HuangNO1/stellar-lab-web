@@ -26,14 +26,14 @@
           </n-input>
 
           <!-- 高級篩選 -->
-          <n-space>
+          <n-space class="filter-controls">
             <!-- 管理員篩選 -->
             <n-select
               v-model:value="filters.admin_id"
               :options="adminOptions"
               :placeholder="$t('admin.operationLogs.selectAdmin')"
               clearable
-              style="width: 200px"
+              class="filter-select"
               @update:value="handleSearch"
             />
 
@@ -43,7 +43,7 @@
               :options="editTypeOptions"
               :placeholder="$t('admin.operationLogs.selectOperation')"
               clearable
-              style="width: 200px"
+              class="filter-select"
               @update:value="handleSearch"
             />
 
@@ -53,7 +53,7 @@
               :options="moduleOptions"
               :placeholder="$t('admin.operationLogs.selectModule')"
               clearable
-              style="width: 200px"
+              class="filter-select"
               @update:value="handleSearch"
             />
 
@@ -66,8 +66,8 @@
                 :format="currentLocale === 'zh' ? 'yyyy年MM月dd日' : 'yyyy-MM-dd'"
                 value-format="yyyy-MM-dd"
                 clearable
+                class="date-picker"
                 @update:value="handleDateChange"
-                :style="{ width: currentLocale === 'zh' ? '350px' : '300px' }"
               />
             </n-config-provider>
           </n-space>
@@ -77,29 +77,31 @@
 
     <!-- 操作日誌列表 -->
     <n-card>
-      <n-config-provider :locale="naiveLocale" :date-locale="dateLocale">
-        <n-data-table
-          :columns="columns"
-          :data="logs"
-          :loading="loading"
-          :row-key="(row: EditRecord) => row.edit_id"
-          :pagination="false"
-          :bordered="false"
-        />
-        
-        <!-- 分頁組件 -->
-        <div class="pagination-container">
-          <n-pagination
-            v-model:page="pagination.page"
-            v-model:page-size="pagination.per_page"
-            :page-count="Math.ceil(pagination.total / pagination.per_page)"
-            :page-sizes="[10, 20, 50]"
-            show-size-picker
-            @update:page="handlePageChange"
-            @update:page-size="handlePageSizeChange"
+      <div class="table-container">
+        <n-config-provider :locale="naiveLocale" :date-locale="dateLocale">
+          <n-data-table
+            :columns="columns"
+            :data="logs"
+            :loading="loading"
+            :row-key="(row: EditRecord) => row.edit_id"
+            :pagination="false"
+            :bordered="false"
           />
-        </div>
-      </n-config-provider>
+          
+          <!-- 分頁組件 -->
+          <div class="pagination-container">
+            <n-pagination
+              v-model:page="pagination.page"
+              v-model:page-size="pagination.per_page"
+              :page-count="Math.ceil(pagination.total / pagination.per_page)"
+              :page-sizes="[10, 20, 50]"
+              show-size-picker
+              @update:page="handlePageChange"
+              @update:page-size="handlePageSizeChange"
+            />
+          </div>
+        </n-config-provider>
+      </div>
     </n-card>
 
     <!-- JSON 詳情 Modal -->
@@ -420,16 +422,88 @@ onMounted(() => {
   margin-top: 20px;
 }
 
-/* 響應式設計 */
-@media (max-width: 48rem) {
-  :deep(.n-space) {
-    flex-direction: column;
-    align-items: stretch;
-  }
+.search-controls {
+  width: 100%;
+}
 
+.filter-controls {
+  width: 100%;
+}
+
+/* 基本樣式 */
+:deep(.filter-select) {
+  width: 200px;
+  min-width: 150px;
+}
+
+:deep(.date-picker) {
+  width: 320px;
+  min-width: 280px;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .search-controls {
+    overflow-x: auto;
+  }
+  
+  .filter-controls {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+  
+  /* 強制設置寬度 */
+  :deep(.filter-select),
+  :deep(.date-picker),
   :deep(.n-select),
   :deep(.n-date-picker) {
     width: 100% !important;
+    min-width: unset !important;
+    max-width: 100% !important;
+  }
+  
+  /* 單獨處理每個組件 */
+  :deep(.n-select .n-base-selection),
+  :deep(.n-date-picker .n-input) {
+    width: 100% !important;
+  }
+}
+
+/* 中等屏幕設備優化 */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .filter-controls {
+    flex-wrap: wrap;
+  }
+  
+  :deep(.filter-select) {
+    min-width: 180px;
+    flex: 1;
+  }
+  
+  :deep(.date-picker) {
+    min-width: 280px;
+    flex: 1;
+  }
+}
+
+.table-container {
+  overflow-x: auto;
+  min-width: 0;
+  width: 100%;
+}
+
+/* 手機端表格優化 */
+@media (max-width: 768px) {
+  .table-container {
+    margin: -16px -20px;
+    padding: 16px 20px;
+    border-radius: 0;
+  }
+  
+  /* 設置表格最小寬度以觸發滾動 */
+  :deep(.n-data-table-wrapper) {
+    min-width: 1200px;
   }
 }
 </style>
