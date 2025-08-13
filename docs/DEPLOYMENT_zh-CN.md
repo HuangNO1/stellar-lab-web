@@ -2,6 +2,8 @@
 
 使用 Docker 容器化的實驗室網站框架完整部署指南。
 
+> 📘 **雲服務器用戶注意**: 如果您要在 ECS、AWS EC2、或其他雲服務器上從零開始部署，建議查看 **[ECS 雲服務器部署指南](./ECS_DEPLOYMENT_zh-CN.md)**，該指南提供了更詳細的雲環境部署步驟和優化配置。
+
 ## 📋 目錄
 
 - [系統需求](#系統需求)
@@ -16,6 +18,7 @@
 - [監控與日誌](#監控與日誌)
 - [故障排除](#故障排除)
 - [維護](#維護)
+- [相關文檔](#相關文檔)
 
 ## 系統需求
 
@@ -671,6 +674,26 @@ services:
 - [ ] 設定錯誤追蹤
 - [ ] 配置電子郵件通知（如已實現）
 - [ ] 記錄自訂配置
+
+## 相關文檔
+
+根據您的部署環境和需求，查看以下相關文檔：
+
+### 雲端部署
+- **[ECS 雲服務器部署指南 (中文)](./ECS_DEPLOYMENT_zh-CN.md)** - 適用於 AWS ECS、阿里雲 ECS、騰訊雲等雲服務器環境的詳細部署指南
+- **[ECS Cloud Server Deployment Guide (English)](./ECS_DEPLOYMENT.md)** - English version of cloud server deployment guide
+
+### Docker 相關
+- **[Docker 參考文檔 (中文)](./DOCKER_REFERENCE_zh-CN.md)** - Docker 配置和最佳實踐
+- **[Docker Reference (English)](./DOCKER_REFERENCE.md)** - Docker configuration and best practices
+
+### 靈活部署
+- **[靈活部署配置 (中文)](./FLEXIBLE_DEPLOYMENT.md)** - 各種部署場景和配置選項
+
+### 項目文檔
+- **[主要 README](../README_zh-CN.md)** - 項目概覽和功能介紹
+- **[後端文檔](../backend/README.md)** - Flask API 詳細說明
+- **[前端文檔](../frontend/README_zh-CN.md)** - Vue.js 前端配置和開發
 
 ## 支援
 

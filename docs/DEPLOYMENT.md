@@ -2,6 +2,8 @@
 
 Complete deployment guide for the Lab Website Framework with Docker containerization.
 
+> 📘 **Cloud Server Users Note**: If you're deploying on ECS, AWS EC2, or other cloud servers from scratch, we recommend checking the **[ECS Cloud Server Deployment Guide](./ECS_DEPLOYMENT.md)** which provides more detailed cloud environment deployment steps and optimization configurations.
+
 ## 📋 Table of Contents
 
 - [Prerequisites](#prerequisites)
@@ -16,6 +18,7 @@ Complete deployment guide for the Lab Website Framework with Docker containeriza
 - [Monitoring and Logs](#monitoring-and-logs)
 - [Troubleshooting](#troubleshooting)
 - [Maintenance](#maintenance)
+- [Related Documentation](#related-documentation)
 
 ## Prerequisites
 
@@ -691,6 +694,26 @@ Before going live:
 - [ ] Set up error tracking
 - [ ] Configure email notifications (if implemented)
 - [ ] Document custom configurations
+
+## Related Documentation
+
+Based on your deployment environment and requirements, check these related documents:
+
+### Cloud Deployment
+- **[ECS Cloud Server Deployment Guide (English)](./ECS_DEPLOYMENT.md)** - Detailed deployment guide for AWS ECS, Alibaba Cloud ECS, Tencent Cloud and other cloud server environments
+- **[ECS 雲服務器部署指南 (中文)](./ECS_DEPLOYMENT_zh-CN.md)** - Chinese version of cloud server deployment guide
+
+### Docker Related
+- **[Docker Reference (English)](./DOCKER_REFERENCE.md)** - Docker configuration and best practices
+- **[Docker 參考文檔 (中文)](./DOCKER_REFERENCE_zh-CN.md)** - Chinese version of Docker documentation
+
+### Flexible Deployment
+- **[Flexible Deployment Configuration](./FLEXIBLE_DEPLOYMENT.md)** - Various deployment scenarios and configuration options
+
+### Project Documentation
+- **[Main README](../README.md)** - Project overview and feature introduction
+- **[Backend Documentation](../backend/README.md)** - Flask API detailed documentation
+- **[Frontend Documentation](../frontend/README.md)** - Vue.js frontend configuration and development
 
 ## Support
 
