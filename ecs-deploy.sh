@@ -647,6 +647,27 @@ install_docker_compose() {
     fi
 }
 
+# 從 .env 文件讀取端口配置
+load_env_ports() {
+    if [[ -f "$PROJECT_DIR/.env" ]]; then
+        cd "$PROJECT_DIR"
+        FRONTEND_PORT=$(grep "^FRONTEND_PORT=" .env 2>/dev/null | cut -d'=' -f2 | tr -d ' "' || echo "3000")
+        BACKEND_PORT=$(grep "^BACKEND_PORT=" .env 2>/dev/null | cut -d'=' -f2 | tr -d ' "' || echo "8000")
+        MYSQL_PORT=$(grep "^MYSQL_PORT=" .env 2>/dev/null | cut -d'=' -f2 | tr -d ' "' || echo "3307")
+        PHPMYADMIN_PORT=$(grep "^PHPMYADMIN_PORT=" .env 2>/dev/null | cut -d'=' -f2 | tr -d ' "' || echo "8081")
+        
+        log_info "從 .env 讀取端口配置: 前端=$FRONTEND_PORT, 後端=$BACKEND_PORT"
+    else
+        # 使用默認值
+        FRONTEND_PORT="3000"
+        BACKEND_PORT="8000"
+        MYSQL_PORT="3307"
+        PHPMYADMIN_PORT="8081"
+        
+        log_warning ".env 文件不存在，使用默認端口: 前端=$FRONTEND_PORT, 後端=$BACKEND_PORT"
+    fi
+}
+
 # 配置防火牆
 configure_firewall() {
     if [ "$SKIP_FIREWALL" = true ]; then
@@ -656,25 +677,28 @@ configure_firewall() {
     
     log_info "配置防火牆..."
     
+    # 加載端口配置
+    load_env_ports
+    
     if systemctl is-active firewalld &>/dev/null; then
         log_info "配置 firewalld..."
-        firewall-cmd --permanent --add-port=22/tcp     # SSH
-        firewall-cmd --permanent --add-port=80/tcp     # HTTP
-        firewall-cmd --permanent --add-port=443/tcp    # HTTPS
-        firewall-cmd --permanent --add-port=3000/tcp   # Frontend
-        firewall-cmd --permanent --add-port=8000/tcp   # Backend
-        firewall-cmd --permanent --add-port=8081/tcp   # phpMyAdmin
+        firewall-cmd --permanent --add-port=22/tcp      # SSH
+        firewall-cmd --permanent --add-port=80/tcp      # HTTP
+        firewall-cmd --permanent --add-port=443/tcp     # HTTPS
+        firewall-cmd --permanent --add-port=${FRONTEND_PORT}/tcp   # Frontend
+        firewall-cmd --permanent --add-port=${BACKEND_PORT}/tcp    # Backend
+        firewall-cmd --permanent --add-port=${PHPMYADMIN_PORT}/tcp # phpMyAdmin
         firewall-cmd --reload
         log_success "firewalld 配置完成"
     elif command -v ufw &> /dev/null && [ "$SYSTEM" = "ubuntu" ]; then
         log_info "配置 ufw..."
         ufw --force enable
-        ufw allow 22/tcp    # SSH
-        ufw allow 80/tcp    # HTTP
-        ufw allow 443/tcp   # HTTPS
-        ufw allow 3000/tcp  # Frontend
-        ufw allow 8000/tcp  # Backend
-        ufw allow 8081/tcp  # phpMyAdmin
+        ufw allow 22/tcp           # SSH
+        ufw allow 80/tcp           # HTTP
+        ufw allow 443/tcp          # HTTPS
+        ufw allow ${FRONTEND_PORT}/tcp      # Frontend
+        ufw allow ${BACKEND_PORT}/tcp       # Backend
+        ufw allow ${PHPMYADMIN_PORT}/tcp    # phpMyAdmin
         log_success "ufw 配置完成"
     else
         log_warning "未檢測到防火牆，跳過本地防火牆配置"
@@ -853,16 +877,19 @@ verify_deployment() {
     # 測試端點
     echo "========== 端點測試 ==========" | tee -a "$LOG_FILE"
     
-    if curl -sf http://localhost:3000 > /dev/null 2>&1; then
-        echo "✓ 前端服務 (3000) - 正常" | tee -a "$LOG_FILE"
+    # 加載端口配置
+    load_env_ports
+    
+    if curl -sf http://localhost:$FRONTEND_PORT > /dev/null 2>&1; then
+        echo "✓ 前端服務 ($FRONTEND_PORT) - 正常" | tee -a "$LOG_FILE"
     else
-        echo "✗ 前端服務 (3000) - 異常" | tee -a "$LOG_FILE"
+        echo "✗ 前端服務 ($FRONTEND_PORT) - 異常" | tee -a "$LOG_FILE"
     fi
     
-    if curl -sf http://localhost:8000/health > /dev/null 2>&1; then
-        echo "✓ 後端服務 (8000) - 正常" | tee -a "$LOG_FILE"
+    if curl -sf http://localhost:$BACKEND_PORT/health > /dev/null 2>&1; then
+        echo "✓ 後端服務 ($BACKEND_PORT) - 正常" | tee -a "$LOG_FILE"
     else
-        echo "✗ 後端服務 (8000) - 異常" | tee -a "$LOG_FILE"
+        echo "✗ 後端服務 ($BACKEND_PORT) - 異常" | tee -a "$LOG_FILE"
     fi
     
     # 獲取公網 IP
@@ -879,10 +906,10 @@ verify_deployment() {
     echo "=========================================="
     echo "           部署完成！"
     echo "=========================================="
-    echo "🌐 前端訪問: http://$DISPLAY_IP:3000"
-    echo "🔌 後端 API: http://$DISPLAY_IP:8000"
-    echo "📚 API 文檔: http://$DISPLAY_IP:8000/api/docs"
-    echo "🗄️ 資料庫管理: http://$DISPLAY_IP:8081"
+    echo "🌐 前端訪問: http://$DISPLAY_IP:$FRONTEND_PORT"
+    echo "🔌 後端 API: http://$DISPLAY_IP:$BACKEND_PORT"
+    echo "📚 API 文檔: http://$DISPLAY_IP:$BACKEND_PORT/api/docs"
+    echo "🗄️ 資料庫管理: http://$DISPLAY_IP:$PHPMYADMIN_PORT"
     echo ""
     echo "👤 預設管理員帳號:"
     echo "   用戶名: admin"
@@ -892,7 +919,7 @@ verify_deployment() {
     echo "1. 請立即修改預設管理員密碼"
     echo "2. 請檢查雲服務器安全組，確保開放以下端口:"
     echo "   - 22 (SSH)、80 (HTTP)、443 (HTTPS)"
-    echo "   - 3000 (前端服務)、8000 (後端 API)、8081 (phpMyAdmin)"
+    echo "   - $FRONTEND_PORT (前端服務)、$BACKEND_PORT (後端 API)、$PHPMYADMIN_PORT (phpMyAdmin)"
     echo "3. 建議設置域名和 SSL 證書"
     echo "=========================================="
 }
