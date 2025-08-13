@@ -11,3 +11,4 @@ coverage
 .idea
 *.tar.*
 *.zip
+docker-images
