@@ -1,761 +1,761 @@
 export default {
-  nav: {
-    home: '首頁',
-    members: '成員',
-    research: '研究',
-    projects: '項目',
-    papers: '論文',
-    news: '新聞',
-    about: '關於'
-  },
-  common: {
-    language: '語言',
-    theme: '主題',
-    light: '明亮模式',
-    dark: '暗黑模式',
-    loading: '載入中...',
-    error: '錯誤',
-    success: '成功',
-    confirm: '確認',
-    cancel: '取消',
-    contact: '聯繫我們',
-    retry: '重試',
-    viewDetails: '查看詳情',
-    fetchError: '獲取數據失敗',
-    goBack: '返回',
-    back: '返回',
-    page: '頁',
-    noData: '暫無數據',
-    itemsPerPage: '每頁條數'
-  },
-  defaults: {
-    labName: '實驗室',
-    labDescription: '本實驗室專注於前沿科技研究',
-    labFallbackName: '智慧實驗室',
-    carousel: {
-      alt1: '實驗室輪播圖1',
-      alt2: '實驗室輪播圖2', 
-      alt3: '實驗室輪播圖3',
-      alt4: '實驗室輪播圖4',
-      defaultAlt1: '默認輪播圖1',
-      defaultAlt2: '默認輪播圖2'
-    }
-  },
-  home: {
-    title: '歡迎來到實驗室',
-    subtitle: '探索科學，創造未來',
-    description: '我們是一個專注於前沿科技研究的實驗室'
-  },
-  members: {
-    title: '團隊成員',
-    professor: '教授',
-    postdoc: '博士後',
-    phd: '博士生',
-    master: '碩士生',
-    undergraduate: '本科生',
-    alumni: '校友',
-    others: '其他成員',
-    description: '個人簡介',
-    relatedPapers: '相關論文'
-  },
-  research: {
-    title: '研究領域',
-    projects_title: '研究項目',
-    papers_title: '學術論文',
-    ongoing: '進行中',
-    completed: '已完成'
-  },
-  news: {
-    title: '實驗室新聞',
-    latest: '最新消息',
-    date: '日期',
-    description: '查看實驗室最新動態',
-    type: '類型',
-    empty: '暫無新聞數據',
-    paperPublished: '論文發表',
-    award: '獲獎消息',
-    academic: '學術活動',
-    other: '其他',
-    viewMore: '查看更多',
-    notFound: '未找到該新聞',
-    invalidId: '無效的新聞ID',
-    fetchError: '獲取新聞詳情失敗',
-    types: {
-      publication: '論文發表',
-      award: '獲獎消息',
-      activity: '學術活動'
-    }
-  },
-  about: {
-    title: '關於我們',
-    mission: '使命',
-    vision: '願景',
-    contact: '聯繫我們'
-  },
-  researchGroups: {
-    title: '研究課題組',
-    viewDetails: '查看詳情',
-    leader: '課題組負責人',
-    members: '成員數量',
-    projects: '項目數量'
-  },
-  papers: {
-    title: '論文成果',
-    accepted: '已接收',
-    submitted: '投稿中',
-    description: '查看實驗室發表的學術論文',
-    type: '論文類型',
-    status: '狀態',
-    viewOnline: '在線查看',
-    download: '下載',
-    empty: '暫無論文數據',
-    conference: '會議論文',
-    journal: '期刊論文',
-    patent: '專利',
-    book: '書籍',
-    other: '其他',
-    date: '發表日期',
-    venue: '發表期刊/會議',
-    andOthers: '等',
-    authors: '作者',
-    abstract: '摘要',
-    correspondingAuthor: '通訊作者',
-    notFound: '未找到該論文',
-    invalidId: '無效的論文ID',
-    fetchError: '獲取論文詳情失敗',
-    types: {
-      conference: '會議論文',
-      journal: '期刊論文',
-      patent: '專利',
-      book: '書籍',
-      other: '其他'
-    }
-  },
-  projects: {
-    title: '研究項目',
-    description: '查看實驗室的研究項目',
-    status: '狀態',
-    startDate: '開始日期',
-    viewRepository: '查看代碼庫',
-    empty: '暫無項目數據',
-    ongoing: '進行中',
-    completed: '已完成',
-    name: '項目名稱',
-    notFound: '未找到該項目',
-    invalidId: '無效的項目ID',
-    fetchError: '獲取項目詳情失敗'
-  },
-  groups: {
-    title: '研究課題組',
-    leader: '課題組負責人',
-    description: '課題組簡介',
-    members: '成員列表'
-  },
-  search: {
-    placeholder: '搜索...',
-    advanced: '高級搜索',
-    dateRange: '日期範圍',
-    startDate: '開始日期',
-    endDate: '結束日期',
-    all: '全部',
-    sortBy: '排序方式',
-    default: '默認',
-    desc: '降序',
-    asc: '升序',
-    search: '搜索'
-  },
-  emptyStates: {
-    noMembers: '暫無成員數據',
-    noGroupMembers: '該課題組暫無成員',
-    groupNotFound: '未找到該課題組',
-    memberNotFound: '未找到該成員'
-  },
-  errorMessages: {
-    fetchGroupDetail: '獲取課題組詳情失敗',
-    fetchMemberDetail: '獲取成員詳情失敗',
-    invalidMemberId: '無效的成員ID',
-    invalidGroupId: '無效的課題組ID',
-    networkError: '網路連接錯誤'
-  },
-  language: {
-    chinese: '中文',
-    english: 'English'
-  },
-  admin: {
-    layout: {
-      title: '管理後台',
-      dashboard: '儀表板',
-      languageChanged: '語言已切換'
-    },
-    menu: {
-      dashboard: '儀表板',
-      content: '內容管理',
-      members: '成員管理',
-      groups: '課題組管理',
-      papers: '論文管理',
-      projects: '項目管理',
-      news: '新聞管理',
-      lab: '實驗室管理',
-      admins: '管理員管理',
-      system: '系統管理'
-    },
-    login: {
-      title: '管理員登錄',
-      subtitle: '歡迎回到實驗室管理系統',
-      usernamePlaceholder: '請輸入管理員用戶名',
-      passwordPlaceholder: '請輸入管理員密碼',
-      loginButton: '登錄',
-      footer: '實驗室管理系統 v1.0',
-      usernameRequired: '請輸入用戶名',
-      passwordRequired: '請輸入密碼',
-      loginSuccess: '登錄成功',
-      loginFailed: '登錄失敗'
-    },
-    user: {
-      profile: '個人資料',
-      changePassword: '修改密碼',
-      logout: '退出登錄',
-      logoutSuccess: '已安全退出'
-    },
-    dashboard: {
-      totalMembers: '總成員數',
-      totalPapers: '總論文數',
-      totalProjects: '總項目數',
-      totalNews: '總新聞數',
-      quickActions: '快速操作',
-      addMember: '添加成員',
-      addPaper: '添加論文',
-      addProject: '添加項目',
-      addNews: '添加新聞',
-      systemStatus: '系統狀態',
-      apiStatus: 'API服務',
-      databaseStatus: '數據庫',
-      mediaStatus: '媒體服務',
-      online: '在線',
-      normal: '正常',
-      recentActivities: '最近活動',
-      noActivities: '暫無活動記錄',
-      todoList: '待辦事項',
-      reviewPapers: '審核新提交的論文',
-      updateLabInfo: '更新實驗室基本信息',
-      checkNews: '檢查新聞內容'
+    nav: {
+        home: '首页',
+        members: '成员',
+        research: '研究',
+        projects: '项目',
+        papers: '论文',
+        news: '新闻',
+        about: '关于'
     },
     common: {
-      enabled: '啟用',
-      disabled: '禁用',
-      edit: '編輯',
-      delete: '刪除',
-      confirmDelete: '確認刪除',
-      actions: '操作',
-      comingSoon: '功能開發中',
-      comingSoonDesc: '此功能正在開發中，敬請期待！',
-      create: '創建',
-      update: '更新',
-      cancel: '取消',
-      submit: '提交',
-      loading: '載入中...',
-      success: '成功',
-      failed: '失敗',
-      batchEdit: '批量編輯',
-      batchDelete: '批量刪除',
-      noPermission: '無權限',
-      status: '狀態',
-      // 表單選項
-      memberTypes: {
-        teacher: '教師',
-        student: '學生',
-        alumni: '校友'
-      },
-      jobTypes: {
-        professor: '教授',
-        associateProfessor: '副教授',
-        lecturer: '講師',
-        assistantResearcher: '助理研究員',
-        postdoc: '博士後'
-      },
-      studentTypes: {
-        phd: '博士生',
-        master: '碩士生',
-        undergraduate: '本科生'
-      },
-      paperTypes: {
-        conference: '會議',
-        journal: '期刊',
-        patent: '專利',
-        book: '書籍',
-        other: '其他'
-      },
-      paperStatus: {
-        submitting: '投稿中',
-        accepted: '已接收'
-      },
-      projectStatus: {
-        ongoing: '進行中',
-        completed: '已完成'
-      },
-      newsTypes: {
-        publication: '論文發表',
-        award: '獲獎消息',
-        activity: '學術活動'
-      },
-      validationMessages: {
-        required: '此欄位為必填項',
-        invalidEmail: '請輸入有效的電子信箱',
-        invalidUrl: '請輸入有效的URL'
-      },
-      fileUpload: {
-        selectImage: '選擇圖片',
-        selectPdf: '選擇 PDF 文件',
-        selectFile: '選擇文件',
-        uploadSuccess: '文件上傳成功',
-        uploadError: '文件上傳失敗'
-      },
-      viewDetails: '查看詳情',
-      avatarPreview: '頭像預覽'
+        language: '语言',
+        theme: '主题',
+        light: '明亮模式',
+        dark: '暗黑模式',
+        loading: '载入中...',
+        error: '错误',
+        success: '成功',
+        confirm: '确认',
+        cancel: '取消',
+        contact: '联系我们',
+        retry: '重试',
+        viewDetails: '查看详情',
+        fetchError: '获取数据失败',
+        goBack: '返回',
+        back: '返回',
+        page: '页',
+        noData: '暂无数据',
+        itemsPerPage: '每页条数'
+    },
+    defaults: {
+        labName: '实验室',
+        labDescription: '本实验室专注于前沿科技研究',
+        labFallbackName: '智慧实验室',
+        carousel: {
+            alt1: '实验室轮播图1',
+            alt2: '实验室轮播图2',
+            alt3: '实验室轮播图3',
+            alt4: '实验室轮播图4',
+            defaultAlt1: '默认轮播图1',
+            defaultAlt2: '默认轮播图2'
+        }
+    },
+    home: {
+        title: '欢迎来到实验室',
+        subtitle: '探索科学，创造未来',
+        description: '我们是一个专注于前沿科技研究的实验室'
     },
     members: {
-      addMember: '添加成員',
-      editMember: '編輯成員',
-      searchPlaceholder: '搜索成員姓名或郵箱...',
-      filterByType: '按類型篩選',
-      filterByGroup: '按課題組篩選',
-      avatar: '頭像',
-      name: '姓名',
-      email: '郵箱',
-      type: '類型',
-      group: '課題組',
-      status: '狀態',
-      details: '詳情',
-      studentGrade: '年級',
-      jobType: '職位',
-      studentType: '學位類型',
-      grade: '年級',
-      fetchError: '獲取成員列表失敗',
-      deleteConfirmText: '確定要刪除這個成員嗎？此操作不可撤銷。',
-      deleteSuccess: '成員刪除成功',
-      deleteError: '刪除成員失敗',
-      batchEdit: '批量編輯',
-      batchEditTip: '將對選中的 {count} 位成員進行批量修改',
-      batchDeleteConfirmText: '確定要刪除選中的 {count} 位成員嗎？此操作不可撤銷。',
-      batchDeleteWarning: '批量刪除操作將無法恢復，請謹慎操作！',
-      batchDeleteSuccess: '成功刪除 {count} 位成員',
-      batchUpdateSuccess: '成功更新 {count} 位成員',
-      updateError: '更新成員失敗',
-      noUpdatesSelected: '請至少選擇一個要更新的字段',
-      jobTypes: {
+        title: '团队成员',
         professor: '教授',
-        assocProfessor: '副教授',
-        lecturer: '講師',
-        assistantProfessor: '助理教授',
-        postdoc: '博士後'
-      },
-      studentTypes: {
-        phd: '博士',
-        master: '碩士',
-        undergraduate: '本科'
-      },
-      placeholders: {
-        studentGrade: '請輸入年級 (1-6)',
-        jobType: '請選擇職位類型',
-        studentType: '請選擇學位類型',
-        status: '請選擇狀態'
-      },
-      // QuickActionModal 相關
-      form: {
-        nameZh: '中文姓名',
-        nameEn: '英文姓名',
-        email: '電子信箱',
-        type: '成員類型',
-        jobType: '職務類型',
-        studentType: '學生類型',
-        studentGrade: '年級',
-        destinationZh: '去向（中文）',
-        destinationEn: '去向（英文）',
-        group: {
-          label: '課題組',
-          none: '無'
-        },
-        description: '成員描述（中文）',
-        descriptionEn: '成員描述（英文）',
-        avatar: '頭像上傳',
-        placeholders: {
-          nameZh: '請輸入中文姓名',
-          nameEn: '請輸入英文姓名',
-          email: '請輸入電子信箱',
-          type: '請選擇成員類型',
-          jobType: '請選擇職務類型',
-          studentType: '請選擇學生類型',
-          studentGrade: '請輸入年級（1-10）',
-          destinationZh: '請輸入去向（中文）',
-          destinationEn: '請輸入去向（英文）',
-          group: '請選擇課題組',
-          description: '請輸入成員中文描述（支持 Markdown 語法）',
-          descriptionEn: '請輸入成員英文描述（支持 Markdown 語法）'
-        },
-        validation: {
-          nameZhRequired: '請輸入中文姓名',
-          nameEnRequired: '請輸入英文姓名',
-          emailRequired: '請輸入電子信箱',
-          typeRequired: '請選擇成員類型',
-          groupRequired: '請選擇課題組',
-          jobTypeRequired: '請選擇職務類型',
-          studentTypeRequired: '請選擇學生類型',
-          studentGradeRequired: '請輸入有效年級（1-10）'
-        }
-      }
+        postdoc: '博士后',
+        phd: '博士生',
+        master: '硕士生',
+        undergraduate: '本科生',
+        alumni: '校友',
+        others: '其他成员',
+        description: '个人简介',
+        relatedPapers: '相关论文'
     },
-    papers: {
-      addPaper: '添加論文',
-      editPaper: '編輯論文',
-      searchPlaceholder: '搜索論文標題...',
-      filterByType: '按類型篩選',
-      filterByStatus: '按狀態篩選',
-      fetchError: '獲取論文列表失敗',
-      deleteConfirmText: '確定要刪除這篇論文嗎？此操作不可撤銷。',
-      deleteSuccess: '論文刪除成功',
-      deleteError: '刪除論文失敗',
-      form: {
-        titleZh: '中文標題',
-        titleEn: '英文標題',
-        description: '論文描述（中文）',
-        descriptionEn: '論文描述（英文）',
-        venue: '期刊/會議',
-        type: '論文類型',
-        date: '發表日期',
-        status: '接收狀態',
-        url: '論文連結',
-        file: '論文文件',
-        authors: '作者',
-        placeholders: {
-          titleZh: '請輸入論文中文標題',
-          titleEn: '請輸入論文英文標題',
-          description: '請輸入論文中文描述（支持 Markdown 語法）',
-          descriptionEn: '請輸入論文英文描述（支持 Markdown 語法）',
-          venue: '請輸入發表期刊或會議',
-          type: '請選擇論文類型',
-          date: '請選擇發表日期',
-          status: '請選擇接收狀態',
-          url: '請輸入論文連結URL',
-          authors: '請選擇論文作者'
-        },
-        validation: {
-          titleZhRequired: '請輸入中文標題',
-          typeRequired: '請選擇論文類型',
-          statusRequired: '請選擇接收狀態',
-          dateRequired: '請選擇發表日期'
-        }
-      }
-    },
-    projects: {
-      addProject: '添加項目',
-      editProject: '編輯項目',
-      searchPlaceholder: '搜索項目名稱...',
-      filterByStatus: '按狀態篩選',
-      fetchError: '獲取項目列表失敗',
-      deleteConfirmText: '確定要刪除這個項目嗎？此操作不可撤銷。',
-      deleteSuccess: '項目刪除成功',
-      deleteError: '刪除項目失敗',
-      form: {
-        nameZh: '中文名稱',
-        nameEn: '英文名稱',
-        description: '項目描述（中文）',
-        descriptionEn: '項目描述（英文）',
-        url: '項目URL',
-        startDate: '開始日期',
-        status: '項目狀態',
-        placeholders: {
-          nameZh: '請輸入項目中文名稱',
-          nameEn: '請輸入項目英文名稱',
-          description: '請輸入項目描述（支持 Markdown 語法）',
-          descriptionEn: '請輸入項目英文描述（支持 Markdown 語法）',
-          url: '請輸入項目URL',
-          startDate: '請選擇開始日期',
-          status: '請選擇項目狀態'
-        },
-        validation: {
-          nameZhRequired: '請輸入項目中文名稱'
-        }
-      }
+    research: {
+        title: '研究领域',
+        projects_title: '研究项目',
+        papers_title: '学术论文',
+        ongoing: '进行中',
+        completed: '已完成'
     },
     news: {
-      addNews: '添加新聞',
-      editNews: '編輯新聞',
-      searchPlaceholder: '搜索新聞內容...',
-      filterByType: '按類型篩選',
-      fetchError: '獲取新聞列表失敗',
-      deleteConfirmText: '確定要刪除這條新聞嗎？此操作不可撤銷。',
-      deleteSuccess: '新聞刪除成功',
-      deleteError: '刪除新聞失敗',
-      form: {
-        type: '新聞類型',
-        contentZh: '中文內容',
-        contentEn: '英文內容',
-        date: '新聞日期',
-        placeholders: {
-          type: '請選擇新聞類型',
-          contentZh: '請輸入新聞中文內容（支持 Markdown 語法）',
-          contentEn: '請輸入新聞英文內容（支持 Markdown 語法）',
-          date: '請選擇新聞日期'
-        },
-        validation: {
-          typeRequired: '請選擇新聞類型',
-          contentZhRequired: '請輸入新聞中文內容',
-          dateRequired: '請選擇新聞日期'
+        title: '实验室新闻',
+        latest: '最新消息',
+        date: '日期',
+        description: '查看实验室最新动态',
+        type: '类型',
+        empty: '暂无新闻数据',
+        paperPublished: '论文发表',
+        award: '获奖消息',
+        academic: '学术活动',
+        other: '其他',
+        viewMore: '查看更多',
+        notFound: '未找到该新闻',
+        invalidId: '无效的新闻ID',
+        fetchError: '获取新闻详情失败',
+        types: {
+            publication: '论文发表',
+            award: '获奖消息',
+            activity: '学术活动'
         }
-      }
+    },
+    about: {
+        title: '关于我们',
+        mission: '使命',
+        vision: '愿景',
+        contact: '联系我们'
+    },
+    researchGroups: {
+        title: '研究课题组',
+        viewDetails: '查看详情',
+        leader: '课题组负责人',
+        members: '成员数量',
+        projects: '项目数量'
+    },
+    papers: {
+        title: '论文成果',
+        accepted: '已接收',
+        submitted: '投稿中',
+        description: '查看实验室发表的学术论文',
+        type: '论文类型',
+        status: '状态',
+        viewOnline: '在线查看',
+        download: '下载',
+        empty: '暂无论文数据',
+        conference: '会议论文',
+        journal: '期刊论文',
+        patent: '专利',
+        book: '书籍',
+        other: '其他',
+        date: '发表日期',
+        venue: '发表期刊/会议',
+        andOthers: '等',
+        authors: '作者',
+        abstract: '摘要',
+        correspondingAuthor: '通讯作者',
+        notFound: '未找到该论文',
+        invalidId: '无效的论文ID',
+        fetchError: '获取论文详情失败',
+        types: {
+            conference: '会议论文',
+            journal: '期刊论文',
+            patent: '专利',
+            book: '书籍',
+            other: '其他'
+        }
+    },
+    projects: {
+        title: '研究项目',
+        description: '查看实验室的研究项目',
+        status: '状态',
+        startDate: '开始日期',
+        viewRepository: '查看代码库',
+        empty: '暂无项目数据',
+        ongoing: '进行中',
+        completed: '已完成',
+        name: '项目名称',
+        notFound: '未找到该项目',
+        invalidId: '无效的项目ID',
+        fetchError: '获取项目详情失败'
     },
     groups: {
-      title: '研究課題組',
-      leader: '課題組負責人',
-      description: '課題組簡介',
-      members: '成員列表',
-      addGroup: '添加課題組',
-      editGroup: '編輯課題組',
-      searchPlaceholder: '搜索課題組名稱...',
-      fetchError: '獲取課題組列表失敗',
-      deleteConfirmText: '確定要刪除這個課題組嗎？此操作不可撤銷。',
-      deleteSuccess: '課題組刪除成功',
-      deleteError: '刪除課題組失敗',
-      form: {
-        nameZh: '中文名稱',
-        nameEn: '英文名稱',
-        descriptionZh: '中文描述',
-        descriptionEn: '英文描述',
-        leader: '組長',
-        placeholders: {
-          nameZh: '請輸入課題組中文名稱',
-          nameEn: '請輸入課題組英文名稱',
-          descriptionZh: '請輸入課題組中文描述（支持 Markdown 語法）',
-          descriptionEn: '請輸入課題組英文描述（支持 Markdown 語法）',
-          leader: '請選擇組長'
+        title: '研究课题组',
+        leader: '课题组负责人',
+        description: '课题组简介',
+        members: '成员列表'
+    },
+    search: {
+        placeholder: '搜索...',
+        advanced: '高级搜索',
+        dateRange: '日期范围',
+        startDate: '开始日期',
+        endDate: '结束日期',
+        all: '全部',
+        sortBy: '排序方式',
+        default: '默认',
+        desc: '降序',
+        asc: '升序',
+        search: '搜索'
+    },
+    emptyStates: {
+        noMembers: '暂无成员数据',
+        noGroupMembers: '该课题组暂无成员',
+        groupNotFound: '未找到该课题组',
+        memberNotFound: '未找到该成员'
+    },
+    errorMessages: {
+        fetchGroupDetail: '获取课题组详情失败',
+        fetchMemberDetail: '获取成员详情失败',
+        invalidMemberId: '无效的成员ID',
+        invalidGroupId: '无效的课题组ID',
+        networkError: '网络连接错误'
+    },
+    language: {
+        chinese: '中文',
+        english: 'English'
+    },
+    admin: {
+        layout: {
+            title: '管理后台',
+            dashboard: '仪表板',
+            languageChanged: '语言已切换'
         },
-        validation: {
-          nameZhRequired: '請輸入課題組中文名稱'
-        }
-      }
-    },
-    // MarkdownEditor 翻譯
-    markdownEditor: {
-      preview: '預覽',
-      edit: '編輯',
-      tip: '支持 Markdown 語法：**粗體**, *斜體*, ### 標題, - 列表, [鏈接](url)',
-      placeholder: '請輸入內容...',
-      toolbar: {
-        bold: '粗體',
-        italic: '斜體',
-        heading: '標題',
-        list: '列表',
-        link: '鏈接'
-      }
-    },
-    // QuickActionModal 翻譯
-    quickAction: {
-      modalTitle: {
-        createMember: '新增成員',
-        editMember: '編輯成員',
-        createPaper: '新增論文',
-        editPaper: '編輯論文',
-        createProject: '新增項目',
-        editProject: '編輯項目',
-        createNews: '新增新聞',
-        editNews: '編輯新聞',
-        createGroup: '新增課題組',
-        editGroup: '編輯課題組',
-        createAdmin: '新增管理員',
-        editAdmin: '編輯管理員'
-      },
-      messages: {
-        createSuccess: '創建成功',
-        updateSuccess: '更新成功',
-        operationFailed: '操作失敗',
-        checkInput: '操作失敗，請檢查輸入',
-        loadGroupsFailed: '載入課題組失敗',
-        loadMembersFailed: '載入成員失敗'
-      },
-      timeFormat: {
-        daysAgo: '天前',
-        hoursAgo: '小時前', 
-        minutesAgo: '分鐘前',
-        justNow: '剛剛'
-      },
-      activities: {
-        created: '新增了',
-        updated: '編輯了',
-        moduleNames: {
-          members: '成員',
-          papers: '論文',
-          projects: '項目',
-          news: '新聞',
-          groups: '課題組'
-        }
-      }
-    },
-    // 實驗室管理翻譯
-    lab: {
-      basicInfo: '基本信息',
-      contactInfo: '聯繫信息',
-      imageManagement: '圖片管理',
-      nameZh: '實驗室中文名稱',
-      nameEn: '實驗室英文名稱',
-      descZh: '中文描述',
-      descEn: '英文描述',
-      addressZh: '中文地址',
-      addressEn: '英文地址',
-      email: '聯繫郵箱',
-      phone: '聯繫電話',
-      logo: '實驗室Logo',
-      carouselImages: '輪播圖片',
-      carouselImage: '輪播圖片 {number}',
-      placeholders: {
-        nameZh: '請輸入實驗室中文名稱',
-        nameEn: '請輸入實驗室英文名稱',
-        descZh: '請輸入實驗室中文描述',
-        descEn: '請輸入實驗室英文描述',
-        addressZh: '請輸入實驗室中文地址',
-        addressEn: '請輸入實驗室英文地址',
-        email: '請輸入聯繫郵箱',
-        phone: '請輸入聯繫電話'
-      },
-      validation: {
-        nameZhRequired: '實驗室中文名稱必填',
-        nameEnRequired: '實驗室英文名稱必填'
-      },
-      messages: {
-        fetchFailed: '獲取實驗室信息失敗',
-        saveSuccess: '保存成功',
-        saveFailed: '保存失敗'
-      },
-      logoPreview: 'Logo 預覽',
-      carouselPreview: '輪播圖 {number} 預覽'
-    },
-    // 管理員管理翻譯
-    admins: {
-      addAdmin: '添加管理員',
-      editAdmin: '編輯管理員',
-      searchPlaceholder: '搜索管理員用戶名...',
-      adminName: '用戶名',
-      adminType: '類型',
-      superAdmin: '超級管理員',
-      normalAdmin: '普通管理員',
-      createdAt: '創建時間',
-      fetchError: '獲取管理員列表失敗',
-      deleteConfirmText: '確定要刪除這個管理員嗎？此操作不可撤銷。',
-      deleteSuccess: '管理員刪除成功',
-      deleteError: '刪除管理員失敗',
-      noEditPermission: '無權限編輯此管理員',
-      noDeletePermission: '無權限刪除此管理員',
-      noCreatePermission: '無權限創建管理員',
-      cannotEditSelf: '不能編輯自己的帳號',
-      cannotEditSuperAdmin: '不能編輯超級管理員',
-      form: {
-        adminName: '用戶名',
-        adminPass: '密碼',
-        isSuper: '管理員類型',
-        enable: '狀態',
-        placeholders: {
-          adminName: '請輸入用戶名',
-          adminPass: '請輸入密碼',
-          isSuper: '請選擇管理員類型',
-          enable: '請選擇狀態'
+        menu: {
+            dashboard: '仪表板',
+            content: '内容管理',
+            members: '成员管理',
+            groups: '课题组管理',
+            papers: '论文管理',
+            projects: '项目管理',
+            news: '新闻管理',
+            lab: '实验室管理',
+            admins: '管理员管理',
+            system: '系统管理'
         },
-        validation: {
-          adminNameRequired: '用戶名必填',
-          adminPassRequired: '密碼必填'
+        login: {
+            title: '管理员登录',
+            subtitle: '欢迎回到实验室管理系统',
+            usernamePlaceholder: '请输入管理员用户名',
+            passwordPlaceholder: '请输入管理员密码',
+            loginButton: '登录',
+            footer: '实验室管理系统 v1.0',
+            usernameRequired: '请输入用户名',
+            passwordRequired: '请输入密码',
+            loginSuccess: '登录成功',
+            loginFailed: '登录失败'
+        },
+        user: {
+            profile: '个人资料',
+            changePassword: '修改密码',
+            logout: '退出登录',
+            logoutSuccess: '已安全退出'
+        },
+        dashboard: {
+            totalMembers: '总成员数',
+            totalPapers: '总论文数',
+            totalProjects: '总项目数',
+            totalNews: '总新闻数',
+            quickActions: '快速操作',
+            addMember: '添加成员',
+            addPaper: '添加论文',
+            addProject: '添加项目',
+            addNews: '添加新闻',
+            systemStatus: '系统状态',
+            apiStatus: 'API服务',
+            databaseStatus: '数据库',
+            mediaStatus: '媒体服务',
+            online: '在线',
+            normal: '正常',
+            recentActivities: '最近活动',
+            noActivities: '暂无活动记录',
+            todoList: '待办事项',
+            reviewPapers: '审核新提交的论文',
+            updateLabInfo: '更新实验室基本信息',
+            checkNews: '检查新闻内容'
+        },
+        common: {
+            enabled: '启用',
+            disabled: '禁用',
+            edit: '编辑',
+            delete: '删除',
+            confirmDelete: '确认删除',
+            actions: '操作',
+            comingSoon: '功能开发中',
+            comingSoonDesc: '此功能正在开发中，敬请期待！',
+            create: '创建',
+            update: '更新',
+            cancel: '取消',
+            submit: '提交',
+            loading: '载入中...',
+            success: '成功',
+            failed: '失败',
+            batchEdit: '批量编辑',
+            batchDelete: '批量删除',
+            noPermission: '无权限',
+            status: '状态',
+            // 表单选项
+            memberTypes: {
+                teacher: '教师',
+                student: '学生',
+                alumni: '校友'
+            },
+            jobTypes: {
+                professor: '教授',
+                associateProfessor: '副教授',
+                lecturer: '讲师',
+                assistantResearcher: '助理研究员',
+                postdoc: '博士后'
+            },
+            studentTypes: {
+                phd: '博士生',
+                master: '硕士生',
+                undergraduate: '本科生'
+            },
+            paperTypes: {
+                conference: '会议',
+                journal: '期刊',
+                patent: '专利',
+                book: '书籍',
+                other: '其他'
+            },
+            paperStatus: {
+                submitting: '投稿中',
+                accepted: '已接收'
+            },
+            projectStatus: {
+                ongoing: '进行中',
+                completed: '已完成'
+            },
+            newsTypes: {
+                publication: '论文发表',
+                award: '获奖消息',
+                activity: '学术活动'
+            },
+            validationMessages: {
+                required: '此栏位为必填项',
+                invalidEmail: '请输入有效的电子信箱',
+                invalidUrl: '请输入有效的URL'
+            },
+            fileUpload: {
+                selectImage: '选择图片',
+                selectPdf: '选择 PDF 文件',
+                selectFile: '选择文件',
+                uploadSuccess: '文件上传成功',
+                uploadError: '文件上传失败'
+            },
+            viewDetails: '查看详情',
+            avatarPreview: '头像预览'
+        },
+        members: {
+            addMember: '添加成员',
+            editMember: '编辑成员',
+            searchPlaceholder: '搜索成员姓名或邮箱...',
+            filterByType: '按类型筛选',
+            filterByGroup: '按课题组筛选',
+            avatar: '头像',
+            name: '姓名',
+            email: '邮箱',
+            type: '类型',
+            group: '课题组',
+            status: '状态',
+            details: '详情',
+            studentGrade: '年级',
+            jobType: '职位',
+            studentType: '学位类型',
+            grade: '年级',
+            fetchError: '获取成员列表失败',
+            deleteConfirmText: '确定要删除这个成员吗？此操作不可撤销。',
+            deleteSuccess: '成员删除成功',
+            deleteError: '删除成员失败',
+            batchEdit: '批量编辑',
+            batchEditTip: '将对选中的 {count} 位成员进行批量修改',
+            batchDeleteConfirmText: '确定要删除选中的 {count} 位成员吗？此操作不可撤销。',
+            batchDeleteWarning: '批量删除操作将无法恢复，请谨慎操作！',
+            batchDeleteSuccess: '成功删除 {count} 位成员',
+            batchUpdateSuccess: '成功更新 {count} 位成员',
+            updateError: '更新成员失败',
+            noUpdatesSelected: '请至少选择一个要更新的字段',
+            jobTypes: {
+                professor: '教授',
+                assocProfessor: '副教授',
+                lecturer: '讲师',
+                assistantProfessor: '助理教授',
+                postdoc: '博士后'
+            },
+            studentTypes: {
+                phd: '博士',
+                master: '硕士',
+                undergraduate: '本科'
+            },
+            placeholders: {
+                studentGrade: '请输入年级 (1-6)',
+                jobType: '请选择职位类型',
+                studentType: '请选择学位类型',
+                status: '请选择状态'
+            },
+            // QuickActionModal 相关
+            form: {
+                nameZh: '中文姓名',
+                nameEn: '英文姓名',
+                email: '电子信箱',
+                type: '成员类型',
+                jobType: '职务类型',
+                studentType: '学生类型',
+                studentGrade: '年级',
+                destinationZh: '去向（中文）',
+                destinationEn: '去向（英文）',
+                group: {
+                    label: '课题组',
+                    none: '无'
+                },
+                description: '成员描述（中文）',
+                descriptionEn: '成员描述（英文）',
+                avatar: '头像上传',
+                placeholders: {
+                    nameZh: '请输入中文姓名',
+                    nameEn: '请输入英文姓名',
+                    email: '请输入电子信箱',
+                    type: '请选择成员类型',
+                    jobType: '请选择职务类型',
+                    studentType: '请选择学生类型',
+                    studentGrade: '请输入年级（1-10）',
+                    destinationZh: '请输入去向（中文）',
+                    destinationEn: '请输入去向（英文）',
+                    group: '请选择课题组',
+                    description: '请输入成员中文描述（支持 Markdown 语法）',
+                    descriptionEn: '请输入成员英文描述（支持 Markdown 语法）'
+                },
+                validation: {
+                    nameZhRequired: '请输入中文姓名',
+                    nameEnRequired: '请输入英文姓名',
+                    emailRequired: '请输入电子信箱',
+                    typeRequired: '请选择成员类型',
+                    groupRequired: '请选择课题组',
+                    jobTypeRequired: '请选择职务类型',
+                    studentTypeRequired: '请选择学生类型',
+                    studentGradeRequired: '请输入有效年级（1-10）'
+                }
+            }
+        },
+        papers: {
+            addPaper: '添加论文',
+            editPaper: '编辑论文',
+            searchPlaceholder: '搜索论文标题...',
+            filterByType: '按类型筛选',
+            filterByStatus: '按状态筛选',
+            fetchError: '获取论文列表失败',
+            deleteConfirmText: '确定要删除这篇论文吗？此操作不可撤销。',
+            deleteSuccess: '论文删除成功',
+            deleteError: '删除论文失败',
+            form: {
+                titleZh: '中文标题',
+                titleEn: '英文标题',
+                description: '论文描述（中文）',
+                descriptionEn: '论文描述（英文）',
+                venue: '期刊/会议',
+                type: '论文类型',
+                date: '发表日期',
+                status: '接收状态',
+                url: '论文连结',
+                file: '论文文件',
+                authors: '作者',
+                placeholders: {
+                    titleZh: '请输入论文中文标题',
+                    titleEn: '请输入论文英文标题',
+                    description: '请输入论文中文描述（支持 Markdown 语法）',
+                    descriptionEn: '请输入论文英文描述（支持 Markdown 语法）',
+                    venue: '请输入发表期刊或会议',
+                    type: '请选择论文类型',
+                    date: '请选择发表日期',
+                    status: '请选择接收状态',
+                    url: '请输入论文连结URL',
+                    authors: '请选择论文作者'
+                },
+                validation: {
+                    titleZhRequired: '请输入中文标题',
+                    typeRequired: '请选择论文类型',
+                    statusRequired: '请选择接收状态',
+                    dateRequired: '请选择发表日期'
+                }
+            }
+        },
+        projects: {
+            addProject: '添加项目',
+            editProject: '编辑项目',
+            searchPlaceholder: '搜索项目名称...',
+            filterByStatus: '按状态筛选',
+            fetchError: '获取项目列表失败',
+            deleteConfirmText: '确定要删除这个项目吗？此操作不可撤销。',
+            deleteSuccess: '项目删除成功',
+            deleteError: '删除项目失败',
+            form: {
+                nameZh: '中文名称',
+                nameEn: '英文名称',
+                description: '项目描述（中文）',
+                descriptionEn: '项目描述（英文）',
+                url: '项目URL',
+                startDate: '开始日期',
+                status: '项目状态',
+                placeholders: {
+                    nameZh: '请输入项目中文名称',
+                    nameEn: '请输入项目英文名称',
+                    description: '请输入项目描述（支持 Markdown 语法）',
+                    descriptionEn: '请输入项目英文描述（支持 Markdown 语法）',
+                    url: '请输入项目URL',
+                    startDate: '请选择开始日期',
+                    status: '请选择项目状态'
+                },
+                validation: {
+                    nameZhRequired: '请输入项目中文名称'
+                }
+            }
+        },
+        news: {
+            addNews: '添加新闻',
+            editNews: '编辑新闻',
+            searchPlaceholder: '搜索新闻内容...',
+            filterByType: '按类型筛选',
+            fetchError: '获取新闻列表失败',
+            deleteConfirmText: '确定要删除这条新闻吗？此操作不可撤销。',
+            deleteSuccess: '新闻删除成功',
+            deleteError: '删除新闻失败',
+            form: {
+                type: '新闻类型',
+                contentZh: '中文内容',
+                contentEn: '英文内容',
+                date: '新闻日期',
+                placeholders: {
+                    type: '请选择新闻类型',
+                    contentZh: '请输入新闻中文内容（支持 Markdown 语法）',
+                    contentEn: '请输入新闻英文内容（支持 Markdown 语法）',
+                    date: '请选择新闻日期'
+                },
+                validation: {
+                    typeRequired: '请选择新闻类型',
+                    contentZhRequired: '请输入新闻中文内容',
+                    dateRequired: '请选择新闻日期'
+                }
+            }
+        },
+        groups: {
+            title: '研究课题组',
+            leader: '课题组负责人',
+            description: '课题组简介',
+            members: '成员列表',
+            addGroup: '添加课题组',
+            editGroup: '编辑课题组',
+            searchPlaceholder: '搜索课题组名称...',
+            fetchError: '获取课题组列表失败',
+            deleteConfirmText: '确定要删除这个课题组吗？此操作不可撤销。',
+            deleteSuccess: '课题组删除成功',
+            deleteError: '删除课题组失败',
+            form: {
+                nameZh: '中文名称',
+                nameEn: '英文名称',
+                descriptionZh: '中文描述',
+                descriptionEn: '英文描述',
+                leader: '组长',
+                placeholders: {
+                    nameZh: '请输入课题组中文名称',
+                    nameEn: '请输入课题组英文名称',
+                    descriptionZh: '请输入课题组中文描述（支持 Markdown 语法）',
+                    descriptionEn: '请输入课题组英文描述（支持 Markdown 语法）',
+                    leader: '请选择组长'
+                },
+                validation: {
+                    nameZhRequired: '请输入课题组中文名称'
+                }
+            }
+        },
+        // MarkdownEditor 翻译
+        markdownEditor: {
+            preview: '预览',
+            edit: '编辑',
+            tip: '支持 Markdown 语法：**粗体**, *斜体*, ### 标题, - 列表, [链接](url)',
+            placeholder: '请输入内容...',
+            toolbar: {
+                bold: '粗体',
+                italic: '斜体',
+                heading: '标题',
+                list: '列表',
+                link: '链接'
+            }
+        },
+        // QuickActionModal 翻译
+        quickAction: {
+            modalTitle: {
+                createMember: '新增成员',
+                editMember: '编辑成员',
+                createPaper: '新增论文',
+                editPaper: '编辑论文',
+                createProject: '新增项目',
+                editProject: '编辑项目',
+                createNews: '新增新闻',
+                editNews: '编辑新闻',
+                createGroup: '新增课题组',
+                editGroup: '编辑课题组',
+                createAdmin: '新增管理员',
+                editAdmin: '编辑管理员'
+            },
+            messages: {
+                createSuccess: '创建成功',
+                updateSuccess: '更新成功',
+                operationFailed: '操作失败',
+                checkInput: '操作失败，请检查输入',
+                loadGroupsFailed: '载入课题组失败',
+                loadMembersFailed: '载入成员失败'
+            },
+            timeFormat: {
+                daysAgo: '天前',
+                hoursAgo: '小时前',
+                minutesAgo: '分钟前',
+                justNow: '刚刚'
+            },
+            activities: {
+                created: '新增了',
+                updated: '编辑了',
+                moduleNames: {
+                    members: '成员',
+                    papers: '论文',
+                    projects: '项目',
+                    news: '新闻',
+                    groups: '课题组'
+                }
+            }
+        },
+        // 实验室管理翻译
+        lab: {
+            basicInfo: '基本信息',
+            contactInfo: '联系信息',
+            imageManagement: '图片管理',
+            nameZh: '实验室中文名称',
+            nameEn: '实验室英文名称',
+            descZh: '中文描述',
+            descEn: '英文描述',
+            addressZh: '中文地址',
+            addressEn: '英文地址',
+            email: '联系邮箱',
+            phone: '联系电话',
+            logo: '实验室Logo',
+            carouselImages: '轮播图片',
+            carouselImage: '轮播图片 {number}',
+            placeholders: {
+                nameZh: '请输入实验室中文名称',
+                nameEn: '请输入实验室英文名称',
+                descZh: '请输入实验室中文描述',
+                descEn: '请输入实验室英文描述',
+                addressZh: '请输入实验室中文地址',
+                addressEn: '请输入实验室英文地址',
+                email: '请输入联系邮箱',
+                phone: '请输入联系电话'
+            },
+            validation: {
+                nameZhRequired: '实验室中文名称必填',
+                nameEnRequired: '实验室英文名称必填'
+            },
+            messages: {
+                fetchFailed: '获取实验室信息失败',
+                saveSuccess: '保存成功',
+                saveFailed: '保存失败'
+            },
+            logoPreview: 'Logo 预览',
+            carouselPreview: '轮播图 {number} 预览'
+        },
+        // 管理员管理翻译
+        admins: {
+            addAdmin: '添加管理员',
+            editAdmin: '编辑管理员',
+            searchPlaceholder: '搜索管理员用户名...',
+            adminName: '用户名',
+            adminType: '类型',
+            superAdmin: '超级管理员',
+            normalAdmin: '普通管理员',
+            createdAt: '创建时间',
+            fetchError: '获取管理员列表失败',
+            deleteConfirmText: '确定要删除这个管理员吗？此操作不可撤销。',
+            deleteSuccess: '管理员删除成功',
+            deleteError: '删除管理员失败',
+            noEditPermission: '无权限编辑此管理员',
+            noDeletePermission: '无权限删除此管理员',
+            noCreatePermission: '无权限创建管理员',
+            cannotEditSelf: '不能编辑自己的账号',
+            cannotEditSuperAdmin: '不能编辑超级管理员',
+            form: {
+                adminName: '用户名',
+                adminPass: '密码',
+                isSuper: '管理员类型',
+                enable: '状态',
+                placeholders: {
+                    adminName: '请输入用户名',
+                    adminPass: '请输入密码',
+                    isSuper: '请选择管理员类型',
+                    enable: '请选择状态'
+                },
+                validation: {
+                    adminNameRequired: '用户名必填',
+                    adminPassRequired: '密码必填'
+                }
+            }
+        },
+        // 操作日志翻译
+        operationLogs: {
+            title: '操作日志',
+            description: '查看所有管理员操作和系统活动记录',
+            searchPlaceholder: '搜索管理员姓名、操作类型或内容...',
+            selectAdmin: '选择管理员',
+            selectOperation: '选择操作类型',
+            selectModule: '选择模块',
+            allAdmins: '全部管理员',
+            allOperations: '全部操作',
+            allModules: '全部模块',
+            time: '操作时间',
+            admin: '操作管理员',
+            operation: '操作类型',
+            module: '操作模块',
+            content: '操作内容',
+            create: '创建',
+            update: '更新',
+            delete: '删除',
+            login: '登录',
+            logout: '登出',
+            changePassword: '修改密码',
+            batchDelete: '批量删除',
+            batchUpdate: '批量更新',
+            upload: '文件上传',
+            adminModule: '管理员/认证',
+            labModule: '实验室',
+            groupModule: '课题组',
+            memberModule: '成员',
+            paperModule: '论文',
+            newsModule: '新闻',
+            projectModule: '项目',
+            loadError: '载入操作日志失败',
+            emptyContent: '没有操作内容',
+            copyJson: '复制JSON',
+            copying: '复制中...',
+            copySuccess: 'JSON已复制到剪贴板',
+            copyFailed: '复制失败',
+            expand: '展开',
+            collapse: '收起'
+        },
+        // 个人资料管理翻译
+        profile: {
+            editProfile: '编辑个人资料',
+            currentPassword: '当前密码',
+            newPassword: '新密码',
+            confirmPassword: '确认新密码',
+            placeholders: {
+                currentPassword: '请输入当前密码',
+                newPassword: '请输入新密码（至少6位字符）',
+                confirmPassword: '请确认新密码'
+            },
+            validation: {
+                currentPasswordRequired: '请输入当前密码',
+                newPasswordRequired: '请输入新密码',
+                confirmPasswordRequired: '请确认新密码',
+                passwordMinLength: '密码至少需要6位字符',
+                passwordNotMatch: '两次输入的密码不一致'
+            },
+            messages: {
+                profileUpdateSuccess: '个人资料更新成功',
+                passwordChangeSuccess: '密码修改成功',
+                passwordChangeFailed: '密码修改失败',
+                updateFailed: '更新失败',
+                noChanges: '没有需要保存的更改'
+            }
+        },
+        // 系统管理翻译
+        system: {
+            backup: '数据备份',
+            backupDesc: '备份和还原系统数据',
+            settings: '系统设置',
+            settingsDesc: '配置系统参数和选项'
+        },
+        // 图片裁切翻译
+        imageCropper: {
+            selectImage: '选择图片',
+            supportedFormats: '支持 JPG、PNG、WebP 格式',
+            cropAvatar: '裁切头像',
+            cropLogo: '裁切Logo',
+            cropCarousel: '裁切轮播图',
+            avatarHint: '头像将被裁切为正方形',
+            logoHint: 'Logo 可保持原始比例',
+            carouselHint: '请选择适合的宽高比例',
+            aspectRatio: '选择比例',
+            reselect: '重新选择',
+            cropAndSave: '裁切并保存',
+            cropSuccess: '图片裁切成功',
+            cropFailed: '图片裁切失败',
+            invalidFormat: '请选择有效的图片格式',
+            noImageSelected: '未选择图片进行裁切',
+            noCropAreaSelected: '未选择裁切区域'
         }
-      }
-    },
-    // 操作日誌翻譯
-    operationLogs: {
-      title: '操作日誌',
-      description: '查看所有管理員操作和系統活動記錄',
-      searchPlaceholder: '搜索管理員姓名、操作類型或內容...',
-      selectAdmin: '選擇管理員',
-      selectOperation: '選擇操作類型',
-      selectModule: '選擇模塊',
-      allAdmins: '全部管理員',
-      allOperations: '全部操作',
-      allModules: '全部模塊',
-      time: '操作時間',
-      admin: '操作管理員',
-      operation: '操作類型',
-      module: '操作模塊',
-      content: '操作內容',
-      create: '創建',
-      update: '更新',
-      delete: '刪除',
-      login: '登錄',
-      logout: '登出',
-      changePassword: '修改密碼',
-      batchDelete: '批量刪除',
-      batchUpdate: '批量更新',
-      upload: '文件上傳',
-      adminModule: '管理員/認證',
-      labModule: '實驗室',
-      groupModule: '課題組',
-      memberModule: '成員',
-      paperModule: '論文',
-      newsModule: '新聞',
-      projectModule: '項目',
-      loadError: '載入操作日誌失敗',
-      emptyContent: '沒有操作內容',
-      copyJson: '複製JSON',
-      copying: '複製中...',
-      copySuccess: 'JSON已複製到剪貼板',
-      copyFailed: '複製失敗',
-      expand: '展開',
-      collapse: '收起'
-    },
-    // 個人資料管理翻譯
-    profile: {
-      editProfile: '編輯個人資料',
-      currentPassword: '當前密碼',
-      newPassword: '新密碼',
-      confirmPassword: '確認新密碼',
-      placeholders: {
-        currentPassword: '請輸入當前密碼',
-        newPassword: '請輸入新密碼（至少6位字符）',
-        confirmPassword: '請確認新密碼'
-      },
-      validation: {
-        currentPasswordRequired: '請輸入當前密碼',
-        newPasswordRequired: '請輸入新密碼',
-        confirmPasswordRequired: '請確認新密碼',
-        passwordMinLength: '密碼至少需要6位字符',
-        passwordNotMatch: '兩次輸入的密碼不一致'
-      },
-      messages: {
-        profileUpdateSuccess: '個人資料更新成功',
-        passwordChangeSuccess: '密碼修改成功',
-        passwordChangeFailed: '密碼修改失敗',
-        updateFailed: '更新失敗',
-        noChanges: '沒有需要保存的更改'
-      }
-    },
-    // 系統管理翻譯
-    system: {
-      backup: '數據備份',
-      backupDesc: '備份和還原系統數據',
-      settings: '系統設置',
-      settingsDesc: '配置系統參數和選項'
-    },
-    // 圖片裁切翻譯
-    imageCropper: {
-      selectImage: '選擇圖片',
-      supportedFormats: '支持 JPG、PNG、WebP 格式',
-      cropAvatar: '裁切頭像',
-      cropLogo: '裁切Logo',
-      cropCarousel: '裁切輪播圖',
-      avatarHint: '頭像將被裁切為正方形',
-      logoHint: 'Logo 可保持原始比例',
-      carouselHint: '請選擇適合的寬高比例',
-      aspectRatio: '選擇比例',
-      reselect: '重新選擇',
-      cropAndSave: '裁切並保存',
-      cropSuccess: '圖片裁切成功',
-      cropFailed: '圖片裁切失敗',
-      invalidFormat: '請選擇有效的圖片格式',
-      noImageSelected: '未選擇圖片進行裁切',
-      noCropAreaSelected: '未選擇裁切區域'
     }
-  }
 }
