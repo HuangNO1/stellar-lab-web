@@ -43,9 +43,11 @@ export const useAuthStore = defineStore('auth', () => {
       } else {
         return { success: false, message: response.message };
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('登錄失敗:', error);
-      return { success: false, message: '登錄失敗，請檢查網絡連接' };
+      // 優先使用服務器返回的錯誤信息
+      const errorMessage = error?.message || '登錄失敗，請檢查網絡連接';
+      return { success: false, message: errorMessage };
     } finally {
       loading.value = false;
     }
