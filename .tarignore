@@ -1,0 +1,17 @@
+node_modules
+.git
+.vscode
+.idea
+*.log
+.DS_Store
+Thumbs.db
+coverage
+.nyc_output
+dist
+build
+.cache
+.temp
+*.tmp
+*.swp
+*.swo
+*~

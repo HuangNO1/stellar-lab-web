@@ -9,3 +9,5 @@ coverage
 .nyc_output
 .vscode
 .idea
+*.tar.*
+*.zip
