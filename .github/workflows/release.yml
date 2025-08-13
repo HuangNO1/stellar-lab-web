@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_PREFIX: ${{ github.repository }}
+  IMAGE_PREFIX: HuangNO1/stellar-lab-web
 
 jobs:
   build-and-push:
@@ -106,12 +106,12 @@ jobs:
           
           #### Frontend (Vue 3 + TypeScript)
           ```bash
-          docker pull ghcr.io/${{ github.repository }}/frontend:${{ steps.version.outputs.version }}
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:${{ steps.version.outputs.version }}
           ```
           
           #### Backend (Flask + Python)  
           ```bash
-          docker pull ghcr.io/${{ github.repository }}/backend:${{ steps.version.outputs.version }}
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/backend:${{ steps.version.outputs.version }}
           ```
           
           ### 🔧 Quick Deployment
@@ -131,13 +131,13 @@ jobs:
           # Frontend
           docker run -d -p 3000:80 \
             --name lab-frontend \
-            ghcr.io/${{ github.repository }}/frontend:${{ steps.version.outputs.version }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:${{ steps.version.outputs.version }}
           
           # Backend (requires database)
           docker run -d -p 8000:8000 \
             --name lab-backend \
             -e DATABASE_URL="your-database-url" \
-            ghcr.io/${{ github.repository }}/backend:${{ steps.version.outputs.version }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/backend:${{ steps.version.outputs.version }}
           ```
           
           ### 🌐 Supported Architectures
@@ -188,6 +188,10 @@ jobs:
       contents: read
       packages: read
       security-events: write
+    
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_PREFIX: HuangNO1/stellar-lab-web
       
     strategy:
       matrix:
@@ -197,7 +201,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.ref_name }}
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}:${{ github.ref_name }}
           format: sarif
           output: trivy-results-${{ matrix.service }}.sarif
           
