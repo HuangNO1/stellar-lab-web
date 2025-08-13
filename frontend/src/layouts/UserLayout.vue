@@ -144,7 +144,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, h, computed, provide, watch } from 'vue'
+import { ref, onMounted, h, computed, provide, watch, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { NIcon, darkTheme } from 'naive-ui'
@@ -315,6 +315,7 @@ watch(() => route.path, (newPath) => {
 })
 
 // Initialize
+
 onMounted(() => {
   // Set initial background based on theme
   const bgColor = isDarkMode.value ? 'rgb(16, 16, 20)' : '#fff'
@@ -323,6 +324,11 @@ onMounted(() => {
   
   // Set active menu based on current route
   updateActiveKey(route.path)
+})
+
+// 組件卸載時清理
+onUnmounted(() => {
+  // cleanup if needed
 })
 </script>
 
@@ -601,15 +607,14 @@ html:has(#user-app.dark-mode) {
 .main-layout {
   margin-top: 4.5rem;
   min-height: calc(100vh - 4.5rem);
-  display: flex;
-  justify-content: center;
+  width: 100%;
 }
 
 .main-content {
   padding: 1.5rem;
   min-height: calc(100vh - 4.5rem);
-  min-width: 70rem;
-  max-width: 80rem;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
   background: transparent;
 }
@@ -623,7 +628,13 @@ html:has(#user-app.dark-mode) {
 }
 
 /* Responsive Design */
-/* Responsive Design */
+@media (max-width: 1200px) {
+  .main-content:not(.home-content) {
+    max-width: 100%;
+    padding: 1.25rem;
+  }
+}
+
 @media (max-width: 1024px) {
   .nav-container {
     width: 85vw;
@@ -677,7 +688,7 @@ html:has(#user-app.dark-mode) {
     margin-top: 4rem;
   }
   
-  .main-content {
+  .main-content:not(.home-content) {
     padding: 1rem;
     min-height: calc(100vh - 4rem);
   }
@@ -699,7 +710,7 @@ html:has(#user-app.dark-mode) {
     margin-top: 3.5rem;
   }
   
-  .main-content {
+  .main-content:not(.home-content) {
     padding: 0.75rem;
     min-height: calc(100vh - 3.5rem);
   }
@@ -725,7 +736,7 @@ html:has(#user-app.dark-mode) {
     margin-top: 3rem;
   }
   
-  .main-content {
+  .main-content:not(.home-content) {
     padding: 0.5rem;
     min-height: calc(100vh - 3rem);
   }
