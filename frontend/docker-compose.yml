@@ -11,14 +11,11 @@ services:
       - "3000:80"
     environment:
       - NODE_ENV=production
-    volumes:
-      # Mount custom nginx config (optional override)
-      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
       - lab-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -27,7 +24,7 @@ services:
 networks:
   lab-network:
     external: true
-    name: lab_web_default
+    name: backend_lab_web_network
 
 # To connect to backend, ensure backend is running and accessible
 # Example usage:
