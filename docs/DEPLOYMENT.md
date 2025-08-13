@@ -4,6 +4,8 @@ Complete deployment guide for the Lab Website Framework with Docker containeriza
 
 > 📘 **Cloud Server Users Note**: If you're deploying on ECS, AWS EC2, or other cloud servers from scratch, we recommend checking the **[ECS Cloud Server Deployment Guide](./ECS_DEPLOYMENT.md)** which provides more detailed cloud environment deployment steps and optimization configurations.
 
+> 🚀 **Fast Deployment Recommendation**: If you want to significantly reduce server deployment time (from 10-15 minutes to 2-3 minutes), consider using the **[Local Build + Image Deployment Solution](./IMAGE_DEPLOYMENT.md)**, especially suitable for production environments and multi-server deployments.
+
 ## 📋 Table of Contents
 
 - [Prerequisites](#prerequisites)
