@@ -44,18 +44,20 @@
 
     <!-- 數據表格 -->
     <n-card>
-      <n-config-provider :locale="naiveLocale" :date-locale="dateLocale">
-        <n-data-table
-          :columns="columns"
-          :data="groupList"
-          :pagination="pagination"
-          :loading="loading"
-          :remote="true"
-          :row-key="(row: ResearchGroup) => row.research_group_id"
-          @update:page="handlePageChange"
-          @update:page-size="handlePageSizeChange"
-        />
-      </n-config-provider>
+      <div class="table-container">
+        <n-config-provider :locale="naiveLocale" :date-locale="dateLocale">
+          <n-data-table
+            :columns="columns"
+            :data="groupList"
+            :pagination="pagination"
+            :loading="loading"
+            :remote="true"
+            :row-key="(row: ResearchGroup) => row.research_group_id"
+            @update:page="handlePageChange"
+            @update:page-size="handlePageSizeChange"
+          />
+        </n-config-provider>
+      </div>
     </n-card>
 
     <!-- 新增/編輯 Modal -->
@@ -246,9 +248,10 @@ const fetchGroups = async () => {
     } else {
       message.error(response.message || t('admin.groups.fetchError'));
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('獲取課題組列表失敗:', error);
-    message.error(t('admin.groups.fetchError'));
+    const errorMessage = error?.message || t('admin.groups.fetchError');
+    message.error(errorMessage);
   } finally {
     loading.value = false;
   }
@@ -311,9 +314,10 @@ const confirmDelete = async () => {
     } else {
       message.error(response.message || t('admin.groups.deleteError'));
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('刪除課題組失敗:', error);
-    message.error(t('admin.groups.deleteError'));
+    const errorMessage = error?.message || t('admin.groups.deleteError');
+    message.error(errorMessage);
   } finally {
     deleteLoading.value = false;
   }
@@ -396,5 +400,25 @@ onMounted(() => {
 [data-theme="dark"] .group-leader,
 .dark .group-leader {
   color: #aaa;
+}
+
+.table-container {
+  overflow-x: auto;
+  min-width: 0;
+  width: 100%;
+}
+
+/* 手機端響應式優化 */
+@media (max-width: 768px) {
+  .table-container {
+    margin: -16px -20px;
+    padding: 16px 20px;
+    border-radius: 0;
+  }
+  
+  /* 設置表格最小寬度以觸發滾動 */
+  :deep(.n-data-table-wrapper) {
+    min-width: 1000px;
+  }
 }
 </style>

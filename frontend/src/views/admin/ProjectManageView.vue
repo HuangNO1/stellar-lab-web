@@ -53,18 +53,20 @@
 
     <!-- 數據表格 -->
     <n-card>
-      <n-config-provider :locale="naiveLocale" :date-locale="dateLocale">
-        <n-data-table
-          :columns="columns"
-          :data="projectList"
-          :pagination="pagination"
-          :loading="loading"
-          :remote="true"
-          :row-key="(row: Project) => row.project_id"
-          @update:page="handlePageChange"
-          @update:page-size="handlePageSizeChange"
-        />
-      </n-config-provider>
+      <div class="table-container">
+        <n-config-provider :locale="naiveLocale" :date-locale="dateLocale">
+          <n-data-table
+            :columns="columns"
+            :data="projectList"
+            :pagination="pagination"
+            :loading="loading"
+            :remote="true"
+            :row-key="(row: Project) => row.project_id"
+            @update:page="handlePageChange"
+            @update:page-size="handlePageSizeChange"
+          />
+        </n-config-provider>
+      </div>
     </n-card>
 
     <!-- 新增/編輯 Modal -->
@@ -291,9 +293,10 @@ const fetchProjects = async () => {
     } else {
       message.error(response.message || t('admin.projects.fetchError'));
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('獲取項目列表失敗:', error);
-    message.error(t('admin.projects.fetchError'));
+    const errorMessage = error?.message || t('admin.projects.fetchError');
+    message.error(errorMessage);
   } finally {
     loading.value = false;
   }
@@ -356,9 +359,10 @@ const confirmDelete = async () => {
     } else {
       message.error(response.message || t('admin.projects.deleteError'));
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('刪除項目失敗:', error);
-    message.error(t('admin.projects.deleteError'));
+    const errorMessage = error?.message || t('admin.projects.deleteError');
+    message.error(errorMessage);
   } finally {
     deleteLoading.value = false;
   }
@@ -459,5 +463,25 @@ onMounted(() => {
 [data-theme="dark"] .project-url a,
 .dark .project-url a {
   color: #52c41a;
+}
+
+.table-container {
+  overflow-x: auto;
+  min-width: 0;
+  width: 100%;
+}
+
+/* 手機端響應式優化 */
+@media (max-width: 768px) {
+  .table-container {
+    margin: -16px -20px;
+    padding: 16px 20px;
+    border-radius: 0;
+  }
+  
+  /* 設置表格最小寬度以觸發滾動 */
+  :deep(.n-data-table-wrapper) {
+    min-width: 1200px;
+  }
 }
 </style>

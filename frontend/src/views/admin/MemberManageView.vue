@@ -90,19 +90,21 @@
 
     <!-- 數據表格 -->
     <n-card>
-      <n-config-provider :locale="naiveLocale" :date-locale="dateLocale">
-        <n-data-table
-          v-model:checked-row-keys="selectedRowKeys"
-          :columns="columns"
-          :data="memberList"
-          :pagination="pagination"
-          :loading="loading"
-          :remote="true"
-          :row-key="(row: Member) => row.mem_id"
-          @update:page="handlePageChange"
-          @update:page-size="handlePageSizeChange"
-        />
-      </n-config-provider>
+      <div class="table-container">
+        <n-config-provider :locale="naiveLocale" :date-locale="dateLocale">
+          <n-data-table
+            v-model:checked-row-keys="selectedRowKeys"
+            :columns="columns"
+            :data="memberList"
+            :pagination="pagination"
+            :loading="loading"
+            :remote="true"
+            :row-key="(row: Member) => row.mem_id"
+            @update:page="handlePageChange"
+            @update:page-size="handlePageSizeChange"
+          />
+        </n-config-provider>
+      </div>
     </n-card>
 
     <!-- 新增/編輯 Modal -->
@@ -473,9 +475,10 @@ const fetchMembers = async () => {
     } else {
       message.error(response.message || t('admin.members.fetchError'));
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('獲取成員列表失敗:', error);
-    message.error(t('admin.members.fetchError'));
+    const errorMessage = error?.message || t('admin.members.fetchError');
+    message.error(errorMessage);
   } finally {
     loading.value = false;
   }
@@ -570,9 +573,10 @@ const confirmDelete = async () => {
     
     showDeleteModal.value = false;
     fetchMembers();
-  } catch (error) {
+  } catch (error: any) {
     console.error('刪除成員失敗:', error);
-    message.error(t('admin.members.deleteError'));
+    const errorMessage = error?.message || t('admin.members.deleteError');
+    message.error(errorMessage);
   } finally {
     deleteLoading.value = false;
   }
@@ -608,9 +612,10 @@ const handleBatchUpdate = async () => {
     } else {
       message.error(response.message || t('admin.members.updateError'));
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('批量更新失敗:', error);
-    message.error(t('admin.members.updateError'));
+    const errorMessage = error?.message || t('admin.members.updateError');
+    message.error(errorMessage);
   } finally {
     batchLoading.value = false;
   }
@@ -686,5 +691,25 @@ onMounted(() => {
 [data-theme="dark"] .member-email,
 .dark .member-email {
   color: #ccc;
+}
+
+.table-container {
+  overflow-x: auto;
+  min-width: 0;
+  width: 100%;
+}
+
+/* 手機端響應式優化 */
+@media (max-width: 768px) {
+  .table-container {
+    margin: -16px -20px;
+    padding: 16px 20px;
+    border-radius: 0;
+  }
+  
+  /* 設置表格最小寬度以觸發滾動 */
+  :deep(.n-data-table-wrapper) {
+    min-width: 1200px;
+  }
 }
 </style>

@@ -62,18 +62,20 @@
 
     <!-- 數據表格 -->
     <n-card>
-      <n-config-provider :locale="naiveLocale" :date-locale="dateLocale">
-        <n-data-table
-          :columns="columns"
-          :data="paperList"
-          :pagination="pagination"
-          :loading="loading"
-          :remote="true"
-          :row-key="(row: Paper) => row.paper_id"
-          @update:page="handlePageChange"
-          @update:page-size="handlePageSizeChange"
-        />
-      </n-config-provider>
+      <div class="table-container">
+        <n-config-provider :locale="naiveLocale" :date-locale="dateLocale">
+          <n-data-table
+            :columns="columns"
+            :data="paperList"
+            :pagination="pagination"
+            :loading="loading"
+            :remote="true"
+            :row-key="(row: Paper) => row.paper_id"
+            @update:page="handlePageChange"
+            @update:page-size="handlePageSizeChange"
+          />
+        </n-config-provider>
+      </div>
     </n-card>
 
     <!-- 新增/編輯 Modal -->
@@ -321,9 +323,10 @@ const fetchPapers = async () => {
     } else {
       message.error(response.message || t('admin.papers.fetchError'));
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('獲取論文列表失敗:', error);
-    message.error(t('admin.papers.fetchError'));
+    const errorMessage = error?.message || t('admin.papers.fetchError');
+    message.error(errorMessage);
   } finally {
     loading.value = false;
   }
@@ -386,9 +389,10 @@ const confirmDelete = async () => {
     } else {
       message.error(response.message || t('admin.papers.deleteError'));
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('刪除論文失敗:', error);
-    message.error(t('admin.papers.deleteError'));
+    const errorMessage = error?.message || t('admin.papers.deleteError');
+    message.error(errorMessage);
   } finally {
     deleteLoading.value = false;
   }
@@ -475,5 +479,25 @@ onMounted(() => {
 [data-theme="dark"] .paper-date,
 .dark .paper-date {
   color: #aaa;
+}
+
+.table-container {
+  overflow-x: auto;
+  min-width: 0;
+  width: 100%;
+}
+
+/* 手機端響應式優化 */
+@media (max-width: 768px) {
+  .table-container {
+    margin: -16px -20px;
+    padding: 16px 20px;
+    border-radius: 0;
+  }
+  
+  /* 設置表格最小寬度以觸發滾動 */
+  :deep(.n-data-table-wrapper) {
+    min-width: 1400px;
+  }
 }
 </style>
