@@ -77,24 +77,37 @@
       </div>
 
       <!-- 作者信息 -->
-      <div v-if="paper.authors && paper.authors.length > 0" class="paper-authors">
+      <div v-if="(paper.authors && paper.authors.length > 0) || paper.all_authors_zh || paper.all_authors_en" class="paper-authors">
         <h3>{{ $t('papers.authors') }}</h3>
-        <div class="authors-list">
-          <span 
-            v-for="(author, index) in paper.authors" 
-            :key="author.mem_id"
-            class="author-item"
-            :class="{ 'corresponding': author.is_corresponding }"
-            @click="toMember(author.mem_id)"
-          >
-            {{ getCurrentLocale() === 'zh' ? author.member?.mem_name_zh : author.member?.mem_name_en }}
-            <sup v-if="author.is_corresponding">*</sup>
-            <span v-if="index < paper.authors.length - 1">, </span>
-          </span>
+        
+        <!-- 實驗室作者 -->
+        <div v-if="paper.authors && paper.authors.length > 0" class="authors-section">
+          <h4 class="authors-subtitle">{{ $t('admin.papers.form.labAuthors') }}</h4>
+          <div class="authors-list">
+            <span 
+              v-for="(author, index) in paper.authors" 
+              :key="author.mem_id"
+              class="author-item"
+              :class="{ 'corresponding': author.is_corresponding }"
+              @click="toMember(author.mem_id)"
+            >
+              {{ getCurrentLocale() === 'zh' ? author.member?.mem_name_zh : author.member?.mem_name_en }}
+              <sup v-if="author.is_corresponding">*</sup>
+              <span v-if="index < paper.authors.length - 1">, </span>
+            </span>
+          </div>
+          <p class="corresponding-note" v-if="hasCorrespondingAuthor()">
+            <sup>*</sup> {{ $t('papers.correspondingAuthor') }}
+          </p>
         </div>
-        <p class="corresponding-note" v-if="hasCorrespondingAuthor()">
-          <sup>*</sup> {{ $t('papers.correspondingAuthor') }}
-        </p>
+
+        <!-- 全部作者 -->
+        <div v-if="paper.all_authors_zh || paper.all_authors_en" class="authors-section">
+          <h4 class="authors-subtitle">{{ $t('admin.papers.form.allAuthors') }}</h4>
+          <div class="authors-text">
+            {{ getCurrentLocale() === 'zh' ? (paper.all_authors_zh || paper.all_authors_en) : (paper.all_authors_en || paper.all_authors_zh) }}
+          </div>
+        </div>
       </div>
 
       <!-- 論文描述 -->
@@ -151,7 +164,8 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { paperApi } from '@/services/api';
-import { getMediaUrl } from '@/utils/media';
+import { getMediaUrl, processMarkdownImageUrls } from '@/utils/media';
+import { createMarkdownPlugins } from '@/utils/markdown';
 import type { Paper, ApiError } from '@/types/api';
 import MarkdownIt from 'vue3-markdown-it';
 
@@ -172,39 +186,11 @@ const getCurrentLocale = () => {
 const getPaperDescription = () => {
   if (!paper.value) return '';
   const desc = getCurrentLocale() === 'zh' ? paper.value.paper_desc_zh : paper.value.paper_desc_en;
-  return desc || '';
+  return desc ? processMarkdownImageUrls(desc) : '';
 };
 
 // Markdown插件配置
-const markdownPlugins = [
-  {
-    plugin: (md: Record<string, unknown>) => {
-      // 修改链接渲染规则
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const defaultRender = (md as any).renderer.rules.link_open || function(tokens: Record<string, unknown>[], idx: number, options: Record<string, unknown>, env: Record<string, unknown>, renderer: Record<string, unknown>) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (renderer as any).renderToken(tokens, idx, options);
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (md as any).renderer.rules.link_open = function (tokens: Record<string, unknown>[], idx: number, options: Record<string, unknown>, env: Record<string, unknown>, renderer: Record<string, unknown>) {
-        const token = tokens[idx];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const href = (token as any).attrGet('href');
-        
-        // 检查是否为外部链接
-        if (href && (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//') || href.includes('://'))) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (token as any).attrSet('target', '_blank');
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (token as any).attrSet('rel', 'noopener noreferrer');
-        }
-        
-        return defaultRender(tokens, idx, options, env, renderer);
-      };
-    }
-  }
-];
+const markdownPlugins = createMarkdownPlugins();
 
 // 方法
 const fetchPaperDetail = async () => {
@@ -369,7 +355,25 @@ onMounted(() => {
   color: #333;
 }
 
-.authors-list {
+.authors-section {
+  margin-bottom: 1.5rem;
+}
+
+.authors-section:last-child {
+  margin-bottom: 0;
+}
+
+.authors-subtitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+  color: #1890ff;
+  border-bottom: 2px solid #e0f2ff;
+  padding-bottom: 0.25rem;
+}
+
+.authors-list,
+.authors-text {
   font-size: 1.1rem;
   line-height: 1.6;
 }
@@ -456,6 +460,12 @@ onMounted(() => {
 .dark .paper-authors h3,
 .dark .paper-description h3 {
   color: #fff;
+}
+
+[data-theme="dark"] .authors-subtitle,
+.dark .authors-subtitle {
+  color: #70a1ff;
+  border-bottom-color: rgba(112, 161, 255, 0.3);
 }
 
 [data-theme="dark"] .author-item,

@@ -245,6 +245,57 @@ const columns: DataTableColumns<Paper> = [
     }
   },
   {
+    title: t('admin.papers.form.authors'),
+    key: 'authors',
+    width: 200,
+    ellipsis: {
+      tooltip: true
+    },
+    render(row) {
+      if (row.authors && row.authors.length > 0) {
+        const authorNames = row.authors
+          .sort((a, b) => (a.author_order || 0) - (b.author_order || 0))
+          .slice(0, 2)
+          .map(author => {
+            const name = locale.value === 'zh' ? author.member?.mem_name_zh : author.member?.mem_name_en;
+            return name || '';
+          })
+          .filter(name => name);
+        
+        let text = authorNames.join(', ');
+        if (row.authors.length > 2) {
+          text += `, ${t('papers.andOthers')}`;
+        }
+        
+        return h('div', [
+          h('div', { style: { fontSize: '0.875rem', color: '#1890ff', marginBottom: '2px' } }, 
+            `${t('admin.papers.form.labAuthors')}: ${text || '-'}`
+          ),
+          h('div', { style: { fontSize: '0.8rem', color: '#666' } }, 
+            `${t('admin.papers.form.allAuthors')}: ${
+              locale.value === 'zh' ? 
+                (row.all_authors_zh || row.all_authors_en || '-') : 
+                (row.all_authors_en || row.all_authors_zh || '-')
+            }`.slice(0, 50) + (
+              (locale.value === 'zh' ? 
+                (row.all_authors_zh || row.all_authors_en || '') : 
+                (row.all_authors_en || row.all_authors_zh || '')
+              ).length > 50 ? '...' : ''
+            )
+          )
+        ]);
+      } else if (row.all_authors_zh || row.all_authors_en) {
+        const allAuthors = locale.value === 'zh' ? 
+          (row.all_authors_zh || row.all_authors_en) : 
+          (row.all_authors_en || row.all_authors_zh);
+        return h('div', { style: { fontSize: '0.875rem', color: '#666' } }, 
+          `${t('admin.papers.form.allAuthors')}: ${allAuthors.slice(0, 80)}${allAuthors.length > 80 ? '...' : ''}`
+        );
+      }
+      return '-';
+    }
+  },
+  {
     title: t('admin.papers.form.date'),
     key: 'paper_date',
     width: 120,

@@ -65,8 +65,15 @@
             </div>
             <div class="paper-info">
               <span class="paper-date">{{ formatDate(paper.paper_date) }}</span>
-              <span v-if="paper.authors && paper.authors.length > 0" class="paper-authors">
+              <!-- 實驗室作者 -->
+              <span v-if="paper.authors && paper.authors.length > 0" class="paper-authors lab-authors">
+                <span class="author-label">{{ $t('admin.papers.form.labAuthors') }}:</span>
                 {{ getAuthorsText(paper.authors) }}
+              </span>
+              <!-- 全部作者 -->
+              <span v-if="paper.all_authors_zh || paper.all_authors_en" class="paper-authors all-authors">
+                <span class="author-label">{{ $t('admin.papers.form.allAuthors') }}:</span>
+                {{ getCurrentLocale() === 'zh' ? (paper.all_authors_zh || paper.all_authors_en) : (paper.all_authors_en || paper.all_authors_zh) }}
               </span>
             </div>
           </div>
@@ -511,6 +518,20 @@ onMounted(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin-bottom: 0.25rem;
+}
+
+.author-label {
+  font-weight: 600;
+  color: #1890ff;
+}
+
+.lab-authors .author-label {
+  color: #1890ff;
+}
+
+.all-authors .author-label {
+  color: #666;
 }
 
 .paper-actions {
@@ -589,6 +610,18 @@ onMounted(() => {
 .dark .paper-authors,
 .dark-mode .paper-authors {
   color: #aaa;
+}
+
+[data-theme="dark"] .author-label,
+.dark .author-label,
+.dark-mode .author-label {
+  color: #70a1ff;
+}
+
+[data-theme="dark"] .all-authors .author-label,
+.dark .all-authors .author-label,
+.dark-mode .all-authors .author-label {
+  color: #bbb;
 }
 
 [data-theme="dark"] .pagination-wrapper,
