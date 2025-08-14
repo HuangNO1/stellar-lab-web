@@ -110,6 +110,17 @@ else
     exit 1
 fi
 
+# 執行數據庫遷移
+echo "🔄 執行數據庫遷移..."
+cd /app && flask db upgrade
+
+if [ $? -eq 0 ]; then
+    echo "✅ 數據庫遷移完成"
+else
+    echo "❌ 數據庫遷移失敗"
+    exit 1
+fi
+
 # 啟動應用
 echo "🎯 啟動 Flask 應用..."
 echo "   - 工作進程: 4"
