@@ -44,16 +44,22 @@
 | key name       | 主鍵 | 含義                         | 類型   | 範圍      | 非空        | 備註                |
 | -------------- | ---- | ---------------------------- | ------ | --------- | ----------- | ------------------- |
 | lab_id         | 是   | 實驗室id                     | int    | /         | 是          | 遞增                |
-| lab_logo_path  |      | 實驗室logo在伺服器的儲存路徑 | string | /         |             | 圖片限制5M          |
+| lab_logo_path  |      | 實驗室logo在伺服器的儲存路徑 | string | (0, 500)  |             | 圖片限制5M          |
+| carousel_img_1 |      | 輪播圖1路徑                  | string | (0, 500)  |             | 首頁輪播圖片        |
+| carousel_img_2 |      | 輪播圖2路徑                  | string | (0, 500)  |             | 首頁輪播圖片        |
+| carousel_img_3 |      | 輪播圖3路徑                  | string | (0, 500)  |             | 首頁輪播圖片        |
+| carousel_img_4 |      | 輪播圖4路徑                  | string | (0, 500)  |             | 首頁輪播圖片        |
 | lab_zh         |      | 實驗室名稱中文               | string | (0, 500)  |             |                     |
 | lab_en         |      | 實驗室名稱英文               | string | (0, 500)  |             |                     |
-| lab_desc_zh    |      | 實驗室介紹中文               | string | (0, 1000) |             |                     |
-| lab_desc_en    |      | 實驗室介紹英文               | string | (0, 1000) |             |                     |
+| lab_desc_zh    |      | 實驗室介紹中文               | text   | /         |             | 支持Markdown格式    |
+| lab_desc_en    |      | 實驗室介紹英文               | text   | /         |             | 支持Markdown格式    |
 | lab_address_zh |      | 實驗室地址中文               | string | (0, 500)  |             |                     |
 | lab_address_en |      | 實驗室地址英文               | string | (0, 500)  |             |                     |
 | lab_email      |      | 實驗室Email                  | string | (0, 500)  |             |                     |
 | lab_phone      |      | 實驗室電話                   | string | (0, 500)  |             |                     |
 | enable         |      | 數據是否有效                 | int    | (0, 1)    | 是（默認1） | 0->無效;<br>1->有效 |
+| created_at     |      | 創建時間                     | datetime | /        | 是          | 自動生成            |
+| updated_at     |      | 更新時間                     | datetime | /        | 是          | 自動更新            |
 
 ### 3.3 課題組
 
@@ -63,21 +69,23 @@
 | lab_id                      | 外部主鍵 | 實驗室id       | int    | /         | 是          |                     |
 | research_group_name_zh      |          | 課題組中文     | string | (0, 500)  |             |                     |
 | research_group_name_en      |          | 課題組英文     | string | (0, 500)  |             |                     |
-| research_group_name_desc_zh |          | 課題組中文介紹 | string | (0, 1000) |             |                     |
-| research_group_name_desc_en |          | 課題組英文介紹 | string | (0, 1000) |             |                     |
-| mem_id                      | 外部主鍵 | 課題組組長     | int    | (0, 500)  | 是          |                     |
+| research_group_desc_zh      |          | 課題組中文介紹 | string | (0, 1000) |             | 支持Markdown格式    |
+| research_group_desc_en      |          | 課題組英文介紹 | string | (0, 1000) |             | 支持Markdown格式    |
+| mem_id                      | 外部主鍵 | 課題組組長     | int    | /         |             | 可為空              |
 | enable                      |          | 數據是否有效   | int    | (0, 1)    | 是（默認1） | 0->無效;<br>1->有效 |
+| created_at                  |          | 創建時間       | datetime | /       | 是          | 自動生成            |
+| updated_at                  |          | 更新時間       | datetime | /       | 是          | 自動更新            |
 
 ### 3.4 成員
 
 | key name          | 主鍵     | 含義             | 類型   | 範圍      | 非空        | 備註                                                         |
 | ----------------- | -------- | ---------------- | ------ | --------- | ----------- | ------------------------------------------------------------ |
 | mem_id            | 是       | 成員id           | int    | /         | 是          | 遞增                                                         |
-| mem_avatar        |          | 成員頭像         | blob   | /         |             | 圖片限制5M                                                   |
+| mem_avatar_path   |          | 成員頭像路徑     | string | (0, 500)  |             | 圖片限制5M，存儲路徑而非blob                                 |
 | mem_name_zh       |          | 成員中文名       | string | (0, 500)  |             |                                                              |
 | mem_name_en       |          | 成員英文名       | string | (0, 500)  |             |                                                              |
-| mem_desc_zh       |          | 成員中文介紹     | string | (0, 5000) |             | 預設內容：個人簡介、教育與工作經歷、發表論文、獲獎情況、教學工作 |
-| mem_desc_en       |          | 成員英文介紹     | string | (0, 5000) |             |                                                              |
+| mem_desc_zh       |          | 成員中文介紹     | text   | /         |             | 支持Markdown格式，預設內容：個人簡介、教育與工作經歷、發表論文、獲獎情況、教學工作 |
+| mem_desc_en       |          | 成員英文介紹     | text   | /         |             | 支持Markdown格式                                             |
 | mem_email         |          | 成員email        | string | (0, 500)  |             |                                                              |
 | mem_type          |          | 成員類型         | int    | /         | 是（默認0） | 0->教師;<br>1->學生; <br>2->校友                             |
 | job_type          |          | 職稱類型         | int    | /         |             | 只有選擇教師才會有職稱<br>0->教授<br>1->副教授<br>2->講師<br>3->助理研究員<br>4->博士後 |
@@ -88,6 +96,8 @@
 | research_group_id | 外部主鍵 | 成員所在課題組id | int    | /         | 是          |                                                              |
 | lab_id            | 外部主鍵 | 成員所在實驗室   | int    | /         | 是          |                                                              |
 | enable            |          | 數據是否有效     | int    | (0, 1)    | 是（默認1） | 0->無效;<br>1->有效                                          |
+| created_at        |          | 創建時間         | datetime | /       | 是          | 自動生成                                                     |
+| updated_at        |          | 更新時間         | datetime | /       | 是          | 自動更新                                                     |
 
 ### 3.5 論文
 
@@ -99,16 +109,20 @@
 | research_group_id | 外部主鍵 | 論文成員所在課題組 | int    | /         |             | 需要考慮如果此篇論文作者已畢業或是課題組被刪除               |
 | lab_id            | 外部主鍵 | 論文成員所在實驗室 | int    | /         |             | 需要考慮如果此篇論文作者已畢業或是實驗室被刪除               |
 | paper_date        |          | 論文發表日期       | date   | /         | 是          |                                                              |
-| paper_title_zh    |          | 論文中文           | string | (0, 500)  |             |                                                              |
-| paper_title_en    |          | 論文英文           | string | (0, 500)  |             |                                                              |
-| paper_desc_zh     |          | 論文簡述中文       | string | (0, 1000) |             |                                                              |
-| paper_desc_en     |          | 論文簡述英文       | string | (0, 1000) |             |                                                              |
+| paper_title_zh    |          | 論文中文標題       | string | (0, 500)  |             |                                                              |
+| paper_title_en    |          | 論文英文標題       | string | (0, 500)  |             |                                                              |
+| paper_desc_zh     |          | 論文簡述中文       | text   | /         |             |                                                              |
+| paper_desc_en     |          | 論文簡述英文       | text   | /         |             |                                                              |
 | paper_type        |          | 論文類型           | int    | /         | 是（默認0） | 0->期刊論文<br>1->會議論文<br>2->學位論文<br>3->專題著作<br>4->其它 |
 | paper_venue       |          | 論文在哪發表       | string | (0, 500)  |             | e,g. AAAI, ICCV, CVPR                                        |
 | paper_accept      |          | 論文是否被接收     | int    | (0, 1)    | 是（默認0） | 0->未接收<br>1->已接收                                       |
-| paper_blob        |          | 論文pdf            | blob   | /         |             |                                                              |
+| paper_file_path   |          | 論文pdf路徑        | string | (0, 500)  |             | 存儲路徑而非blob                                             |
 | paper_url         |          | 論文外部連結       | string | (0, 1000) |             |                                                              |
+| all_authors_zh    |          | 全部作者中文       | text   | /         |             | 包含非實驗室成員作者                                         |
+| all_authors_en    |          | 全部作者英文       | text   | /         |             | 包含非實驗室成員作者                                         |
 | enable            |          | 數據是否有效       | int    | (0, 1)    | 是（默認1） | 0->無效;<br>1->有效                                          |
+| created_at        |          | 創建時間           | datetime | /       | 是          | 自動生成                                                     |
+| updated_at        |          | 更新時間           | datetime | /       | 是          | 自動更新                                                     |
 
 #### 3.5.2 論文作者
 
@@ -131,22 +145,28 @@
 | project_url        |      | 項目url        | string | (0, 500)  |             |                        |
 | project_name_zh    |      | 項目中文名     | string | (0, 500)  |             |                        |
 | project_name_en    |      | 項目英文名     | string | (0, 500)  |             |                        |
-| project_desc_zh    |      | 項目中文描述   | string | (0, 1000) |             |                        |
-| project_desc_en    |      | 項目英文描述   | string | (0, 1000) |             |                        |
+| project_desc_zh    |      | 項目中文描述   | text   | /         |             |                        |
+| project_desc_en    |      | 項目英文描述   | text   | /         |             |                        |
 | project_date_start |      | 項目開始日期   | date   | /         |             |                        |
 | is_end             |      | 項目是否已結項 | int    | /         | 是（默認0） | 0->未結項<br>1->已結項 |
 | enable             |      | 數據是否有效   | int    | (0, 1)    | 是（默認1） | 0->無效;<br>1->有效    |
+| created_at         |      | 創建時間       | datetime | /       | 是          | 自動生成               |
+| updated_at         |      | 更新時間       | datetime | /       | 是          | 自動更新               |
 
 ### 3.7 新聞
 
-| key name        | 主鍵 | 含義         | 類型   | 範圍      | 非空 | 備註                                        |
-| --------------- | ---- | ------------ | ------ | --------- | ---- | ------------------------------------------- |
-| news_id         | 是   | 新聞id       | int    | /         | 是   | 遞增                                        |
-| news_type       |      | 新聞類型     | int    | /         | 是   | 0->論文;<br>1->獎項;<br>2->報告;<br>3->其它 |
-| news_content_zh |      | 新聞內容中文 | string | (0, 1000) |      |                                             |
-| news_content_en |      | 新聞內容英文 | string | (0, 1000) |      |                                             |
-| news_date       |      | 新聞發表日期 | date   | /         |      |                                             |
-| enable          |      | 數據是否有效 | int    | (0, 1)    | 是   | 0->無效;<br>1->有效                         |
+| key name        | 主鍵 | 含義         | 類型   | 範圍      | 非空        | 備註                                        |
+| --------------- | ---- | ------------ | ------ | --------- | ----------- | ------------------------------------------- |
+| news_id         | 是   | 新聞id       | int    | /         | 是          | 遞增                                        |
+| news_type       |      | 新聞類型     | int    | /         | 是          | 0->論文;<br>1->獎項;<br>2->報告;<br>3->其它 |
+| news_title_zh   |      | 新聞標題中文 | string | (0, 500)  |             |                                             |
+| news_title_en   |      | 新聞標題英文 | string | (0, 500)  |             |                                             |
+| news_content_zh |      | 新聞內容中文 | text   | /         |             |                                             |
+| news_content_en |      | 新聞內容英文 | text   | /         |             |                                             |
+| news_date       |      | 新聞發表日期 | date   | /         |             |                                             |
+| enable          |      | 數據是否有效 | int    | (0, 1)    | 是（默認1） | 0->無效;<br>1->有效                         |
+| created_at      |      | 創建時間     | datetime | /       | 是          | 自動生成                                    |
+| updated_at      |      | 更新時間     | datetime | /       | 是          | 自動更新                                    |
 
 ### 3.8 編輯記錄
 
