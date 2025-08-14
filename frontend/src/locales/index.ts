@@ -48,4 +48,7 @@ const i18n = createI18n({
   globalInjection: true // Enable global $t function
 })
 
+// Export global translation function for use in stores and other non-component contexts
+export const t = i18n.global.t
+
 export default i18n

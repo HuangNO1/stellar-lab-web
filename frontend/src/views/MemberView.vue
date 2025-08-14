@@ -37,7 +37,7 @@
     <div v-else class="members-content">
       <!-- 教師 -->
       <div v-if="groupedMembers.teachers.length > 0" class="member-section">
-        <h2 class="section-title">{{ $t('members.professor') }}</h2>
+        <h2 class="section-title">{{ $t('members.teachers') }}</h2>
         <div class="members-grid">
           <div v-for="member in groupedMembers.teachers" :key="member.mem_id" class="member-card" @click="toMember(member.mem_id)">
             <n-avatar

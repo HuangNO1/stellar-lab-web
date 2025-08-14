@@ -37,8 +37,7 @@ export default {
     updateFailed: '更新失敗，請重試',
     changePasswordFailed: '修改密碼失敗',
     changePasswordSuccess: '密碼修改成功',
-    changeFailed: '修改失敗，請重試',
-    fetchMembersFailed: '獲取成員數據失敗'
+    changeFailed: '修改失敗，請重試'
   },
   defaults: {
     labName: '實驗室',
@@ -60,6 +59,7 @@ export default {
   },
   members: {
     title: '團隊成員',
+    teachers: '教師',
     professor: '教授',
     postdoc: '博士後',
     phd: '博士生',

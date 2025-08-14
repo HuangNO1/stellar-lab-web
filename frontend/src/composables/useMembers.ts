@@ -29,7 +29,7 @@ export function useMembers() {
       }
     } catch (err) {
       console.error('Failed to fetch members:', err);
-      error.value = t('auth.fetchMembersFailed');
+      error.value = t('common.fetchError');
       // 設置為空數組而不是使用本地數據
       members.value = [];
       total.value = 0;

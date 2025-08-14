@@ -1,4 +1,5 @@
 import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { labApi } from '@/services/api';
 import type { Lab } from '@/types/api';
 
@@ -6,6 +7,7 @@ import type { Lab } from '@/types/api';
  * 實驗室數據 Hook
  */
 export function useLab() {
+  const { t } = useI18n();
   const lab = ref<Lab | null>(null);
   const loading = ref(false);
   const error = ref<string | null>(null);
@@ -22,7 +24,7 @@ export function useLab() {
       }
     } catch (err) {
       console.error('Failed to fetch lab data:', err);
-      error.value = '獲取實驗室數據失敗';
+      error.value = t('common.fetchError');
     } finally {
       loading.value = false;
     }

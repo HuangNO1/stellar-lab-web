@@ -37,8 +37,7 @@ export default {
         updateFailed: '更新失败，请重试',
         changePasswordFailed: '修改密码失败',
         changePasswordSuccess: '密码修改成功',
-        changeFailed: '修改失败，请重试',
-        fetchMembersFailed: '获取成员数据失败'
+        changeFailed: '修改失败，请重试'
     },
     defaults: {
         labName: '实验室',
@@ -60,6 +59,7 @@ export default {
     },
     members: {
         title: '团队成员',
+        teachers: '教师',
         professor: '教授',
         postdoc: '博士后',
         phd: '博士生',

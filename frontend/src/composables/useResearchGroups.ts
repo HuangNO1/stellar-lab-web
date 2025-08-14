@@ -1,4 +1,5 @@
 import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { researchGroupApi } from '@/services/api';
 import type { ResearchGroup, ResearchGroupQueryParams } from '@/types/api';
 
@@ -6,6 +7,7 @@ import type { ResearchGroup, ResearchGroupQueryParams } from '@/types/api';
  * 課題組數據 Hook
  */
 export function useResearchGroups() {
+  const { t } = useI18n();
   const researchGroups = ref<ResearchGroup[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
@@ -26,7 +28,7 @@ export function useResearchGroups() {
       }
     } catch (err) {
       console.error('Failed to fetch research groups:', err);
-      error.value = '獲取課題組數據失敗';
+      error.value = t('common.fetchError');
       // 如果 API 請求失敗，使用本地數據作為後備
       try {
         const { researchGroups: fallbackData } = await import('@/Model/researchGroup');

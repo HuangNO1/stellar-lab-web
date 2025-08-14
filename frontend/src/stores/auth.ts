@@ -1,11 +1,10 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { t } from '@/locales';
 import type { Admin, ApiError } from '@/types/api';
 import { authApi } from '@/services/api';
 
 export const useAuthStore = defineStore('auth', () => {
-  const { t } = useI18n();
   const isAuthenticated = ref<boolean>(false);
   const admin = ref<Admin | null>(null);
   const token = ref<string | null>(localStorage.getItem('admin_token'));

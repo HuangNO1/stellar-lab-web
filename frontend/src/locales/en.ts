@@ -37,8 +37,7 @@ export default {
     updateFailed: 'Update failed, please retry',
     changePasswordFailed: 'Failed to change password',
     changePasswordSuccess: 'Password changed successfully',
-    changeFailed: 'Change failed, please retry',
-    fetchMembersFailed: 'Failed to fetch members data'
+    changeFailed: 'Change failed, please retry'
   },
   defaults: {
     labName: 'Laboratory',
@@ -60,6 +59,7 @@ export default {
   },
   members: {
     title: 'Team Members',
+    teachers: 'Teachers',
     professor: 'Professor',
     postdoc: 'Postdoc',
     phd: 'PhD Student',
