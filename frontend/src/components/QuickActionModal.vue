@@ -134,6 +134,9 @@
             <I18nMdEditor
               v-model="formData.mem_desc_zh"
               :placeholder="t('admin.members.form.placeholders.description')"
+              :entity-type="entityType"
+              :entity-id="entityId"
+              field-name="mem_desc_zh"
               style="height: 200px; width: 100%"
             />
           </n-form-item>
@@ -141,6 +144,9 @@
             <I18nMdEditor
               v-model="formData.mem_desc_en"
               :placeholder="t('admin.members.form.placeholders.descriptionEn')"
+              :entity-type="entityType"
+              :entity-id="entityId"
+              field-name="mem_desc_en"
               style="height: 200px; width: 100%"
             />
           </n-form-item>
@@ -190,6 +196,9 @@
             <I18nMdEditor
               v-model="formData.paper_desc_zh"
               :placeholder="t('admin.papers.form.placeholders.description')"
+              :entity-type="entityType"
+              :entity-id="entityId"
+              field-name="paper_desc_zh"
               style="height: 200px; width: 100%"
             />
           </n-form-item>
@@ -197,10 +206,13 @@
             <I18nMdEditor
               v-model="formData.paper_desc_en"
               :placeholder="t('admin.papers.form.placeholders.descriptionEn')"
+              :entity-type="entityType"
+              :entity-id="entityId"
+              field-name="paper_desc_en"
               style="height: 200px; width: 100%"
             />
           </n-form-item>
-          <n-form-item :label="t('admin.papers.form.authors')" path="authors">
+          <n-form-item :label="t('admin.papers.form.labAuthors')" path="authors">
             <n-select
               v-model:value="formData.authors"
               multiple
@@ -210,6 +222,20 @@
               :placeholder="t('admin.papers.form.placeholders.authors')"
               :loading="loadingMembers"
               :filter="filterMemberOption"
+              style="width: 100%"
+            />
+          </n-form-item>
+          <n-form-item :label="t('admin.papers.form.allAuthorsZh')" path="all_authors_zh">
+            <n-input
+              v-model:value="formData.all_authors_zh"
+              :placeholder="t('admin.papers.form.placeholders.allAuthorsZh')"
+              style="width: 100%"
+            />
+          </n-form-item>
+          <n-form-item :label="t('admin.papers.form.allAuthorsEn')" path="all_authors_en">
+            <n-input
+              v-model:value="formData.all_authors_en"
+              :placeholder="t('admin.papers.form.placeholders.allAuthorsEn')"
               style="width: 100%"
             />
           </n-form-item>
@@ -284,6 +310,9 @@
             <I18nMdEditor
               v-model="formData.project_desc_zh"
               :placeholder="t('admin.projects.form.placeholders.description')"
+              :entity-type="entityType"
+              :entity-id="entityId"
+              field-name="project_desc_zh"
               style="height: 200px; width: 100%"
             />
           </n-form-item>
@@ -291,6 +320,9 @@
             <I18nMdEditor
               v-model="formData.project_desc_en"
               :placeholder="t('admin.projects.form.placeholders.descriptionEn')"
+              :entity-type="entityType"
+              :entity-id="entityId"
+              field-name="project_desc_en"
               style="height: 200px; width: 100%"
             />
           </n-form-item>
@@ -329,10 +361,27 @@
               style="width: 100%"
             />
           </n-form-item>
+          <n-form-item :label="t('admin.news.form.titleZh')" path="news_title_zh">
+            <n-input
+              v-model:value="formData.news_title_zh"
+              :placeholder="t('admin.news.form.placeholders.titleZh')"
+              style="width: 100%"
+            />
+          </n-form-item>
+          <n-form-item :label="t('admin.news.form.titleEn')" path="news_title_en">
+            <n-input
+              v-model:value="formData.news_title_en"
+              :placeholder="t('admin.news.form.placeholders.titleEn')"
+              style="width: 100%"
+            />
+          </n-form-item>
           <n-form-item :label="t('admin.news.form.contentZh')" path="news_content_zh">
             <I18nMdEditor
               v-model="formData.news_content_zh"
               :placeholder="t('admin.news.form.placeholders.contentZh')"
+              :entity-type="entityType"
+              :entity-id="entityId"
+              field-name="news_content_zh"
               style="height: 200px; width: 100%"
             />
           </n-form-item>
@@ -340,6 +389,9 @@
             <I18nMdEditor
               v-model="formData.news_content_en"
               :placeholder="t('admin.news.form.placeholders.contentEn')"
+              :entity-type="entityType"
+              :entity-id="entityId"
+              field-name="news_content_en"
               style="height: 200px; width: 100%"
             />
           </n-form-item>
@@ -373,6 +425,9 @@
             <I18nMdEditor
               v-model="formData.research_group_desc_zh"
               :placeholder="t('admin.groups.form.placeholders.descriptionZh')"
+              :entity-type="entityType"
+              :entity-id="entityId"
+              field-name="research_group_desc_zh"
               style="height: 200px; width: 100%"
             />
           </n-form-item>
@@ -380,6 +435,9 @@
             <I18nMdEditor
               v-model="formData.research_group_desc_en"
               :placeholder="t('admin.groups.form.placeholders.descriptionEn')"
+              :entity-type="entityType"
+              :entity-id="entityId"
+              field-name="research_group_desc_en"
               style="height: 200px; width: 100%"
             />
           </n-form-item>
@@ -524,6 +582,8 @@ interface PaperFormData {
   paper_desc_zh?: string;
   paper_desc_en?: string;
   authors?: number[];
+  all_authors_zh?: string;
+  all_authors_en?: string;
   paper_venue?: string;
   paper_type?: number;
   paper_date?: number | null;
@@ -545,6 +605,8 @@ interface ProjectFormData {
 
 interface NewsFormData {
   news_type?: number;
+  news_title_zh?: string;
+  news_title_en?: string;
   news_content_zh?: string;
   news_content_en?: string;
   news_date?: number | null;
@@ -714,6 +776,33 @@ const researchGroupOptionsWithNone = computed(() => {
     value: null
   };
   return [noneOption, ...researchGroupOptions.value];
+});
+
+// 計算實體信息，用於圖片上傳追蹤
+const entityType = computed(() => {
+  const typeMap = {
+    'members': 'member',
+    'papers': 'paper',
+    'projects': 'project',
+    'news': 'news',
+    'research-groups': 'research_group'
+  };
+  return typeMap[props.moduleType as keyof typeof typeMap] || '';
+});
+
+const entityId = computed(() => {
+  if (props.actionType !== 'edit' || !props.editData) return 0;
+  
+  const idFields = {
+    'members': 'mem_id',
+    'papers': 'paper_id',
+    'projects': 'project_id',
+    'news': 'news_id',
+    'research-groups': 'research_group_id'
+  };
+  
+  const idField = idFields[props.moduleType as keyof typeof idFields];
+  return (props.editData[idField] as number) || 0;
 });
 
 // Computed
@@ -1008,10 +1097,14 @@ const resetForm = () => {
     formData.paper_desc_zh = '';
     formData.paper_desc_en = '';
     formData.authors = [];
+    formData.all_authors_zh = '';
+    formData.all_authors_en = '';
   } else if (props.moduleType === 'projects') {
     formData.project_desc_zh = '';
     formData.project_desc_en = '';
   } else if (props.moduleType === 'news') {
+    formData.news_title_zh = '';
+    formData.news_title_en = '';
     formData.news_content_zh = '';
     formData.news_content_en = '';
   } else if (props.moduleType === 'research-groups') {
