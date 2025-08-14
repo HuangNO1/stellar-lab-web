@@ -1,0 +1,68 @@
+/* 
+ * KaTeX數學公式全局樣式
+ * 為所有使用markdown渲染器的頁面提供數學公式支持
+ */
+
+/* KaTeX基礎樣式已通過 import 'katex/dist/katex.min.css' 導入 */
+
+/* 自定義數學公式容器樣式 */
+.math-display {
+  margin: 1.5em 0 !important;
+  padding: 0.8em !important;
+  background-color: #fafafa !important;
+  border-left: 4px solid #007bff !important;
+  border-radius: 4px !important;
+  overflow-x: auto !important;
+  text-align: center !important;
+}
+
+.math-inline {
+  /* KaTeX已經提供了基本樣式，這裡不需要額外樣式 */
+}
+
+/* 數學公式錯誤樣式 */
+.math-error {
+  color: #dc3545 !important;
+  background-color: #f8d7da !important;
+  border: 1px solid #f5c6cb !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 0.25rem !important;
+  font-family: 'Courier New', monospace !important;
+  font-weight: normal !important;
+}
+
+/* 暗色主題支持 */
+@media (prefers-color-scheme: dark) {
+  .math-display {
+    background-color: #2a2a2a !important;
+    border-left-color: #4dabf7 !important;
+    color: #e0e0e0 !important;
+  }
+  
+  .math-error {
+    color: #f8d7da !important;
+    background-color: #721c24 !important;
+    border-color: #a94442 !important;
+  }
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .math-display {
+    padding: 0.5em !important;
+    font-size: 0.9em !important;
+  }
+}
+
+/* Naive UI深色主題兼容性 */
+.n-config-provider[data-theme="dark"] .math-display {
+  background-color: #2a2a2a !important;
+  border-left-color: #4dabf7 !important;
+  color: #e0e0e0 !important;
+}
+
+.n-config-provider[data-theme="dark"] .math-error {
+  color: #f8d7da !important;
+  background-color: #721c24 !important;
+  border-color: #a94442 !important;
+}

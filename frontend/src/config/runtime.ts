@@ -12,7 +12,7 @@ interface AppConfig {
 
 // Default fallback configuration
 const defaultConfig: AppConfig = {
-  API_BASE_URL: process.env.VUE_APP_API_BASE_URL || '/api',
+  API_BASE_URL: process.env.VUE_APP_API_BASE_URL || 'http://localhost:8000/api',
   BACKEND_URL: process.env.VUE_APP_BACKEND_URL || 'http://localhost:8000',
   APP_TITLE: process.env.VUE_APP_TITLE || 'Laboratory Website',
   APP_DESCRIPTION: process.env.VUE_APP_DESCRIPTION || 'Modern laboratory website'
