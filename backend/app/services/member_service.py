@@ -437,8 +437,8 @@ class MemberService(BaseService):
         string_fields = {
             'mem_name_zh': 100,
             'mem_name_en': 100,
-            'mem_desc_zh': 10000,
-            'mem_desc_en': 10000
+            'mem_desc_zh': 50000,
+            'mem_desc_en': 50000
         }
         
         for field, max_length in string_fields.items():

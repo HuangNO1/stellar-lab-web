@@ -181,8 +181,8 @@ class NewsService(BaseService):
         string_fields = {
             'news_title_zh': 500,
             'news_title_en': 500,
-            'news_content_zh': 10000,
-            'news_content_en': 10000
+            'news_content_zh': 50000,
+            'news_content_en': 50000
         }
         
         for field, max_length in string_fields.items():

@@ -322,8 +322,8 @@ class PaperService(BaseService):
         string_fields = {
             'paper_title_zh': 500,
             'paper_title_en': 500,
-            'paper_desc_zh': 10000,
-            'paper_desc_en': 10000,
+            'paper_desc_zh': 50000,
+            'paper_desc_en': 50000,
             'paper_venue': 500,
             'paper_url': 1000,
             'all_authors_zh': 2000,  # 新增：全部作者中文字段

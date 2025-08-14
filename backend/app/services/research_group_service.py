@@ -206,8 +206,8 @@ class ResearchGroupService(BaseService):
         string_fields = {
             'research_group_name_zh': 200,
             'research_group_name_en': 200,
-            'research_group_desc_zh': 10000,
-            'research_group_desc_en': 10000
+            'research_group_desc_zh': 50000,
+            'research_group_desc_en': 50000
         }
         
         for field, max_length in string_fields.items():

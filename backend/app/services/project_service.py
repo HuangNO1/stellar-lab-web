@@ -196,8 +196,8 @@ class ProjectService(BaseService):
         string_fields = {
             'project_name_zh': 200,
             'project_name_en': 200,
-            'project_desc_zh': 10000,
-            'project_desc_en': 10000,
+            'project_desc_zh': 50000,
+            'project_desc_en': 50000,
             'project_url': 500
         }
         
