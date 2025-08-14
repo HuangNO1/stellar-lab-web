@@ -217,25 +217,17 @@ const columns: DataTableColumns<News> = [
       tooltip: true
     },
     render(row) {
-      return h('div', { style: { maxWidth: '400px' } }, 
-        row.news_content_zh ? 
-          row.news_content_zh.slice(0, 100) + (row.news_content_zh.length > 100 ? '...' : '') :
-          '-'
-      );
-    }
-  },
-  {
-    title: t('admin.news.form.contentEn'),
-    key: 'news_content_en',
-    ellipsis: {
-      tooltip: true
-    },
-    render(row) {
-      return h('div', { style: { maxWidth: '300px', fontSize: '0.875rem', color: '#666' } }, 
-        row.news_content_en ? 
-          row.news_content_en.slice(0, 80) + (row.news_content_en.length > 80 ? '...' : '') :
-          '-'
-      );
+      const displayText = row.news_title_zh || row.news_content_zh;
+      return h('div', [
+        h('div', { style: { fontWeight: 'bold', maxWidth: '400px' } }, 
+          displayText ? 
+            displayText.slice(0, 100) + (displayText.length > 100 ? '...' : '') :
+            '-'
+        ),
+        row.news_title_en && h('div', { style: { fontSize: '0.875rem', color: '#666', maxWidth: '400px' } }, 
+          row.news_title_en.slice(0, 80) + (row.news_title_en.length > 80 ? '...' : '')
+        )
+      ]);
     }
   },
   {

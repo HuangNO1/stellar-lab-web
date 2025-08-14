@@ -46,6 +46,11 @@
       </div>
       
       <div class="news-header">
+        <!-- 新聞標題 -->
+        <h1 v-if="news.news_title_zh || news.news_title_en" class="news-title">
+          {{ getCurrentLocale() === 'zh' ? (news.news_title_zh || news.news_title_en) : (news.news_title_en || news.news_title_zh) }}
+        </h1>
+        
         <div class="news-meta">
           <n-tag :type="getNewsTypeColor(news.news_type)" size="medium">
             {{ getNewsTypeText(news.news_type) }}
@@ -79,6 +84,8 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { newsApi } from '@/services/api';
+import { processMarkdownImageUrls } from '@/utils/media';
+import { createMarkdownPlugins } from '@/utils/markdown';
 import type { News, ApiError } from '@/types/api';
 import MarkdownIt from 'vue3-markdown-it';
 
@@ -99,39 +106,11 @@ const getCurrentLocale = () => {
 const getNewsContent = () => {
   if (!news.value) return '';
   const content = getCurrentLocale() === 'zh' ? news.value.news_content_zh : news.value.news_content_en;
-  return content || '';
+  return content ? processMarkdownImageUrls(content) : '';
 };
 
 // Markdown插件配置
-const markdownPlugins = [
-  {
-    plugin: (md: Record<string, unknown>) => {
-      // 修改链接渲染规则
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const defaultRender = (md as any).renderer.rules.link_open || function(tokens: Record<string, unknown>[], idx: number, options: Record<string, unknown>, env: Record<string, unknown>, renderer: Record<string, unknown>) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (renderer as any).renderToken(tokens, idx, options);
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (md as any).renderer.rules.link_open = function (tokens: Record<string, unknown>[], idx: number, options: Record<string, unknown>, env: Record<string, unknown>, renderer: Record<string, unknown>) {
-        const token = tokens[idx];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const href = (token as any).attrGet('href');
-        
-        // 检查是否为外部链接
-        if (href && (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//') || href.includes('://'))) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (token as any).attrSet('target', '_blank');
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (token as any).attrSet('rel', 'noopener noreferrer');
-        }
-        
-        return defaultRender(tokens, idx, options, env, renderer);
-      };
-    }
-  }
-];
+const markdownPlugins = createMarkdownPlugins();
 
 // 方法
 const fetchNewsDetail = async () => {
@@ -220,6 +199,17 @@ onMounted(() => {
   margin-bottom: 2rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid #e0e0e0;
+}
+
+.news-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  background: linear-gradient(135deg, #1890ff, #722ed1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
 }
 
 .news-meta {

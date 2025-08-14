@@ -144,7 +144,11 @@
                 </div>
                 <div class="news-content-compact">
                   <span class="news-title-compact">
-                    {{ stripMarkdown(getCurrentLocale() === 'zh' ? news.news_content_zh : (news.news_content_en || news.news_content_zh)) }}
+                    {{
+                      (news.news_title_zh || news.news_title_en) 
+                        ? (getCurrentLocale() === 'zh' ? (news.news_title_zh || news.news_title_en) : (news.news_title_en || news.news_title_zh))
+                        : stripMarkdown(getCurrentLocale() === 'zh' ? news.news_content_zh : (news.news_content_en || news.news_content_zh))
+                    }}
                   </span>
                 </div>
               </div>
