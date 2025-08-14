@@ -11,7 +11,7 @@
             <div class="nav-container">
               <!-- Left side: Logo and Name -->
               <div class="nav-left">
-                <div class="logo-container">
+                <div class="logo-container" @click="router.push('/')">
                   <img v-if="lab?.lab_logo_path" :src="getLabLogoUrl(lab.lab_logo_path)" :alt="$t('defaults.labName')" class="lab-logo" />
                   <n-icon v-else size="26" color="#1890ff">
                     <svg viewBox="0 0 24 24">
