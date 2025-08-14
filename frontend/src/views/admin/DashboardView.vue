@@ -253,8 +253,10 @@ import { useI18n } from 'vue-i18n';
 import { memberApi, paperApi, projectApi, newsApi, editRecordApi, systemApi } from '@/services/api';
 import type { EditRecord } from '@/types/api';
 import QuickActionModal from '@/components/QuickActionModal.vue';
+import { useTimeFormatter } from '@/utils/timezone';
 
 const { t, locale } = useI18n();
+const { formatRelativeTime } = useTimeFormatter();
 
 // 統計數據
 const stats = reactive({
@@ -269,7 +271,7 @@ const recentActivities = ref<Array<{
   id: string;
   type: 'create' | 'update' | 'delete' | 'login' | 'logout' | 'change_password' | 'batch_delete' | 'batch_update' | 'upload';
   title: string;
-  time: Date;
+  time: string; // 改為字符串類型存儲 UTC 時間
   admin: string;
 }>>([]);
 
@@ -336,7 +338,7 @@ const fetchRecentActivities = async () => {
           id: log.edit_id.toString(),
           type: log.edit_type.toLowerCase().replace('_', '_') as 'create' | 'update' | 'delete' | 'login' | 'logout' | 'change_password' | 'batch_delete' | 'batch_update' | 'upload',
           title: `${log.admin?.admin_name || 'Unknown'} ${actionName}了${moduleName}`,
-          time: new Date(log.edit_date),
+          time: log.edit_date, // 保持原始 UTC 時間字符串
           admin: log.admin?.admin_name || 'Unknown'
         };
       });
@@ -472,35 +474,9 @@ const getActivityIcon = (type: string) => {
   return icons[type as keyof typeof icons] || icons.create;
 };
 
-// 格式化時間
-const formatTime = (time: Date) => {
-  const now = new Date();
-  const diff = now.getTime() - time.getTime();
-  const minutes = Math.floor(diff / (1000 * 60));
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-
-  if (locale.value === 'zh') {
-    if (days > 0) {
-      return `${days}${t('admin.quickAction.timeFormat.daysAgo')}`;
-    } else if (hours > 0) {
-      return `${hours}${t('admin.quickAction.timeFormat.hoursAgo')}`;
-    } else if (minutes > 0) {
-      return `${minutes}${t('admin.quickAction.timeFormat.minutesAgo')}`;
-    } else {
-      return t('admin.quickAction.timeFormat.justNow');
-    }
-  } else {
-    if (days > 0) {
-      return `${days} day${days > 1 ? 's' : ''} ago`;
-    } else if (hours > 0) {
-      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-    } else if (minutes > 0) {
-      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-    } else {
-      return 'Just now';
-    }
-  }
+// 格式化時間 - 使用新的時區處理工具
+const formatTime = (utcTimeString: string) => {
+  return formatRelativeTime(utcTimeString);
 };
 
 // 獲取狀態圖標類
@@ -570,7 +546,7 @@ const handleModalSuccess = () => {
     id: Date.now().toString(),
     type: modalConfig.actionType === 'create' ? 'create' as const : 'update' as const,
     title: `${actionNames[modalConfig.actionType]}${moduleNames[modalConfig.moduleType]}`,
-    time: new Date(),
+    time: new Date().toISOString(), // 使用 ISO 字符串格式
     admin: 'Current Admin' // 臨時值，真實數據會從API獲取
   };
   

@@ -623,7 +623,21 @@ export default {
         daysAgo: ' days ago',
         hoursAgo: ' hours ago',
         minutesAgo: ' minutes ago',
-        justNow: 'just now'
+        justNow: 'just now',
+        yearsAgo: ' years ago',
+        monthsAgo: ' months ago',
+        shortMinutesAgo: 'm ago',
+        now: 'now',
+        day: 'day',
+        days: 'days',
+        hour: 'hour',
+        hours: 'hours',
+        minute: 'minute',
+        minutes: 'minutes',
+        year: 'year',
+        years: 'years',
+        month: 'month',
+        months: 'months'
       },
       activities: {
         created: 'created',

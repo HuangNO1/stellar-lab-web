@@ -122,9 +122,11 @@ import type { DataTableColumns } from 'naive-ui';
 import { editRecordApi, adminApi } from '@/services/api';
 import type { EditRecord, EditRecordQueryParams, Admin } from '@/types/api';
 import JsonDetailModal from '@/components/JsonDetailModal.vue';
+import { useTimeFormatter } from '@/utils/timezone';
 
 const { t, locale } = useI18n();
 const message = useMessage();
+const { formatDateTime, getCurrentTimezone } = useTimeFormatter();
 
 // 響應式數據
 const loading = ref(false);
@@ -250,54 +252,58 @@ const formatEditType = (type: string): string => {
 };
 
 // 表格列定義
-const columns = computed<DataTableColumns<EditRecord>>(() => [
-  {
-    title: t('admin.operationLogs.time'),
-    key: 'edit_date',
-    width: 180,
-    render: (row) => new Date(row.edit_date).toLocaleString(currentLocale.value === 'zh' ? 'zh-CN' : 'en-US')
-  },
-  {
-    title: t('admin.operationLogs.admin'),
-    key: 'admin',
-    width: 120,
-    render: (row) => row.admin?.admin_name || '-'
-  },
-  {
-    title: t('admin.operationLogs.operation'),
-    key: 'edit_type',
-    width: 100,
-    render: (row) => formatEditType(row.edit_type)
-  },
-  {
-    title: t('admin.operationLogs.module'),
-    key: 'edit_module',
-    width: 120,
-    render: (row) => formatModuleName(row.edit_module)
-  },
-  {
-    title: t('admin.operationLogs.content'),
-    key: 'edit_content',
-    width: 160,
-    render: (row) => {
-      const hasContent = row.edit_content && Object.keys(row.edit_content).length > 0;
-      
-      if (!hasContent) {
-        return '-';
+const columns = computed<DataTableColumns<EditRecord>>(() => {
+  const timezone = getCurrentTimezone();
+  
+  return [
+    {
+      title: `${t('admin.operationLogs.time')} (${timezone.offset})`,
+      key: 'edit_date',
+      width: 200,
+      render: (row) => formatDateTime(row.edit_date)
+    },
+    {
+      title: t('admin.operationLogs.admin'),
+      key: 'admin',
+      width: 120,
+      render: (row) => row.admin?.admin_name || '-'
+    },
+    {
+      title: t('admin.operationLogs.operation'),
+      key: 'edit_type',
+      width: 100,
+      render: (row) => formatEditType(row.edit_type)
+    },
+    {
+      title: t('admin.operationLogs.module'),
+      key: 'edit_module',
+      width: 120,
+      render: (row) => formatModuleName(row.edit_module)
+    },
+    {
+      title: t('admin.operationLogs.content'),
+      key: 'edit_content',
+      width: 160,
+      render: (row) => {
+        const hasContent = row.edit_content && Object.keys(row.edit_content).length > 0;
+        
+        if (!hasContent) {
+          return '-';
+        }
+        
+        return h(
+          NButton,
+          {
+            size: 'small',
+            type: 'primary',
+            onClick: () => showJsonDetail(row.edit_content, `${formatEditType(row.edit_type)} - ${formatModuleName(row.edit_module)}`)
+          },
+          { default: () => t('common.viewDetails') }
+        );
       }
-      
-      return h(
-        NButton,
-        {
-          size: 'small',
-          type: 'primary',
-          onClick: () => showJsonDetail(row.edit_content, `${formatEditType(row.edit_type)} - ${formatModuleName(row.edit_module)}`)
-        },
-        { default: () => t('common.viewDetails') }
-      );
     }
-  }
-]);
+  ];
+});
 
 // 載入操作日誌
 const loadLogs = async () => {

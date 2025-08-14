@@ -623,7 +623,11 @@ export default {
                 daysAgo: '天前',
                 hoursAgo: '小时前',
                 minutesAgo: '分钟前',
-                justNow: '刚刚'
+                justNow: '刚刚',
+                yearsAgo: '年前',
+                monthsAgo: '个月前',
+                shortMinutesAgo: '分前',
+                now: '刚才'
             },
             activities: {
                 created: '新增了',

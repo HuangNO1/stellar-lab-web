@@ -1,5 +1,6 @@
 from typing import Dict, Any, Optional
 from flask import g
+from datetime import datetime, timezone
 from app import db
 from app.models import EditRecord
 from .base_service import BaseService
@@ -160,7 +161,7 @@ class AuditService(BaseService):
         content = login_info or {}
         content.update({
             'admin_id': admin_id,
-            'timestamp': content.get('timestamp', None)
+            'timestamp': content.get('timestamp', datetime.now(timezone.utc).isoformat())  # 確保使用 UTC 時區
         })
         
         return self.log_operation(
@@ -183,7 +184,8 @@ class AuditService(BaseService):
         """
         content = logout_info or {}
         content.update({
-            'admin_id': admin_id
+            'admin_id': admin_id,
+            'timestamp': datetime.now(timezone.utc).isoformat()  # 添加登出時間戳
         })
         
         return self.log_operation(

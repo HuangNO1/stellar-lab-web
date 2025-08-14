@@ -1,5 +1,5 @@
 from app import db
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 
 class EditRecord(db.Model):
@@ -10,7 +10,7 @@ class EditRecord(db.Model):
     edit_type = db.Column(db.String(50), nullable=False, index=True)  # 添加索引用於操作類型篩選 CREATE, UPDATE, DELETE
     edit_module = db.Column(db.Integer, nullable=False, index=True)  # 添加索引用於模塊篩選 0:管理員 1:實驗室 2:課題組 3:成員 4:論文 5:新聞 6:項目 7:媒體文件 8:圖片上傳
     edit_content = db.Column(db.Text)
-    edit_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)  # 添加索引用於日期查詢和排序
+    edit_date = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), index=True)  # 明確使用 UTC 時區
     
     # 複合索引
     __table_args__ = (
@@ -37,6 +37,6 @@ class EditRecord(db.Model):
             'edit_type': self.edit_type,
             'edit_module': self.edit_module,
             'edit_content': self.get_content(),
-            'edit_date': self.edit_date.isoformat(),
+            'edit_date': self.edit_date.replace(tzinfo=timezone.utc).isoformat(),  # 明確標示 UTC 時區
             'admin': self.admin.to_dict() if self.admin else None
         }
