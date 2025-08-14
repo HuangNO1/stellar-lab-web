@@ -356,7 +356,7 @@ const columns: DataTableColumns<Member> = [
       return h(NAvatar, {
         size: 'medium',
         src: row.mem_avatar_path ? getMediaUrl(row.mem_avatar_path) : undefined,
-        fallbackSrc: '/default-avatar.png'
+        fallbackSrc: '/default-avatar.svg'
       });
     }
   },

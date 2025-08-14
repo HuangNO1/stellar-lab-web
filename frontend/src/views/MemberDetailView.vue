@@ -150,6 +150,8 @@ import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { memberApi, researchGroupApi, paperApi } from '@/services/api';
 import { useMembers } from '@/composables/useMembers';
+import { processMarkdownImageUrls } from '@/utils/media';
+import { createMarkdownPlugins } from '@/utils/markdown';
 import type { Member, ResearchGroup, Paper, ApiError } from '@/types/api';
 import MarkdownIt from 'vue3-markdown-it';
 
@@ -173,39 +175,11 @@ const getCurrentLocale = () => {
 const getMemberDescription = () => {
   if (!member.value) return '';
   const desc = getCurrentLocale() === 'zh' ? member.value.mem_desc_zh : member.value.mem_desc_en;
-  return desc || '';
+  return desc ? processMarkdownImageUrls(desc) : '';
 };
 
 // Markdown插件配置
-const markdownPlugins = [
-  {
-    plugin: (md: Record<string, unknown>) => {
-      // 修改链接渲染规则
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const defaultRender = (md as any).renderer.rules.link_open || function(tokens: Record<string, unknown>[], idx: number, options: Record<string, unknown>, env: Record<string, unknown>, renderer: Record<string, unknown>) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (renderer as any).renderToken(tokens, idx, options);
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (md as any).renderer.rules.link_open = function (tokens: Record<string, unknown>[], idx: number, options: Record<string, unknown>, env: Record<string, unknown>, renderer: Record<string, unknown>) {
-        const token = tokens[idx];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const href = (token as any).attrGet('href');
-        
-        // 检查是否为外部链接
-        if (href && (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//') || href.includes('://'))) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (token as any).attrSet('target', '_blank');
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (token as any).attrSet('rel', 'noopener noreferrer');
-        }
-        
-        return defaultRender(tokens, idx, options, env, renderer);
-      };
-    }
-  }
-];
+const markdownPlugins = createMarkdownPlugins();
 
 const getResearchGroupName = () => {
   if (!researchGroup.value) return '';
@@ -659,6 +633,47 @@ watch(() => route.params.id, () => {
   
   .member-name {
     font-size: 1.75rem;
+  }
+}
+</style>
+
+<style>
+/* KaTeX數學公式樣式 - 全局樣式，不使用scoped */
+.math-display {
+  margin: 1.5em 0;
+  padding: 0.8em;
+  background-color: #fafafa;
+  border-left: 4px solid #007bff;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.math-error {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-family: 'Courier New', monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  .math-display {
+    background-color: #2a2a2a;
+    border-left-color: #4dabf7;
+  }
+  
+  .math-error {
+    color: #f8d7da;
+    background-color: #721c24;
+    border-color: #a94442;
+  }
+}
+
+@media (max-width: 768px) {
+  .math-display {
+    padding: 0.5em;
+    font-size: 0.9em;
   }
 }
 </style>
