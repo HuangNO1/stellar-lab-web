@@ -19,7 +19,13 @@
       
       <!-- JSON 內容 -->
       <div v-else class="json-container">
-        <div class="json-toolbar">
+        <div 
+          class="json-toolbar" 
+          :style="{
+            backgroundColor: themeVars.bodyColor,
+            borderColor: themeVars.borderColor
+          }"
+        >
           <n-button
             size="small"
             @click="copyToClipboard"
@@ -36,8 +42,17 @@
           </n-button>
         </div>
         
-        <div class="json-display">
-          <pre ref="codeRef" class="json-pre"><code class="language-json">{{ formattedJson }}</code></pre>
+        <div 
+          class="json-display" 
+          :style="{
+            backgroundColor: themeVars.cardColor,
+            borderColor: themeVars.borderColor
+          }"
+        >
+          <pre 
+            ref="codeRef" 
+            class="json-pre"
+          ><code class="language-json">{{ formattedJson }}</code></pre>
         </div>
       </div>
     </div>
@@ -51,10 +66,10 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useMessage } from 'naive-ui';
+import { useMessage, useThemeVars } from 'naive-ui';
 import hljs from 'highlight.js/lib/core';
 import json from 'highlight.js/lib/languages/json';
-import 'highlight.js/styles/github.css';
+// 不再全局导入CSS，而是动态处理
 
 // 註冊 JSON 語言
 hljs.registerLanguage('json', json);
@@ -74,10 +89,27 @@ const emit = defineEmits<Emits>();
 
 const { t } = useI18n();
 const message = useMessage();
+const themeVars = useThemeVars();
 
 const visible = ref(false);
 const copying = ref(false);
 const codeRef = ref<HTMLElement>();
+
+// 檢測是否為暗色主題
+const isDarkTheme = computed(() => {
+  // 通過主題變量的背景顏色來判斷是否為暗色主題
+  // 暗色主題的背景通常是深色的
+  const bodyColorHex = themeVars.value.bodyColor;
+  if (!bodyColorHex) return false;
+  
+  // 簡單的顏色亮度檢測
+  const hex = bodyColorHex.replace('#', '');
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness < 128; // 亮度小於128認為是暗色主題
+});
 
 // 監聽 show prop 的變化
 watch(
@@ -92,6 +124,18 @@ watch(
     }
   },
   { immediate: true }
+);
+
+// 監聽主題變化
+watch(
+  isDarkTheme,
+  () => {
+    if (visible.value) {
+      nextTick(() => {
+        highlightCode();
+      });
+    }
+  }
 );
 
 
@@ -124,8 +168,39 @@ const highlightCode = () => {
     if (codeElement) {
       // 清除之前的高亮
       codeElement.removeAttribute('data-highlighted');
+      
       // 應用新的高亮
       hljs.highlightElement(codeElement);
+      
+      // 動態添加適合的CSS樣式
+      nextTick(() => {
+        if (codeElement && isDarkTheme.value) {
+          // 為暗色主題手動設置顏色
+          const spans = codeElement.querySelectorAll('span[class*="hljs-"]');
+          spans.forEach((span: Element) => {
+            const htmlSpan = span as HTMLElement;
+            if (htmlSpan.className.includes('hljs-string')) {
+              htmlSpan.style.color = '#a5d6ff';
+            } else if (htmlSpan.className.includes('hljs-number') || htmlSpan.className.includes('hljs-literal')) {
+              htmlSpan.style.color = '#79c0ff';
+            } else if (htmlSpan.className.includes('hljs-attr')) {
+              htmlSpan.style.color = '#79c0ff';
+            } else if (htmlSpan.className.includes('hljs-keyword')) {
+              htmlSpan.style.color = '#ff7b72';
+            }
+          });
+          // 設置基本文本顏色
+          codeElement.style.color = '#e6edf3';
+        } else {
+          // 明亮主題，清除自定義樣式
+          const spans = codeElement.querySelectorAll('span[class*="hljs-"]');
+          spans.forEach((span: Element) => {
+            const htmlSpan = span as HTMLElement;
+            htmlSpan.style.color = '';
+          });
+          codeElement.style.color = '';
+        }
+      });
     }
   }
 };
@@ -201,11 +276,6 @@ const copyToClipboard = async () => {
   border: 1px solid #e5e7eb;
 }
 
-[data-theme="dark"] .json-toolbar,
-.dark .json-toolbar {
-  background-color: #374151;
-  border-color: #4b5563;
-}
 
 /* JSON 顯示區域 */
 .json-display {
@@ -217,11 +287,7 @@ const copyToClipboard = async () => {
   min-height: 200px; /* 最小高度確保內容可見 */
 }
 
-[data-theme="dark"] .json-display,
-.dark .json-display {
-  background-color: #1f2937;
-  border-color: #374151;
-}
+
 
 .json-pre {
   margin: 0;
@@ -239,17 +305,6 @@ const copyToClipboard = async () => {
   font-family: inherit;
   background: transparent;
   color: inherit;
-}
-
-/* 覆蓋 highlight.js 的暗色主題 */
-[data-theme="dark"] .json-pre,
-.dark .json-pre {
-  filter: invert(1) hue-rotate(180deg);
-}
-
-[data-theme="dark"] .json-pre code,
-.dark .json-pre code {
-  background: transparent !important;
 }
 
 /* 滾動條樣式 */
@@ -272,18 +327,15 @@ const copyToClipboard = async () => {
   background: #a8a8a8;
 }
 
-[data-theme="dark"] .json-pre::-webkit-scrollbar-track,
-.dark .json-pre::-webkit-scrollbar-track {
+.json-pre.dark-theme::-webkit-scrollbar-track {
   background: #374151;
 }
 
-[data-theme="dark"] .json-pre::-webkit-scrollbar-thumb,
-.dark .json-pre::-webkit-scrollbar-thumb {
+.json-pre.dark-theme::-webkit-scrollbar-thumb {
   background: #6b7280;
 }
 
-[data-theme="dark"] .json-pre::-webkit-scrollbar-thumb:hover,
-.dark .json-pre::-webkit-scrollbar-thumb:hover {
+.json-pre.dark-theme::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
 }
 
