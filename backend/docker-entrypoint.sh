@@ -47,7 +47,7 @@ def wait_for_database():
     # 數據庫配置
     host = os.getenv('MYSQL_HOST', 'db')
     port = int(os.getenv('MYSQL_PORT', 3306))
-    root_password = os.getenv('MYSQL_ROOT_PASSWORD', 'lab_web_root_123')
+    root_password = os.getenv('MYSQL_ROOT_PASSWORD', 'LabWeb2024Root!@#SecurePass')
     database = os.getenv('MYSQL_DATABASE', 'lab_web')
     
     print(f"📊 連接配置: {host}:{port}")
