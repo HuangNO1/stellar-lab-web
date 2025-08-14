@@ -203,7 +203,9 @@ const moduleOptions = computed(() => [
   { label: t('admin.operationLogs.memberModule'), value: 3 },
   { label: t('admin.operationLogs.paperModule'), value: 4 },
   { label: t('admin.operationLogs.newsModule'), value: 5 },
-  { label: t('admin.operationLogs.projectModule'), value: 6 }
+  { label: t('admin.operationLogs.projectModule'), value: 6 },
+  { label: t('admin.operationLogs.mediaModule'), value: 7 },
+  { label: t('admin.operationLogs.imageUploadModule'), value: 8 }
 ]);
 
 // 顯示 JSON 詳情
@@ -218,13 +220,15 @@ const showJsonDetail = (content: Record<string, unknown> | undefined, title: str
 // 格式化模組名稱
 const formatModuleName = (moduleId: number): string => {
   const moduleNames = [
-    t('admin.operationLogs.adminModule'),
-    t('admin.operationLogs.labModule'),
-    t('admin.operationLogs.groupModule'),
-    t('admin.operationLogs.memberModule'),
-    t('admin.operationLogs.paperModule'),
-    t('admin.operationLogs.newsModule'),
-    t('admin.operationLogs.projectModule')
+    t('admin.operationLogs.adminModule'),      // 0
+    t('admin.operationLogs.labModule'),        // 1
+    t('admin.operationLogs.groupModule'),      // 2
+    t('admin.operationLogs.memberModule'),     // 3
+    t('admin.operationLogs.paperModule'),      // 4
+    t('admin.operationLogs.newsModule'),       // 5
+    t('admin.operationLogs.projectModule'),    // 6
+    t('admin.operationLogs.mediaModule'),      // 7
+    t('admin.operationLogs.imageUploadModule') // 8
   ];
   return moduleNames[moduleId] || `模組 ${moduleId}`;
 };

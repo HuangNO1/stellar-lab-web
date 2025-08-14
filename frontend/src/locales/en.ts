@@ -762,6 +762,8 @@ export default {
       paperModule: 'Paper',
       newsModule: 'News',
       projectModule: 'Project',
+      mediaModule: 'Media Files',
+      imageUploadModule: 'Image Upload',
       loadError: 'Failed to load operation logs',
       emptyContent: 'No operation content',
       copyJson: 'Copy JSON',

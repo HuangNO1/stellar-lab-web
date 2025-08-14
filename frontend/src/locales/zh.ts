@@ -743,6 +743,8 @@ export default {
             paperModule: '论文',
             newsModule: '新闻',
             projectModule: '项目',
+            mediaModule: '媒体文件',
+            imageUploadModule: '图片上传',
             loadError: '载入操作日志失败',
             emptyContent: '没有操作内容',
             copyJson: '复制JSON',

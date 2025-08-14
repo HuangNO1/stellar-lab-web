@@ -8,7 +8,7 @@ class EditRecord(db.Model):
     edit_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     admin_id = db.Column(db.Integer, db.ForeignKey('admins.admin_id'), nullable=False)
     edit_type = db.Column(db.String(50), nullable=False, index=True)  # 添加索引用於操作類型篩選 CREATE, UPDATE, DELETE
-    edit_module = db.Column(db.Integer, nullable=False, index=True)  # 添加索引用於模塊篩選 0:實驗室 1:課題組 2:成員 3:論文 4:新聞 5:項目
+    edit_module = db.Column(db.Integer, nullable=False, index=True)  # 添加索引用於模塊篩選 0:管理員 1:實驗室 2:課題組 3:成員 4:論文 5:新聞 6:項目 7:媒體文件 8:圖片上傳
     edit_content = db.Column(db.Text)
     edit_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)  # 添加索引用於日期查詢和排序
     

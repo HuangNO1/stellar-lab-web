@@ -739,6 +739,8 @@ export default {
       paperModule: '論文',
       newsModule: '新聞',
       projectModule: '項目',
+      mediaModule: '媒體檔案',
+      imageUploadModule: '圖片上傳',
       loadError: '載入操作日誌失敗',
       emptyContent: '沒有操作內容',
       copyJson: '複製JSON',
