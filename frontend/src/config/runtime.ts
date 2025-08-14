@@ -14,8 +14,8 @@ interface AppConfig {
 const defaultConfig: AppConfig = {
   API_BASE_URL: import.meta.env.VITE_API_BASE_URL || '/api',
   BACKEND_URL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000',
-  APP_TITLE: import.meta.env.VITE_APP_TITLE || 'Lab Website Framework',
-  APP_DESCRIPTION: import.meta.env.VITE_APP_DESCRIPTION || 'Modern laboratory website framework'
+  APP_TITLE: import.meta.env.VITE_APP_TITLE || 'Laboratory Website',
+  APP_DESCRIPTION: import.meta.env.VITE_APP_DESCRIPTION || 'Modern laboratory website'
 };
 
 // Runtime configuration from nginx-generated config.js

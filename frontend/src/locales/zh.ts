@@ -6,7 +6,8 @@ export default {
         projects: '项目',
         papers: '论文',
         news: '新闻',
-        about: '关于'
+        about: '关于',
+        menu: '导航菜单'
     },
     common: {
         language: '语言',
@@ -27,6 +28,17 @@ export default {
         page: '页',
         noData: '暂无数据',
         itemsPerPage: '每页条数'
+    },
+    auth: {
+        loginFailed: '登录失败',
+        loginNetworkError: '登录失败，请检查网络连接',
+        logoutFailed: '登出请求失败',
+        updateProfileFailed: '更新个人资讯失败',
+        updateFailed: '更新失败，请重试',
+        changePasswordFailed: '修改密码失败',
+        changePasswordSuccess: '密码修改成功',
+        changeFailed: '修改失败，请重试',
+        fetchMembersFailed: '获取成员数据失败'
     },
     defaults: {
         labName: '实验室',
@@ -56,7 +68,20 @@ export default {
         alumni: '校友',
         others: '其他成员',
         description: '个人简介',
-        relatedPapers: '相关论文'
+        relatedPapers: '相关论文',
+        positions: {
+            professor: '教授',
+            associateProfessor: '副教授',
+            lecturer: '讲师',
+            assistantProfessor: '助理教授',
+            postdoc: '博士后',
+            phdStudent: '博士生',
+            masterStudent: '硕士生',
+            undergraduate: '本科生',
+            alumni: '校友',
+            other: '其他',
+            year: '年级'
+        }
     },
     research: {
         title: '研究领域',

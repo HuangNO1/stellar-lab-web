@@ -6,7 +6,8 @@ export default {
     projects: '項目',
     papers: '論文',
     news: '新聞',
-    about: '關於'
+    about: '關於',
+    menu: '導航選單'
   },
   common: {
     language: '語言',
@@ -27,6 +28,17 @@ export default {
     page: '頁',
     noData: '暫無數據',
     itemsPerPage: '每頁條數'
+  },
+  auth: {
+    loginFailed: '登錄失敗',
+    loginNetworkError: '登錄失敗，請檢查網絡連接',
+    logoutFailed: '登出請求失敗',
+    updateProfileFailed: '更新個人資訊失敗',
+    updateFailed: '更新失敗，請重試',
+    changePasswordFailed: '修改密碼失敗',
+    changePasswordSuccess: '密碼修改成功',
+    changeFailed: '修改失敗，請重試',
+    fetchMembersFailed: '獲取成員數據失敗'
   },
   defaults: {
     labName: '實驗室',
@@ -56,7 +68,20 @@ export default {
     alumni: '校友',
     others: '其他成員',
     description: '個人簡介',
-    relatedPapers: '相關論文'
+    relatedPapers: '相關論文',
+    positions: {
+      professor: '教授',
+      associateProfessor: '副教授',
+      lecturer: '講師',
+      assistantProfessor: '助理教授',
+      postdoc: '博士後',
+      phdStudent: '博士生',
+      masterStudent: '碩士生',
+      undergraduate: '本科生',
+      alumni: '校友',
+      other: '其他',
+      year: '年級'
+    }
   },
   research: {
     title: '研究領域',

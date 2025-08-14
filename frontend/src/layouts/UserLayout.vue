@@ -77,7 +77,7 @@
             placement="right"
             class="mobile-drawer"
           >
-            <n-drawer-content title="導航選單">
+            <n-drawer-content :title="$t('nav.menu')">
               <div class="mobile-nav-content">
                 <n-menu
                   v-model:value="activeKey"
@@ -91,7 +91,7 @@
                 <div class="mobile-settings">
                   <!-- Language Selector -->
                   <div class="setting-item">
-                    <span class="setting-label">語言</span>
+                    <span class="setting-label">{{ $t('common.language') }}</span>
                     <n-select
                       :value="locale"
                       :options="languageSelectOptions"
@@ -102,16 +102,16 @@
                   
                   <!-- Theme Toggle -->
                   <div class="setting-item">
-                    <span class="setting-label">主題</span>
+                    <span class="setting-label">{{ $t('common.theme') }}</span>
                     <n-switch
                       :value="isDarkMode"
                       @update:value="toggleTheme"
                     >
                       <template #checked>
-                        暗色
+                        {{ $t('common.dark') }}
                       </template>
                       <template #unchecked>
-                        明亮
+                        {{ $t('common.light') }}
                       </template>
                     </n-switch>
                   </div>

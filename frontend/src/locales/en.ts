@@ -6,7 +6,8 @@ export default {
     projects: 'Projects',
     papers: 'Papers',
     news: 'News',
-    about: 'About'
+    about: 'About',
+    menu: 'Navigation Menu'
   },
   common: {
     language: 'Language',
@@ -27,6 +28,17 @@ export default {
     page: 'Page',
     noData: 'No Data',
     itemsPerPage: 'Items per page'
+  },
+  auth: {
+    loginFailed: 'Login failed',
+    loginNetworkError: 'Login failed, please check network connection',
+    logoutFailed: 'Logout request failed',
+    updateProfileFailed: 'Failed to update profile',
+    updateFailed: 'Update failed, please retry',
+    changePasswordFailed: 'Failed to change password',
+    changePasswordSuccess: 'Password changed successfully',
+    changeFailed: 'Change failed, please retry',
+    fetchMembersFailed: 'Failed to fetch members data'
   },
   defaults: {
     labName: 'Laboratory',
@@ -56,7 +68,20 @@ export default {
     alumni: 'Alumni',
     others: 'Others',
     description: 'Biography',
-    relatedPapers: 'Related Papers'
+    relatedPapers: 'Related Papers',
+    positions: {
+      professor: 'Professor',
+      associateProfessor: 'Associate Professor',
+      lecturer: 'Lecturer',
+      assistantProfessor: 'Assistant Professor',
+      postdoc: 'Postdoc',
+      phdStudent: 'PhD Student',
+      masterStudent: 'Master Student',
+      undergraduate: 'Undergraduate',
+      alumni: 'Alumni',
+      other: 'Other',
+      year: 'Year'
+    }
   },
   research: {
     title: 'Research Areas',

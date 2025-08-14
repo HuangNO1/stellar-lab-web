@@ -1,4 +1,5 @@
 import { ref, onMounted, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { memberApi } from '@/services/api';
 import type { Member, MemberQueryParams } from '@/types/api';
 import { getMemberAvatarUrl } from '@/utils/media';
@@ -7,6 +8,7 @@ import { getMemberAvatarUrl } from '@/utils/media';
  * 成員數據 Hook
  */
 export function useMembers() {
+  const { t, locale } = useI18n();
   const members = ref<Member[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
@@ -27,7 +29,7 @@ export function useMembers() {
       }
     } catch (err) {
       console.error('Failed to fetch members:', err);
-      error.value = '獲取成員數據失敗';
+      error.value = t('auth.fetchMembersFailed');
       // 設置為空數組而不是使用本地數據
       members.value = [];
       total.value = 0;
@@ -130,39 +132,40 @@ export function useMembers() {
   };
 
   // 獲取成員職位描述
-  const getMemberPosition = (member: Member, locale: 'zh' | 'en' = 'zh') => {
+  const getMemberPosition = (member: Member) => {
     if (member.mem_type === 0) {
       // 教師
-      const jobTypes = {
-        zh: ['教授', '副教授', '講師', '助理教授', '博士後'],
-        en: ['Professor', 'Associate Professor', 'Lecturer', 'Assistant Professor', 'Postdoc']
-      };
-      return jobTypes[locale][member.job_type || 4];
+      const jobTypeKeys = ['professor', 'associateProfessor', 'lecturer', 'assistantProfessor', 'postdoc'];
+      const jobTypeKey = jobTypeKeys[member.job_type || 4];
+      return t(`members.positions.${jobTypeKey}`);
     } else if (member.mem_type === 1) {
       // 學生
       if (member.destination_zh || member.destination_en) {
         // 有去向信息的學生視為校友 - 顯示去向
-        return locale === 'zh' ? member.destination_zh : member.destination_en;
+        return locale.value === 'zh' ? member.destination_zh : member.destination_en;
       } else {
         // 在校學生
-        const studentTypes = {
-          zh: ['博士生', '碩士生', '本科生'],
-          en: ['PhD Student', 'Master Student', 'Undergraduate']
-        };
-        const type = studentTypes[locale][member.student_type || 0];
-        const grade = member.student_grade ? `${member.student_grade}年級` : '';
-        return locale === 'zh' ? `${type}${grade}` : `${type} ${grade ? `Year ${member.student_grade}` : ''}`;
+        const studentTypeKeys = ['phdStudent', 'masterStudent', 'undergraduate'];
+        const studentTypeKey = studentTypeKeys[member.student_type || 0];
+        const type = t(`members.positions.${studentTypeKey}`);
+        if (member.student_grade) {
+          const grade = locale.value === 'zh' ? 
+            `${member.student_grade}${t('members.positions.year')}` :
+            `${t('members.positions.year')} ${member.student_grade}`;
+          return `${type} ${grade}`;
+        }
+        return type;
       }
     } else if (member.mem_type === 2) {
       // 校友 - 顯示去向或默認文本
       if (member.destination_zh || member.destination_en) {
-        return locale === 'zh' ? member.destination_zh : member.destination_en;
+        return locale.value === 'zh' ? member.destination_zh : member.destination_en;
       } else {
-        return locale === 'zh' ? '校友' : 'Alumni';
+        return t('members.positions.alumni');
       }
     } else {
       // 其他
-      return locale === 'zh' ? '其他' : 'Other';
+      return t('members.positions.other');
     }
   };
 

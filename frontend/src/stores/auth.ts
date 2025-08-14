@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { Admin, ApiError } from '@/types/api';
 import { authApi } from '@/services/api';
 
 export const useAuthStore = defineStore('auth', () => {
+  const { t } = useI18n();
   const isAuthenticated = ref<boolean>(false);
   const admin = ref<Admin | null>(null);
   const token = ref<string | null>(localStorage.getItem('admin_token'));
@@ -44,10 +46,10 @@ export const useAuthStore = defineStore('auth', () => {
         return { success: false, message: response.message };
       }
     } catch (error: unknown) {
-      console.error('登錄失敗:', error);
+      console.error(t('auth.loginFailed') + ':', error);
       // 優先使用服務器返回的錯誤信息
       const apiError = error as ApiError;
-      const errorMessage = apiError?.message || '登錄失敗，請檢查網絡連接';
+      const errorMessage = apiError?.message || t('auth.loginNetworkError');
       return { success: false, message: errorMessage };
     } finally {
       loading.value = false;
@@ -61,7 +63,7 @@ export const useAuthStore = defineStore('auth', () => {
         await authApi.logout();
       }
     } catch (error) {
-      console.error('登出請求失敗:', error);
+      console.error(t('auth.logoutFailed') + ':', error);
     } finally {
       // 清除本地狀態
       clearAuth();
@@ -89,8 +91,8 @@ export const useAuthStore = defineStore('auth', () => {
         return { success: false, message: response.message };
       }
     } catch (error) {
-      console.error('更新個人資訊失敗:', error);
-      return { success: false, message: '更新失敗，請重試' };
+      console.error(t('auth.updateProfileFailed') + ':', error);
+      return { success: false, message: t('auth.updateFailed') };
     }
   };
 
@@ -99,13 +101,13 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const response = await authApi.changePassword(oldPassword, newPassword);
       if (response.code === 0) {
-        return { success: true, message: '密碼修改成功' };
+        return { success: true, message: t('auth.changePasswordSuccess') };
       } else {
         return { success: false, message: response.message };
       }
     } catch (error) {
-      console.error('修改密碼失敗:', error);
-      return { success: false, message: '修改失敗，請重試' };
+      console.error(t('auth.changePasswordFailed') + ':', error);
+      return { success: false, message: t('auth.changeFailed') };
     }
   };
 
