@@ -29,11 +29,24 @@ def save_file(file, file_type='other', max_size=None):
     if not allowed_file(file.filename, file_type):
         raise ValueError(msg.get_error_message('UNSUPPORTED_FILE_TYPE'))
     
-    # 檢查文件大小
-    if max_size and len(file.read()) > max_size:
-        raise ValueError(msg.get_error_message('FILE_SIZE_EXCEEDED', max_size=max_size))
+    # 檢查文件大小 - 使用 content_length 避免讀取整個文件
+    if max_size:
+        # 優先使用 content_length
+        if hasattr(file, 'content_length') and file.content_length:
+            if file.content_length > max_size:
+                raise ValueError(msg.get_error_message('FILE_SIZE_EXCEEDED', max_size=max_size))
+        else:
+            # 回退到原方法，但先保存當前位置
+            current_pos = file.tell()
+            file.seek(0, 2)  # 移動到文件末尾
+            file_size = file.tell()
+            file.seek(current_pos)  # 恢復原位置
+            
+            if file_size > max_size:
+                raise ValueError(msg.get_error_message('FILE_SIZE_EXCEEDED', max_size=max_size))
     
-    file.seek(0)  # 重置文件指針
+    # 確保文件指針在開始位置
+    file.seek(0)
     
     # 生成文件名
     ext = file.filename.rsplit('.', 1)[1].lower()

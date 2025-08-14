@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from app.auth import admin_required
 from app.utils.helpers import success_response, error_response
 from app.services import PaperService
@@ -48,6 +48,11 @@ def get_paper(paper_id):
 def create_paper():
     """創建論文"""
     try:
+        # 記錄上傳開始時間
+        import time
+        start_time = time.time()
+        current_app.logger.info(f"論文創建開始，Content-Length: {request.headers.get('Content-Length', 'Unknown')}")
+        
         # 根據Content-Type選擇數據源
         if request.is_json:
             form_data = request.get_json() or {}
@@ -60,6 +65,9 @@ def create_paper():
             
             # 處理文件數據
             files_data = dict(request.files) if request.files else {}
+            if files_data and 'paper_file' in files_data:
+                file = files_data['paper_file']
+                current_app.logger.info(f"上傳文件: {file.filename}, 大小: {getattr(file, 'content_length', 'Unknown')}")
             
             # 處理作者信息
             authors_data = []
@@ -71,16 +79,30 @@ def create_paper():
                     return jsonify(error_response(2000, msg.get_error_message('INVALID_INPUT'))), 400
         
         paper = paper_service.create_paper(form_data, files_data, authors_data)
+        
+        # 記錄處理時間
+        end_time = time.time()
+        current_app.logger.info(f"論文創建完成，處理時間: {end_time - start_time:.2f}秒")
+        
         return jsonify(success_response(paper, msg.get_success_message('PAPER_CREATE_SUCCESS'))), 201
     except ServiceException as e:
+        current_app.logger.error(f"論文創建失敗: {str(e)}")
         error_data = paper_service.format_error_response(e)
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
+    except Exception as e:
+        current_app.logger.error(f"論文創建發生未知錯誤: {str(e)}")
+        return jsonify(error_response(5000, msg.get_error_message('OPERATION_FAILED'))), 500
 
 @bp.route('/papers/<int:paper_id>', methods=['PUT'])
 @admin_required
 def update_paper(paper_id):
     """更新論文"""
     try:
+        # 記錄上傳開始時間
+        import time
+        start_time = time.time()
+        current_app.logger.info(f"論文更新開始 (ID: {paper_id})，Content-Length: {request.headers.get('Content-Length', 'Unknown')}")
+        
         # 根據Content-Type選擇數據源
         if request.is_json:
             form_data = request.get_json() or {}
@@ -88,13 +110,25 @@ def update_paper(paper_id):
         else:
             form_data = dict(request.form)
             files_data = dict(request.files) if request.files else None
+            if files_data and 'paper_file' in files_data:
+                file = files_data['paper_file']
+                current_app.logger.info(f"更新文件: {file.filename}, 大小: {getattr(file, 'content_length', 'Unknown')}")
             
         paper = paper_service.update_paper(paper_id, form_data, files_data)
+        
+        # 記錄處理時間
+        end_time = time.time()
+        current_app.logger.info(f"論文更新完成 (ID: {paper_id})，處理時間: {end_time - start_time:.2f}秒")
+        
         return jsonify(success_response(paper, msg.get_success_message('PAPER_UPDATE_SUCCESS')))
     except ServiceException as e:
+        current_app.logger.error(f"論文更新失敗 (ID: {paper_id}): {str(e)}")
         error_data = paper_service.format_error_response(e)
         status_code = 404 if 'NotFoundError' in str(type(e)) else 400
         return jsonify(error_response(error_data['code'], error_data['message'])), status_code
+    except Exception as e:
+        current_app.logger.error(f"論文更新發生未知錯誤 (ID: {paper_id}): {str(e)}")
+        return jsonify(error_response(5000, msg.get_error_message('OPERATION_FAILED'))), 500
 
 @bp.route('/papers/<int:paper_id>', methods=['DELETE'])
 @admin_required
