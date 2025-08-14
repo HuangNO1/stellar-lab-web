@@ -33,9 +33,12 @@ class Config:
     MAX_PER_PAGE = 100
     
     # 其他配置
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 
+    cors_origins_env = os.environ.get('CORS_ORIGINS', 
         'http://localhost:3000,http://127.0.0.1:3000,http://localhost:5000,http://127.0.0.1:5000,http://localhost:8000,http://127.0.0.1:8000,http://localhost:8080,http://127.0.0.1:8080'
-    ).split(',') if os.environ.get('CORS_ORIGINS') != '*' else '*'
+    )
+    # 處理環境變量中可能包含的引號
+    cors_origins_env = cors_origins_env.strip('"\'')
+    CORS_ORIGINS = '*' if cors_origins_env == '*' else cors_origins_env.split(',')
 
 class DevelopmentConfig(Config):
     DEBUG = True
