@@ -1611,6 +1611,7 @@ GET /api/health
   "code": 0,
   "message": "OK",
   "data": {
+    "message": "Laboratory web framework backend service is running normally",
     "status": "healthy",
     "timestamp": "2024-01-01T00:00:00",
     "version": "1.0.0"
