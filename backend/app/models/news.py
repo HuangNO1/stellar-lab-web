@@ -6,6 +6,9 @@ class News(db.Model):
     
     news_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     news_type = db.Column(db.Integer, nullable=False, index=True)  # 添加索引用於類型篩選
+    # 新增：標題字段
+    news_title_zh = db.Column(db.String(500), index=True)  # 中文標題，添加索引用於搜索
+    news_title_en = db.Column(db.String(500), index=True)  # 英文標題，添加索引用於搜索
     news_content_zh = db.Column(db.Text)
     news_content_en = db.Column(db.Text)
     news_date = db.Column(db.Date, index=True)  # 添加索引用於日期查詢和排序
@@ -23,6 +26,8 @@ class News(db.Model):
         return {
             'news_id': self.news_id,
             'news_type': self.news_type,
+            'news_title_zh': self.news_title_zh,
+            'news_title_en': self.news_title_en,
             'news_content_zh': self.news_content_zh,
             'news_content_en': self.news_content_en,
             'news_date': self.news_date.isoformat() if self.news_date else None,

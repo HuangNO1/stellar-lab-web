@@ -32,6 +32,8 @@ class NewsService(BaseService):
             if filters.get('q'):
                 search_term = f"%{filters['q']}%"
                 query = query.filter(
+                    (News.news_title_zh.like(search_term)) |
+                    (News.news_title_en.like(search_term)) |
                     (News.news_content_zh.like(search_term)) |
                     (News.news_content_en.like(search_term))
                 )
@@ -74,6 +76,8 @@ class NewsService(BaseService):
             
             # 設置新聞信息
             news.news_type = news_data['news_type']
+            news.news_title_zh = news_data.get('news_title_zh', '')
+            news.news_title_en = news_data.get('news_title_en', '')
             news.news_content_zh = news_data['news_content_zh']
             news.news_content_en = news_data.get('news_content_en', '')
             news.news_date = datetime.strptime(news_data['news_date'], '%Y-%m-%d').date()
@@ -108,7 +112,7 @@ class NewsService(BaseService):
             update_data = {}
             
             # 更新字段
-            fields = ['news_type', 'news_content_zh', 'news_content_en', 'news_date']
+            fields = ['news_type', 'news_title_zh', 'news_title_en', 'news_content_zh', 'news_content_en', 'news_date']
             for field in fields:
                 if field in news_data:
                     old_value = getattr(news, field)
@@ -158,6 +162,10 @@ class NewsService(BaseService):
         if is_create:
             required_fields = ['news_type', 'news_content_zh', 'news_date']
             self.validate_required_fields(news_data, required_fields)
+            
+            # 檢查至少有一個標題字段
+            if not news_data.get('news_title_zh') and not news_data.get('news_title_en'):
+                raise ValidationError(msg.get_error_message('NEWS_TITLE_REQUIRED'))
         
         # 新聞類型校驗
         if 'news_type' in news_data:
@@ -171,6 +179,8 @@ class NewsService(BaseService):
         
         # 字符串長度校驗
         string_fields = {
+            'news_title_zh': 500,
+            'news_title_en': 500,
             'news_content_zh': 10000,
             'news_content_en': 10000
         }

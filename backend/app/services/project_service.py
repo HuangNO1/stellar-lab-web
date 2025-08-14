@@ -5,6 +5,7 @@ from app.utils.validators import validate_string_length
 from app.utils.helpers import get_pagination_params, paginate_query
 from app.utils.messages import msg
 from .base_service import BaseService, ValidationError, NotFoundError
+from .image_upload_service import ImageUploadService
 
 
 class ProjectService(BaseService):
@@ -87,6 +88,17 @@ class ProjectService(BaseService):
             self.db.session.add(project)
             self.db.session.flush()
             
+            # 處理描述字段中的圖片管理
+            image_upload_service = ImageUploadService()
+            for field in ['project_desc_zh', 'project_desc_en']:
+                if field in project_data and project_data[field]:
+                    image_upload_service.mark_images_as_used(
+                        content=project_data[field],
+                        entity_type='project',
+                        entity_id=project.project_id,
+                        field_name=field
+                    )
+            
             return project.to_dict()
         
         # 執行操作並記錄審計
@@ -131,6 +143,16 @@ class ProjectService(BaseService):
                     if old_value != new_value:
                         setattr(project, field, new_value)
                         update_data[field] = {'old': str(old_value), 'new': str(new_value)}
+                        
+                        # 處理描述字段的圖片管理
+                        if field in ['project_desc_zh', 'project_desc_en'] and new_value:
+                            image_upload_service = ImageUploadService()
+                            image_upload_service.mark_images_as_used(
+                                content=new_value,
+                                entity_type='project',
+                                entity_id=project_id,
+                                field_name=field
+                            )
             
             return project.to_dict(), update_data
         

@@ -6,8 +6,9 @@ from .paper import Paper, PaperAuthor
 from .project import Project
 from .news import News
 from .edit_record import EditRecord
+from .uploaded_image import UploadedImage
 
 __all__ = [
     'Admin', 'Lab', 'ResearchGroup', 'Member', 
-    'Paper', 'PaperAuthor', 'Project', 'News', 'EditRecord'
+    'Paper', 'PaperAuthor', 'Project', 'News', 'EditRecord', 'UploadedImage'
 ]

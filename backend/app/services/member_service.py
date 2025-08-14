@@ -5,6 +5,7 @@ from app.utils.file_handler import save_file, delete_file
 from app.utils.helpers import get_pagination_params, paginate_query
 from app.utils.messages import msg
 from .base_service import BaseService, ValidationError, NotFoundError, BusinessLogicError
+from .image_upload_service import ImageUploadService
 
 
 class MemberService(BaseService):
@@ -106,6 +107,17 @@ class MemberService(BaseService):
             
             self.db.session.add(member)
             self.db.session.flush()
+            
+            # 處理描述字段中的圖片管理
+            image_upload_service = ImageUploadService()
+            for field in ['mem_desc_zh', 'mem_desc_en']:
+                if field in form_data and form_data[field]:
+                    image_upload_service.mark_images_as_used(
+                        content=form_data[field],
+                        entity_type='member',
+                        entity_id=member.mem_id,
+                        field_name=field
+                    )
             
             return member.to_dict()
         
@@ -518,6 +530,16 @@ class MemberService(BaseService):
                 if old_value != new_value:
                     setattr(member, field, new_value)
                     update_data[field] = {'old': old_value, 'new': new_value}
+                    
+                    # 處理描述字段的圖片管理
+                    if field in ['mem_desc_zh', 'mem_desc_en'] and new_value:
+                        image_upload_service = ImageUploadService()
+                        image_upload_service.mark_images_as_used(
+                            content=new_value,
+                            entity_type='member',
+                            entity_id=member.mem_id,
+                            field_name=field
+                        )
         
         return update_data
     

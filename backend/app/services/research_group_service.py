@@ -4,6 +4,7 @@ from app.utils.validators import validate_string_length
 from app.utils.helpers import get_pagination_params, paginate_query
 from app.utils.messages import msg
 from .base_service import BaseService, ValidationError, NotFoundError, BusinessLogicError
+from .image_upload_service import ImageUploadService
 
 
 class ResearchGroupService(BaseService):
@@ -94,6 +95,17 @@ class ResearchGroupService(BaseService):
             self.db.session.add(group)
             self.db.session.flush()
             
+            # 處理描述字段中的圖片管理
+            image_upload_service = ImageUploadService()
+            for field in ['research_group_desc_zh', 'research_group_desc_en']:
+                if field in group_data and group_data[field]:
+                    image_upload_service.mark_images_as_used(
+                        content=group_data[field],
+                        entity_type='research_group',
+                        entity_id=group.research_group_id,
+                        field_name=field
+                    )
+            
             return group.to_dict()
         
         # 執行操作並記錄審計
@@ -134,6 +146,16 @@ class ResearchGroupService(BaseService):
                     if old_value != new_value:
                         setattr(group, field, new_value)
                         update_data[field] = {'old': old_value, 'new': new_value}
+                        
+                        # 處理描述字段的圖片管理
+                        if field in ['research_group_desc_zh', 'research_group_desc_en'] and new_value:
+                            image_upload_service = ImageUploadService()
+                            image_upload_service.mark_images_as_used(
+                                content=new_value,
+                                entity_type='research_group',
+                                entity_id=group_id,
+                                field_name=field
+                            )
             
             # 更新關聯信息
             association_updates = self._update_group_associations(group, group_data)

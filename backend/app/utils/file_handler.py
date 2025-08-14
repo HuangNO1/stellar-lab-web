@@ -18,6 +18,8 @@ def allowed_file(filename, file_type='image'):
         return ext in current_app.config['ALLOWED_DOCUMENT_EXTENSIONS']
     elif file_type == 'member_avatar':
         return ext in current_app.config['ALLOWED_IMAGE_EXTENSIONS']
+    elif file_type == 'description_image':
+        return ext in current_app.config['ALLOWED_IMAGE_EXTENSIONS']
     
     return False
 
@@ -63,7 +65,7 @@ def save_file(file, file_type='other', max_size=None):
     file.save(file_path)
     
     # 對圖片進行處理
-    if file_type in ['image', 'member_avatar']:
+    if file_type in ['image', 'member_avatar', 'description_image']:
         try:
             with Image.open(file_path) as img:
                 # 限制最大尺寸

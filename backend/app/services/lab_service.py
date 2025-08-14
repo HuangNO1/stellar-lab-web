@@ -5,6 +5,7 @@ from app.utils.validators import validate_email, validate_string_length
 from app.utils.file_handler import save_file, delete_file
 from app.utils.messages import msg
 from .base_service import BaseService, ValidationError, NotFoundError
+from .image_upload_service import ImageUploadService
 
 
 class LabService(BaseService):
@@ -250,6 +251,16 @@ class LabService(BaseService):
                 if getattr(lab, field) != value:
                     setattr(lab, field, value)
                     update_data[field] = value
+                    
+                    # 處理描述字段的圖片管理
+                    if field in ['lab_desc_zh', 'lab_desc_en'] and value:
+                        image_upload_service = ImageUploadService()
+                        image_upload_service.mark_images_as_used(
+                            content=value,
+                            entity_type='lab',
+                            entity_id=lab.lab_id,
+                            field_name=field
+                        )
         
         return update_data
     

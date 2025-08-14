@@ -18,6 +18,7 @@ from .research_group_service import ResearchGroupService
 from .paper_service import PaperService
 from .admin_service import AdminService
 from .media_service import MediaService
+from .image_upload_service import ImageUploadService
 
 __all__ = [
     'BaseService',
@@ -30,5 +31,6 @@ __all__ = [
     'ResearchGroupService',
     'PaperService',
     'AdminService',
-    'MediaService'
+    'MediaService',
+    'ImageUploadService'
 ]

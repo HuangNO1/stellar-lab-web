@@ -28,7 +28,9 @@ class AuditService(BaseService):
         'member': 3,
         'paper': 4,
         'news': 5,
-        'project': 6
+        'project': 6,
+        'media': 7,
+        'image_upload': 8
     }
     
     # 操作類型枚舉
