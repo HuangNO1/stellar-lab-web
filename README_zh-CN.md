@@ -9,8 +9,7 @@
 <!-- Header -->
 
 <div align="center">
-
-<img src="frontend/src/assets/logo.png" width="128"/>
+<img src="preview/logo.png" width="128"/>
 
 # 實驗室網頁框架
 
@@ -449,6 +448,20 @@ lab_web/
 ## 📄 許可證
 
 本專案採用 MIT 許可證 - 詳見 [LICENSE](LICENSE) 檔案。
+
+## 👤 關於作者
+
+Moon Cancer
+
+Let's go to the pier and grab some fries. Ciallo～(∠・ω< )⌒☆
+
+- GitHub: [HuangNO1](https://github.com/HuangNO1)
+
+- Blog: [Rem Blog](https://huangno1.github.io/)
+
+🙏 致謝
+
+- Logo 來源：[「私」](https://www.pixiv.net/artworks/117867484) by [ｻｻﾞﾅﾐ。](https://www.pixiv.net/users/16252763)。
 
 ---
 

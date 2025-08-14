@@ -10,7 +10,7 @@
 
 <div align="center">
 
-<img src="frontend/src/assets/logo.png" width="128"/>
+<img src="preview/logo.png" width="128"/>
 
 # Lab Website Framework
 
@@ -448,6 +448,20 @@ For questions, issues, or feature requests:
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👤 About the Author
+
+Moon Cancer
+
+Let's go to the pier and grab some fries. Ciallo～(∠・ω< )⌒☆
+
+- GitHub: [HuangNO1](https://github.com/HuangNO1)
+
+- Blog: [Rem Blog](https://huangno1.github.io/)
+
+🙏 Acknowledgements
+
+- Application Logo Source: [「私」](https://www.pixiv.net/artworks/117867484) by [ｻｻﾞﾅﾐ。](https://www.pixiv.net/users/16252763).
 
 ---
 
