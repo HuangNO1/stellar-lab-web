@@ -4,9 +4,10 @@
     :language="currentLanguage"
     :placeholder="placeholder"
     :preview="preview"
-    :toolbars="toolbars"
+    :toolbars="toolbars || defaultToolbars"
     :style="style"
     :theme="currentTheme"
+    :onUploadImg="handleUploadImg"
     @update:modelValue="$emit('update:modelValue', $event)"
   />
 </template>
@@ -17,23 +18,37 @@ import { useI18n } from 'vue-i18n';
 import { MdEditor, config } from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
 import { getTheme } from '@/locales';
+import { useMessage } from 'naive-ui';
+import { imageApi } from '@/services/api';
+import type { ApiError } from '@/types/api';
 
 // Props
-defineProps<{
+const props = defineProps<{
   modelValue?: string;
   placeholder?: string;
   preview?: boolean;
   toolbars?: string[];
   style?: string | Record<string, unknown>;
+  entityType?: string;
+  entityId?: number;
+  fieldName?: string;
 }>();
-
 
 // Emits
 defineEmits<{
   'update:modelValue': [value: string];
 }>();
 
-const { locale } = useI18n();
+const { locale, t } = useI18n();
+const message = useMessage();
+
+// 默認工具欄配置，包含KaTeX數學公式按鈕
+const defaultToolbars = [
+  'bold', 'underline', 'italic', 'strikeThrough', '-',
+  'title', 'sub', 'sup', 'quote', 'unorderedList', 'orderedList', 'task', '-',
+  'codeRow', 'code', 'link', 'image', 'table', 'mermaid', 'katex', '-',
+  'revoke', 'next', 'save', '=', 'pageFullscreen', 'fullscreen', 'preview', 'htmlPreview', 'catalog'
+];
 
 // Try to inject theme from parent, fallback to getTheme()
 const isDarkMode = inject('isDarkMode', null);
@@ -45,12 +60,57 @@ const currentLanguage = computed(() => {
 
 // 當前主題
 const currentTheme = computed(() => {
-  // Try to get theme from injected value or fallback to stored theme
   if (isDarkMode && typeof isDarkMode === 'object' && 'value' in isDarkMode) {
     return isDarkMode.value ? 'dark' : 'light';
   }
   return getTheme() === 'dark' ? 'dark' : 'light';
 });
+
+// 處理圖片上傳
+const handleUploadImg = async (files: File[], callback: (urls: string[]) => void) => {
+  const uploadResults: string[] = [];
+  
+  for (const file of files) {
+    try {
+      // 檢查文件類型
+      if (!file.type.startsWith('image/')) {
+        message.error(t('admin.markdownEditor.imageUpload.invalidFileType'));
+        continue;
+      }
+      
+      // 檢查文件大小 (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        message.error(t('admin.markdownEditor.imageUpload.fileSizeExceeded'));
+        continue;
+      }
+      
+      // 使用封裝的 API 上傳圖片
+      const response = await imageApi.uploadImage(
+        file,
+        props.entityType,
+        props.entityId,
+        props.fieldName
+      );
+      
+      if (response.code === 0 && response.data) {
+        uploadResults.push(response.data.file_url);
+      } else {
+        message.error(response.message || t('admin.markdownEditor.imageUpload.uploadFailed'));
+      }
+    } catch (error) {
+      console.error('圖片上傳錯誤:', error);
+      const apiError = error as ApiError;
+      message.error(apiError?.message || t('admin.markdownEditor.imageUpload.uploadFailed'));
+    }
+  }
+  
+  // 回調返回上傳成功的圖片URL
+  callback(uploadResults);
+  
+  if (uploadResults.length > 0) {
+    message.success(t('admin.markdownEditor.imageUpload.uploadSuccess', { count: uploadResults.length }));
+  }
+};
 
 // 配置國際化和主題
 onMounted(() => {

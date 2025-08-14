@@ -19,12 +19,39 @@ export const getMediaUrl = (path: string): string => {
   
   // 根據API.md，媒體文件通過 /api/media/serve/{file_path} 獲取
   const config = getConfig();
-  const baseUrl = config.API_BASE_URL;
+  const baseUrl = config.API_BASE_URL || config.BACKEND_URL;
   
   // 移除路徑開頭的 /media/ 前綴（如果存在）
   const cleanPath = path.startsWith('/media/') ? path.substring(7) : path;
   
   return `${baseUrl}/media/serve/${cleanPath}`;
+};
+
+/**
+ * 處理Markdown內容中的圖片URL，將相對路徑轉換為完整URL
+ * @param markdown Markdown內容
+ * @returns 處理後的Markdown內容
+ */
+export const processMarkdownImageUrls = (markdown: string): string => {
+  if (!markdown) return '';
+  
+  const config = getConfig();
+  const backendUrl = config.BACKEND_URL || 'http://localhost:8000';
+  
+  // 匹配Markdown圖片語法: ![alt](url)
+  return markdown.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, url) => {
+    // 如果已經是完整URL，直接返回
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return match;
+    }
+    
+    // 如果是以/api開頭的相對路徑，添加後端URL
+    if (url.startsWith('/api/')) {
+      return `![${alt}](${backendUrl}${url})`;
+    }
+    
+    return match;
+  });
 };
 
 /**
@@ -125,7 +152,7 @@ export const getDefaultCarouselUrls = (): string[] => {
  * @returns 頭像URL，如果沒有則返回默認頭像
  */
 export const getMemberAvatarUrl = (avatarPath?: string): string => {
-  return avatarPath ? getMediaUrl(avatarPath) : '/default-avatar.png';
+  return avatarPath ? getMediaUrl(avatarPath) : '/default-avatar.svg';
 };
 
 /**

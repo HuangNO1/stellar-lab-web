@@ -451,6 +451,10 @@ export default {
                 url: '论文连结',
                 file: '论文文件',
                 authors: '作者',
+                labAuthors: '實驗室作者',
+                allAuthors: '全部作者',
+                allAuthorsZh: '全部作者（中文）',
+                allAuthorsEn: '全部作者（英文）',
                 placeholders: {
                     titleZh: '请输入论文中文标题',
                     titleEn: '请输入论文英文标题',
@@ -461,7 +465,9 @@ export default {
                     date: '请选择发表日期',
                     status: '请选择接收状态',
                     url: '请输入论文连结URL',
-                    authors: '请选择论文作者'
+                    authors: '请选择论文作者',
+                    allAuthorsZh: '请输入全部作者中文名称（例如：张三, 李四, 王五）',
+                    allAuthorsEn: '请输入全部作者英文名称（例如：John Smith, Jane Doe）'
                 },
                 validation: {
                     titleZhRequired: '请输入中文标题',
@@ -513,11 +519,15 @@ export default {
             deleteError: '删除新闻失败',
             form: {
                 type: '新闻类型',
+                titleZh: '中文标题',
+                titleEn: '英文标题',
                 contentZh: '中文内容',
                 contentEn: '英文内容',
                 date: '新闻日期',
                 placeholders: {
                     type: '请选择新闻类型',
+                    titleZh: '请输入新闻中文标题',
+                    titleEn: '请输入新闻英文标题',
                     contentZh: '请输入新闻中文内容（支持 Markdown 语法）',
                     contentEn: '请输入新闻英文内容（支持 Markdown 语法）',
                     date: '请选择新闻日期'
@@ -571,6 +581,14 @@ export default {
                 heading: '标题',
                 list: '列表',
                 link: '链接'
+            },
+            imageUpload: {
+                selectFile: '选择图片文件',
+                invalidFileType: '请选择图片文件',
+                fileSizeExceeded: '图片大小不能超过 5MB',
+                uploadSuccess: '成功上传 {count} 张图片',
+                uploadFailed: '图片上传失败',
+                uploading: '正在上传图片...'
             }
         },
         // QuickActionModal 翻译

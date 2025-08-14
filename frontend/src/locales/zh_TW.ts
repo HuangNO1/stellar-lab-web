@@ -451,6 +451,10 @@ export default {
         url: '論文連結',
         file: '論文文件',
         authors: '作者',
+        labAuthors: '實驗室作者',
+        allAuthors: '全部作者',
+        allAuthorsZh: '全部作者（中文）',
+        allAuthorsEn: '全部作者（英文）',
         placeholders: {
           titleZh: '請輸入論文中文標題',
           titleEn: '請輸入論文英文標題',
@@ -461,7 +465,9 @@ export default {
           date: '請選擇發表日期',
           status: '請選擇接收狀態',
           url: '請輸入論文連結URL',
-          authors: '請選擇論文作者'
+          authors: '請選擇論文作者',
+          allAuthorsZh: '請輸入全部作者中文名稱（例如：張三, 李四, 王五）',
+          allAuthorsEn: '請輸入全部作者英文名稱（例如：John Smith, Jane Doe）'
         },
         validation: {
           titleZhRequired: '請輸入中文標題',
@@ -513,11 +519,15 @@ export default {
       deleteError: '刪除新聞失敗',
       form: {
         type: '新聞類型',
+        titleZh: '中文標題',
+        titleEn: '英文標題',
         contentZh: '中文內容',
         contentEn: '英文內容',
         date: '新聞日期',
         placeholders: {
           type: '請選擇新聞類型',
+          titleZh: '請輸入新聞中文標題',
+          titleEn: '請輸入新聞英文標題',
           contentZh: '請輸入新聞中文內容（支持 Markdown 語法）',
           contentEn: '請輸入新聞英文內容（支持 Markdown 語法）',
           date: '請選擇新聞日期'
@@ -571,6 +581,14 @@ export default {
         heading: '標題',
         list: '列表',
         link: '鏈接'
+      },
+      imageUpload: {
+        selectFile: '選擇圖片檔案',
+        invalidFileType: '請選擇圖片檔案',
+        fileSizeExceeded: '圖片大小不能超過 5MB',
+        uploadSuccess: '成功上傳 {count} 張圖片',
+        uploadFailed: '圖片上傳失敗',
+        uploading: '正在上傳圖片...'
       }
     },
     // QuickActionModal 翻譯

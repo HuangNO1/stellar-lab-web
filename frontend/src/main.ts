@@ -9,6 +9,8 @@ import { initConfig, logConfig } from './config/runtime'
 import 'vfonts/Lato.css'
 // 等宽字体
 import 'vfonts/FiraCode.css'
+// KaTeX數學公式樣式
+import './styles/katex.css'
 
 const pinia = createPinia()
 

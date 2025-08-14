@@ -483,6 +483,10 @@ export default {
         url: 'Paper URL',
         file: 'Paper File',
         authors: 'Authors',
+        labAuthors: 'Lab Authors',
+        allAuthors: 'All Authors',
+        allAuthorsZh: 'All Authors (Chinese)',
+        allAuthorsEn: 'All Authors (English)',
         placeholders: {
           titleZh: 'Enter paper Chinese title',
           titleEn: 'Enter paper English title',
@@ -493,7 +497,9 @@ export default {
           date: 'Select publication date',
           status: 'Select acceptance status',
           url: 'Enter paper URL',
-          authors: 'Select paper authors'
+          authors: 'Select paper authors',
+          allAuthorsZh: 'Enter all authors in Chinese (e.g., 張三, 李四, 王五)',
+          allAuthorsEn: 'Enter all authors in English (e.g., John Smith, Jane Doe)',
         },
         validation: {
           titleZhRequired: 'Chinese title is required',
@@ -545,6 +551,8 @@ export default {
       deleteError: 'Failed to delete news',
       form: {
         type: 'News Type',
+        titleZh: 'Chinese Title',
+        titleEn: 'English Title',
         contentZh: 'Chinese Content',
         contentEn: 'English Content',
         date: 'News Date',
@@ -573,6 +581,14 @@ export default {
         heading: 'Heading',
         list: 'List',
         link: 'Link'
+      },
+      imageUpload: {
+        selectFile: 'Select image file',
+        invalidFileType: 'Please select an image file',
+        fileSizeExceeded: 'Image size cannot exceed 5MB',
+        uploadSuccess: 'Successfully uploaded {count} images',
+        uploadFailed: 'Image upload failed',
+        uploading: 'Uploading images...'
       }
     },
     // QuickActionModal translations

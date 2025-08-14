@@ -25,6 +25,13 @@ import type {
 // Get runtime configuration
 const config = getConfig();
 
+// Debug: 打印配置資訊
+console.log('=== API Configuration Debug ===');
+console.log('BACKEND_URL:', config.BACKEND_URL);
+console.log('API_BASE_URL (Full URL):', config.API_BASE_URL);
+console.log('Final baseURL:', config.API_BASE_URL);
+console.log('================================');
+
 // 創建 axios 實例
 const api = axios.create({
     baseURL: config.API_BASE_URL,
@@ -451,6 +458,30 @@ export const editRecordApi = {
   // 獲取編輯記錄詳情
   getEditRecord(editId: number): Promise<ApiResponse<EditRecord>> {
     return api.get(`/edit-records/${editId}`);
+  }
+};
+
+/**
+ * 圖片上傳相關 API
+ */
+export const imageApi = {
+  // 上傳圖片（用於Markdown編輯器）
+  uploadImage(file: File, entityType?: string, entityId?: number, fieldName?: string): Promise<ApiResponse<{
+    file_url: string;
+    filename: string;
+    file_path: string;
+  }>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (entityType) formData.append('entity_type', entityType);
+    if (entityId) formData.append('entity_id', entityId.toString());
+    if (fieldName) formData.append('field_name', fieldName);
+
+    return api.post('/images/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 };
 

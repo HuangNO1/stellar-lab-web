@@ -100,6 +100,8 @@ export interface Paper {
   paper_accept: number; // 0=投稿中, 1=已接收
   paper_file_path?: string;
   paper_url?: string;
+  all_authors_zh?: string; // 全部作者中文
+  all_authors_en?: string; // 全部作者英文
   enable: number;
   authors?: PaperAuthor[];
 }
@@ -117,6 +119,8 @@ export interface PaperAuthor {
 export interface News {
   news_id: number;
   news_type: number; // 0=論文發表, 1=獲獎消息, 2=學術活動
+  news_title_zh?: string; // 新聞標題中文
+  news_title_en?: string; // 新聞標題英文
   news_content_zh: string;
   news_content_en?: string;
   news_date: string;
