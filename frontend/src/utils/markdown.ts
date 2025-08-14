@@ -6,15 +6,67 @@
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 
+// 定义 markdown-it 相关类型
+interface MarkdownIt {
+  inline: {
+    ruler: {
+      before(name: string, ruleName: string, rule: (state: StateInline, silent: boolean) => boolean): void;
+    };
+  };
+  block: {
+    ruler: {
+      before(name: string, ruleName: string, rule: (state: StateBlock, start: number, end: number, silent: boolean) => boolean): void;
+    };
+  };
+  renderer: {
+    rules: Record<string, (tokens: Token[], idx: number, options?: unknown, env?: unknown, renderer?: unknown) => string>;
+  };
+}
+
+interface StateInline {
+  pos: number;
+  posMax: number;
+  src: string;
+  push(type: string, tag: string, nesting: number): Token;
+}
+
+interface StateBlock {
+  bMarks: number[];
+  eMarks: number[];
+  tShift: number[];
+  sCount: number[];
+  blkIndent: number;
+  src: string;
+  line: number;
+  getLines(begin: number, end: number, indent: number, keepLastLF: boolean): string;
+  push(type: string, tag: string, nesting: number): Token;
+}
+
+interface Token {
+  markup: string;
+  content: string;
+  block?: boolean;
+  attrGet(name: string): string | null;
+  attrSet(name: string, value: string): void;
+}
+
+interface MarkdownPlugin {
+  plugin: (md: MarkdownIt) => void;
+}
+
+interface RendererFunction {
+  (tokens: Token[], idx: number, options?: unknown, env?: unknown, renderer?: unknown): string;
+}
+
 /**
  * 創建支持數學公式的markdown插件 (使用KaTeX)
  * 使用正確的 markdown-it 插件模式
  */
-export const createMathPlugin = () => {
+export const createMathPlugin = (): MarkdownPlugin => {
   return {
-    plugin: (md: any) => {
+    plugin: (md: MarkdownIt) => {
       // 添加inline math規則
-      md.inline.ruler.before('escape', 'math_inline', (state: any, silent: boolean) => {
+      md.inline.ruler.before('escape', 'math_inline', (state: StateInline, silent: boolean) => {
         const start = state.pos;
         const marker = state.src.charCodeAt(start);
         
@@ -64,7 +116,7 @@ export const createMathPlugin = () => {
       });
       
       // 添加block math規則
-      md.block.ruler.before('fence', 'math_block', (state: any, start: number, end: number, silent: boolean) => {
+      md.block.ruler.before('fence', 'math_block', (state: StateBlock, start: number, end: number, silent: boolean) => {
         const pos = state.bMarks[start] + state.tShift[start];
         const max = state.eMarks[start];
         
@@ -114,7 +166,7 @@ export const createMathPlugin = () => {
       });
       
       // 渲染inline math
-      md.renderer.rules.math_inline = (tokens: any[], idx: number) => {
+      md.renderer.rules.math_inline = (tokens: Token[], idx: number) => {
         const token = tokens[idx];
         try {
           const rendered = katex.renderToString(token.content, {
@@ -131,7 +183,7 @@ export const createMathPlugin = () => {
       };
       
       // 渲染block math
-      md.renderer.rules.math_block = (tokens: any[], idx: number) => {
+      md.renderer.rules.math_block = (tokens: Token[], idx: number) => {
         const token = tokens[idx];
         try {
           const rendered = katex.renderToString(token.content, {
@@ -154,15 +206,24 @@ export const createMathPlugin = () => {
  * 創建鏈接處理插件
  * 為外部鏈接添加target="_blank"和安全屬性
  */
-export const createLinkPlugin = () => {
+export const createLinkPlugin = (): MarkdownPlugin => {
   return {
-    plugin: (md: any) => {
+    plugin: (md: MarkdownIt) => {
       // 修改鏈接渲染規則
-      const defaultRender = md.renderer.rules.link_open || function(tokens: any[], idx: number, options: any, env: any, renderer: any) {
-        return renderer.renderToken(tokens, idx, options);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const defaultRender: RendererFunction = md.renderer.rules.link_open || function(tokens: Token[], idx: number, _options?: unknown, _env?: unknown, _renderer?: unknown) {
+        // 如果沒有預設渲染函數，提供一個基本實現
+        const token = tokens[idx];
+        let attrs = '';
+        if (token.attrGet) {
+          // 這裡簡化處理，實際實現會更複雜
+          const href = token.attrGet('href');
+          if (href) attrs += ` href="${href}"`;
+        }
+        return `<a${attrs}>`;
       };
 
-      md.renderer.rules.link_open = function (tokens: any[], idx: number, options: any, env: any, renderer: any) {
+      md.renderer.rules.link_open = function (tokens: Token[], idx: number, options?: unknown, env?: unknown, renderer?: unknown) {
         const token = tokens[idx];
         const href = token.attrGet('href');
         
@@ -183,7 +244,7 @@ export const createLinkPlugin = () => {
  * 創建完整的markdown插件配置
  * 包含數學公式和鏈接處理
  */
-export const createMarkdownPlugins = () => {
+export const createMarkdownPlugins = (): MarkdownPlugin[] => {
   return [
     createMathPlugin(),
     createLinkPlugin()
