@@ -17,6 +17,9 @@ class Paper(db.Model):
     paper_accept = db.Column(db.Integer, nullable=False, default=0, index=True)  # 添加索引用於接收狀態篩選
     paper_file_path = db.Column(db.String(500))
     paper_url = db.Column(db.String(1000))
+    # 全部作者字段（包含非實驗室成員）
+    all_authors_zh = db.Column(db.Text)  # 全部作者中文
+    all_authors_en = db.Column(db.Text)  # 全部作者英文
     enable = db.Column(db.Integer, nullable=False, default=1, index=True)  # 添加索引用於啟用狀態篩選
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)  # 添加索引用於排序
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -48,8 +51,10 @@ class Paper(db.Model):
             'paper_accept': self.paper_accept,
             'paper_file_path': self.paper_file_path,
             'paper_url': self.paper_url,
+            'all_authors_zh': self.all_authors_zh,
+            'all_authors_en': self.all_authors_en,
             'enable': self.enable,
-            'authors': [author.to_dict() for author in self.authors]
+            'authors': [author.to_dict() for author in self.authors]  # 實驗室作者
         }
 
 class PaperAuthor(db.Model):

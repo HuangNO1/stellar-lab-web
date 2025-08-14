@@ -147,7 +147,8 @@ class PaperService(BaseService):
             basic_fields = [
                 'paper_title_zh', 'paper_title_en',
                 'paper_desc_zh', 'paper_desc_en',
-                'paper_venue', 'paper_url', 'paper_type', 'paper_accept'
+                'paper_venue', 'paper_url', 'paper_type', 'paper_accept',
+                'all_authors_zh', 'all_authors_en'  # 新增：全部作者字段
             ]
             
             for field in basic_fields:
@@ -302,7 +303,9 @@ class PaperService(BaseService):
             'paper_desc_zh': 10000,
             'paper_desc_en': 10000,
             'paper_venue': 500,
-            'paper_url': 1000
+            'paper_url': 1000,
+            'all_authors_zh': 2000,  # 新增：全部作者中文字段
+            'all_authors_en': 2000   # 新增：全部作者英文字段
         }
         
         for field, max_length in string_fields.items():
@@ -322,7 +325,8 @@ class PaperService(BaseService):
         fields = [
             'paper_title_zh', 'paper_title_en',
             'paper_desc_zh', 'paper_desc_en',
-            'paper_venue', 'paper_url', 'paper_type', 'paper_accept'
+            'paper_venue', 'paper_url', 'paper_type', 'paper_accept',
+            'all_authors_zh', 'all_authors_en'  # 新增：全部作者字段
         ]
         
         for field in fields:
