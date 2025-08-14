@@ -384,21 +384,28 @@ const fetchSystemHealth = async () => {
     systemStatus.media.loading = true;
     
     const response = await systemApi.healthCheck();
-    if (response.code === 0 && response.data) {
-      // 根據實際API響應格式解析
-      const { status } = response.data;
+    console.log('Health check response:', response);
+    
+    // 健康檢查接口直接返回數據，不是標準的 { code: 0, data: {...} } 格式
+    if (response && response.status) {
+      const { status, message, timestamp, version } = response;
+      console.log('Health check data:', { status, message, timestamp, version });
+      
       if (status === 'healthy') {
         systemStatus.api.status = 'online';
         // 假設API正常表示數據庫也正常
         systemStatus.database.status = 'normal';
         // 假設API正常表示媒體服務也正常  
         systemStatus.media.status = 'normal';
+        console.log('All systems set to healthy');
       } else {
         systemStatus.api.status = 'offline';
         systemStatus.database.status = 'error';
         systemStatus.media.status = 'error';
+        console.log('Systems set to error, status:', status);
       }
     } else {
+      console.log('Health check response invalid:', response);
       systemStatus.api.status = 'offline';
       systemStatus.database.status = 'error';
       systemStatus.media.status = 'error';

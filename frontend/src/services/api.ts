@@ -489,8 +489,8 @@ export const imageApi = {
  * 系統相關 API
  */
 export const systemApi = {
-  // 健康檢查
-  healthCheck(): Promise<ApiResponse<{ status: string; timestamp: string; version: string }>> {
+  // 健康檢查 - 注意：此接口直接返回數據，不是標準的ApiResponse格式
+  healthCheck(): Promise<{ message: string; status: string; timestamp: string; version: string }> {
     return api.get('/health');
   }
 };
