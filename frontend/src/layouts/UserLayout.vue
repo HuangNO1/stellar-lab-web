@@ -62,7 +62,7 @@
                 <n-button text @click="toggleTheme" class="theme-btn desktop-theme-btn">
                   <template #icon>
                     <n-icon size="18">
-                      <component :is="isDarkMode ? SunnyOutline : MoonOutline" />
+                      <component :is="isDarkMode ? MoonOutline :  SunnyOutline" />
                     </n-icon>
                   </template>
                 </n-button>

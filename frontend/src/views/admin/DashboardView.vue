@@ -134,44 +134,56 @@
         <n-card :title="$t('admin.dashboard.systemStatus')" class="system-status">
           <div class="status-items">
             <div class="status-item">
-              <div class="status-icon success">
-                <n-icon size="16">
-                  <svg viewBox="0 0 24 24">
+              <div class="status-icon" :class="getStatusIconClass(systemStatus.api.status)">
+                <n-spin v-if="systemStatus.api.loading" size="small" />
+                <n-icon v-else size="16">
+                  <svg v-if="systemStatus.api.status === 'online'" viewBox="0 0 24 24">
                     <path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+                  </svg>
+                  <svg v-else viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
                   </svg>
                 </n-icon>
               </div>
               <div class="status-info">
                 <div class="status-title">{{ $t('admin.dashboard.apiStatus') }}</div>
-                <div class="status-value">{{ $t('admin.dashboard.online') }}</div>
+                <div class="status-value">{{ getStatusText(systemStatus.api.status, systemStatus.api.loading) }}</div>
               </div>
             </div>
 
             <div class="status-item">
-              <div class="status-icon success">
-                <n-icon size="16">
-                  <svg viewBox="0 0 24 24">
+              <div class="status-icon" :class="getStatusIconClass(systemStatus.database.status)">
+                <n-spin v-if="systemStatus.database.loading" size="small" />
+                <n-icon v-else size="16">
+                  <svg v-if="systemStatus.database.status === 'normal'" viewBox="0 0 24 24">
                     <path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+                  </svg>
+                  <svg v-else viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
                   </svg>
                 </n-icon>
               </div>
               <div class="status-info">
                 <div class="status-title">{{ $t('admin.dashboard.databaseStatus') }}</div>
-                <div class="status-value">{{ $t('admin.dashboard.normal') }}</div>
+                <div class="status-value">{{ getStatusText(systemStatus.database.status, systemStatus.database.loading) }}</div>
               </div>
             </div>
 
             <div class="status-item">
-              <div class="status-icon success">
-                <n-icon size="16">
-                  <svg viewBox="0 0 24 24">
+              <div class="status-icon" :class="getStatusIconClass(systemStatus.media.status)">
+                <n-spin v-if="systemStatus.media.loading" size="small" />
+                <n-icon v-else size="16">
+                  <svg v-if="systemStatus.media.status === 'normal'" viewBox="0 0 24 24">
                     <path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+                  </svg>
+                  <svg v-else viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
                   </svg>
                 </n-icon>
               </div>
               <div class="status-info">
                 <div class="status-title">{{ $t('admin.dashboard.mediaStatus') }}</div>
-                <div class="status-value">{{ $t('admin.dashboard.normal') }}</div>
+                <div class="status-value">{{ getStatusText(systemStatus.media.status, systemStatus.media.loading) }}</div>
               </div>
             </div>
           </div>
@@ -238,7 +250,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, h } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { memberApi, paperApi, projectApi, newsApi, editRecordApi } from '@/services/api';
+import { memberApi, paperApi, projectApi, newsApi, editRecordApi, systemApi } from '@/services/api';
 import type { EditRecord } from '@/types/api';
 import QuickActionModal from '@/components/QuickActionModal.vue';
 
@@ -260,6 +272,22 @@ const recentActivities = ref<Array<{
   time: Date;
   admin: string;
 }>>([]);
+
+// 系統狀態
+const systemStatus = reactive({
+  api: {
+    status: 'unknown' as 'online' | 'offline' | 'unknown',
+    loading: true
+  },
+  database: {
+    status: 'unknown' as 'normal' | 'error' | 'unknown',
+    loading: true
+  },
+  media: {
+    status: 'unknown' as 'normal' | 'error' | 'unknown',
+    loading: true
+  }
+});
 
 // Modal 狀態
 const showModal = ref(false);
@@ -347,6 +375,46 @@ const fetchStats = async () => {
   }
 };
 
+// 獲取系統健康狀態
+const fetchSystemHealth = async () => {
+  try {
+    // 檢查API狀態
+    systemStatus.api.loading = true;
+    systemStatus.database.loading = true;
+    systemStatus.media.loading = true;
+    
+    const response = await systemApi.healthCheck();
+    if (response.code === 0 && response.data) {
+      // 根據實際API響應格式解析
+      const { status } = response.data;
+      if (status === 'healthy') {
+        systemStatus.api.status = 'online';
+        // 假設API正常表示數據庫也正常
+        systemStatus.database.status = 'normal';
+        // 假設API正常表示媒體服務也正常  
+        systemStatus.media.status = 'normal';
+      } else {
+        systemStatus.api.status = 'offline';
+        systemStatus.database.status = 'error';
+        systemStatus.media.status = 'error';
+      }
+    } else {
+      systemStatus.api.status = 'offline';
+      systemStatus.database.status = 'error';
+      systemStatus.media.status = 'error';
+    }
+  } catch (error) {
+    console.error('獲取系統健康狀態失敗:', error);
+    systemStatus.api.status = 'offline';
+    systemStatus.database.status = 'error';
+    systemStatus.media.status = 'error';
+  } finally {
+    systemStatus.api.loading = false;
+    systemStatus.database.loading = false;
+    systemStatus.media.loading = false;
+  }
+};
+
 // 獲取活動類型對應的顏色
 const getActivityColor = (type: string) => {
   const colors = {
@@ -428,6 +496,37 @@ const formatTime = (time: Date) => {
   }
 };
 
+// 獲取狀態圖標類
+const getStatusIconClass = (status: string) => {
+  if (status === 'online' || status === 'normal') {
+    return 'success';
+  } else if (status === 'offline' || status === 'error') {
+    return 'error';
+  } else {
+    return 'warning';
+  }
+};
+
+// 獲取狀態文字
+const getStatusText = (status: string, loading: boolean) => {
+  if (loading) {
+    return t('admin.dashboard.checking');
+  }
+  
+  switch (status) {
+    case 'online':
+      return t('admin.dashboard.online');
+    case 'offline':
+      return t('admin.dashboard.offline');
+    case 'normal':
+      return t('admin.dashboard.normal');
+    case 'error':
+      return t('admin.dashboard.error');
+    default:
+      return t('admin.dashboard.unknown');
+  }
+};
+
 // 打開 Modal
 const openModal = (
   moduleType: 'members' | 'papers' | 'projects' | 'news' | 'research-groups',
@@ -478,6 +577,7 @@ const handleModalSuccess = () => {
 onMounted(() => {
   fetchStats();
   fetchRecentActivities();
+  fetchSystemHealth();
 });
 </script>
 
@@ -614,6 +714,14 @@ onMounted(() => {
   background-color: #52c41a;
 }
 
+.status-icon.error {
+  background-color: #ff4d4f;
+}
+
+.status-icon.warning {
+  background-color: #faad14;
+}
+
 .status-info {
   flex: 1;
 }
@@ -676,39 +784,46 @@ onMounted(() => {
   padding: 0.5rem 0;
 }
 
-/* 暗色主題 */
+/* 暗色主題 - 改善文字可讀性 */
 [data-theme="dark"] .card-number,
-.dark .card-number {
+.dark .card-number,
+.dark-theme .card-number {
   color: #f9fafb;
 }
 
 [data-theme="dark"] .card-title,
-.dark .card-title {
-  color: #9ca3af;
+.dark .card-title,
+.dark-theme .card-title {
+  color: #e5e7eb;
 }
 
 [data-theme="dark"] .status-title,
-.dark .status-title {
-  color: #f3f4f6;
+.dark .status-title,
+.dark-theme .status-title {
+  color: #f9fafb;
 }
 
 [data-theme="dark"] .status-value,
-.dark .status-value {
-  color: #9ca3af;
+.dark .status-value,
+.dark-theme .status-value {
+  color: #e5e7eb;
 }
 
 [data-theme="dark"] .activity-title,
-.dark .activity-title {
-  color: #f3f4f6;
+.dark .activity-title,
+.dark-theme .activity-title {
+  color: #f9fafb;
 }
 
 [data-theme="dark"] .activity-time,
-.dark .activity-time {
-  color: #9ca3af;
+.dark .activity-time,
+.dark-theme .activity-time {
+  color: #e5e7eb;
 }
 
 [data-theme="dark"] .activity-icon,
-.dark .activity-icon {
+.dark .activity-icon,
+.dark-theme .activity-icon {
   background-color: rgba(255, 255, 255, 0.1);
 }
 

@@ -397,8 +397,9 @@ onMounted(() => {
 }
 
 [data-theme="dark"] .page-header h2,
-.dark .page-header h2 {
-  color: #f9fafb;
+.dark .page-header h2,
+.dark-theme .page-header h2 {
+  color: #f9fafb !important;
 }
 
 .search-section {
@@ -406,10 +407,38 @@ onMounted(() => {
   border: 1px solid #e5e7eb;
 }
 
+/* 暗色主題搜索區域 - 改善樣式一致性 */
 [data-theme="dark"] .search-section,
-.dark .search-section {
-  background: #1f2937;
-  border-color: #374151;
+.dark .search-section,
+.dark-theme .search-section {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+/* 確保搜索表單元素在暗色主題下正確顯示 */
+[data-theme="dark"] :deep(.n-input),
+[data-theme="dark"] :deep(.n-select),
+[data-theme="dark"] :deep(.n-date-picker),
+.dark-theme :deep(.n-input),
+.dark-theme :deep(.n-select),
+.dark-theme :deep(.n-date-picker) {
+  background-color: #374151 !important;
+  border-color: #4b5563 !important;
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] :deep(.n-input__input-el),
+[data-theme="dark"] :deep(.n-base-selection-label),
+.dark-theme :deep(.n-input__input-el),
+.dark-theme :deep(.n-base-selection-label) {
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] :deep(.n-input__placeholder),
+[data-theme="dark"] :deep(.n-base-selection-placeholder),
+.dark-theme :deep(.n-input__placeholder),
+.dark-theme :deep(.n-base-selection-placeholder) {
+  color: #9ca3af !important;
 }
 
 .search-controls {

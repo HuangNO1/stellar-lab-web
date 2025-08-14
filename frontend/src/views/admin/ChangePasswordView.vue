@@ -41,7 +41,8 @@ const router = useRouter();
 }
 
 [data-theme="dark"] .page-header h2,
-.dark .page-header h2 {
-  color: #f9fafb;
+.dark .page-header h2,
+.dark-theme .page-header h2 {
+  color: #f9fafb !important;
 }
 </style>

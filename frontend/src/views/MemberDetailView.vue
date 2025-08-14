@@ -537,7 +537,7 @@ watch(() => route.params.id, () => {
 [data-theme="dark"] .paper-item,
 .dark .paper-item,
 .dark-mode .paper-item {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgb(24, 24, 28);
   border-color: rgba(255, 255, 255, 0.1);
   box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.2);
 }
@@ -545,7 +545,7 @@ watch(() => route.params.id, () => {
 [data-theme="dark"] .paper-item:hover,
 .dark .paper-item:hover,
 .dark-mode .paper-item:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgb(32, 32, 36);
   box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.3);
   border-left-color: #70a1ff;
 }

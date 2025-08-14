@@ -99,14 +99,11 @@
 
           <!-- 主題切換 -->
           <n-button text @click="toggleTheme">
-            <n-icon size="18">
-              <svg v-if="isDark" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8M12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31L23.31,12L20,8.69Z"/>
-              </svg>
-              <svg v-else viewBox="0 0 24 24">
-                <path fill="currentColor" d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C7.79,7.9 8.75,10.87 10.95,13.06C13.14,15.26 16.1,16.22 18.97,15.95Z"/>
-              </svg>
-            </n-icon>
+            <template #icon>
+              <n-icon size="18">
+                <component :is="isDark ? MoonOutline : SunnyOutline" />
+              </n-icon>
+            </template>
           </n-button>
 
           <!-- 用戶菜單 -->
@@ -165,6 +162,10 @@ import { useAuthStore } from '@/stores/auth';
 import { setLanguage, getTheme, setTheme } from '@/locales';
 import ProfileModal from '@/components/ProfileModal.vue';
 import QuickActionModal from '@/components/QuickActionModal.vue';
+import {
+  SunnyOutline,
+  MoonOutline
+} from '@vicons/ionicons5'
 import type { MenuOption, DropdownOption } from 'naive-ui';
 
 const router = useRouter();
@@ -383,14 +384,15 @@ const handleLanguageChange = (key: string) => {
 // 切換主題
 const toggleTheme = () => {
   isDark.value = !isDark.value;
-  const newTheme = isDark.value ? 'dark' : 'light';
-  document.documentElement.setAttribute('data-theme', newTheme);
-  setTheme(newTheme);
+  const themeValue = isDark.value ? 'dark' : 'light';
+  setTheme(themeValue);
   
   // Update body and html background immediately for consistent theming
   const bgColor = isDark.value ? 'rgb(16, 16, 20)' : '#fff';
   document.body.style.background = bgColor;
   document.documentElement.style.background = bgColor;
+  
+  console.log('Admin theme toggled to:', themeValue);
 };
 
 // 處理用戶菜單選擇
@@ -423,7 +425,11 @@ const handlePasswordSuccess = () => {
 const initTheme = () => {
   const savedTheme = getTheme();
   isDark.value = savedTheme === 'dark';
-  document.documentElement.setAttribute('data-theme', savedTheme);
+  
+  // Set initial background based on theme
+  const bgColor = isDark.value ? 'rgb(16, 16, 20)' : '#fff';
+  document.body.style.background = bgColor;
+  document.documentElement.style.background = bgColor;
 };
 
 initTheme();
@@ -463,6 +469,13 @@ initTheme();
   align-items: center;
   justify-content: space-between;
   background: #fff;
+}
+
+/* 暗色主題頂部欄 */
+.dark-theme .header,
+[data-theme="dark"] .header {
+  background: #1f2937 !important;
+  color: #f9fafb;
 }
 
 .header-left {
@@ -540,6 +553,13 @@ initTheme();
   min-height: calc(100vh - 64px);
   display: flex;
   flex-direction: column;
+}
+
+/* 暗色主題內容區 */
+.dark-theme .content,
+[data-theme="dark"] .content {
+  background-color: #111827 !important;
+  color: #f9fafb;
 }
 
 /* 移動端內容區調整 */
@@ -645,38 +665,7 @@ initTheme();
   background-color: #111827;
 }
 
-[data-theme="dark"] .sidebar-header,
-.dark .sidebar-header {
-  border-bottom-color: rgba(255, 255, 255, 0.1);
-  background-color: #1f2937;
-}
-
-[data-theme="dark"] .logo-text,
-.dark .logo-text {
-  color: #f9fafb;
-}
-
-[data-theme="dark"] .header,
-.dark .header {
-  background: #1f2937;
-  border-bottom-color: rgba(255, 255, 255, 0.1);
-  color: #f9fafb;
-}
-
-[data-theme="dark"] .user-avatar:hover,
-.dark .user-avatar:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .content,
-.dark .content {
-  background-color: #111827;
-  color: #f9fafb;
-}
-
-[data-theme="dark"] .mobile-menu-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
+/* 移除重複樣式 - 已在上方統一定義 */
 
 /* N-Layout-Sider 暗色主題 */
 [data-theme="dark"] :deep(.n-layout-sider),
@@ -685,7 +674,7 @@ initTheme();
   color: #f9fafb;
 }
 
-/* N-Menu 暗色主題 */
+/* N-Menu 暗色主題 - 改善文字可讀性 */
 [data-theme="dark"] :deep(.n-menu),
 .dark-theme :deep(.n-menu) {
   background-color: transparent !important;
@@ -694,13 +683,13 @@ initTheme();
 
 [data-theme="dark"] :deep(.n-menu .n-menu-item),
 .dark-theme :deep(.n-menu .n-menu-item) {
-  color: #d1d5db !important;
+  color: #f9fafb !important;
 }
 
 [data-theme="dark"] :deep(.n-menu .n-menu-item:hover),
 .dark-theme :deep(.n-menu .n-menu-item:hover) {
   background-color: rgba(255, 255, 255, 0.1) !important;
-  color: #f9fafb !important;
+  color: #ffffff !important;
 }
 
 [data-theme="dark"] :deep(.n-menu .n-menu-item.n-menu-item--selected),
@@ -709,15 +698,15 @@ initTheme();
   color: #6366f1 !important;
 }
 
-/* 麵包屑暗色主題 */
+/* 麵包屑暗色主題 - 改善可讀性 */
 [data-theme="dark"] :deep(.n-breadcrumb),
 .dark-theme :deep(.n-breadcrumb) {
-  color: #d1d5db;
+  color: #f9fafb;
 }
 
 [data-theme="dark"] :deep(.n-breadcrumb .n-breadcrumb-item),
 .dark-theme :deep(.n-breadcrumb .n-breadcrumb-item) {
-  color: #d1d5db;
+  color: #f9fafb;
 }
 
 /* 下拉菜單暗色主題 */
@@ -750,34 +739,117 @@ initTheme();
   color: #f9fafb;
 }
 
-/* 暗色主題 */
-[data-theme="dark"] .sidebar-header,
-.dark .sidebar-header {
+/* 暗色主題支持 - 統一選擇器 */
+.dark-theme .sidebar-header,
+[data-theme="dark"] .sidebar-header {
   border-bottom-color: rgba(255, 255, 255, 0.1);
+  background-color: #1f2937;
 }
 
-[data-theme="dark"] .logo-text,
-.dark .logo-text {
+.dark-theme .logo,
+[data-theme="dark"] .logo {
   color: #f9fafb;
 }
 
-[data-theme="dark"] .header,
-.dark .header {
-  background: #1f2937;
-  border-bottom-color: rgba(255, 255, 255, 0.1);
+.dark-theme .logo-text,
+[data-theme="dark"] .logo-text {
+  color: #f9fafb;
 }
 
-[data-theme="dark"] .user-avatar:hover,
-.dark .user-avatar:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+.dark-theme .user-avatar,
+[data-theme="dark"] .user-avatar {
+  color: #f9fafb;
 }
 
-[data-theme="dark"] .content,
-.dark .content {
-  background-color: #111827;
+.dark-theme .user-avatar:hover,
+[data-theme="dark"] .user-avatar:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
+.dark-theme .mobile-menu-btn:hover,
 [data-theme="dark"] .mobile-menu-btn:hover {
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 深層暗色主題支持 - 確保所有子元素都有正確的文字顏色 */
+.dark-theme,
+[data-theme="dark"] {
+  color: #f9fafb;
+}
+
+.dark-theme *,
+[data-theme="dark"] * {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 全域標題顏色修復 - 使用更強的選擇器 */
+.admin-layout.dark-theme h1,
+.admin-layout.dark-theme h2,
+.admin-layout.dark-theme h3,
+.admin-layout.dark-theme h4,
+.admin-layout.dark-theme h5,
+.admin-layout.dark-theme h6,
+[data-theme="dark"] .admin-layout h1,
+[data-theme="dark"] .admin-layout h2,
+[data-theme="dark"] .admin-layout h3,
+[data-theme="dark"] .admin-layout h4,
+[data-theme="dark"] .admin-layout h5,
+[data-theme="dark"] .admin-layout h6,
+.dark-theme h1,
+.dark-theme h2,
+.dark-theme h3,
+.dark-theme h4,
+.dark-theme h5,
+.dark-theme h6,
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
+  color: #f9fafb !important;
+}
+
+/* 特別針對頁面標題 */
+.admin-layout.dark-theme .page-header h1,
+.admin-layout.dark-theme .page-header h2,
+.admin-layout.dark-theme .page-header h3,
+[data-theme="dark"] .admin-layout .page-header h1,
+[data-theme="dark"] .admin-layout .page-header h2,
+[data-theme="dark"] .admin-layout .page-header h3,
+.dark-theme .page-header h1,
+.dark-theme .page-header h2,
+.dark-theme .page-header h3,
+[data-theme="dark"] .page-header h1,
+[data-theme="dark"] .page-header h2,
+[data-theme="dark"] .page-header h3 {
+  color: #f9fafb !important;
+}
+
+/* 確保naive-ui組件在暗色主題下正確顯示 */
+.dark-theme :deep(.n-breadcrumb-item),
+[data-theme="dark"] :deep(.n-breadcrumb-item) {
+  color: #f9fafb !important;
+}
+
+.dark-theme :deep(.n-button--text),
+[data-theme="dark"] :deep(.n-button--text) {
+  color: #f9fafb !important;
+}
+
+.dark-theme :deep(.n-dropdown-menu),
+[data-theme="dark"] :deep(.n-dropdown-menu) {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+}
+
+.dark-theme :deep(.n-dropdown-option),
+[data-theme="dark"] :deep(.n-dropdown-option) {
+  color: #f9fafb !important;
+}
+
+.dark-theme :deep(.n-avatar),
+[data-theme="dark"] :deep(.n-avatar) {
+  color: #f9fafb !important;
 }
 </style>

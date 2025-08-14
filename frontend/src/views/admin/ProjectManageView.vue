@@ -441,8 +441,9 @@ onMounted(() => {
 
 /* 暗色主題 */
 [data-theme="dark"] .page-header h2,
-.dark .page-header h2 {
-  color: #f9fafb;
+.dark .page-header h2,
+.dark-theme .page-header h2 {
+  color: #f9fafb !important;
 }
 
 [data-theme="dark"] .delete-project-info,

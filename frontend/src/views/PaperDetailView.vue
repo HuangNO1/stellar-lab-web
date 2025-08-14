@@ -444,42 +444,52 @@ onMounted(() => {
 }
 
 [data-theme="dark"] .paper-authors,
-.dark .paper-authors {
-  background: rgba(112, 161, 255, 0.1);
+.dark .paper-authors,
+.dark-mode .paper-authors {
+  background: rgb(24, 24, 28);
   border-left-color: #70a1ff;
+  color: #fff;
 }
 
 [data-theme="dark"] .paper-description,
-.dark .paper-description {
-  background: rgba(255, 255, 255, 0.08);
+.dark .paper-description,
+.dark-mode .paper-description {
+  background: rgb(24, 24, 28);
   border-left-color: #70a1ff;
+  color: #fff;
 }
 
 [data-theme="dark"] .paper-authors h3,
 [data-theme="dark"] .paper-description h3,
 .dark .paper-authors h3,
-.dark .paper-description h3 {
+.dark .paper-description h3,
+.dark-mode .paper-authors h3,
+.dark-mode .paper-description h3 {
   color: #fff;
 }
 
 [data-theme="dark"] .authors-subtitle,
-.dark .authors-subtitle {
+.dark .authors-subtitle,
+.dark-mode .authors-subtitle {
   color: #70a1ff;
   border-bottom-color: rgba(112, 161, 255, 0.3);
 }
 
 [data-theme="dark"] .author-item,
-.dark .author-item {
+.dark .author-item,
+.dark-mode .author-item {
   color: #70a1ff;
 }
 
 [data-theme="dark"] .author-item:hover,
-.dark .author-item:hover {
+.dark .author-item:hover,
+.dark-mode .author-item:hover {
   color: #91caff;
 }
 
 [data-theme="dark"] .corresponding-note,
-.dark .corresponding-note {
+.dark .corresponding-note,
+.dark-mode .corresponding-note {
   color: #ccc;
 }
 

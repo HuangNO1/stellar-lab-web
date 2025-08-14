@@ -1,13 +1,14 @@
 <template>
   <n-message-provider>
     <router-view/>
+    <n-back-top :right="40" :bottom="40" />
   </n-message-provider>
 </template>
 
 <script setup lang="ts">
 import { watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NMessageProvider } from 'naive-ui'
+import { NMessageProvider, NBackTop } from 'naive-ui'
 import { useLabWithAutoFetch } from '@/composables/useLab'
 import { getMediaUrl } from '@/utils/media'
 

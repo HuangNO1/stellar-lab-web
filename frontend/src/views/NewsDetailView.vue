@@ -258,8 +258,9 @@ onMounted(() => {
 }
 
 [data-theme="dark"] .news-content,
-.dark .news-content {
-  background: rgba(255, 255, 255, 0.08);
+.dark .news-content,
+.dark-mode .news-content {
+  background: rgb(24, 24, 28);
   border-left-color: #70a1ff;
   color: #fff;
 }

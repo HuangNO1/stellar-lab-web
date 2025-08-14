@@ -278,13 +278,16 @@ onMounted(() => {
 }
 
 [data-theme="dark"] .project-description,
-.dark .project-description {
-  background: rgba(255, 255, 255, 0.08);
+.dark .project-description,
+.dark-mode .project-description {
+  background: rgb(24, 24, 28);
   border-left-color: #70a1ff;
+  color: #fff;
 }
 
 [data-theme="dark"] .project-description h3,
-.dark .project-description h3 {
+.dark .project-description h3,
+.dark-mode .project-description h3 {
   color: #fff;
 }
 

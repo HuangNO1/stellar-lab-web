@@ -565,8 +565,8 @@ onMounted(() => {
 /* 暗色主題 */
 [data-theme="dark"] .page-header h2,
 .dark .page-header h2,
-.dark-mode .page-header h2 {
-  color: #f9fafb;
+.dark-theme .page-header h2 {
+  color: #f9fafb !important;
 }
 
 [data-theme="dark"] .carousel-item,
