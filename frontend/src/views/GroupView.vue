@@ -115,6 +115,8 @@ import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { researchGroupApi, memberApi } from '@/services/api';
 import { useMembers } from '@/composables/useMembers';
+import { processMarkdownImageUrls } from '@/utils/media';
+import { createMarkdownPlugins } from '@/utils/markdown';
 import type { ResearchGroup, Member, ApiError } from '@/types/api';
 import MarkdownIt from 'vue3-markdown-it';
 
@@ -149,39 +151,11 @@ const isPositionTruncated = (member: Member) => {
 const getGroupDescription = () => {
   if (!researchGroup.value) return '';
   const desc = getCurrentLocale() === 'zh' ? researchGroup.value.research_group_desc_zh : researchGroup.value.research_group_desc_en;
-  return desc || '';
+  return desc ? processMarkdownImageUrls(desc) : '';
 };
 
 // Markdown插件配置
-const markdownPlugins = [
-  {
-    plugin: (md: Record<string, unknown>) => {
-      // 修改链接渲染规则
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const defaultRender = (md as any).renderer.rules.link_open || function(tokens: Record<string, unknown>[], idx: number, options: Record<string, unknown>, env: Record<string, unknown>, renderer: Record<string, unknown>) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (renderer as any).renderToken(tokens, idx, options);
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (md as any).renderer.rules.link_open = function (tokens: Record<string, unknown>[], idx: number, options: Record<string, unknown>, env: Record<string, unknown>, renderer: Record<string, unknown>) {
-        const token = tokens[idx];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const href = (token as any).attrGet('href');
-        
-        // 检查是否为外部链接
-        if (href && (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//') || href.includes('://'))) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (token as any).attrSet('target', '_blank');
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (token as any).attrSet('rel', 'noopener noreferrer');
-        }
-        
-        return defaultRender(tokens, idx, options, env, renderer);
-      };
-    }
-  }
-];
+const markdownPlugins = createMarkdownPlugins();
 
 // 方法
 const fetchGroupDetail = async () => {
