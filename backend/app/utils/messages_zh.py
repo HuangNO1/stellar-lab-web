@@ -109,6 +109,7 @@ ERROR_MESSAGES = {
     
     # 新闻相关错误
     'NEWS_NOT_FOUND': '新闻不存在',
+    'NEWS_TITLE_REQUIRED': '新闻标题不能为空',
     'NEWS_TYPE_INVALID': '新闻类型无效',
     'NEWS_TYPE_FORMAT_ERROR': '新闻类型格式错误',
     'NEWS_DATE_FORMAT_ERROR': '日期格式错误，应为 YYYY-MM-DD',

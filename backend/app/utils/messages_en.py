@@ -109,6 +109,7 @@ ERROR_MESSAGES = {
     
     # News related errors
     'NEWS_NOT_FOUND': 'News not found',
+    'NEWS_TITLE_REQUIRED': 'News title is required',
     'NEWS_TYPE_INVALID': 'Invalid news type',
     'NEWS_TYPE_FORMAT_ERROR': 'News type format error',
     'NEWS_DATE_FORMAT_ERROR': 'Date format error, should be YYYY-MM-DD',
