@@ -152,10 +152,25 @@ const router = createRouter({
         if (savedPosition) {
             return savedPosition
         }
-        // 對於詳情頁面（包含 id 參數的路由），保持平滑滾動到頂部
-        if (to.name && ['paper-detail', 'project-detail', 'news-detail', 'member', 'group'].includes(to.name as string)) {
-            return { top: 0, behavior: 'smooth' }
+        
+        // 對於所有路由切換，都滾動到頂部，但給詳情頁面更多時間來渲染
+        const isDetailPage = to.name && [
+            'paper-detail', 
+            'project-detail', 
+            'news-detail', 
+            'member', 
+            'group'
+        ].includes(to.name as string);
+        
+        if (isDetailPage) {
+            // 詳情頁面使用延遲滾動，確保內容已經渲染完成
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve({ top: 0, behavior: 'smooth' });
+                }, 100); // 100ms 延遲確保 DOM 已更新
+            });
         }
+        
         // 對於其他頁面切換，立即滾動到頂部
         return { top: 0 }
     }
