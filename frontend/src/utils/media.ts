@@ -2,6 +2,8 @@
  * 媒體文件相關工具函數
  */
 
+import { getConfig } from '@/config/runtime';
+
 /**
  * 獲取媒體文件的完整URL
  * @param path 媒體文件路徑 (如: "/media/lab_logo/logo.png" 或 "lab_logo/logo.png")
@@ -16,7 +18,8 @@ export const getMediaUrl = (path: string): string => {
   }
   
   // 根據API.md，媒體文件通過 /api/media/serve/{file_path} 獲取
-  const baseUrl = process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8000/api';
+  const config = getConfig();
+  const baseUrl = config.API_BASE_URL;
   
   // 移除路徑開頭的 /media/ 前綴（如果存在）
   const cleanPath = path.startsWith('/media/') ? path.substring(7) : path;
@@ -32,7 +35,8 @@ export const getMediaUrl = (path: string): string => {
 export const getMediaInfoUrl = (path: string): string => {
   if (!path) return '';
   
-  const baseUrl = process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8000/api';
+  const config = getConfig();
+  const baseUrl = config.API_BASE_URL;
   const cleanPath = path.startsWith('/media/') ? path.substring(7) : path;
   
   return `${baseUrl}/media/info/${cleanPath}`;
@@ -43,8 +47,8 @@ export const getMediaInfoUrl = (path: string): string => {
  * @returns 上傳接口URL
  */
 export const getMediaUploadUrl = (): string => {
-  const baseUrl = process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8000/api';
-  return `${baseUrl}/media/upload`;
+  const config = getConfig();
+  return `${config.API_BASE_URL}/media/upload`;
 };
 
 /**

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { getConfig } from '@/config/runtime';
 import type { 
   ApiResponse, 
   PaginatedResponse, 
@@ -21,9 +22,12 @@ import type {
   LoginResponse
 } from '@/types/api';
 
+// Get runtime configuration
+const config = getConfig();
+
 // 創建 axios 實例
 const api = axios.create({
-    baseURL: process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8000/api',
+    baseURL: config.API_BASE_URL,
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',

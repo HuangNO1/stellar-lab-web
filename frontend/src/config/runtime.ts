@@ -12,10 +12,10 @@ interface AppConfig {
 
 // Default fallback configuration
 const defaultConfig: AppConfig = {
-  API_BASE_URL: import.meta.env.VITE_API_BASE_URL || '/api',
-  BACKEND_URL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000',
-  APP_TITLE: import.meta.env.VITE_APP_TITLE || 'Laboratory Website',
-  APP_DESCRIPTION: import.meta.env.VITE_APP_DESCRIPTION || 'Modern laboratory website'
+  API_BASE_URL: process.env.VUE_APP_API_BASE_URL || '/api',
+  BACKEND_URL: process.env.VUE_APP_BACKEND_URL || 'http://localhost:8000',
+  APP_TITLE: process.env.VUE_APP_TITLE || 'Laboratory Website',
+  APP_DESCRIPTION: process.env.VUE_APP_DESCRIPTION || 'Modern laboratory website'
 };
 
 // Runtime configuration from nginx-generated config.js
@@ -30,7 +30,7 @@ declare global {
  */
 export function getConfig(): AppConfig {
   // Priority: Runtime config (nginx) > Environment variables > Default values
-  const runtimeConfig = window.APP_CONFIG || {};
+  const runtimeConfig: Partial<AppConfig> = window.APP_CONFIG || {};
   
   return {
     API_BASE_URL: runtimeConfig.API_BASE_URL || defaultConfig.API_BASE_URL,
@@ -45,22 +45,41 @@ export function getConfig(): AppConfig {
  */
 export function initConfig(): Promise<AppConfig> {
   return new Promise((resolve) => {
+    let resolved = false;
+    
+    const resolveOnce = () => {
+      if (!resolved) {
+        resolved = true;
+        resolve(getConfig());
+      }
+    };
+    
     // Try to load runtime config from nginx
     const script = document.createElement('script');
     script.src = '/config.js';
-    script.onload = () => {
-      resolve(getConfig());
-    };
+    script.onload = resolveOnce;
     script.onerror = () => {
       console.warn('Runtime config not available, using environment/default config');
-      resolve(getConfig());
+      resolveOnce();
     };
     
     document.head.appendChild(script);
     
-    // Fallback timeout
-    setTimeout(() => {
-      resolve(getConfig());
-    }, 2000);
+    // Fallback timeout (reduced to 1 second for better UX)
+    setTimeout(resolveOnce, 1000);
   });
+}
+
+/**
+ * Debug function to log current configuration
+ */
+export function logConfig(): void {
+  const config = getConfig();
+  console.log('=== Runtime Configuration ===');
+  console.log('API_BASE_URL:', config.API_BASE_URL);
+  console.log('BACKEND_URL:', config.BACKEND_URL);
+  console.log('APP_TITLE:', config.APP_TITLE);
+  console.log('APP_DESCRIPTION:', config.APP_DESCRIPTION);
+  console.log('Runtime config available:', !!window.APP_CONFIG);
+  console.log('===============================');
 }
