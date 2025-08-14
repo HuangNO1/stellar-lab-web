@@ -119,7 +119,7 @@ echo "   - 環境: ${FLASK_CONFIG}"
 exec gunicorn \
     --workers 4 \
     --bind 0.0.0.0:${BACKEND_PORT} \
-    --timeout 500 \
+    --timeout 600 \
     --keep-alive 2 \
     --max-requests 1000 \
     --access-logfile - \
