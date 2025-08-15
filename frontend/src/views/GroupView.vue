@@ -73,6 +73,7 @@
               :size="60"
               :src="getMemberAvatar(member) || '/default-avatar.svg'"
               :fallback-src="'/default-avatar.svg'"
+              class="member-avatar"
             />
             <div class="member-info">
               <n-tooltip trigger="hover" :disabled="!isNameTruncated(member)">
