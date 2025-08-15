@@ -26,11 +26,13 @@ import type {
 const config = getConfig();
 
 // Debug: 打印配置資訊
-console.log('=== API Configuration Debug ===');
-console.log('BACKEND_URL:', config.BACKEND_URL);
-console.log('API_BASE_URL (Full URL):', config.API_BASE_URL);
-console.log('Final baseURL:', config.API_BASE_URL);
-console.log('================================');
+if (process.env.NODE_ENV === 'development') {
+    console.log('=== API Configuration Debug ===');
+    console.log('BACKEND_URL:', config.BACKEND_URL);
+    console.log('API_BASE_URL (Full URL):', config.API_BASE_URL);
+    console.log('Final baseURL:', config.API_BASE_URL);
+    console.log('================================');
+}
 
 // 創建 axios 實例
 const api = axios.create({
