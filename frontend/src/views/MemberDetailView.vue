@@ -79,7 +79,7 @@
             </h1>
           
           <div class="member-position">
-            {{ getMemberPosition(member, getCurrentLocale()) }}
+            {{ getMemberPosition(member) }}
           </div>
 
           <!-- 聯繫方式 -->

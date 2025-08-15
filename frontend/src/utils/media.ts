@@ -19,12 +19,15 @@ export const getMediaUrl = (path: string): string => {
   
   // 根據API.md，媒體文件通過 /api/media/serve/{file_path} 獲取
   const config = getConfig();
-  const baseUrl = config.API_BASE_URL || config.BACKEND_URL;
+  // 直接使用API_BASE_URL，它已經包含了正確的域名和端口
+  const baseUrl = config.API_BASE_URL;
   
   // 移除路徑開頭的 /media/ 前綴（如果存在）
   const cleanPath = path.startsWith('/media/') ? path.substring(7) : path;
   
-  return `${baseUrl}/media/serve/${cleanPath}`;
+  // 構建媒體URL：去掉API_BASE_URL的/api後綴，然後添加/api/media/serve/
+  const apiBaseWithoutSuffix = baseUrl.replace(/\/api$/, '');
+  return `${apiBaseWithoutSuffix}/api/media/serve/${cleanPath}`;
 };
 
 /**
@@ -36,7 +39,9 @@ export const processMarkdownImageUrls = (markdown: string): string => {
   if (!markdown) return '';
   
   const config = getConfig();
-  const backendUrl = config.BACKEND_URL || 'http://localhost:8000';
+  const apiBaseUrl = config.API_BASE_URL;
+  // 從API_BASE_URL中提取基礎URL（去掉/api後綴）
+  const baseUrl = apiBaseUrl.replace(/\/api$/, '');
   
   // 匹配Markdown圖片語法: ![alt](url)
   return markdown.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, url) => {
@@ -45,9 +50,9 @@ export const processMarkdownImageUrls = (markdown: string): string => {
       return match;
     }
     
-    // 如果是以/api開頭的相對路徑，添加後端URL
+    // 如果是以/api開頭的相對路徑，使用基礎URL
     if (url.startsWith('/api/')) {
-      return `![${alt}](${backendUrl}${url})`;
+      return `![${alt}](${baseUrl}${url})`;
     }
     
     return match;
