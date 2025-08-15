@@ -339,7 +339,131 @@ make dev
 - **Debug Mode**: Backend runs in debug mode with detailed error messages
 - **Volume Mounting**: Source code is mounted for live editing
 
+### Container Restart Policy Configuration
+
+#### Production vs Development Environments
+
+**Production Environment** (`./deploy.sh prod start`):
+- ✅ **All containers auto-restart**: Set to `restart: unless-stopped`
+- Automatically start all services after system reboot
+- Automatically restart on container failure
+- Includes: database, backend, frontend, phpmyadmin
+
+**Development Environment** (`./deploy.sh dev start`):
+- 🔧 **Configurable restart policy**: Controlled via `DEV_RESTART_POLICY` environment variable
+- Defaults to `no` (no auto-restart)
+- Flexible adjustment based on development needs
+
+#### Development Environment Restart Policy Options
+
+Set `DEV_RESTART_POLICY` variable in `.env` file:
+
+```env
+# Restart policy options
+DEV_RESTART_POLICY=no              # No auto-restart (default)
+DEV_RESTART_POLICY=unless-stopped  # Restart unless manually stopped (recommended for persistent dev)
+DEV_RESTART_POLICY=always          # Always restart
+DEV_RESTART_POLICY=on-failure       # Restart only on failure
+```
+
+#### Restart Policy Explanation
+
+| Policy | Behavior | Use Case |
+|--------|----------|----------|
+| `no` | Do not restart containers automatically | Daily development, avoid unexpected restarts |
+| `unless-stopped` | Auto-start on system reboot, don't restart when manually stopped | Persistent dev environment, want auto-recovery after reboot |
+| `always` | Always restart containers | High-availability development environment |
+| `on-failure` | Only restart on container failure | Want auto-recovery on errors |
+
+#### Practical Usage Examples
+
+```bash
+# Set development environment to auto-start after system reboot
+echo "DEV_RESTART_POLICY=unless-stopped" >> .env
+./deploy.sh dev restart
+
+# Check container restart policies
+docker inspect lab_web_backend_dev | grep -A 1 "RestartPolicy"
+docker inspect lab_web_frontend_dev | grep -A 1 "RestartPolicy"
+docker inspect lab_web_db_dev | grep -A 1 "RestartPolicy"
+
+# Restore default (no restart)
+echo "DEV_RESTART_POLICY=no" >> .env
+./deploy.sh dev restart
+```
+
+### Restart Policy Best Practices
+
+#### Recommended Configurations
+
+- **Daily Development**: Use `DEV_RESTART_POLICY=no`
+  - Avoid unexpected restarts affecting development workflow
+  - Manually start services when needed
+
+- **Long-term Development Environment**: Use `DEV_RESTART_POLICY=unless-stopped`
+  - Auto-recovery after system reboot
+  - Suitable for scenarios requiring persistent service availability
+
+- **Production Environment**: Automatically uses `unless-stopped`
+  - Ensures high service availability
+  - Auto-recovery after system reboot
+
 ## Configuration
+
+### Docker Commands Quick Reference
+
+#### Using Deploy Script (Recommended)
+
+```bash
+# Production
+./deploy.sh prod start -d          # Start all services
+./deploy.sh prod stop              # Stop all services  
+./deploy.sh prod restart           # Restart all services
+./deploy.sh prod logs -f           # Follow all logs
+./deploy.sh prod status            # Show status
+./deploy.sh prod health            # Health check
+
+# Development
+./deploy.sh dev start -d           # Start dev environment
+./deploy.sh dev logs -f            # Follow dev logs
+
+# Database
+./deploy.sh prod db-init           # Initialize database
+./deploy.sh prod db-backup         # Backup database
+./deploy.sh prod shell --service=db  # MySQL shell
+```
+
+#### Using Make (Even Simpler)
+
+```bash
+make deploy        # Full deployment
+make start         # Start services
+make stop          # Stop services
+make logs          # Follow logs
+make status        # Show status
+make dev          # Start development
+make db-init      # Initialize database
+make urls         # Show service URLs
+```
+
+#### Direct Docker Commands
+
+```bash
+# Container management
+docker ps                              # List running containers
+docker ps -a                           # List all containers
+docker logs lab_web_backend -f         # View backend logs
+docker restart lab_web_frontend        # Restart frontend container
+
+# Enter containers
+docker exec -it lab_web_backend /bin/bash
+docker exec -it lab_web_db mysql -u root -p
+
+# Docker Compose commands
+docker-compose up -d                   # Start services
+docker-compose down                    # Stop services
+docker-compose logs -f backend         # View specific service logs
+```
 
 ### Frontend Configuration
 
@@ -643,6 +767,94 @@ sudo chown -R $USER:$USER logs/
 ./deploy.sh prod build
 ```
 
+### Docker Troubleshooting Commands
+
+#### Health Checks
+
+```bash
+# Check if services are responding
+curl http://localhost:3000/health    # Frontend
+curl http://localhost:8000/health    # Backend
+
+# Check database connection
+docker exec lab_web_db mysqladmin ping -h localhost
+
+# Check container health status
+docker inspect lab_web_frontend --format='{{.State.Health.Status}}'
+```
+
+#### Resource Usage and Cleanup
+
+```bash
+# Container resource usage
+docker stats --no-stream
+
+# Disk usage
+docker system df
+
+# Clean unused resources
+docker container prune              # Remove stopped containers
+docker image prune                  # Remove unused images
+docker volume prune                 # Remove unused volumes
+docker system prune -a --volumes    # Full cleanup (careful!)
+```
+
+#### Container Debugging
+
+```bash
+# Check container startup failures
+docker logs lab_web_backend
+
+# Check container configuration
+docker inspect lab_web_backend
+
+# Check network connectivity
+docker network inspect lab_web_default
+
+# Test inter-container connectivity
+docker exec lab_web_backend ping db
+docker exec lab_web_frontend ping backend
+```
+
+#### Volume Management
+
+```bash
+# List volumes
+docker volume ls | grep lab_web
+
+# Backup volumes
+docker run --rm -v lab_web_mysql_data:/data -v $(pwd):/backup alpine tar czf /backup/mysql_backup.tar.gz -C /data .
+
+# Restore volumes
+docker run --rm -v lab_web_mysql_data:/data -v $(pwd):/backup alpine tar xzf /backup/mysql_backup.tar.gz -C /data
+```
+
+### Emergency Procedures
+
+#### Complete Reset
+
+```bash
+# Stop all services
+./deploy.sh prod stop
+
+# Remove all containers and volumes (destructive!)
+./deploy.sh prod clean
+
+# Start fresh
+./deploy.sh prod start -d
+./deploy.sh prod db-init
+```
+
+#### Pre-Emergency Backup
+
+```bash
+# Always backup before destructive operations
+./deploy.sh prod db-backup
+
+# Backup media files
+docker run --rm -v lab_web_media_data:/data -v $(pwd):/backup alpine tar czf /backup/media_emergency_backup.tar.gz -C /data .
+```
+
 #### 5. Frontend Not Loading
 
 ```bash
@@ -814,16 +1026,9 @@ Before going live:
 
 Based on your deployment environment and requirements, check these related documents:
 
-### Cloud Deployment
-- **[ECS Cloud Server Deployment Guide (English)](./ECS_DEPLOYMENT.md)** - Detailed deployment guide for AWS ECS, Alibaba Cloud ECS, Tencent Cloud and other cloud server environments
-- **[ECS 雲服務器部署指南 (中文)](./ECS_DEPLOYMENT_zh-CN.md)** - Chinese version of cloud server deployment guide
-
-### Docker Related
-- **[Docker Reference (English)](./DOCKER_REFERENCE.md)** - Docker configuration and best practices
-- **[Docker 參考文檔 (中文)](./DOCKER_REFERENCE_zh-CN.md)** - Chinese version of Docker documentation
-
-### Flexible Deployment
-- **[Flexible Deployment Configuration](./FLEXIBLE_DEPLOYMENT.md)** - Various deployment scenarios and configuration options
+### Advanced Deployment
+- **[Advanced Deployment Guide (English)](./ADVANCED_DEPLOYMENT.md)** - Cloud servers, local build + image deployment, flexible configurations, and advanced scenarios
+- **[進階部署指南 (中文)](./ADVANCED_DEPLOYMENT_zh-CN.md)** - Chinese version of advanced deployment scenarios
 
 ### Project Documentation
 - **[Main README](../README.md)** - Project overview and feature introduction

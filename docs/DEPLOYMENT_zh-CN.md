@@ -339,7 +339,131 @@ make dev
 - **除錯模式**: 後端以除錯模式執行，提供詳細錯誤訊息
 - **資料卷掛載**: 原始程式碼被掛載以供即時編輯
 
+### 容器重啟策略配置
+
+#### 生產環境 vs 開發環境
+
+**生產環境**（`./deploy.sh prod start`）：
+- ✅ **所有容器自動重啟**：設定為 `restart: unless-stopped`
+- 系統重啟後自動啟動所有服務
+- 容器異常退出時自動重啟
+- 包括：database、backend、frontend、phpmyadmin
+
+**開發環境**（`./deploy.sh dev start`）：
+- 🔧 **可配置重啟策略**：透過 `DEV_RESTART_POLICY` 環境變數控制
+- 預設為 `no`（不自動重啟）
+- 可根據開發需求靈活調整
+
+#### 開發環境重啟策略選項
+
+在 `.env` 檔案中設定 `DEV_RESTART_POLICY` 變數：
+
+```env
+# 重啟策略選項
+DEV_RESTART_POLICY=no              # 不自動重啟（預設）
+DEV_RESTART_POLICY=unless-stopped  # 除非手動停止否則重啟（推薦持久開發）
+DEV_RESTART_POLICY=always          # 總是重啟
+DEV_RESTART_POLICY=on-failure       # 僅在失敗時重啟
+```
+
+#### 重啟策略說明
+
+| 策略 | 行為 | 使用場景 |
+|------|------|----------|
+| `no` | 不自動重啟容器 | 日常開發，避免意外重啟 |
+| `unless-stopped` | 系統重啟時自動啟動，手動停止時不重啟 | 持久開發環境，希望重啟後自動恢復 |
+| `always` | 總是重啟容器 | 需要高可用性的開發環境 |
+| `on-failure` | 僅在容器異常退出時重啟 | 希望在出錯時自動恢復 |
+
+#### 實際使用範例
+
+```bash
+# 設定開發環境在系統重啟後自動啟動
+echo "DEV_RESTART_POLICY=unless-stopped" >> .env
+./deploy.sh dev restart
+
+# 查看容器重啟策略
+docker inspect lab_web_backend_dev | grep -A 1 "RestartPolicy"
+docker inspect lab_web_frontend_dev | grep -A 1 "RestartPolicy"
+docker inspect lab_web_db_dev | grep -A 1 "RestartPolicy"
+
+# 恢復預設（不重啟）
+echo "DEV_RESTART_POLICY=no" >> .env
+./deploy.sh dev restart
+```
+
+### 重啟策略最佳實踐
+
+#### 建議配置
+
+- **日常開發**：使用 `DEV_RESTART_POLICY=no`
+  - 避免意外重啟影響開發流程
+  - 需要時手動啟動服務
+
+- **長期開發環境**：使用 `DEV_RESTART_POLICY=unless-stopped`
+  - 系統重啟後自動恢復開發環境
+  - 適合需要保持服務運行的開發場景
+
+- **生產環境**：自動使用 `unless-stopped`
+  - 確保服務高可用性
+  - 系統重啟後自動恢復
+
 ## 配置說明
+
+### Docker 命令快速參考
+
+#### 使用部署腳本（推薦）
+
+```bash
+# 生產環境
+./deploy.sh prod start -d          # 啟動所有服務
+./deploy.sh prod stop              # 停止所有服務  
+./deploy.sh prod restart           # 重啟所有服務
+./deploy.sh prod logs -f           # 追蹤所有日誌
+./deploy.sh prod status            # 顯示狀態
+./deploy.sh prod health            # 健康檢查
+
+# 開發環境
+./deploy.sh dev start -d           # 啟動開發環境
+./deploy.sh dev logs -f            # 追蹤開發日誌
+
+# 資料庫操作
+./deploy.sh prod db-init           # 初始化資料庫
+./deploy.sh prod db-backup         # 備份資料庫
+./deploy.sh prod shell --service=db  # MySQL shell
+```
+
+#### 使用 Make（更簡單）
+
+```bash
+make deploy        # 完整部署
+make start         # 啟動服務
+make stop          # 停止服務
+make logs          # 追蹤日誌
+make status        # 顯示狀態
+make dev          # 啟動開發環境
+make db-init      # 初始化資料庫
+make urls         # 顯示服務 URLs
+```
+
+#### 直接 Docker 命令
+
+```bash
+# 容器管理
+docker ps                              # 列出運行中的容器
+docker ps -a                           # 列出所有容器
+docker logs lab_web_backend -f         # 檢視後端日誌
+docker restart lab_web_frontend        # 重啟前端容器
+
+# 進入容器
+docker exec -it lab_web_backend /bin/bash
+docker exec -it lab_web_db mysql -u root -p
+
+# Docker Compose 命令
+docker-compose up -d                   # 啟動服務
+docker-compose down                    # 停止服務
+docker-compose logs -f backend         # 檢視特定服務日誌
+```
 
 ### 前端配置
 
@@ -623,6 +747,94 @@ sudo chown -R $USER:$USER logs/
 ./deploy.sh prod build
 ```
 
+### Docker 故障排除命令
+
+#### 健康檢查
+
+```bash
+# 檢查服務是否回應
+curl http://localhost:3000/health    # 前端
+curl http://localhost:8000/health    # 後端
+
+# 檢查資料庫連接
+docker exec lab_web_db mysqladmin ping -h localhost
+
+# 檢查容器健康狀態
+docker inspect lab_web_frontend --format='{{.State.Health.Status}}'
+```
+
+#### 資源使用和清理
+
+```bash
+# 容器資源使用
+docker stats --no-stream
+
+# 磁碟使用
+docker system df
+
+# 清理未使用的資源
+docker container prune              # 移除已停止的容器
+docker image prune                  # 移除未使用的映像
+docker volume prune                 # 移除未使用的資料卷
+docker system prune -a --volumes    # 完整清理（小心！）
+```
+
+#### 容器除錯
+
+```bash
+# 檢查容器啟動失敗的原因
+docker logs lab_web_backend
+
+# 檢查容器配置
+docker inspect lab_web_backend
+
+# 檢查網路連接
+docker network inspect lab_web_default
+
+# 測試容器間連接
+docker exec lab_web_backend ping db
+docker exec lab_web_frontend ping backend
+```
+
+#### 資料卷管理
+
+```bash
+# 列出資料卷
+docker volume ls | grep lab_web
+
+# 備份資料卷
+docker run --rm -v lab_web_mysql_data:/data -v $(pwd):/backup alpine tar czf /backup/mysql_backup.tar.gz -C /data .
+
+# 恢復資料卷
+docker run --rm -v lab_web_mysql_data:/data -v $(pwd):/backup alpine tar xzf /backup/mysql_backup.tar.gz -C /data
+```
+
+### 緊急程序
+
+#### 完全重設
+
+```bash
+# 停止所有服務
+./deploy.sh prod stop
+
+# 移除所有容器和資料卷（破壞性！）
+./deploy.sh prod clean
+
+# 重新開始
+./deploy.sh prod start -d
+./deploy.sh prod db-init
+```
+
+#### 緊急操作前的備份
+
+```bash
+# 在破壞性操作前總是備份
+./deploy.sh prod db-backup
+
+# 備份媒體檔案
+docker run --rm -v lab_web_media_data:/data -v $(pwd):/backup alpine tar czf /backup/media_emergency_backup.tar.gz -C /data .
+```
+
 #### 5. 前端無法載入
 
 ```bash
@@ -794,16 +1006,9 @@ services:
 
 根據您的部署環境和需求，查看以下相關文檔：
 
-### 雲端部署
-- **[ECS 雲服務器部署指南 (中文)](./ECS_DEPLOYMENT_zh-CN.md)** - 適用於 AWS ECS、阿里雲 ECS、騰訊雲等雲服務器環境的詳細部署指南
-- **[ECS Cloud Server Deployment Guide (English)](./ECS_DEPLOYMENT.md)** - English version of cloud server deployment guide
-
-### Docker 相關
-- **[Docker 參考文檔 (中文)](./DOCKER_REFERENCE_zh-CN.md)** - Docker 配置和最佳實踐
-- **[Docker Reference (English)](./DOCKER_REFERENCE.md)** - Docker configuration and best practices
-
-### 靈活部署
-- **[靈活部署配置 (中文)](./FLEXIBLE_DEPLOYMENT.md)** - 各種部署場景和配置選項
+### 進階部署
+- **[進階部署指南 (中文)](./ADVANCED_DEPLOYMENT_zh-CN.md)** - 雲服務器、本地構建+鏡像部署、靈活配置等進階部署方案
+- **[Advanced Deployment Guide (English)](./ADVANCED_DEPLOYMENT.md)** - English version of advanced deployment scenarios
 
 ### 項目文檔
 - **[主要 README](../README_zh-CN.md)** - 項目概覽和功能介紹

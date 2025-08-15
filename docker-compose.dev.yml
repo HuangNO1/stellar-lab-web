@@ -24,6 +24,7 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-plab_web_root_123"]
       timeout: 20s
       retries: 10
+    restart: ${DEV_RESTART_POLICY:-no}
 
   # Backend Development Mode
   backend-dev:
@@ -53,6 +54,7 @@ services:
     networks:
       - lab_web_network
     command: ["python", "run.py"]
+    restart: ${DEV_RESTART_POLICY:-no}
 
   # Frontend Development Mode with Hot Reloading
   frontend-dev:
@@ -74,6 +76,7 @@ services:
     networks:
       - lab_web_network
     command: npm run serve
+    restart: ${DEV_RESTART_POLICY:-no}
 
 volumes:
   mysql_data_dev:
