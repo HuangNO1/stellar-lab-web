@@ -266,11 +266,11 @@ const handleCrop = async () => {
     console.log('Starting crop operation...');
     console.log('Crop result:', cropResult.value);
     
-    const canvas = cropResult.value.canvas;
+    const canvas = cropResult.value.canvas as HTMLCanvasElement;
     
     // Convert canvas to blob
-    const blob: Blob = await new Promise((resolve) => {
-      canvas.toBlob((blob: Blob) => {
+    const blob: Blob | null = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob((blob: Blob | null) => {
         resolve(blob);
       }, 'image/jpeg', 0.9);
     });

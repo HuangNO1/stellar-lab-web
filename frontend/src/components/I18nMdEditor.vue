@@ -51,7 +51,7 @@ const defaultToolbars = [
 ];
 
 // Try to inject theme from parent, fallback to getTheme()
-const isDarkMode = inject('isDarkMode', null);
+const isDarkMode = inject<{ value: boolean } | null>('isDarkMode', null);
 
 // 當前語言
 const currentLanguage = computed(() => {

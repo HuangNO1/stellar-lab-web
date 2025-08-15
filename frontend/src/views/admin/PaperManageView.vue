@@ -289,7 +289,7 @@ const columns: DataTableColumns<Paper> = [
           (row.all_authors_zh || row.all_authors_en) : 
           (row.all_authors_en || row.all_authors_zh);
         return h('div', { style: { fontSize: '0.875rem', color: '#666' } }, 
-          `${t('admin.papers.form.allAuthors')}: ${allAuthors.slice(0, 80)}${allAuthors.length > 80 ? '...' : ''}`
+          `${t('admin.papers.form.allAuthors')}: ${allAuthors?.slice(0, 80) || ''}${(allAuthors?.length || 0) > 80 ? '...' : ''}`
         );
       }
       return '-';

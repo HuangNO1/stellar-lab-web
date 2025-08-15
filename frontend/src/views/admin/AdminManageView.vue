@@ -109,7 +109,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, h, computed } from 'vue';
+import { ref, reactive, onMounted, h, computed, type VNode } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMessage, NButton, NTag, NSpace, zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
 import { adminApi } from '@/services/api';
@@ -232,7 +232,7 @@ const columns: DataTableColumns<Admin> = [
     key: 'actions',
     width: 180,
     render(row) {
-      const buttons = [];
+      const buttons: VNode[] = [];
       
       // 編輯按鈕 - 只有權限時才顯示
       if (canEditAdmin(row)) {

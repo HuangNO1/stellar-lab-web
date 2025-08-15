@@ -246,7 +246,7 @@ const handleLanguageSelect = (key: string) => {
 
 // Handle menu selection
 const handleMenuSelect = (key: string) => {
-  console.log('Menu selected:', key)
+  // console.log('Menu selected:', key)
   showMobileMenu.value = false // Close mobile menu when item selected
   switch (key) {
     case 'home':

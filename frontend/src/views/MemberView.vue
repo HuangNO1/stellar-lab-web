@@ -59,10 +59,10 @@
               <n-tooltip trigger="hover" :disabled="!isPositionTruncated(member)">
                 <template #trigger>
                   <div class="member-position">
-                    {{ getMemberPosition(member, getCurrentLocale()) }}
+                    {{ getMemberPosition(member) }}
                   </div>
                 </template>
-                {{ getMemberPosition(member, getCurrentLocale()) }}
+                {{ getMemberPosition(member) }}
               </n-tooltip>
             </div>
           </div>
@@ -93,10 +93,10 @@
               <n-tooltip trigger="hover" :disabled="!isPositionTruncated(member)">
                 <template #trigger>
                   <div class="member-position">
-                    {{ getMemberPosition(member, getCurrentLocale()) }}
+                    {{ getMemberPosition(member) }}
                   </div>
                 </template>
-                {{ getMemberPosition(member, getCurrentLocale()) }}
+                {{ getMemberPosition(member) }}
               </n-tooltip>
             </div>
           </div>
@@ -127,10 +127,10 @@
               <n-tooltip trigger="hover" :disabled="!isPositionTruncated(member)">
                 <template #trigger>
                   <div class="member-position">
-                    {{ getMemberPosition(member, getCurrentLocale()) }}
+                    {{ getMemberPosition(member) }}
                   </div>
                 </template>
-                {{ getMemberPosition(member, getCurrentLocale()) }}
+                {{ getMemberPosition(member) }}
               </n-tooltip>
             </div>
           </div>
@@ -161,10 +161,10 @@
               <n-tooltip trigger="hover" :disabled="!isPositionTruncated(member)">
                 <template #trigger>
                   <div class="member-position">
-                    {{ getMemberPosition(member, getCurrentLocale()) }}
+                    {{ getMemberPosition(member) }}
                   </div>
                 </template>
-                {{ getMemberPosition(member, getCurrentLocale()) }}
+                {{ getMemberPosition(member) }}
               </n-tooltip>
             </div>
           </div>
@@ -195,10 +195,10 @@
               <n-tooltip trigger="hover" :disabled="!isPositionTruncated(member)">
                 <template #trigger>
                   <div class="member-position">
-                    {{ getMemberPosition(member, getCurrentLocale()) }}
+                    {{ getMemberPosition(member) }}
                   </div>
                 </template>
-                {{ getMemberPosition(member, getCurrentLocale()) }}
+                {{ getMemberPosition(member) }}
               </n-tooltip>
             </div>
           </div>
@@ -229,10 +229,10 @@
               <n-tooltip trigger="hover" :disabled="!isPositionTruncated(member)">
                 <template #trigger>
                   <div class="member-position">
-                    {{ getMemberPosition(member, getCurrentLocale()) }}
+                    {{ getMemberPosition(member) }}
                   </div>
                 </template>
-                {{ getMemberPosition(member, getCurrentLocale()) }}
+                {{ getMemberPosition(member) }}
               </n-tooltip>
             </div>
           </div>
@@ -287,7 +287,7 @@ const isNameTruncated = (member: Member) => {
 
 // 判断職位是否被截断
 const isPositionTruncated = (member: Member) => {
-  const position = getMemberPosition(member, getCurrentLocale());
+  const position = getMemberPosition(member);
   // 更新判断条件：英文職位超过18字符或中文超过8字符
   return getCurrentLocale() === 'zh' ? (position?.length || 0) > 8 : (position?.length || 0) > 18;
 };
