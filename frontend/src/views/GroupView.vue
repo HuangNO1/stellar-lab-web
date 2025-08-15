@@ -86,10 +86,10 @@
               <n-tooltip trigger="hover" :disabled="!isPositionTruncated(member)">
                 <template #trigger>
                   <div class="member-position">
-                    {{ getMemberPosition(member, getCurrentLocale()) }}
+                    {{ getMemberPosition(member) }}
                   </div>
                 </template>
-                {{ getMemberPosition(member, getCurrentLocale()) }}
+                {{ getMemberPosition(member) }}
               </n-tooltip>
             </div>
           </div>
@@ -144,7 +144,7 @@ const isNameTruncated = (member: Member) => {
 
 // 判断職位是否被截断
 const isPositionTruncated = (member: Member) => {
-  const position = getMemberPosition(member, getCurrentLocale());
+  const position = getMemberPosition(member);
   return getCurrentLocale() === 'zh' ? (position?.length || 0) > 8 : (position?.length || 0) > 18;
 };
 
@@ -396,7 +396,8 @@ watch(() => route.params.id, () => {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  overflow: hidden;
+  overflow: visible;
+  padding: 0 4px;
 }
 
 .member-name {
@@ -404,21 +405,29 @@ watch(() => route.params.id, () => {
   font-weight: 600;
   margin-bottom: 0.25rem;
   color: #333;
-  line-height: 1.2;
+  line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
+  min-height: 1.26rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .member-position {
   font-size: 0.8rem;
   color: #666;
-  line-height: 1.3;
+  line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
+  min-height: 1.12rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .empty-members {
@@ -526,6 +535,144 @@ watch(() => route.params.id, () => {
 }
 
 /* 響應式設計 */
+/* 成員頭像固定樣式 */
+.member-avatar {
+  flex-shrink: 0;
+  width: 60px !important;
+  height: 60px !important;
+  border-radius: 50% !important;
+  object-fit: cover;
+}
+
+/* 不同屏幕尺寸下的頭像調整 */
+@media (max-width: 1024px) {
+  .member-card .member-avatar {
+    width: 50px !important;
+    height: 50px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .member-card .member-avatar {
+    width: 45px !important;
+    height: 45px !important;
+  }
+}
+
+@media (max-width: 30rem) {
+  .member-card .member-avatar {
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
+
+/* 響應式設計 - 改善版 */
+@media (max-width: 1024px) {
+  .group-view {
+    padding: 0.5rem 1rem;
+  }
+  
+  .members-grid {
+    gap: 0.875rem;
+  }
+  
+  .member-card {
+    width: 9rem;
+    min-width: 9rem;
+    max-width: 9rem;
+    height: 8.5rem;
+    min-height: 8.5rem;
+    max-height: 8.5rem;
+  }
+  
+  .member-name {
+    font-size: 0.875rem;
+  }
+  
+  .member-position {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .group-view {
+    padding: 1rem;
+  }
+  
+  .group-name {
+    font-size: 2rem;
+  }
+  
+  .group-header {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .members-grid {
+    gap: 0.75rem;
+    justify-content: center;
+  }
+  
+  .member-card {
+    width: 8.5rem;
+    min-width: 8.5rem;
+    max-width: 8.5rem;
+    height: 8.5rem;
+    min-height: 8.5rem;
+    max-height: 8.5rem;
+  }
+  
+  .member-info {
+    margin-top: 0.5rem;
+    padding: 0 3px;
+  }
+  
+  .member-name {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    min-height: 1.19rem;
+    margin-bottom: 0.2rem;
+  }
+  
+  .member-position {
+    font-size: 0.7rem;
+    line-height: 1.4;
+    min-height: 0.98rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .members-grid {
+    gap: 0.625rem;
+  }
+  
+  .member-card {
+    width: 8rem;
+    min-width: 8rem;
+    max-width: 8rem;
+    height: 8rem;
+    min-height: 8rem;
+    max-height: 8rem;
+    padding: 0.75rem;
+  }
+  
+  .member-info {
+    margin-top: 0.4rem;
+    padding: 0 2px;
+  }
+  
+  .member-name {
+    font-size: 0.8rem;
+    margin-bottom: 0.15rem;
+    min-height: 1.12rem;
+  }
+  
+  .member-position {
+    font-size: 0.65rem;
+    min-height: 0.91rem;
+  }
+}
+
 @media (max-width: 50rem) {
   .group-view {
     padding: 1rem;
@@ -560,13 +707,16 @@ watch(() => route.params.id, () => {
     gap: 0.75rem;
   }
   
-  .member-card {
-    width: 10rem;
-    min-width: 10rem;
-    max-width: 10rem;
-    height: 8rem;
-    min-height: 8rem;
-    max-height: 8rem;
+  .member-name {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    min-height: 1.19rem;
+  }
+  
+  .member-position {
+    font-size: 0.75rem;
+    line-height: 1.4;
+    min-height: 1.05rem;
   }
 }
 
@@ -575,22 +725,34 @@ watch(() => route.params.id, () => {
     font-size: 1.75rem;
   }
   
+  .members-grid {
+    justify-content: center;
+  }
+  
   .member-card {
-    padding: 0.75rem;
-    width: 8rem;
-    min-width: 8rem;
-    max-width: 8rem;
+    padding: 0.6rem 0.4rem;
+    width: 7.5rem;
+    min-width: 7.5rem;
+    max-width: 7.5rem;
     height: 7.5rem;
     min-height: 7.5rem;
     max-height: 7.5rem;
   }
   
+  .member-info {
+    margin-top: 0.3rem;
+    padding: 0 2px;
+  }
+  
   .member-name {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
+    min-height: 1.05rem;
+    margin-bottom: 0.1rem;
   }
   
   .member-position {
-    font-size: 0.75rem;
+    font-size: 0.6rem;
+    min-height: 0.84rem;
   }
 }
 </style>
