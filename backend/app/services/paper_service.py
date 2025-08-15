@@ -358,9 +358,12 @@ class PaperService(BaseService):
                     value = int(value)
                 setattr(paper, field, value)
         
-        # 特殊處理日期字段
+        # 特殊處理日期字段（必需字段）
         if 'paper_date' in paper_data and paper_data['paper_date']:
             paper.paper_date = datetime.strptime(paper_data['paper_date'], '%Y-%m-%d').date()
+        else:
+            # 如果沒有提供日期，使用當前日期作為默認值
+            paper.paper_date = datetime.now().date()
     
     def _create_paper_authors(self, paper_id: int, authors_data: List[Dict[str, Any]]) -> None:
         """創建論文作者關聯"""

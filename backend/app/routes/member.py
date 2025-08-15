@@ -97,6 +97,9 @@ def create_member():
         return jsonify(error_response(error_data['code'], error_data['message'])), 400
         
     except Exception as e:
+        import traceback
+        print(f"Exception in create_member: {e}")
+        print(f"Traceback: {traceback.format_exc()}")
         return jsonify(error_response(5000, msg.get_error_message('OPERATION_FAILED'))), 500
 
 @bp.route('/members/<int:mem_id>', methods=['PUT'])

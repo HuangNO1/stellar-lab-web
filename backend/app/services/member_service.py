@@ -597,26 +597,26 @@ class MemberService(BaseService):
     
     def _set_member_associations(self, member: Member, form_data: Dict[str, Any]) -> None:
         """設置成員關聯信息"""
-        if 'research_group_id' in form_data:
-            research_group_id = form_data['research_group_id']
-            
-            # 如果research_group_id為空、None或0，則不設置課題組
-            if not research_group_id or research_group_id == 0:
-                member.research_group_id = None
-                member.lab_id = None
-                return
-            
-            research_group_id = int(research_group_id)
-            research_group = ResearchGroup.query.filter_by(
-                research_group_id=research_group_id, 
-                enable=1
-            ).first()
-            
-            if not research_group:
-                raise ValidationError(msg.get_error_message('RESEARCH_GROUP_NOT_FOUND'))
-            
-            member.research_group_id = research_group_id
-            member.lab_id = research_group.lab_id
+        # 處理課題組關聯
+        research_group_id = form_data.get('research_group_id')
+        
+        # 如果research_group_id為空、None或0，則不設置課題組（如校友等）
+        if not research_group_id or research_group_id == 0:
+            member.research_group_id = None
+            member.lab_id = None
+            return
+        
+        research_group_id = int(research_group_id)
+        research_group = ResearchGroup.query.filter_by(
+            research_group_id=research_group_id, 
+            enable=1
+        ).first()
+        
+        if not research_group:
+            raise ValidationError(msg.get_error_message('RESEARCH_GROUP_NOT_FOUND'))
+        
+        member.research_group_id = research_group_id
+        member.lab_id = research_group.lab_id
     
     def _update_member_associations(self, member: Member, form_data: Dict[str, Any]) -> Dict[str, Any]:
         """更新成員關聯信息"""

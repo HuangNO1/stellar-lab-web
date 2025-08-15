@@ -17,8 +17,8 @@ class Member(db.Model):
     student_grade = db.Column(db.Integer)
     destination_zh = db.Column(db.String(500))
     destination_en = db.Column(db.String(500))
-    research_group_id = db.Column(db.Integer, db.ForeignKey('research_groups.research_group_id'), nullable=False)
-    lab_id = db.Column(db.Integer, db.ForeignKey('lab.lab_id'), nullable=False)
+    research_group_id = db.Column(db.Integer, db.ForeignKey('research_groups.research_group_id'), nullable=True)
+    lab_id = db.Column(db.Integer, db.ForeignKey('lab.lab_id'), nullable=True)
     enable = db.Column(db.Integer, nullable=False, default=1, index=True)  # 添加索引用於啟用狀態篩選
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)  # 添加索引用於排序
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

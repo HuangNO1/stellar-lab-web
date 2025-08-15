@@ -1412,8 +1412,8 @@ const handleSubmit = async () => {
         // 數值類型（包括 0）都是有效的
         isValidValue = true;
       } else if (typeof value === 'string') {
-        // 字符串不能為空
-        isValidValue = value !== '';
+        // 字符串類型（包括空字符串）都是有效的，空字符串在某些字段中是合法值
+        isValidValue = true;
       } else if (typeof value === 'boolean') {
         // 布爾值都是有效的
         isValidValue = true;
@@ -1423,12 +1423,20 @@ const handleSubmit = async () => {
       } else if (value instanceof Date) {
         // 日期對象都是有效的
         isValidValue = true;
-      } else if (key === 'research_group_id' && value === null) {
-        // 特殊處理：research_group_id 的 null 值是有效的（代表選擇了「無」）
+      } else if (value === null && (
+        key === 'research_group_id' || 
+        key === 'job_type' || 
+        key === 'student_type' || 
+        key === 'student_grade'
+      )) {
+        // 特殊處理：這些字段的 null 值是有效的（代表選擇了「無」或未設置）
         isValidValue = true;
-      } else {
-        // null、undefined、function 等都是無效的
+      } else if (value === undefined || value === null || typeof value === 'function') {
+        // undefined、null（除了特殊字段）、function 等都是無效的
         isValidValue = false;
+      } else {
+        // 其他類型（如對象）需要進一步檢查
+        isValidValue = value != null;
       }
       
       if (isValidValue) {

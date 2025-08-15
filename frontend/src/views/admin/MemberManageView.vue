@@ -589,9 +589,13 @@ const handleBatchUpdate = async () => {
   try {
     batchLoading.value = true;
     
-    // 過濾掉空值
+    // 過濾掉空值 - 注意：數字0是有效值，空字符串在某些情況下也可能是有效值
     const updates = Object.keys(batchFormData)
-      .filter(key => batchFormData[key] !== null && batchFormData[key] !== undefined && batchFormData[key] !== '')
+      .filter(key => {
+        const value = batchFormData[key];
+        // 排除 null, undefined，但保留數字0、空字符串、布爾值false等
+        return value !== null && value !== undefined;
+      })
       .reduce((acc, key) => {
         acc[key] = batchFormData[key];
         return acc;

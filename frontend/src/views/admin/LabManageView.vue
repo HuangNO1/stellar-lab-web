@@ -414,10 +414,9 @@ const handleSave = async () => {
     Object.keys(formData).forEach(key => {
       const value = formData[key as keyof typeof formData];
       
-      // 檢查是否為有效值
+      // 檢查是否為有效值 - 空字符串也是有效值
       const isValidValue = value !== null && 
                           value !== undefined && 
-                          value !== '' &&
                           typeof value !== 'function';
       
       // 對於對象類型，只允許基本數據類型
