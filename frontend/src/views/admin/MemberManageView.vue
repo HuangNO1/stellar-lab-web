@@ -177,6 +177,25 @@
               clearable
             />
           </n-form-item>
+
+          <n-form-item :label="$t('admin.members.form.graduationYear')" v-if="batchFormData.mem_type === 2">
+            <n-input-number
+              v-model:value="batchFormData.graduation_year"
+              :placeholder="$t('admin.members.form.placeholders.graduationYear')"
+              :min="1900"
+              :max="new Date().getFullYear()"
+              clearable
+            />
+          </n-form-item>
+
+          <n-form-item :label="$t('admin.members.form.alumniIdentity')" v-if="batchFormData.mem_type === 2">
+            <n-select
+              v-model:value="batchFormData.alumni_identity"
+              :options="alumniIdentityOptions"
+              :placeholder="$t('admin.members.form.placeholders.alumniIdentity')"
+              clearable
+            />
+          </n-form-item>
           
           <n-form-item :label="$t('admin.common.status')">
             <n-select
@@ -335,6 +354,14 @@ const studentTypeOptions = computed(() => [
   { label: t('admin.members.studentTypes.phd'), value: 0 },
   { label: t('admin.members.studentTypes.master'), value: 1 },
   { label: t('admin.members.studentTypes.undergraduate'), value: 2 }
+]);
+
+const alumniIdentityOptions = computed(() => [
+  { label: t('admin.common.alumniIdentity.phd'), value: 0 },
+  { label: t('admin.common.alumniIdentity.master'), value: 1 },
+  { label: t('admin.common.alumniIdentity.undergraduate'), value: 2 },
+  { label: t('admin.common.alumniIdentity.teacher'), value: 3 },
+  { label: t('admin.common.alumniIdentity.other'), value: 4 }
 ]);
 
 const statusOptions = computed(() => [

@@ -34,7 +34,7 @@
         <n-card :title="t('admin.lab.basicInfo')" class="form-card">
           <n-grid :cols="2" :x-gap="24">
             <n-gi>
-              <n-form-item :label="t('admin.lab.nameZh')" path="lab_zh">
+              <n-form-item :label="t('admin.lab.nameZh')" path="lab_zh" required>
                 <n-input
                   v-model:value="formData.lab_zh"
                   :placeholder="t('admin.lab.placeholders.nameZh')"
@@ -42,7 +42,7 @@
               </n-form-item>
             </n-gi>
             <n-gi>
-              <n-form-item :label="t('admin.lab.nameEn')" path="lab_en">
+              <n-form-item :label="t('admin.lab.nameEn')" path="lab_en" required>
                 <n-input
                   v-model:value="formData.lab_en"
                   :placeholder="t('admin.lab.placeholders.nameEn')"

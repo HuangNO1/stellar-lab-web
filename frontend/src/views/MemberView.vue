@@ -1,8 +1,11 @@
 <template>
   <div class="member-view">
-    <!-- 頁面標題 -->
+    <!-- Page Header -->
     <div class="page-header">
-      <h1 class="page-title">{{ $t('members.title') }}</h1>
+      <div class="header-content">
+        <h1 class="page-title">{{ $t('members.title') }}</h1>
+        <p class="page-description">{{ $t('members.description') }}</p>
+      </div>
     </div>
 
     <!-- 加載狀態 -->
@@ -306,19 +309,33 @@ const toMember = (memberId: number) => {
   width: 100%;
 }
 
+/* Page Header */
 .page-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
+  padding: 2rem 0;
+  background: linear-gradient(135deg, #13c2c2 0%, #1890ff 100%);
+  border-radius: 12px;
+  color: white;
+}
+
+.header-content {
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .page-title {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  margin-bottom: 8px;
-  background: linear-gradient(135deg, #1890ff, #722ed1);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  margin: 0 0 1rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.page-description {
+  font-size: 1.125rem;
+  margin: 0;
+  opacity: 0.9;
+  line-height: 1.6;
 }
 
 .member-section {
@@ -523,6 +540,11 @@ const toMember = (memberId: number) => {
     padding: 1.25rem;
   }
   
+  .page-header {
+    margin-bottom: 2.5rem;
+    padding: 1.75rem 1rem;
+  }
+  
   .members-grid {
     gap: 0.875rem;
   }
@@ -550,8 +572,17 @@ const toMember = (memberId: number) => {
     padding: 1rem;
   }
   
+  .page-header {
+    margin-bottom: 2rem;
+    padding: 1.5rem 1rem;
+  }
+  
   .page-title {
-    font-size: 1.75rem;
+    font-size: 2rem;
+  }
+  
+  .page-description {
+    font-size: 1rem;
   }
   
   .section-title {
@@ -628,8 +659,18 @@ const toMember = (memberId: number) => {
     padding: 1rem;
   }
   
+  .page-header {
+    margin-bottom: 1.5rem;
+    padding: 1rem 0.5rem;
+    border-radius: 8px;
+  }
+  
   .page-title {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
+  }
+  
+  .page-description {
+    font-size: 1rem;
   }
   
   .section-title {
