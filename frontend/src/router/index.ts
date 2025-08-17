@@ -45,6 +45,11 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import('@/views/ProjectView.vue')
             },
             {
+                path: 'resources',
+                name: 'resources',
+                component: () => import('@/views/ResourceView.vue')
+            },
+            {
                 path: 'project/:id',
                 name: 'project-detail',
                 component: () => import('@/views/ProjectDetailView.vue'),
@@ -106,6 +111,11 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import('@/views/admin/ProjectManageView.vue')
             },
             {
+                path: 'resources',
+                name: 'admin-resources',
+                component: () => import('@/views/admin/ResourceManageView.vue')
+            },
+            {
                 path: 'news',
                 name: 'admin-news',
                 component: () => import('@/views/admin/NewsManageView.vue')
@@ -139,8 +149,21 @@ const routes: Array<RouteRecordRaw> = [
                 path: 'change-password',
                 name: 'admin-change-password',
                 component: () => import('@/views/admin/ChangePasswordView.vue')
+            },
+            // 管理員 404 頁面
+            {
+                path: ':pathMatch(.*)*',
+                name: 'admin-not-found',
+                component: () => import('@/views/admin/AdminNotFoundView.vue')
             }
         ]
+    },
+    
+    // 用戶端 404 頁面（必須放在最後）
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'not-found',
+        component: () => import('@/views/NotFoundView.vue')
     }
 ]
 

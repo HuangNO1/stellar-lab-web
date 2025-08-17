@@ -144,7 +144,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, h, computed, provide, watch, onUnmounted } from 'vue'
+import { ref, onMounted, h, computed, provide, watch, onUnmounted, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { NIcon, darkTheme } from 'naive-ui'
@@ -161,6 +161,7 @@ import {
 import { setLanguage, getTheme, setTheme } from '@/locales'
 import { useLabWithAutoFetch } from '@/composables/useLab'
 import { getLabLogoUrl } from '@/utils/media'
+import { memberApi, paperApi, projectApi, newsApi, resourceApi } from '@/services/api'
 
 const router = useRouter()
 const { t, locale } = useI18n()
@@ -183,33 +184,56 @@ provide('lab', lab)
 const activeKey = ref<string>('home')
 const showMobileMenu = ref(false)
 
-const menuOptions = computed(() => [
-  {
-    label: t('nav.home'),
-    key: 'home',
-    icon: () => h(NIcon, { size: 16, component: HomeOutline })
-  },
-  {
-    label: t('nav.members'),
-    key: 'members',
-    icon: () => h(NIcon, { size: 16, component: PeopleOutline })
-  },
-  {
-    label: t('nav.projects'),
-    key: 'projects',
-    icon: () => h(NIcon, { size: 16, component: FolderOpenOutline })
-  },
-  {
-    label: t('nav.papers'),
-    key: 'papers',
-    icon: () => h(NIcon, { size: 16, component: DocumentTextOutline })
-  },
-  {
-    label: t('nav.news'),
-    key: 'news',
-    icon: () => h(NIcon, { size: 14, component: NewspaperOutline })
-  }
-])
+// Data existence tracking
+const dataExists = reactive({
+  members: true, // Home and Members are always visible
+  papers: false,
+  projects: false,
+  news: false,
+  resources: false
+})
+
+const menuOptions = computed(() => {
+  const allOptions = [
+    {
+      label: t('nav.home'),
+      key: 'home',
+      icon: () => h(NIcon, { size: 16, component: HomeOutline })
+    },
+    {
+      label: t('nav.members'),
+      key: 'members',
+      icon: () => h(NIcon, { size: 16, component: PeopleOutline })
+    },
+    {
+      label: t('nav.projects'),
+      key: 'projects',
+      icon: () => h(NIcon, { size: 16, component: FolderOpenOutline }),
+      show: dataExists.projects
+    },
+    {
+      label: t('nav.papers'),
+      key: 'papers',
+      icon: () => h(NIcon, { size: 16, component: DocumentTextOutline }),
+      show: dataExists.papers
+    },
+    {
+      label: t('nav.resources'),
+      key: 'resources',
+      icon: () => h(NIcon, { size: 16 }, () => h('svg', { viewBox: '0 0 24 24' }, h('path', { fill: 'currentColor', d: 'M20,6C20,4.89 19.11,4 18,4H12V2A2,2 0 0,0 10,0H4A2,2 0 0,0 2,2V18A2,2 0 0,0 4,20H18A2,2 0 0,0 20,18V6M18,18H4V2H10V6H18V18Z' }))),
+      show: dataExists.resources
+    },
+    {
+      label: t('nav.news'),
+      key: 'news',
+      icon: () => h(NIcon, { size: 14, component: NewspaperOutline }),
+      show: dataExists.news
+    }
+  ]
+  
+  // Filter out items where show is explicitly false
+  return allOptions.filter(option => option.show !== false)
+})
 
 // Language selector
 const currentLanguage = computed(() => {
@@ -261,6 +285,9 @@ const handleMenuSelect = (key: string) => {
     case 'papers':
       router.push('/papers')
       break
+    case 'resources':
+      router.push('/resources')
+      break
     case 'news':
       router.push('/news')
       break
@@ -304,19 +331,60 @@ const updateActiveKey = (path: string) => {
     activeKey.value = 'projects'
   } else if (path.startsWith('/papers')) {
     activeKey.value = 'papers'
+  } else if (path.startsWith('/resources')) {
+    activeKey.value = 'resources'
   } else if (path.startsWith('/news')) {
     activeKey.value = 'news'
   }
 }
 
+// Check data existence to determine menu visibility
+const checkDataExistence = async () => {
+  try {
+    console.log('Checking data existence for menu visibility...')
+    
+    const [papersRes, projectsRes, newsRes, resourcesRes] = await Promise.all([
+      paperApi.getPapers({ per_page: 1 }), // Just check if any data exists
+      projectApi.getProjects({ per_page: 1 }),
+      newsApi.getNews({ per_page: 1 }),
+      resourceApi.getResources({ per_page: 1 })
+    ])
+
+    // Update data existence flags
+    if (papersRes.code === 0) {
+      dataExists.papers = (papersRes.data.total || papersRes.data.items?.length || 0) > 0
+    }
+    
+    if (projectsRes.code === 0) {
+      dataExists.projects = (projectsRes.data.total || projectsRes.data.items?.length || 0) > 0
+    }
+    
+    if (newsRes.code === 0) {
+      dataExists.news = (newsRes.data.total || newsRes.data.items?.length || 0) > 0
+    }
+    
+    if (resourcesRes.code === 0) {
+      dataExists.resources = (resourcesRes.data.total || resourcesRes.data.items?.length || 0) > 0
+    }
+    
+    console.log('Data existence check completed:', dataExists)
+  } catch (error) {
+    console.error('Failed to check data existence:', error)
+    // On error, show all menus to avoid breaking navigation
+    dataExists.papers = true
+    dataExists.projects = true
+    dataExists.news = true
+    dataExists.resources = true
+  }
+}
+
 // Watch route changes
-watch(() => route.path, (newPath) => {
+const watchRoute = watch(() => route.path, (newPath) => {
   updateActiveKey(newPath)
 })
 
 // Initialize
-
-onMounted(() => {
+onMounted(async () => {
   // Set initial background based on theme
   const bgColor = isDarkMode.value ? 'rgb(16, 16, 20)' : '#fff'
   document.body.style.background = bgColor
@@ -324,11 +392,15 @@ onMounted(() => {
   
   // Set active menu based on current route
   updateActiveKey(route.path)
+  
+  // Check data existence for menu visibility
+  await checkDataExistence()
 })
 
 // 組件卸載時清理
 onUnmounted(() => {
-  // cleanup if needed
+  // cleanup watch
+  watchRoute()
 })
 </script>
 
