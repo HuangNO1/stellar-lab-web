@@ -15,6 +15,8 @@ import type {
   NewsQueryParams,
   Project, 
   ProjectQueryParams,
+  Resource,
+  ResourceQueryParams,
   Admin,
   AdminQueryParams,
   EditRecord,
@@ -351,6 +353,62 @@ export const projectApi = {
   // 刪除項目
   deleteProject(projectId: number): Promise<ApiResponse<null>> {
     return api.delete(`/projects/${projectId}`);
+  }
+};
+
+/**
+ * 資源相關 API
+ */
+export const resourceApi = {
+  // 獲取資源列表（公開訪問）
+  getResources(params?: ResourceQueryParams): Promise<ApiResponse<PaginatedResponse<Resource>>> {
+    return api.get('/resources', { params });
+  },
+  
+  // 獲取資源列表（管理員）
+  getAdminResources(params?: ResourceQueryParams): Promise<ApiResponse<PaginatedResponse<Resource>>> {
+    return api.get('/admin/resources', { params });
+  },
+  
+  // 獲取資源詳情
+  getResource(resourceId: number): Promise<ApiResponse<Resource>> {
+    return api.get(`/resources/${resourceId}`);
+  },
+  
+  // 創建資源
+  createResource(data: FormData | Partial<Resource>): Promise<ApiResponse<Resource>> {
+    if (data instanceof FormData) {
+      return api.post('/admin/resources', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    } else {
+      return api.post('/admin/resources', data);
+    }
+  },
+  
+  // 更新資源
+  updateResource(resourceId: number, data: FormData | Partial<Resource>): Promise<ApiResponse<Resource>> {
+    if (data instanceof FormData) {
+      return api.put(`/admin/resources/${resourceId}`, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    } else {
+      return api.put(`/admin/resources/${resourceId}`, data);
+    }
+  },
+  
+  // 刪除資源
+  deleteResource(resourceId: number): Promise<ApiResponse<null>> {
+    return api.delete(`/admin/resources/${resourceId}`);
+  },
+  
+  // 批量刪除資源
+  batchDeleteResources(resourceIds: number[]): Promise<ApiResponse<null>> {
+    return api.delete('/admin/resources/batch', { data: { resource_ids: resourceIds } });
   }
 };
 

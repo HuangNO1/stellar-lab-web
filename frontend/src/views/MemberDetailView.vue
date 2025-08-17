@@ -105,7 +105,7 @@
           <!-- 個人描述 -->
           <div v-if="member.mem_desc_zh || member.mem_desc_en" class="member-description">
             <h3>{{ $t('members.description') }}</h3>
-            <markdown-it :source="getMemberDescription()" :plugins="markdownPlugins"></markdown-it>
+            <MarkdownRenderer :source="getMemberDescription()" />
           </div>
           </div>
         </div>
@@ -115,24 +115,16 @@
       <div v-if="relatedPapers.length > 0" class="related-papers-section">
         <h2 class="section-title">{{ $t('members.relatedPapers') }}</h2>
         <div class="papers-list">
-          <div v-for="paper in relatedPapers" :key="paper.paper_id" class="paper-item" @click="toPaper(paper.paper_id)">
-            <div class="paper-header">
-              <h4 class="paper-title">
-                {{ getCurrentLocale() === 'zh' ? paper.paper_title_zh : paper.paper_title_en }}
-              </h4>
-              <n-tag v-if="paper.paper_accept === 1" type="success" size="small">
-                {{ $t('papers.accepted') }}
-              </n-tag>
-              <n-tag v-else type="warning" size="small">
-                {{ $t('papers.submitted') }}
-              </n-tag>
-            </div>
-            <div class="paper-venue">{{ paper.paper_venue }}</div>
-            <div class="paper-date">{{ formatDate(paper.paper_date) }}</div>
-            <div v-if="paper.paper_desc_zh || paper.paper_desc_en" class="paper-description">
-              {{ getCurrentLocale() === 'zh' ? paper.paper_desc_zh : paper.paper_desc_en }}
-            </div>
-          </div>
+          <PaperCard 
+            v-for="paper in relatedPapers" 
+            :key="paper.paper_id" 
+            :paper="paper"
+            :show-actions="true"
+            :show-preview-image="true"
+            @click="toPaper"
+            @open-url="openPaperUrl"
+            @download="downloadPaper"
+          />
         </div>
       </div>
     </div>
@@ -150,10 +142,10 @@ import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { memberApi, researchGroupApi, paperApi } from '@/services/api';
 import { useMembers } from '@/composables/useMembers';
-import { processMarkdownImageUrls } from '@/utils/media';
-import { createMarkdownPlugins } from '@/utils/markdown';
+import { getMediaUrl } from '@/utils/media';
 import type { Member, ResearchGroup, Paper, ApiError } from '@/types/api';
-import MarkdownIt from 'vue3-markdown-it';
+import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
+import PaperCard from '@/components/PaperCard.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -175,11 +167,8 @@ const getCurrentLocale = () => {
 const getMemberDescription = () => {
   if (!member.value) return '';
   const desc = getCurrentLocale() === 'zh' ? member.value.mem_desc_zh : member.value.mem_desc_en;
-  return desc ? processMarkdownImageUrls(desc) : '';
+  return desc || '';
 };
-
-// Markdown插件配置
-const markdownPlugins = createMarkdownPlugins();
 
 const getResearchGroupName = () => {
   if (!researchGroup.value) return '';
@@ -250,14 +239,25 @@ const toResearchGroup = () => {
   }
 };
 
-const toPaper = (paperId: number) => {
-  // 跳轉到論文詳情頁面 (假設存在)
-  router.push(`/paper/${paperId}`);
+const toPaper = (paper: Paper) => {
+  // 跳轉到論文詳情頁面
+  router.push(`/paper/${paper.paper_id}`);
 };
 
-const formatDate = (dateStr: string) => {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString(getCurrentLocale() === 'zh' ? 'zh-CN' : 'en-US');
+const openPaperUrl = (url: string) => {
+  window.open(url, '_blank');
+};
+
+const downloadPaper = (paper: Paper) => {
+  if (paper.paper_file_path) {
+    const downloadUrl = getMediaUrl(paper.paper_file_path);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `${paper.paper_title_zh || paper.paper_title_en || 'paper'}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 };
 
 const goBack = () => {
@@ -415,6 +415,19 @@ watch(() => route.params.id, () => {
 /* 相關論文區域 */
 .related-papers-section {
   margin-top: 3rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.papers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
 .section-title {
@@ -657,6 +670,202 @@ watch(() => route.params.id, () => {
   font-family: 'Courier New', monospace;
 }
 
+/* 研究領域TAG樣式 - 全局樣式，不使用scoped */
+.research-tags-container {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: var(--research-tags-bg, linear-gradient(135deg, #f8f9fa, #e9ecef));
+  border-radius: 0.75rem;
+  border: 1px solid var(--research-tags-border, #dee2e6);
+  transition: all 0.3s ease;
+}
+
+.research-tags-container:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.research-tags-label {
+  display: inline-block;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.research-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.research-tag {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  background: linear-gradient(135deg, #1890ff, #40a9ff);
+  color: white;
+  border-radius: 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  box-shadow: 0 2px 6px rgba(24, 144, 255, 0.3);
+}
+
+.research-tag:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
+  background: linear-gradient(135deg, #40a9ff, #69c0ff);
+}
+
+/* 個人主頁TAG樣式 - 全局樣式，不使用scoped */
+.homepage-container {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border-radius: 0.75rem;
+  border: 1px solid #bae6fd;
+  transition: all 0.3s ease;
+}
+
+.homepage-container:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.homepage-label {
+  display: inline-block;
+  font-weight: 600;
+  color: #0369a1;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.homepage-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+  color: white;
+  text-decoration: none;
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+}
+
+.homepage-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.4);
+  background: linear-gradient(135deg, #38bdf8, #7dd3fc);
+  color: white;
+  text-decoration: none;
+}
+
+.homepage-icon,
+.homepage-external-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.homepage-text {
+  flex: 1;
+}
+
+.homepage-external-icon {
+  opacity: 0.8;
+}
+
+/* 論文列表TAG樣式 - 全局樣式，不使用scoped */
+.papers-list-container {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: linear-gradient(135deg, #fefce8, #fef3c7);
+  border-radius: 0.75rem;
+  border: 1px solid #fbbf24;
+  transition: all 0.3s ease;
+}
+
+.papers-list-container:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.papers-list-label {
+  display: inline-block;
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.papers-list-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #92400e;
+  font-size: 0.9rem;
+}
+
+.loading-spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #fbbf24;
+  border-top: 2px solid #92400e;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.papers-list-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.papers-list-item {
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.papers-list-item:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #fbbf24;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.papers-list-item-title {
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.papers-list-item-venue {
+  font-size: 0.8rem;
+  color: #d97706;
+  margin-bottom: 0.25rem;
+}
+
+.papers-list-item-date {
+  font-size: 0.75rem;
+  color: #a16207;
+}
+
 @media (prefers-color-scheme: dark) {
   .math-display {
     background-color: #2a2a2a;
@@ -668,12 +877,149 @@ watch(() => route.params.id, () => {
     background-color: #721c24;
     border-color: #a94442;
   }
+
+  .research-tags-container {
+    background: var(--research-tags-bg, linear-gradient(135deg, #1f1f23, #2a2a2e));
+    border-color: var(--research-tags-border, #3a3a3e);
+  }
+
+  .research-tags-label {
+    color: #e9ecef;
+  }
+
+  .research-tag {
+    background: linear-gradient(135deg, #4dabf7, #74c0fc);
+    box-shadow: 0 2px 6px rgba(77, 171, 247, 0.3);
+  }
+
+  .research-tag:hover {
+    background: linear-gradient(135deg, #74c0fc, #91d5ff);
+    box-shadow: 0 4px 12px rgba(77, 171, 247, 0.4);
+  }
+
+  .homepage-container {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    border-color: #334155;
+  }
+
+  .homepage-label {
+    color: #7dd3fc;
+  }
+
+  .homepage-link {
+    background: linear-gradient(135deg, #0284c7, #0ea5e9);
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+  }
+
+  .homepage-link:hover {
+    background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+    box-shadow: 0 4px 16px rgba(2, 132, 199, 0.4);
+  }
+
+  .papers-list-container {
+    background: linear-gradient(135deg, #292524, #1c1917);
+    border-color: #78716c;
+  }
+
+  .papers-list-label {
+    color: #fbbf24;
+  }
+
+  .papers-list-loading {
+    color: #fbbf24;
+  }
+
+  .loading-spinner {
+    border-color: #78716c;
+    border-top-color: #fbbf24;
+  }
+
+  .papers-list-item {
+    background: rgba(41, 37, 36, 0.8);
+    border-color: rgba(120, 113, 108, 0.3);
+  }
+
+  .papers-list-item:hover {
+    background: rgba(41, 37, 36, 0.95);
+    border-color: #78716c;
+  }
+
+  .papers-list-item-title {
+    color: #fbbf24;
+  }
+
+  .papers-list-item-venue {
+    color: #f59e0b;
+  }
+
+  .papers-list-item-date {
+    color: #d97706;
+  }
 }
 
 @media (max-width: 768px) {
   .math-display {
     padding: 0.5em;
     font-size: 0.9em;
+  }
+
+  .research-tags-container {
+    margin: 1rem 0;
+    padding: 0.75rem;
+  }
+
+  .research-tags-label {
+    font-size: 0.9rem;
+  }
+
+  .research-tag {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .homepage-container {
+    margin: 1rem 0;
+    padding: 0.75rem;
+  }
+
+  .homepage-label {
+    font-size: 0.9rem;
+  }
+
+  .homepage-link {
+    padding: 0.65rem 0.85rem;
+    font-size: 0.85rem;
+  }
+
+  .homepage-icon,
+  .homepage-external-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .papers-list-container {
+    margin: 1rem 0;
+    padding: 0.75rem;
+  }
+
+  .papers-list-label {
+    font-size: 0.9rem;
+  }
+
+  .papers-list-item {
+    padding: 0.65rem;
+  }
+
+  .papers-list-item-title {
+    font-size: 0.9rem;
+  }
+
+  .papers-list-item-venue {
+    font-size: 0.75rem;
+  }
+
+  .papers-list-item-date {
+    font-size: 0.7rem;
   }
 }
 </style>

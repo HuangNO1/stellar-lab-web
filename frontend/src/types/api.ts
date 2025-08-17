@@ -77,6 +77,8 @@ export interface Member {
   job_type?: number; // 0=教授, 1=副教授, 2=講師, 3=助理教授, 4=博士後
   student_type?: number; // 0=博士, 1=碩士, 2=本科
   student_grade?: number;
+  graduation_year?: number; // 畢業年份（校友）
+  alumni_identity?: number; // 校友身份類型：0=博士, 1=碩士, 2=本科, 3=教師, 4=其他
   destination_zh?: string;
   destination_en?: string;
   research_group_id?: number;
@@ -100,6 +102,7 @@ export interface Paper {
   paper_accept: number; // 0=投稿中, 1=已接收
   paper_file_path?: string;
   paper_url?: string;
+  preview_img?: string; // 論文預覽圖片路徑
   all_authors_zh?: string; // 全部作者中文
   all_authors_en?: string; // 全部作者英文
   enable: number;
@@ -139,6 +142,25 @@ export interface Project {
   project_date_start?: string;
   is_end: number; // 0=進行中, 1=已完成
   enable: number;
+}
+
+// 資源信息
+export interface Resource {
+  resource_id: number;
+  resource_name_zh: string;
+  resource_name_en?: string;
+  resource_description_zh?: string;
+  resource_description_en?: string;
+  resource_type: number; // 0=設備, 1=軟件, 2=數據庫, 3=其他
+  resource_location_zh?: string;
+  resource_location_en?: string;
+  resource_url?: string;
+  resource_file?: string;
+  resource_image?: string;
+  availability_status: number; // 0=不可用, 1=可用, 2=維護中
+  contact_info?: string;
+  created_time: string;
+  updated_time: string;
 }
 
 // 管理員信息
@@ -205,6 +227,14 @@ export interface ProjectQueryParams extends BaseQueryParams {
   is_end?: number;
   start_date?: string;
   end_date?: string;
+  sort_by?: string;
+  order?: string;
+}
+
+// 資源查詢參數
+export interface ResourceQueryParams extends BaseQueryParams {
+  resource_type?: number;
+  availability_status?: number;
   sort_by?: string;
   order?: string;
 }

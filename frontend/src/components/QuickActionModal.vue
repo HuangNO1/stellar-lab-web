@@ -37,21 +37,21 @@
         >
           <!-- 成員表單 -->
         <template v-if="moduleType === 'members'">
-          <n-form-item :label="t('admin.members.form.nameZh')" path="mem_name_zh">
+          <n-form-item :label="t('admin.members.form.nameZh')" path="mem_name_zh" required>
             <n-input
               v-model:value="formData.mem_name_zh"
               :placeholder="t('admin.members.form.placeholders.nameZh')"
               style="width: 100%"
             />
           </n-form-item>
-          <n-form-item :label="t('admin.members.form.nameEn')" path="mem_name_en">
+          <n-form-item :label="t('admin.members.form.nameEn')" path="mem_name_en" required>
             <n-input
               v-model:value="formData.mem_name_en"
               :placeholder="t('admin.members.form.placeholders.nameEn')"
               style="width: 100%"
             />
           </n-form-item>
-          <n-form-item :label="t('admin.members.form.email')" path="mem_email">
+          <n-form-item :label="t('admin.members.form.email')" path="mem_email" required>
             <n-input
               v-model:value="formData.mem_email"
               :placeholder="t('admin.members.form.placeholders.email')"
@@ -104,6 +104,23 @@
           
           <!-- 校友去向 -->
           <template v-if="formData.mem_type === 2">
+            <n-form-item :label="t('admin.members.form.graduationYear')" path="graduation_year">
+              <n-input-number
+                v-model:value="formData.graduation_year"
+                :placeholder="t('admin.members.form.placeholders.graduationYear')"
+                :min="1900"
+                :max="new Date().getFullYear()"
+                style="width: 100%"
+              />
+            </n-form-item>
+            <n-form-item :label="t('admin.members.form.alumniIdentity')" path="alumni_identity">
+              <n-select
+                v-model:value="formData.alumni_identity"
+                :options="alumniIdentityOptions"
+                :placeholder="t('admin.members.form.placeholders.alumniIdentity')"
+                style="width: 100%"
+              />
+            </n-form-item>
             <n-form-item :label="t('admin.members.form.destinationZh')" path="destination_zh">
               <n-input
                 v-model:value="formData.destination_zh"
@@ -137,7 +154,7 @@
               :entity-type="entityType"
               :entity-id="entityId"
               field-name="mem_desc_zh"
-              style="height: 200px; width: 100%"
+              style="height: 300px; width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.members.form.descriptionEn')" path="mem_desc_en">
@@ -147,7 +164,7 @@
               :entity-type="entityType"
               :entity-id="entityId"
               field-name="mem_desc_en"
-              style="height: 200px; width: 100%"
+              style="height: 300px; width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.members.form.avatar')" path="mem_avatar">
@@ -178,7 +195,7 @@
 
         <!-- 論文表單 -->
         <template v-if="moduleType === 'papers'">
-          <n-form-item :label="t('admin.papers.form.titleZh')" path="paper_title_zh">
+          <n-form-item :label="t('admin.papers.form.titleZh')" path="paper_title_zh" required>
             <n-input
               v-model:value="formData.paper_title_zh"
               :placeholder="t('admin.papers.form.placeholders.titleZh')"
@@ -199,7 +216,7 @@
               :entity-type="entityType"
               :entity-id="entityId"
               field-name="paper_desc_zh"
-              style="height: 200px; width: 100%"
+              style="height: 300px; width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.papers.form.descriptionEn')" path="paper_desc_en">
@@ -209,7 +226,7 @@
               :entity-type="entityType"
               :entity-id="entityId"
               field-name="paper_desc_en"
-              style="height: 200px; width: 100%"
+              style="height: 300px; width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.papers.form.labAuthors')" path="authors">
@@ -277,6 +294,30 @@
               style="width: 100%"
             />
           </n-form-item>
+          <n-form-item :label="t('admin.papers.form.previewImg')" path="preview_img">
+            <div class="image-upload-container">
+              <!-- 已選擇的圖片預覽 -->
+              <div v-if="hasPreviewImageToShow" class="image-preview">
+                <img 
+                  :src="getPreviewImageUrl('preview_img')" 
+                  :alt="t('admin.papers.form.previewImgAlt')" 
+                  class="preview-image"
+                />
+                <div class="image-actions">
+                  <n-button size="small" @click="openCropper('preview_img', 'carousel')">
+                    {{ props.editData && props.editData['preview_img'] ? t('admin.imageCropper.cropImage') : t('admin.common.fileUpload.selectImage') }}
+                  </n-button>
+                  <n-button size="small" type="error" @click="removePreviewImage('preview_img')">
+                    {{ t('admin.common.delete') }}
+                  </n-button>
+                </div>
+              </div>
+              <!-- 上傳按鈕 -->
+              <n-button v-else @click="openCropper('preview_img', 'carousel')">
+                {{ t('admin.common.fileUpload.selectImage') }}
+              </n-button>
+            </div>
+          </n-form-item>
           <n-form-item :label="t('admin.papers.form.file')" path="paper_file">
             <n-upload
               :default-file-list="getDefaultFileList('paper_file')"
@@ -292,7 +333,7 @@
 
         <!-- 項目表單 -->
         <template v-if="moduleType === 'projects'">
-          <n-form-item :label="t('admin.projects.form.nameZh')" path="project_name_zh">
+          <n-form-item :label="t('admin.projects.form.nameZh')" path="project_name_zh" required>
             <n-input
               v-model:value="formData.project_name_zh"
               :placeholder="t('admin.projects.form.placeholders.nameZh')"
@@ -313,7 +354,7 @@
               :entity-type="entityType"
               :entity-id="entityId"
               field-name="project_desc_zh"
-              style="height: 200px; width: 100%"
+              style="height: 300px; width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.projects.form.descriptionEn')" path="project_desc_en">
@@ -323,7 +364,7 @@
               :entity-type="entityType"
               :entity-id="entityId"
               field-name="project_desc_en"
-              style="height: 200px; width: 100%"
+              style="height: 300px; width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.projects.form.url')" path="project_url">
@@ -353,7 +394,7 @@
 
         <!-- 新聞表單 -->
         <template v-if="moduleType === 'news'">
-          <n-form-item :label="t('admin.news.form.type')" path="news_type">
+          <n-form-item :label="t('admin.news.form.type')" path="news_type" required>
             <n-select
               v-model:value="formData.news_type"
               :options="newsTypeOptions"
@@ -361,14 +402,14 @@
               style="width: 100%"
             />
           </n-form-item>
-          <n-form-item :label="t('admin.news.form.titleZh')" path="news_title_zh">
+          <n-form-item :label="t('admin.news.form.titleZh')" path="news_title_zh" required>
             <n-input
               v-model:value="formData.news_title_zh"
               :placeholder="t('admin.news.form.placeholders.titleZh')"
               style="width: 100%"
             />
           </n-form-item>
-          <n-form-item :label="t('admin.news.form.titleEn')" path="news_title_en">
+          <n-form-item :label="t('admin.news.form.titleEn')" path="news_title_en" required>
             <n-input
               v-model:value="formData.news_title_en"
               :placeholder="t('admin.news.form.placeholders.titleEn')"
@@ -382,7 +423,7 @@
               :entity-type="entityType"
               :entity-id="entityId"
               field-name="news_content_zh"
-              style="height: 200px; width: 100%"
+              style="height: 300px; width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.news.form.contentEn')" path="news_content_en">
@@ -392,10 +433,10 @@
               :entity-type="entityType"
               :entity-id="entityId"
               field-name="news_content_en"
-              style="height: 200px; width: 100%"
+              style="height: 300px; width: 100%"
             />
           </n-form-item>
-          <n-form-item :label="t('admin.news.form.date')" path="news_date">
+          <n-form-item :label="t('admin.news.form.date')" path="news_date" required>
             <n-date-picker
               v-model:value="formData.news_date"
               type="date"
@@ -407,7 +448,7 @@
 
         <!-- 課題組表單 -->
         <template v-if="moduleType === 'research-groups'">
-          <n-form-item :label="t('admin.groups.form.nameZh')" path="research_group_name_zh">
+          <n-form-item :label="t('admin.groups.form.nameZh')" path="research_group_name_zh" required>
             <n-input
               v-model:value="formData.research_group_name_zh"
               :placeholder="t('admin.groups.form.placeholders.nameZh')"
@@ -428,7 +469,7 @@
               :entity-type="entityType"
               :entity-id="entityId"
               field-name="research_group_desc_zh"
-              style="height: 200px; width: 100%"
+              style="height: 300px; width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.groups.form.descriptionEn')" path="research_group_desc_en">
@@ -438,7 +479,7 @@
               :entity-type="entityType"
               :entity-id="entityId"
               field-name="research_group_desc_en"
-              style="height: 200px; width: 100%"
+              style="height: 300px; width: 100%"
             />
           </n-form-item>
           <n-form-item :label="t('admin.groups.form.leader')" path="mem_id">
@@ -454,11 +495,117 @@
           </n-form-item>
         </template>
 
+        <!-- 資源表單 -->
+        <template v-if="moduleType === 'resources'">
+          <n-form-item :label="t('admin.resources.form.nameZh')" path="resource_name_zh" required>
+            <n-input
+              v-model:value="formData.resource_name_zh"
+              :placeholder="t('admin.resources.form.placeholders.nameZh')"
+              style="width: 100%"
+            />
+          </n-form-item>
+          <n-form-item :label="t('admin.resources.form.nameEn')" path="resource_name_en">
+            <n-input
+              v-model:value="formData.resource_name_en"
+              :placeholder="t('admin.resources.form.placeholders.nameEn')"
+              style="width: 100%"
+            />
+          </n-form-item>
+          <n-form-item :label="t('admin.resources.form.type')" path="resource_type">
+            <n-select
+              v-model:value="formData.resource_type"
+              :options="resourceTypeOptions"
+              :placeholder="t('admin.resources.form.placeholders.type')"
+              style="width: 100%"
+            />
+          </n-form-item>
+          <n-form-item :label="t('admin.resources.form.availabilityStatus')" path="availability_status">
+            <n-select
+              v-model:value="formData.availability_status"
+              :options="resourceStatusOptions"
+              :placeholder="t('admin.resources.form.placeholders.availabilityStatus')"
+              style="width: 100%"
+            />
+          </n-form-item>
+          <n-form-item :label="t('admin.resources.form.descriptionZh')" path="resource_description_zh">
+            <I18nMdEditor
+              v-model="formData.resource_description_zh"
+              :placeholder="t('admin.resources.form.placeholders.descriptionZh')"
+              :entity-type="entityType"
+              :entity-id="entityId"
+              field-name="resource_description_zh"
+              style="height: 300px; width: 100%"
+            />
+          </n-form-item>
+          <n-form-item :label="t('admin.resources.form.descriptionEn')" path="resource_description_en">
+            <I18nMdEditor
+              v-model="formData.resource_description_en"
+              :placeholder="t('admin.resources.form.placeholders.descriptionEn')"
+              :entity-type="entityType"
+              :entity-id="entityId"
+              field-name="resource_description_en"
+              style="height: 300px; width: 100%"
+            />
+          </n-form-item>
+          <n-form-item :label="t('admin.resources.form.locationZh')" path="resource_location_zh">
+            <n-input
+              v-model:value="formData.resource_location_zh"
+              :placeholder="t('admin.resources.form.placeholders.locationZh')"
+              style="width: 100%"
+            />
+          </n-form-item>
+          <n-form-item :label="t('admin.resources.form.locationEn')" path="resource_location_en">
+            <n-input
+              v-model:value="formData.resource_location_en"
+              :placeholder="t('admin.resources.form.placeholders.locationEn')"
+              style="width: 100%"
+            />
+          </n-form-item>
+          <n-form-item :label="t('admin.resources.form.url')" path="resource_url">
+            <n-input
+              v-model:value="formData.resource_url"
+              :placeholder="t('admin.resources.form.placeholders.url')"
+              style="width: 100%"
+            />
+          </n-form-item>
+          <n-form-item :label="t('admin.resources.form.contactInfo')" path="contact_info">
+            <n-input
+              v-model:value="formData.contact_info"
+              :placeholder="t('admin.resources.form.placeholders.contactInfo')"
+              style="width: 100%"
+            />
+          </n-form-item>
+          <n-form-item :label="t('admin.resources.form.image')" path="resource_image">
+            <div class="image-upload-container">
+              <!-- 已選擇的圖片預覽 -->
+              <div v-if="hasResourceImageToShow" class="image-preview">
+                <img 
+                  :src="getResourceImageUrl()" 
+                  :alt="t('admin.resources.form.imageAlt')" 
+                  class="resource-image-preview"
+                />
+                <div class="image-actions">
+                  <n-button size="small" @click="openCropper('resource_image', 'carousel')">
+                    {{ props.editData && props.editData['resource_image'] ? t('admin.imageCropper.cropImage') : t('admin.common.fileUpload.selectImage') }}
+                  </n-button>
+                  <n-button size="small" type="error" @click="removeResourceImage()">
+                    {{ t('admin.common.delete') }}
+                  </n-button>
+                </div>
+              </div>
+              <!-- 上傳按鈕 -->
+              <n-button v-else @click="openCropper('resource_image', 'carousel')">
+                {{ t('admin.common.fileUpload.selectImage') }}
+              </n-button>
+            </div>
+          </n-form-item>
+        </template>
+
         <!-- 管理員表單 -->
         <template v-if="moduleType === 'admins'">
           <!-- 密碼修改模式：只顯示密碼相關字段 -->
           <template v-if="passwordOnly">
-            <n-form-item :label="t('admin.profile.currentPassword')" path="old_password">
+            <n-form-item :label="t('admin.profile.currentPassword')" path="old_password" required>
               <n-input
                 v-model:value="formData.old_password"
                 type="password"
@@ -466,7 +613,7 @@
                 style="width: 100%"
               />
             </n-form-item>
-            <n-form-item :label="t('admin.profile.newPassword')" path="new_password">
+            <n-form-item :label="t('admin.profile.newPassword')" path="new_password" required>
               <n-input
                 v-model:value="formData.new_password"
                 type="password"
@@ -486,14 +633,14 @@
           
           <!-- 正常管理員表單模式 -->
           <template v-else>
-            <n-form-item :label="t('admin.admins.form.adminName')" path="admin_name">
+            <n-form-item :label="t('admin.admins.form.adminName')" path="admin_name" required>
               <n-input
                 v-model:value="formData.admin_name"
                 :placeholder="t('admin.admins.form.placeholders.adminName')"
                 style="width: 100%"
               />
             </n-form-item>
-            <n-form-item v-if="actionType === 'create'" :label="t('admin.admins.form.adminPass')" path="admin_pass">
+            <n-form-item v-if="actionType === 'create'" :label="t('admin.admins.form.adminPass')" path="admin_pass" required>
               <n-input
                 v-model:value="formData.admin_pass"
                 type="password"
@@ -552,7 +699,7 @@ import { ref, reactive, computed, watch, nextTick, onMounted, onUnmounted } from
 import { useMessage } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/auth';
-import { memberApi, paperApi, projectApi, newsApi, researchGroupApi, adminApi, authApi } from '@/services/api';
+import { memberApi, paperApi, projectApi, newsApi, researchGroupApi, adminApi, authApi, resourceApi } from '@/services/api';
 import { getMediaUrl } from '@/utils/media';
 import I18nMdEditor from '@/components/I18nMdEditor.vue';
 import ImageCropperModal from '@/components/ImageCropperModal.vue';
@@ -567,6 +714,8 @@ interface MemberFormData {
   job_type?: number;
   student_type?: number;
   student_grade?: number;
+  graduation_year?: number;
+  alumni_identity?: number;
   destination_zh?: string;
   destination_en?: string;
   research_group_id?: number | null;
@@ -631,7 +780,23 @@ interface AdminFormData {
   admin_id?: number;
 }
 
-type FormData = MemberFormData | PaperFormData | ProjectFormData | NewsFormData | ResearchGroupFormData | AdminFormData;
+interface ResourceFormData {
+  resource_name_zh?: string;
+  resource_name_en?: string;
+  resource_description_zh?: string;
+  resource_description_en?: string;
+  resource_type?: number;
+  resource_location_zh?: string;
+  resource_location_en?: string;
+  resource_url?: string;
+  resource_file?: string;
+  resource_image?: string;
+  availability_status?: number;
+  contact_info?: string;
+  resource_id?: number;
+}
+
+type FormData = MemberFormData | PaperFormData | ProjectFormData | NewsFormData | ResearchGroupFormData | AdminFormData | ResourceFormData;
 
 interface SelectOption {
   label: string;
@@ -653,7 +818,7 @@ const authStore = useAuthStore();
 // Props
 interface Props {
   modelValue: boolean;
-  moduleType: 'members' | 'papers' | 'projects' | 'news' | 'research-groups' | 'admins';
+  moduleType: 'members' | 'papers' | 'projects' | 'news' | 'research-groups' | 'admins' | 'resources';
   actionType: 'create' | 'edit';
   editData?: Record<string, unknown>;
   passwordOnly?: boolean; // 新增：仅密码修改模式
@@ -685,6 +850,8 @@ const loadingMembers = ref(false);
 const formData = reactive<Record<string, unknown>>({});
 const uploadedFiles = reactive<Record<string, File>>({});
 
+// 資源圖片文件列表已移除，改用統一的圖片處理方式
+
 // 計算是否有頭像需要顯示
 const hasAvatarToShow = computed(() => {
   // 如果有新上傳的文件
@@ -696,6 +863,44 @@ const hasAvatarToShow = computed(() => {
   if (props.actionType === 'edit' && props.editData && props.editData['mem_avatar_path']) {
     // 檢查是否被標記為刪除
     if (formData['mem_avatar_delete']) {
+      return false;
+    }
+    return true;
+  }
+  
+  return false;
+});
+
+// 計算是否有預覽圖片需要顯示
+const hasPreviewImageToShow = computed(() => {
+  // 如果有新上傳的文件
+  if (uploadedFiles['preview_img']) {
+    return true;
+  }
+  
+  // 如果是編輯模式且有現有預覽圖片，但沒有被標記為刪除
+  if (props.actionType === 'edit' && props.editData && props.editData['preview_img']) {
+    // 檢查是否被標記為刪除
+    if (formData['preview_img_delete']) {
+      return false;
+    }
+    return true;
+  }
+  
+  return false;
+});
+
+// 計算是否有資源圖片需要顯示
+const hasResourceImageToShow = computed(() => {
+  // 如果有新上傳的文件
+  if (uploadedFiles['resource_image']) {
+    return true;
+  }
+  
+  // 如果是編輯模式且有現有資源圖片，但沒有被標記為刪除
+  if (props.actionType === 'edit' && props.editData && props.editData['resource_image']) {
+    // 檢查是否被標記為刪除
+    if (formData['resource_image_delete']) {
       return false;
     }
     return true;
@@ -732,6 +937,15 @@ const studentTypeOptions = computed(() => [
   { label: t('admin.common.studentTypes.undergraduate'), value: 2 }
 ]);
 
+// 校友身份類型選項
+const alumniIdentityOptions = computed(() => [
+  { label: t('admin.common.alumniIdentity.phd'), value: 0 },
+  { label: t('admin.common.alumniIdentity.master'), value: 1 },
+  { label: t('admin.common.alumniIdentity.undergraduate'), value: 2 },
+  { label: t('admin.common.alumniIdentity.teacher'), value: 3 },
+  { label: t('admin.common.alumniIdentity.other'), value: 4 }
+]);
+
 const paperTypeOptions = computed(() => [
   { label: t('admin.common.paperTypes.conference'), value: 0 },
   { label: t('admin.common.paperTypes.journal'), value: 1 },
@@ -766,6 +980,20 @@ const enableOptions = computed(() => [
   { label: t('admin.common.enabled'), value: 1 }
 ]);
 
+const resourceTypeOptions = computed(() => [
+  { label: t('admin.common.resourceTypes.equipment'), value: 0 },
+  { label: t('admin.common.resourceTypes.software'), value: 1 },
+  { label: t('admin.common.resourceTypes.database'), value: 2 },
+  { label: t('admin.common.resourceTypes.dataset'), value: 3 },
+  { label: t('admin.common.resourceTypes.other'), value: 4 }
+]);
+
+const resourceStatusOptions = computed(() => [
+  { label: t('admin.common.resourceStatus.unavailable'), value: 0 },
+  { label: t('admin.common.resourceStatus.available'), value: 1 },
+  { label: t('admin.common.resourceStatus.maintenance'), value: 2 }
+]);
+
 const researchGroupOptions = ref<SelectOption[]>([]);
 const memberOptions = ref<SelectOption[]>([]);
 
@@ -785,7 +1013,8 @@ const entityType = computed(() => {
     'papers': 'paper',
     'projects': 'project',
     'news': 'news',
-    'research-groups': 'research_group'
+    'research-groups': 'research_group',
+    'resources': 'resource'
   };
   return typeMap[props.moduleType as keyof typeof typeMap] || '';
 });
@@ -798,7 +1027,8 @@ const entityId = computed(() => {
     'papers': 'paper_id',
     'projects': 'project_id',
     'news': 'news_id',
-    'research-groups': 'research_group_id'
+    'research-groups': 'research_group_id',
+    'resources': 'resource_id'
   };
   
   const idField = idFields[props.moduleType as keyof typeof idFields];
@@ -819,7 +1049,8 @@ const modalTitle = computed(() => {
     'projects': 'Project',
     'news': 'News',
     'research-groups': 'Group',
-    'admins': 'Admin'
+    'admins': 'Admin',
+    'resources': 'Resource'
   };
   
   const actionKey = props.actionType === 'create' ? 'create' : 'edit';
@@ -939,7 +1170,32 @@ const formRules = computed(() => {
       },
       trigger: 'change'
     }];
-    rules.news_content_zh = [{ required: true, message: t('admin.news.form.validation.contentZhRequired'), trigger: 'blur' }];
+    // 新聞標題必填校驗 - 至少需要中文或英文標題之一
+    rules.news_title_zh = [{
+      required: false,
+      validator: (rule: unknown, value: unknown) => {
+        const titleZh = value as string;
+        const titleEn = formData.news_title_en;
+        if (!titleZh && !titleEn) {
+          return new Error(t('admin.news.form.validation.titleRequired'));
+        }
+        return true;
+      },
+      trigger: 'blur'
+    }];
+    rules.news_title_en = [{
+      required: false,
+      validator: (rule: unknown, value: unknown) => {
+        const titleEn = value as string;
+        const titleZh = formData.news_title_zh;
+        if (!titleEn && !titleZh) {
+          return new Error(t('admin.news.form.validation.titleRequired'));
+        }
+        return true;
+      },
+      trigger: 'blur'
+    }];
+    // 新聞內容改為非必填
     rules.news_date = [{
       required: false,
       validator: (rule: unknown, value: unknown) => {
@@ -983,6 +1239,28 @@ const formRules = computed(() => {
         ];
       }
     }
+  } else if (props.moduleType === 'resources') {
+    rules.resource_name_zh = [{ required: true, message: t('admin.resources.form.validation.nameZhRequired'), trigger: 'blur' }];
+    rules.resource_type = [{
+      required: false,
+      validator: (rule: unknown, value: unknown) => {
+        if (value === null || value === undefined || value === '') {
+          return new Error(t('admin.resources.form.validation.typeRequired'));
+        }
+        return true;
+      },
+      trigger: 'change'
+    }];
+    rules.availability_status = [{
+      required: false,
+      validator: (rule: unknown, value: unknown) => {
+        if (value === null || value === undefined || value === '') {
+          return new Error(t('admin.resources.form.validation.availabilityStatusRequired'));
+        }
+        return true;
+      },
+      trigger: 'change'
+    }];
   }
   
   return rules;
@@ -1053,6 +1331,8 @@ watch(() => (formData as MemberFormData).mem_type, (newType, oldType) => {
       delete formData.student_grade;
     } else if (oldType === 2) {
       // 從校友切換到其他類型，清除去向字段
+      delete formData.graduation_year;
+      delete formData.alumni_identity;
       delete formData.destination_zh;
       delete formData.destination_en;
     }
@@ -1083,16 +1363,30 @@ onUnmounted(() => {
 });
 
 // Methods
+const getMemberDescriptionTemplate = (language: 'zh' | 'en') => {
+  if (language === 'zh') {
+    return t('admin.members.form.descriptionTemplate');
+  } else {
+    return t('admin.members.form.descriptionTemplateEn');
+  }
+};
+
 const resetForm = () => {
   // 清空 formData 對象，但保留響應式特性
   Object.keys(formData).forEach(key => {
     delete formData[key];
   });
   
-  // 初始化字符串字段為空字符串，防止 undefined 問題
+  // 初始化字符串字段為空字符串或模板，防止 undefined 問題
   if (props.moduleType === 'members') {
-    formData.mem_desc_zh = '';
-    formData.mem_desc_en = '';
+    // 為新增成員設置描述模板
+    if (props.actionType === 'create') {
+      formData.mem_desc_zh = getMemberDescriptionTemplate('zh');
+      formData.mem_desc_en = getMemberDescriptionTemplate('en');
+    } else {
+      formData.mem_desc_zh = '';
+      formData.mem_desc_en = '';
+    }
   } else if (props.moduleType === 'papers') {
     formData.paper_desc_zh = '';
     formData.paper_desc_en = '';
@@ -1110,6 +1404,9 @@ const resetForm = () => {
   } else if (props.moduleType === 'research-groups') {
     formData.research_group_desc_zh = '';
     formData.research_group_desc_en = '';
+  } else if (props.moduleType === 'resources') {
+    formData.resource_description_zh = '';
+    formData.resource_description_en = '';
   }
   
   // 清空上傳文件對象
@@ -1280,6 +1577,20 @@ const handleFileRemove = (fieldName: string) => {
   }
 };
 
+// Image handling methods removed - now all image uploads use the unified cropper approach
+
+const removePreviewImage = (fieldName: string) => {
+  // 刪除新上傳的文件
+  delete uploadedFiles[fieldName];
+  
+  // 如果是編輯模式，標記為刪除
+  if (props.actionType === 'edit') {
+    if (fieldName === 'preview_img') {
+      formData['preview_img_delete'] = true;
+    }
+  }
+};
+
 // Image cropper methods
 const openCropper = (fieldName: string, type: 'avatar' | 'logo' | 'carousel') => {
   currentImageField.value = fieldName;
@@ -1294,6 +1605,8 @@ const handleCroppedImage = (croppedFile: File) => {
     // 如果用戶上傳新圖片，清除刪除標記
     if (currentImageField.value === 'mem_avatar') {
       delete formData['mem_avatar_delete'];
+    } else if (currentImageField.value === 'preview_img') {
+      delete formData['preview_img_delete'];
     }
     
     currentImageField.value = '';
@@ -1336,6 +1649,60 @@ const getImagePreview = (fieldName: string): string => {
     if (imagePath && typeof imagePath === 'string') {
       return getMediaUrl(imagePath);
     }
+  }
+  
+  return '';
+};
+
+const getPreviewImageUrl = (fieldName: string): string => {
+  if (uploadedFiles[fieldName]) {
+    return URL.createObjectURL(uploadedFiles[fieldName]);
+  }
+  
+  // 如果是編輯模式且有現有預覽圖片
+  if (props.actionType === 'edit' && props.editData) {
+    let imagePath: string | undefined;
+    
+    if (fieldName === 'preview_img') {
+      imagePath = props.editData['preview_img'] as string | undefined;
+      // 如果被標記為刪除，不顯示
+      if (formData['preview_img_delete']) {
+        return '';
+      }
+    }
+    
+    if (imagePath && typeof imagePath === 'string') {
+      return getMediaUrl(imagePath);
+    }
+  }
+  
+  return '';
+};
+
+// 資源圖片處理函數
+const removeResourceImage = () => {
+  // 刪除新上傳的文件
+  delete uploadedFiles['resource_image'];
+  
+  // 如果是編輯模式且有現有圖片，標記為刪除
+  if (props.actionType === 'edit' && props.editData && props.editData['resource_image']) {
+    formData['resource_image_delete'] = true;
+  }
+};
+
+// 獲取資源圖片URL
+const getResourceImageUrl = (): string => {
+  if (uploadedFiles['resource_image']) {
+    return URL.createObjectURL(uploadedFiles['resource_image']);
+  }
+  
+  // 如果是編輯模式且有現有資源圖片
+  if (props.actionType === 'edit' && props.editData && props.editData['resource_image']) {
+    // 如果被標記為刪除，不顯示
+    if (formData['resource_image_delete']) {
+      return '';
+    }
+    return getMediaUrl(props.editData['resource_image'] as string);
   }
   
   return '';
@@ -1526,7 +1893,8 @@ const handleSubmit = async () => {
       projects: projectApi,
       news: newsApi,
       'research-groups': researchGroupApi,
-      admins: adminApi
+      admins: adminApi,
+      resources: resourceApi
     };
 
     const api = apis[props.moduleType];
@@ -1538,7 +1906,8 @@ const handleSubmit = async () => {
         projects: 'createProject',
         news: 'createNews',
         'research-groups': 'createResearchGroup',
-        admins: 'createAdmin'
+        admins: 'createAdmin',
+        resources: 'createResource'
       };
       response = await (api as unknown as Record<string, (data: FormData | Record<string, unknown>) => Promise<ApiResponse<unknown>>>)[createMethods[props.moduleType]](submitData);
     } else {
@@ -1548,7 +1917,8 @@ const handleSubmit = async () => {
         projects: 'updateProject',
         news: 'updateNews',
         'research-groups': 'updateResearchGroup',
-        admins: 'updateAdmin'
+        admins: 'updateAdmin',
+        resources: 'updateResource'
       };
       const idField = {
         members: 'mem_id',
@@ -1556,7 +1926,8 @@ const handleSubmit = async () => {
         projects: 'project_id',
         news: 'news_id',
         'research-groups': 'research_group_id',
-        admins: 'admin_id'
+        admins: 'admin_id',
+        resources: 'resource_id'
       };
       const id = props.editData?.[idField[props.moduleType]];
       response = await (api as unknown as Record<string, (id: number, data: FormData | Record<string, unknown>) => Promise<ApiResponse<unknown>>>)[updateMethods[props.moduleType]](id as number, submitData);
@@ -1786,6 +2157,34 @@ const handleSubmit = async () => {
   border-color: #424242;
 }
 
+/* 論文預覽圖片樣式 */
+.preview-image {
+  width: 200px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 資源圖片樣式 */
+.resource-image-preview {
+  width: 200px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 暗色主題圖片樣式 */
+[data-theme="dark"] .preview-image,
+.dark .preview-image,
+[data-theme="dark"] .resource-image-preview,
+.dark .resource-image-preview {
+  border-color: #424242;
+}
+
 /* 移動端圖片預覽調整 */
 @media (max-width: 768px) {
   .image-preview {
@@ -1804,6 +2203,16 @@ const handleSubmit = async () => {
   
   .carousel-preview {
     width: 150px;
+  }
+  
+  .preview-image {
+    width: 150px;
+    height: 112px;
+  }
+  
+  .resource-image-preview {
+    width: 150px;
+    height: 112px;
   }
   
   .image-actions {

@@ -5,6 +5,7 @@ export default {
     research: 'Research',
     projects: 'Projects',
     papers: 'Papers',
+    resources: 'Resources',
     news: 'News',
     about: 'About',
     menu: 'Navigation Menu'
@@ -59,6 +60,7 @@ export default {
   },
   members: {
     title: 'Team Members',
+    description: 'Meet our research team members',
     teachers: 'Teachers',
     professor: 'Professor',
     postdoc: 'Postdoc',
@@ -67,7 +69,7 @@ export default {
     undergraduate: 'Undergraduate',
     alumni: 'Alumni',
     others: 'Others',
-    description: 'Biography',
+    biography: 'Biography',
     relatedPapers: 'Related Papers',
     positions: {
       professor: 'Professor',
@@ -80,8 +82,17 @@ export default {
       undergraduate: 'Undergraduate',
       alumni: 'Alumni',
       other: 'Other',
-      year: 'Year'
-    }
+      year: 'Year',
+      // Alumni identity types
+      phdGraduate: 'PhD Graduate',
+      masterGraduate: 'Master Graduate',
+      undergraduateGraduate: 'Bachelor Graduate',
+      faculty: 'Faculty/Staff',
+      graduateYear: 'Graduate',
+      graduate: 'Graduate'
+    },
+    // Research areas
+    researchAreas: 'Research Areas'
   },
   research: {
     title: 'Research Areas',
@@ -105,6 +116,9 @@ export default {
     notFound: 'News not found',
     invalidId: 'Invalid news ID',
     fetchError: 'Failed to fetch news details',
+    noContent: 'No Content',
+    noContentTitle: 'News Content Empty',
+    noContentMessage: 'This news item currently has no displayable content.',
     types: {
       publication: 'Paper Published',
       award: 'Award News',
@@ -129,6 +143,9 @@ export default {
     accepted: 'Accepted',
     submitted: 'Submitted',
     description: 'View academic papers published by our lab',
+    searchPlaceholder: 'Search papers...',
+    filterByType: 'Filter by Type',
+    filterByStatus: 'Filter by Status',
     type: 'Paper Type',
     status: 'Status',
     viewOnline: 'View Online',
@@ -143,6 +160,7 @@ export default {
     venue: 'Journal/Conference',
     andOthers: 'et al.',
     authors: 'Authors',
+    allAuthors: 'All Authors',
     abstract: 'Abstract',
     correspondingAuthor: 'Corresponding Author',
     notFound: 'Paper not found',
@@ -182,6 +200,31 @@ export default {
     notFound: 'Project not found',
     invalidId: 'Invalid project ID',
     fetchError: 'Failed to fetch project details'
+  },
+  resources: {
+    title: 'Lab Resources',
+    description: 'Manage lab equipment, software and database resources',
+    name: 'Resource Name',
+    resourceType: 'Resource Type',
+    availabilityStatus: 'Availability Status',
+    location: 'Location',
+    contact: 'Contact Information',
+    url: 'Visit Link',
+    empty: 'No resources available',
+    notFound: 'Resource not found',
+    fetchError: 'Failed to fetch resource details',
+    types: {
+      equipment: 'Equipment',
+      software: 'Software',
+      database: 'Database',
+      dataset: 'Dataset',
+      other: 'Other'
+    },
+    status: {
+      unavailable: 'Unavailable',
+      available: 'Available',
+      maintenance: 'Under Maintenance'
+    }
   },
   search: {
     placeholder: 'Search...',
@@ -227,6 +270,7 @@ export default {
       papers: 'Paper Management',
       projects: 'Project Management',
       news: 'News Management',
+      resources: 'Resource Management',
       lab: 'Lab Management',
       admins: 'Admin Management',
       system: 'System Management'
@@ -254,11 +298,14 @@ export default {
       totalPapers: 'Total Papers',
       totalProjects: 'Total Projects',
       totalNews: 'Total News',
+      totalResources: 'Total Resources',
+      totalGroups: 'Total Research Groups',
       quickActions: 'Quick Actions',
       addMember: 'Add Member',
       addPaper: 'Add Paper',
       addProject: 'Add Project',
       addNews: 'Add News',
+      addResource: 'Add Resource',
       systemStatus: 'System Status',
       apiStatus: 'API Service',
       databaseStatus: 'Database',
@@ -314,6 +361,13 @@ export default {
         master: 'Master Student',
         undergraduate: 'Undergraduate'
       },
+      alumniIdentity: {
+        phd: 'PhD Graduate',
+        master: 'Master Graduate',
+        undergraduate: 'Bachelor Graduate',
+        teacher: 'Faculty/Staff',
+        other: 'Other'
+      },
       paperTypes: {
         conference: 'Conference',
         journal: 'Journal',
@@ -333,6 +387,18 @@ export default {
         publication: 'Publication',
         award: 'Award',
         activity: 'Activity'
+      },
+      resourceTypes: {
+        equipment: 'Equipment',
+        software: 'Software',
+        database: 'Database',
+        dataset: 'Dataset',
+        other: 'Other'
+      },
+      resourceStatus: {
+        unavailable: 'Unavailable',
+        available: 'Available',
+        maintenance: 'Under Maintenance'
       },
       validationMessages: {
         required: 'This field is required',
@@ -405,6 +471,8 @@ export default {
         jobType: 'Job Type',
         studentType: 'Student Type',
         studentGrade: 'Grade',
+        graduationYear: 'Graduation Year',
+        alumniIdentity: 'Alumni Identity',
         destinationZh: 'Destination (Chinese)',
         destinationEn: 'Destination (English)',
         group: {
@@ -414,6 +482,70 @@ export default {
         description: 'Description (Chinese)',
         descriptionEn: 'Description (English)',
         avatar: 'Avatar Upload',
+        descriptionTemplate: `## Profile
+
+[Introduce your research background and academic experience here]
+
+## Research Areas
+
+{{research: Machine Learning, Deep Learning, Computer Vision, Natural Language Processing}}
+
+## Homepage
+
+{{github: https://github.com/your-username}}
+{{scholar: https://scholar.google.com/citations?user=YOUR_ID}}
+{{linkedin: https://linkedin.com/in/your-profile}}
+{{researchgate: https://researchgate.net/profile/your-profile}}
+{{website: https://your-personal-website.com}}
+
+## Education
+
+- **Year-Year**: Degree, Institution Name
+- **Year-Year**: Degree, Institution Name
+
+## Representative Achievements
+
+### Lab Publications
+{{papers: 1,2,3}}
+
+### Other Publications
+- [Paper Title], [Journal/Conference Name], [Publication Year]
+- [Paper Title], [Journal/Conference Name], [Publication Year]
+
+### Project Experience
+- **Project Name**: [Project Description] ([Start Year-End Year])
+
+---
+
+### 📝 Markdown Syntax Guide:
+
+**🏷️ Research Area Tags**:
+\`{{research: Area1, Area2, Area3}}\`
+- Automatically cycles through different colors (blue, info blue, green, orange, red)
+- Supports custom colors: \`{{research: Machine Learning#3b82f6, Deep Learning#8b5cf6, Computer Vision#10b981}}\`
+- Custom color format: AreaName#6-digit HEX color code (e.g., #ff0000 for red)
+- Supports container background: \`{{research: Machine Learning, Deep Learning[bg:#f0f9ff]}}\`
+- Background format: Add [bg:#6-digit HEX color code] at the end of tag list
+
+**🔗 Homepage Links**:
+- \`{{github: https://github.com/username}}\` - GitHub page (default gray)
+- \`{{scholar: https://scholar.google.com/citations?user=ID}}\` - Google Scholar (info blue)
+- \`{{linkedin: https://linkedin.com/in/profile}}\` - LinkedIn (primary blue)
+- \`{{researchgate: https://researchgate.net/profile/name}}\` - ResearchGate (success green)
+- \`{{website: https://your-site.com}}\` - Personal website (primary theme)
+- \`{{any-label: https://your-link.com}}\` - Generic link (e.g., \`{{personal-blog: https://blog.example.com}}\`)
+
+**📚 Paper Lists**:
+\`{{papers: 1,2,3}}\`
+- Enter lab paper ID numbers (comma-separated)
+
+## Honors & Awards
+
+- [Award Name], [Awarding Institution], [Year]
+
+## Contact
+
+- **Email**: [Your Email]`,
         placeholders: {
           nameZh: 'Enter Chinese name',
           nameEn: 'Enter English name',
@@ -422,6 +554,8 @@ export default {
           jobType: 'Select job type',
           studentType: 'Select student type',
           studentGrade: 'Enter grade (1-10)',
+          graduationYear: 'Enter graduation year',
+          alumniIdentity: 'Select alumni identity',
           destinationZh: 'Enter destination (Chinese)',
           destinationEn: 'Enter destination (English)',
           group: 'Select research group',
@@ -486,6 +620,8 @@ export default {
         status: 'Acceptance Status',
         url: 'Paper URL',
         file: 'Paper File',
+        previewImg: 'Preview Image',
+        previewImgAlt: 'Paper preview image',
         authors: 'Authors',
         labAuthors: 'Lab Authors',
         allAuthors: 'All Authors',
@@ -544,6 +680,48 @@ export default {
         }
       }
     },
+    resources: {
+      addResource: 'Add Resource',
+      editResource: 'Edit Resource',
+      searchPlaceholder: 'Search resource name...',
+      filterByType: 'Filter by type',
+      filterByStatus: 'Filter by status',
+      fetchError: 'Failed to fetch resources',
+      deleteConfirmText: 'Are you sure you want to delete this resource? This action cannot be undone.',
+      deleteSuccess: 'Resource deleted successfully',
+      deleteError: 'Failed to delete resource',
+      form: {
+        nameZh: 'Chinese Name',
+        nameEn: 'English Name',
+        descriptionZh: 'Chinese Description',
+        descriptionEn: 'English Description',
+        type: 'Resource Type',
+        locationZh: 'Chinese Location',
+        locationEn: 'English Location',
+        url: 'Visit Link',
+        file: 'Resource File',
+        image: 'Resource Image',
+        availabilityStatus: 'Availability Status',
+        contactInfo: 'Contact Information',
+        placeholders: {
+          nameZh: 'Enter Chinese resource name',
+          nameEn: 'Enter English resource name',
+          descriptionZh: 'Enter Chinese resource description',
+          descriptionEn: 'Enter English resource description',
+          type: 'Select resource type',
+          locationZh: 'Enter Chinese location',
+          locationEn: 'Enter English location',
+          url: 'Enter resource URL',
+          availabilityStatus: 'Select availability status',
+          contactInfo: 'Enter contact information'
+        },
+        validation: {
+          nameZhRequired: 'Chinese name is required',
+          typeRequired: 'Resource type is required',
+          availabilityStatusRequired: 'Availability status is required'
+        }
+      }
+    },
     news: {
       addNews: 'Add News',
       editNews: 'Edit News',
@@ -568,7 +746,7 @@ export default {
         },
         validation: {
           typeRequired: 'News type is required',
-          contentZhRequired: 'Chinese news content is required',
+          titleRequired: 'Please enter at least one title (Chinese or English)',
           dateRequired: 'News date is required'
         }
       }
@@ -609,7 +787,9 @@ export default {
         createGroup: 'Add Group',
         editGroup: 'Edit Group',
         createAdmin: 'Add Admin',
-        editAdmin: 'Edit Admin'
+        editAdmin: 'Edit Admin',
+        createResource: 'Add Resource',
+        editResource: 'Edit Resource'
       },
       messages: {
         createSuccess: 'Created successfully',
@@ -647,7 +827,8 @@ export default {
           papers: 'paper',
           projects: 'project',
           news: 'news',
-          groups: 'group'
+          groups: 'group',
+          resources: 'resource'
         }
       }
     },
@@ -688,6 +869,19 @@ export default {
       },
       logoPreview: 'Logo Preview',
       carouselPreview: 'Carousel Image {number} Preview'
+    },
+    // Error Page translations
+    error: {
+      pageNotFound: 'Page Not Found',
+      pageNotFoundDescription: 'Sorry, the page you are looking for does not exist or has been moved.',
+      adminPageNotFoundDescription: 'Sorry, the admin page you are looking for does not exist. Please check the URL.',
+      backToHome: 'Back to Home',
+      backToDashboard: 'Back to Dashboard',
+      quickNavigation: 'Quick Navigation',
+      serverError: 'Server Error',
+      serverErrorDescription: 'A server error occurred. Please try again later.',
+      networkError: 'Network Error',
+      networkErrorDescription: 'Network connection failed. Please check your network settings.'
     },
     // Image Cropper Modal translations
     imageCropper: {
@@ -776,6 +970,7 @@ export default {
       paperModule: 'Paper',
       newsModule: 'News',
       projectModule: 'Project',
+      resourceModule: 'Resource',
       mediaModule: 'Media Files',
       imageUploadModule: 'Image Upload',
       loadError: 'Failed to load operation logs',
