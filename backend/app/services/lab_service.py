@@ -266,6 +266,12 @@ class LabService(BaseService):
     
     def _validate_text_field(self, field: str, value: str) -> None:
         """校驗文本字段"""
+        # 實驗室名稱必填校驗
+        if field in ['lab_zh', 'lab_en']:
+            if not value or not value.strip():
+                field_name = '實驗室中文名稱' if field == 'lab_zh' else '實驗室英文名稱'
+                raise ValidationError(f'{field_name}為必填項目')
+        
         # 郵箱格式校驗
         if field == 'lab_email' and value:
             if not validate_email(value):
