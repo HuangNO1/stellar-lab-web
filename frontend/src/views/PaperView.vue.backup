@@ -1,0 +1,724 @@
+<template>
+  <div class="paper-view">
+    <div class="paper-header">
+      <h1 class="page-title">{{ $t('nav.papers') }}</h1>
+      <p class="page-description">{{ $t('papers.description') }}</p>
+    </div>
+
+    <!-- 搜索組件 -->
+    <SearchComponent
+      :config="searchConfig"
+      :filters="currentFilters"
+      @search="handleSearch"
+    />
+
+    <!-- 加載狀態 -->
+    <div v-if="loading" class="paper-skeleton">
+      <div v-for="i in 6" :key="i" class="paper-item-skeleton">
+        <div class="skeleton-header">
+          <n-skeleton text height="1.5rem" width="80%" />
+          <n-skeleton text height="1rem" width="60%" style="margin-top: 0.5rem" />
+        </div>
+        <n-skeleton text height="0.875rem" width="100%" :repeat="2" style="margin-top: 1rem" />
+        <div class="skeleton-meta" style="margin-top: 1rem; display: flex; gap: 1rem;">
+          <n-skeleton text height="0.75rem" width="20%" />
+          <n-skeleton text height="0.75rem" width="15%" />
+        </div>
+      </div>
+    </div>
+
+    <!-- 錯誤狀態 -->
+    <div v-else-if="error" class="error-state">
+      <n-alert type="warning" :title="$t('common.error')" style="margin-bottom: 1rem;">
+        {{ error }}
+      </n-alert>
+      <n-button @click="fetchPapers" type="primary" ghost>
+        {{ $t('common.retry') }}
+      </n-button>
+    </div>
+
+    <!-- 論文列表 -->
+    <div v-else class="paper-content">
+      <div v-if="paperList.length > 0" class="paper-list">
+        <PaperCard 
+          v-for="paper in paperList" 
+          :key="paper.paper_id" 
+          :paper="paper"
+          :show-actions="true"
+          :show-preview-image="true"
+          @click="viewPaperDetail"
+          @open-url="openPaperUrl"
+          @download="downloadPaper"
+        />
+      </div>
+
+      <!-- 空狀態 -->
+      <div v-else class="empty-state">
+        <n-empty :description="$t('papers.empty')" />
+      </div>
+
+      <!-- 分頁 -->
+      <div v-if="pagination && pagination.pages > 1" class="pagination-wrapper">
+        <n-config-provider :locale="naiveLocale" :date-locale="dateLocale">
+          <n-pagination
+            v-model:page="currentPage"
+            :page-count="pagination.pages"
+            :page-size="pagination.per_page"
+            :item-count="pagination.total"
+            show-size-picker
+            :page-sizes="[10, 20, 50]"
+            show-quick-jumper
+            @update:page="handlePageChange"
+            @update:page-size="handlePageSizeChange"
+          />
+        </n-config-provider>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import { NConfigProvider, zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
+import SearchComponent from '@/components/SearchComponent.vue';
+import PaperCard from '@/components/PaperCard.vue';
+import { paperApi } from '@/services/api';
+import { getMediaUrl } from '@/utils/media';
+import { stripMarkdown } from '@/utils/text';
+import type { Paper, SearchFilters, PaperAuthor, ApiError } from '@/types/api';
+
+const { t, locale } = useI18n();
+const router = useRouter();
+
+// Naive UI 語言包配置
+const naiveLocale = computed(() => {
+  return locale.value === 'zh' ? zhCN : enUS;
+});
+
+// 日期選擇器的國際化配置
+const dateLocale = computed(() => {
+  return locale.value === 'zh' ? dateZhCN : dateEnUS;
+});
+
+// 響應式數據
+const paperList = ref<Paper[]>([]);
+const loading = ref(false);
+const error = ref<string | null>(null);
+const currentPage = ref(1);
+const currentPageSize = ref(10);
+const pagination = ref<{
+  total: number;
+  page: number;
+  per_page: number;
+  pages: number;
+  has_prev: boolean;
+  has_next: boolean;
+} | null>(null);
+
+// 搜索配置
+const searchConfig = {
+  type: 'papers' as const,
+  dateRange: true,
+  sorting: true,
+  sortFields: [
+    { value: 'paper_date', label: 'papers.date' },
+    { value: 'paper_title_zh', label: 'papers.title' },
+    { value: 'paper_venue', label: 'papers.venue' }
+  ]
+};
+
+// 當前搜索過濾器
+const currentFilters = ref<SearchFilters>({
+  q: '',
+  sort_by: 'paper_date',
+  order: 'desc'
+});
+
+// 獲取當前語言
+const getCurrentLocale = () => {
+  return locale.value as 'zh' | 'en';
+};
+
+// 獲取論文類型顏色
+const getPaperTypeColor = (type: number) => {
+  const colorMap = {
+    0: 'info',     // 會議
+    1: 'success',  // 期刊
+    2: 'warning',  // 專利
+    3: 'error',    // 書籍
+    4: 'default'   // 其他
+  };
+  return colorMap[type as keyof typeof colorMap] || 'default';
+};
+
+// 獲取論文類型文本
+const getPaperTypeText = (type: number) => {
+  const textMap = {
+    0: t('papers.conference'),
+    1: t('papers.journal'),
+    2: t('papers.patent'),
+    3: t('papers.book'),
+    4: t('papers.other')
+  };
+  return textMap[type as keyof typeof textMap] || t('papers.other');
+};
+
+// 獲取論文狀態顏色
+const getPaperStatusColor = (status: number) => {
+  return status === 1 ? 'success' : 'warning';
+};
+
+// 獲取論文狀態文本
+const getPaperStatusText = (status: number) => {
+  return status === 1 ? t('papers.accepted') : t('papers.submitted');
+};
+
+// 格式化日期
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString(getCurrentLocale() === 'zh' ? 'zh-CN' : 'en-US');
+};
+
+// 獲取作者文本
+const getAuthorsText = (authors: PaperAuthor[]) => {
+  if (!authors || authors.length === 0) return '';
+  
+  const sortedAuthors = authors
+    .sort((a, b) => (a.author_order || 0) - (b.author_order || 0))
+    .slice(0, 3); // 最多顯示3個作者
+  
+  const authorNames = sortedAuthors.map(author => {
+    if (author.member) {
+      return getCurrentLocale() === 'zh' ? author.member.mem_name_zh : author.member.mem_name_en;
+    }
+    return '';
+  }).filter(name => name);
+  
+  let text = authorNames.join(', ');
+  if (authors.length > 3) {
+    text += `, ${t('papers.andOthers')}`;
+  }
+  
+  return text;
+};
+
+// 獲取論文數據
+const fetchPapers = async (resetPage = false) => {
+  try {
+    loading.value = true;
+    error.value = null;
+
+    if (resetPage) {
+      currentPage.value = 1;
+    }
+
+    const params = {
+      page: currentPage.value,
+      per_page: currentPageSize.value,
+      q: currentFilters.value.q,
+      paper_type: currentFilters.value.paper_type,
+      paper_accept: currentFilters.value.paper_accept,
+      start_date: currentFilters.value.start_date,
+      end_date: currentFilters.value.end_date,
+      sort_by: currentFilters.value.sort_by,
+      order: currentFilters.value.order
+    };
+
+    // 移除空值
+    Object.keys(params).forEach(key => {
+      if (params[key as keyof typeof params] === '' || params[key as keyof typeof params] === null || params[key as keyof typeof params] === undefined) {
+        delete params[key as keyof typeof params];
+      }
+    });
+
+    const response = await paperApi.getPapers(params);
+    if (response.code === 0) {
+      paperList.value = response.data.items;
+      
+      // 處理分頁信息
+      if ('total' in response.data) {
+        pagination.value = {
+          total: response.data.total,
+          page: response.data.page || currentPage.value,
+          per_page: response.data.per_page || currentPageSize.value,
+          pages: response.data.pages || Math.ceil(response.data.total / (response.data.per_page || currentPageSize.value)),
+          has_prev: response.data.has_prev || false,
+          has_next: response.data.has_next || false
+        };
+      } else {
+        pagination.value = null;
+      }
+    } else {
+      error.value = response.message || t('common.fetchError');
+    }
+  } catch (err: unknown) {
+    console.error('Failed to fetch papers:', err);
+    const apiError = err as ApiError;
+    error.value = apiError?.message || t('common.networkError');
+  } finally {
+    loading.value = false;
+  }
+};
+
+// 搜索處理
+const handleSearch = (filters: SearchFilters) => {
+  currentFilters.value = { ...filters };
+  fetchPapers(true);
+};
+
+// 頁面變化處理
+const handlePageChange = (page: number) => {
+  currentPage.value = page;
+  fetchPapers();
+};
+
+// 每頁數量變化處理
+const handlePageSizeChange = (pageSize: number) => {
+  currentPageSize.value = pageSize;
+  currentPage.value = 1;
+  fetchPapers();
+};
+
+// 查看論文詳情
+const viewPaperDetail = (paper: Paper) => {
+  router.push(`/paper/${paper.paper_id}`);
+};
+
+// 打開論文URL
+const openPaperUrl = (url: string) => {
+  window.open(url, '_blank');
+};
+
+// 下載論文
+const downloadPaper = (paper: Paper) => {
+  if (paper.paper_file_path) {
+    const fileUrl = getMediaUrl(paper.paper_file_path);
+    window.open(fileUrl, '_blank');
+  }
+};
+
+// 生命週期
+onMounted(() => {
+  fetchPapers();
+});
+</script>
+
+<style scoped>
+.paper-view {
+  padding: 1.5rem;
+  min-width: 60rem;
+  max-width: 87.5rem;
+  margin: 0 auto;
+}
+
+/* 頁面頭部 */
+.paper-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  background: linear-gradient(135deg, #1890ff, #722ed1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.page-description {
+  font-size: 1.125rem;
+  color: #666;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* 骨架屏 */
+.paper-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.paper-item-skeleton {
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.08);
+  border: 0.0625rem solid rgba(0, 0, 0, 0.06);
+}
+
+.skeleton-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* 錯誤狀態 */
+.error-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+/* 論文內容 */
+.paper-content {
+  margin-top: 1.5rem;
+}
+
+.paper-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+  gap: 1.5rem;
+}
+
+/* 空狀態 */
+.empty-state {
+  text-align: center;
+  padding: 5rem 1.5rem;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .paper-view {
+    min-width: auto;
+    padding: 1rem;
+  }
+  
+  .page-title {
+    font-size: 2rem;
+  }
+  
+  .paper-list {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 1.75rem;
+  }
+  
+  .page-description {
+    font-size: 1rem;
+  }
+}
+</style>
+.paper-view {
+  padding: 1.5rem;
+  min-width: 60rem;
+  max-width: 87.5rem;
+  margin: 0 auto;
+}
+
+/* 頁面頭部 */
+.paper-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  background: linear-gradient(135deg, #1890ff, #722ed1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.page-description {
+  font-size: 1.125rem;
+  color: #666;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* 骨架屏 */
+.paper-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.paper-item-skeleton {
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.08);
+  border: 0.0625rem solid rgba(0, 0, 0, 0.06);
+}
+
+.skeleton-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* 錯誤和空狀態 */
+.error-state,
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.25rem;
+}
+
+/* 論文列表 */
+.paper-content {
+  margin-top: 1.5rem;
+}
+
+.paper-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+  gap: 1.5rem;
+}
+
+.paper-item {
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.08);
+  border: 0.0625rem solid rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border-left: 0.25rem solid transparent;
+}
+
+.paper-item:hover {
+  transform: translateY(-0.125rem);
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.12);
+  border-left-color: #1890ff;
+}
+
+.paper-header-info {
+  margin-bottom: 1rem;
+}
+
+.paper-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.paper-venue {
+  font-size: 1rem;
+  color: #1890ff;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.paper-description {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.paper-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.paper-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.paper-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  text-align: right;
+}
+
+.paper-date {
+  font-size: 0.875rem;
+  color: #888;
+  font-weight: 500;
+}
+
+.paper-authors {
+  font-size: 0.8rem;
+  color: #999;
+  max-width: 15rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 0.25rem;
+}
+
+.author-label {
+  font-weight: 600;
+  color: #1890ff;
+}
+
+.lab-authors .author-label {
+  color: #1890ff;
+}
+
+.all-authors .author-label {
+  color: #666;
+}
+
+.paper-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* 分頁 */
+.pagination-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 0.0625rem solid rgba(0, 0, 0, 0.06);
+}
+
+/* 暗色主題 */
+[data-theme="dark"] .paper-view,
+.dark .paper-view,
+.dark-mode .paper-view {
+  color: #fff;
+}
+
+[data-theme="dark"] .page-description,
+.dark .page-description,
+.dark-mode .page-description {
+  color: #ccc;
+}
+
+[data-theme="dark"] .paper-item,
+[data-theme="dark"] .paper-item-skeleton,
+.dark .paper-item,
+.dark .paper-item-skeleton,
+.dark-mode .paper-item,
+.dark-mode .paper-item-skeleton {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .paper-item:hover,
+.dark .paper-item:hover,
+.dark-mode .paper-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.3);
+  border-left-color: #70a1ff;
+}
+
+[data-theme="dark"] .paper-title,
+.dark .paper-title,
+.dark-mode .paper-title {
+  color: #fff;
+}
+
+[data-theme="dark"] .paper-venue,
+.dark .paper-venue,
+.dark-mode .paper-venue {
+  color: #70a1ff;
+}
+
+[data-theme="dark"] .paper-description,
+.dark .paper-description,
+.dark-mode .paper-description {
+  color: #ccc;
+}
+
+[data-theme="dark"] .paper-date,
+.dark .paper-date,
+.dark-mode .paper-date {
+  color: #bbb;
+}
+
+[data-theme="dark"] .paper-authors,
+.dark .paper-authors,
+.dark-mode .paper-authors {
+  color: #aaa;
+}
+
+[data-theme="dark"] .author-label,
+.dark .author-label,
+.dark-mode .author-label {
+  color: #70a1ff;
+}
+
+[data-theme="dark"] .all-authors .author-label,
+.dark .all-authors .author-label,
+.dark-mode .all-authors .author-label {
+  color: #bbb;
+}
+
+[data-theme="dark"] .pagination-wrapper,
+.dark .pagination-wrapper,
+.dark-mode .pagination-wrapper {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 響應式設計 */
+@media (max-width: 48rem) {
+  .paper-view {
+    padding: 1rem;
+    min-width: unset;
+  }
+  
+  .page-title {
+    font-size: 2rem;
+  }
+  
+  .page-description {
+    font-size: 1rem;
+  }
+  
+  .paper-item {
+    padding: 1rem;
+  }
+  
+  .paper-title {
+    font-size: 1.125rem;
+  }
+  
+  .paper-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .paper-info {
+    align-items: flex-start;
+    text-align: left;
+  }
+  
+  .paper-actions {
+    justify-content: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .paper-actions .n-button {
+    font-size: 0.8rem;
+  }
+}
+</style>
