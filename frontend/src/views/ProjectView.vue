@@ -1,8 +1,11 @@
 <template>
   <div class="project-view">
-    <div class="project-header">
-      <h1 class="page-title">{{ $t('nav.projects') }}</h1>
-      <p class="page-description">{{ $t('projects.description') }}</p>
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title">{{ $t('nav.projects') }}</h1>
+        <p class="page-description">{{ $t('projects.description') }}</p>
+      </div>
     </div>
 
     <!-- 搜索組件 -->
@@ -291,25 +294,32 @@ onMounted(() => {
 }
 
 /* 頁面頭部 */
-.project-header {
+/* Page Header */
+.page-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
+  padding: 2rem 0;
+  background: linear-gradient(135deg, #52c41a 0%, #1890ff 100%);
+  border-radius: 12px;
+  color: white;
+}
+
+.header-content {
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .page-title {
   font-size: 2.5rem;
   font-weight: 700;
-  margin: 0 0 0.75rem 0;
-  background: linear-gradient(135deg, #1890ff, #722ed1);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  margin: 0 0 1rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .page-description {
   font-size: 1.125rem;
-  color: #666;
   margin: 0;
+  opacity: 0.9;
   line-height: 1.6;
 }
 
@@ -498,10 +508,15 @@ onMounted(() => {
 }
 
 /* 響應式設計 */
-@media (max-width: 48rem) {
+@media (max-width: 768px) {
   .project-view {
     padding: 1rem;
     min-width: unset;
+  }
+  
+  .page-header {
+    margin-bottom: 2rem;
+    padding: 1.5rem 1rem;
   }
   
   .page-title {
@@ -533,6 +548,22 @@ onMounted(() => {
   
   .project-actions .n-button {
     font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    margin-bottom: 1.5rem;
+    padding: 1rem 0.5rem;
+    border-radius: 8px;
+  }
+  
+  .page-title {
+    font-size: 1.75rem;
+  }
+  
+  .page-description {
+    font-size: 1rem;
   }
 }
 </style>
