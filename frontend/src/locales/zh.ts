@@ -5,6 +5,7 @@ export default {
         research: '研究',
         projects: '项目',
         papers: '论文',
+        resources: '资源',
         news: '新闻',
         about: '关于',
         menu: '导航菜单'
@@ -59,6 +60,7 @@ export default {
     },
     members: {
         title: '团队成员',
+        description: '认识我们的研究团队成员',
         teachers: '教师',
         professor: '教授',
         postdoc: '博士后',
@@ -67,7 +69,7 @@ export default {
         undergraduate: '本科生',
         alumni: '校友',
         others: '其他成员',
-        description: '个人简介',
+        profile: '个人简介',
         relatedPapers: '相关论文',
         positions: {
             professor: '教授',
@@ -80,8 +82,17 @@ export default {
             undergraduate: '本科生',
             alumni: '校友',
             other: '其他',
-            year: '年级'
-        }
+            year: '年级',
+            // 校友身份类型
+            phdGraduate: '博士毕业生',
+            masterGraduate: '硕士毕业生',
+            undergraduateGraduate: '本科毕业生',
+            faculty: '教职员工',
+            graduateYear: '年毕业',
+            graduate: '毕业'
+        },
+        // 研究领域相关
+        researchAreas: '研究領域'
     },
     research: {
         title: '研究领域',
@@ -105,6 +116,9 @@ export default {
         notFound: '未找到该新闻',
         invalidId: '无效的新闻ID',
         fetchError: '获取新闻详情失败',
+        noContent: '无内容',
+        noContentTitle: '新闻内容为空',
+        noContentMessage: '这条新闻暂时没有可显示的内容。',
         types: {
             publication: '论文发表',
             award: '获奖消息',
@@ -129,6 +143,9 @@ export default {
         accepted: '已接收',
         submitted: '投稿中',
         description: '查看实验室发表的学术论文',
+        searchPlaceholder: '搜索论文...',
+        filterByType: '按类型筛选',
+        filterByStatus: '按状态筛选',
         type: '论文类型',
         status: '状态',
         viewOnline: '在线查看',
@@ -143,6 +160,7 @@ export default {
         venue: '发表期刊/会议',
         andOthers: '等',
         authors: '作者',
+        allAuthors: '全部作者',
         abstract: '摘要',
         correspondingAuthor: '通讯作者',
         notFound: '未找到该论文',
@@ -169,6 +187,31 @@ export default {
         notFound: '未找到该项目',
         invalidId: '无效的项目ID',
         fetchError: '获取项目详情失败'
+    },
+    resources: {
+        title: '实验室资源',
+        description: '管理实验室设备、软件和数据库资源',
+        name: '资源名称',
+        resourceType: '资源类型',
+        availabilityStatus: '可用状态',
+        location: '位置',
+        contact: '联系方式',
+        url: '访问链接',
+        empty: '暂无资源数据',
+        notFound: '未找到该资源',
+        fetchError: '获取资源详情失败',
+        types: {
+            equipment: '设备',
+            software: '软件',
+            database: '数据库',
+            dataset: '数据集',
+            other: '其他'
+        },
+        status: {
+            unavailable: '不可用',
+            available: '可用',
+            maintenance: '维护中'
+        }
     },
     groups: {
         title: '研究课题组',
@@ -220,6 +263,7 @@ export default {
             papers: '论文管理',
             projects: '项目管理',
             news: '新闻管理',
+            resources: '资源管理',
             lab: '实验室管理',
             admins: '管理员管理',
             system: '系统管理'
@@ -247,11 +291,14 @@ export default {
             totalPapers: '总论文数',
             totalProjects: '总项目数',
             totalNews: '总新闻数',
+            totalResources: '总资源数',
+            totalGroups: '总课题组数',
             quickActions: '快速操作',
             addMember: '添加成员',
             addPaper: '添加论文',
             addProject: '添加项目',
             addNews: '添加新闻',
+            addResource: '添加资源',
             systemStatus: '系统状态',
             apiStatus: 'API服务',
             databaseStatus: '数据库',
@@ -307,6 +354,13 @@ export default {
                 master: '硕士生',
                 undergraduate: '本科生'
             },
+            alumniIdentity: {
+                phd: '博士毕业生',
+                master: '硕士毕业生',
+                undergraduate: '本科毕业生',
+                teacher: '教职员工',
+                other: '其他'
+            },
             paperTypes: {
                 conference: '会议',
                 journal: '期刊',
@@ -326,6 +380,18 @@ export default {
                 publication: '论文发表',
                 award: '获奖消息',
                 activity: '学术活动'
+            },
+            resourceTypes: {
+                equipment: '设备',
+                software: '软件',
+                database: '数据库',
+                dataset: '数据集',
+                other: '其他'
+            },
+            resourceStatus: {
+                unavailable: '不可用',
+                available: '可用',
+                maintenance: '维护中'
             },
             validationMessages: {
                 required: '此栏位为必填项',
@@ -398,6 +464,8 @@ export default {
                 jobType: '职务类型',
                 studentType: '学生类型',
                 studentGrade: '年级',
+                graduationYear: '毕业年份',
+                alumniIdentity: '校友身份',
                 destinationZh: '去向（中文）',
                 destinationEn: '去向（英文）',
                 group: {
@@ -407,6 +475,108 @@ export default {
                 description: '成员描述（中文）',
                 descriptionEn: '成员描述（英文）',
                 avatar: '头像上传',
+                descriptionTemplate: `## 個人簡介
+
+[在此處介紹您的研究背景和學術經歷]
+
+## 研究領域
+
+{{research: 機器學習, 深度學習, 計算機視覺, 自然語言處理}}
+
+## 個人主頁
+
+{{github: https://github.com/your-username}}
+{{scholar: https://scholar.google.com/citations?user=YOUR_ID}}
+{{linkedin: https://linkedin.com/in/your-profile}}
+{{researchgate: https://researchgate.net/profile/your-profile}}
+{{website: https://your-personal-website.com}}
+
+## 教育背景
+
+- **年份-年份**: 學位, 學校/機構名稱
+- **年份-年份**: 學位, 學校/機構名稱
+
+## 代表性成果
+
+### 實驗室論文
+{{papers: 1,2,3}}
+
+### 其他論文發表
+- [論文標題], [期刊/會議名稱], [發表年份]
+- [論文標題], [期刊/會議名稱], [發表年份]
+
+### 項目經歷
+- **項目名稱**: [項目描述] ([起始年份-結束年份])
+
+---
+
+### 📝 Markdown 語法說明：
+
+**🏷️ 研究領域標籤**：
+\`{{research: 領域1, 領域2, 領域3}}\`
+- 自動循環顯示不同顏色（藍色、資訊藍、綠色、橙色、紅色）
+- 支持自定義顏色：\`{{research: 機器學習#3b82f6, 深度學習#8b5cf6, 計算機視覺#10b981}}\`
+- 自定義顏色格式：領域名#六位HEX顏色碼（如 #ff0000 代表紅色）
+- 支持容器背景色：\`{{research: 機器學習, 深度學習[bg:#f0f9ff]}}\`
+- 背景色格式：在標籤組最後添加 [bg:#六位HEX顏色碼]
+
+**🔗 個人主頁連結**：
+- \`{{github: https://github.com/username}}\` - GitHub 頁面（灰色）
+- \`{{scholar: https://scholar.google.com/citations?user=ID}}\` - Google Scholar（藍色）
+- \`{{linkedin: https://linkedin.com/in/profile}}\` - LinkedIn（藍色）
+- \`{{researchgate: https://researchgate.net/profile/name}}\` - ResearchGate（綠色）
+- \`{{website: https://your-site.com}}\` - 個人網站（主色調）
+- \`{{任意標籤名: https://連結地址}}\` - 通用連結（如 \`{{個人博客: https://blog.example.com}}\`）
+
+**📚 論文列表**：
+\`{{papers: 1,2,3}}\`
+- 填入實驗室論文的ID編號（以逗號分隔）
+
+## 榮譽獎項
+
+- [獎項名稱], [頒發機構], [獲獎年份]
+
+## 聯繫方式
+
+- **郵箱**: [您的郵箱]`,
+                descriptionTemplateEn: `## Profile
+
+[Introduce your research background and academic experience here]
+
+## Research Areas
+
+{{research: Machine Learning, Deep Learning, Computer Vision, Natural Language Processing}}
+
+## Homepage
+
+{{homepage: https://scholar.google.com/citations?user=YOUR_ID}}
+{{homepage: https://github.com/your-username}}
+{{homepage: https://your-personal-website.com}}
+
+## Education
+
+- **Year-Year**: Degree, Institution Name
+- **Year-Year**: Degree, Institution Name
+
+## Representative Achievements
+
+### Lab Publications
+{{papers: 1,2,3}}
+
+### Other Publications
+- [Paper Title], [Journal/Conference Name], [Publication Year]
+- [Paper Title], [Journal/Conference Name], [Publication Year]
+
+### Project Experience
+- **Project Name**: [Project Description] ([Start Year-End Year])
+
+## Honors & Awards
+
+- [Award Name], [Awarding Institution], [Year]
+
+## Contact
+
+- **Email**: [Your Email]`,
                 placeholders: {
                     nameZh: '请输入中文姓名',
                     nameEn: '请输入英文姓名',
@@ -415,6 +585,8 @@ export default {
                     jobType: '请选择职务类型',
                     studentType: '请选择学生类型',
                     studentGrade: '请输入年级（1-10）',
+                    graduationYear: '请输入毕业年份',
+                    alumniIdentity: '请选择校友身份',
                     destinationZh: '请输入去向（中文）',
                     destinationEn: '请输入去向（英文）',
                     group: '请选择课题组',
@@ -454,6 +626,8 @@ export default {
                 status: '接收状态',
                 url: '论文连结',
                 file: '论文文件',
+                previewImg: '预览图片',
+                previewImgAlt: '论文预览图片',
                 authors: '作者',
                 labAuthors: '實驗室作者',
                 allAuthors: '全部作者',
@@ -512,6 +686,49 @@ export default {
                 }
             }
         },
+        resources: {
+            addResource: '添加资源',
+            editResource: '编辑资源',
+            searchPlaceholder: '搜索资源名称...',
+            filterByType: '按类型筛选',
+            filterByStatus: '按状态筛选',
+            fetchError: '获取资源列表失败',
+            deleteConfirmText: '确定要删除这个资源吗？此操作不可撤销。',
+            deleteSuccess: '资源删除成功',
+            deleteError: '删除资源失败',
+            form: {
+                nameZh: '中文名称',
+                nameEn: '英文名称',
+                descriptionZh: '中文描述',
+                descriptionEn: '英文描述',
+                type: '资源类型',
+                locationZh: '中文位置',
+                locationEn: '英文位置',
+                url: '资源链接',
+                file: '资源文件',
+                image: '资源图片',
+                imageAlt: '资源图片预览',
+                availabilityStatus: '可用状态',
+                contactInfo: '联系方式',
+                placeholders: {
+                    nameZh: '请输入资源中文名称',
+                    nameEn: '请输入资源英文名称',
+                    descriptionZh: '请输入资源中文描述',
+                    descriptionEn: '请输入资源英文描述',
+                    type: '请选择资源类型',
+                    locationZh: '请输入中文位置',
+                    locationEn: '请输入英文位置',
+                    url: '请输入资源链接',
+                    availabilityStatus: '请选择可用状态',
+                    contactInfo: '请输入联系方式'
+                },
+                validation: {
+                    nameZhRequired: '请输入中文名称',
+                    typeRequired: '请选择资源类型',
+                    availabilityStatusRequired: '请选择可用状态'
+                }
+            }
+        },
         news: {
             addNews: '添加新闻',
             editNews: '编辑新闻',
@@ -538,7 +755,7 @@ export default {
                 },
                 validation: {
                     typeRequired: '请选择新闻类型',
-                    contentZhRequired: '请输入新闻中文内容',
+                    titleRequired: '请至少输入中文或英文标题之一',
                     dateRequired: '请选择新闻日期'
                 }
             }
@@ -609,7 +826,9 @@ export default {
                 createGroup: '新增课题组',
                 editGroup: '编辑课题组',
                 createAdmin: '新增管理员',
-                editAdmin: '编辑管理员'
+                editAdmin: '编辑管理员',
+                createResource: '新增资源',
+                editResource: '编辑资源'
             },
             messages: {
                 createSuccess: '创建成功',
@@ -637,7 +856,8 @@ export default {
                     papers: '论文',
                     projects: '项目',
                     news: '新闻',
-                    groups: '课题组'
+                    groups: '课题组',
+                    resources: '资源'
                 }
             }
         },
@@ -747,6 +967,7 @@ export default {
             paperModule: '论文',
             newsModule: '新闻',
             projectModule: '项目',
+            resourceModule: '资源',
             mediaModule: '媒体文件',
             imageUploadModule: '图片上传',
             loadError: '载入操作日志失败',
@@ -791,6 +1012,19 @@ export default {
             settings: '系统设置',
             settingsDesc: '配置系统参数和选项'
         },
+        // 錯誤頁面翻譯
+        error: {
+            pageNotFound: '頁面未找到',
+            pageNotFoundDescription: '抱歉，您訪問的頁面不存在或已被移動。',
+            adminPageNotFoundDescription: '抱歉，您訪問的管理頁面不存在。請檢查URL是否正確。',
+            backToHome: '返回首頁',
+            backToDashboard: '返回儀表板',
+            quickNavigation: '快速導航',
+            serverError: '服務器錯誤',
+            serverErrorDescription: '服務器發生錯誤，請稍後再試。',
+            networkError: '網絡錯誤',
+            networkErrorDescription: '網絡連接失敗，請檢查您的網絡設置。'
+        },
         // 图片裁切翻译
         imageCropper: {
             selectImage: '选择图片',
@@ -798,6 +1032,7 @@ export default {
             cropAvatar: '裁切头像',
             cropLogo: '裁切Logo',
             cropCarousel: '裁切轮播图',
+            cropImage: '裁切图片',
             avatarHint: '头像将被裁切为正方形',
             logoHint: 'Logo 可保持原始比例',
             carouselHint: '请选择适合的宽高比例',
