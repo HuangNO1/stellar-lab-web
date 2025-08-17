@@ -1,7 +1,7 @@
 from typing import Optional, Dict, Any
 from datetime import datetime
 from app.models import Project
-from app.utils.validators import validate_string_length
+from app.utils.validators import validate_string_length, validate_date
 from app.utils.helpers import get_pagination_params, paginate_query
 from app.utils.messages import msg
 from .base_service import BaseService, ValidationError, NotFoundError
@@ -45,9 +45,13 @@ class ProjectService(BaseService):
             
             # 日期範圍篩選
             if filters.get('start_date'):
-                query = query.filter(Project.project_date_start >= filters['start_date'])
+                valid, date_obj = validate_date(filters['start_date'])
+                if valid and date_obj:
+                    query = query.filter(Project.project_date_start >= date_obj)
             if filters.get('end_date'):
-                query = query.filter(Project.project_date_start <= filters['end_date'])
+                valid, date_obj = validate_date(filters['end_date'])
+                if valid and date_obj:
+                    query = query.filter(Project.project_date_start <= date_obj)
         
         # 排序
         sort_by = filters.get('sort_by', 'project_date_start') if filters else 'project_date_start'
