@@ -35,6 +35,10 @@ SUCCESS_MESSAGES = {
     'PROJECT_CREATE_SUCCESS': '项目创建成功',
     'PROJECT_UPDATE_SUCCESS': '项目更新成功',
     'PROJECT_DELETE_SUCCESS': '项目删除成功',
+    'RESOURCE_CREATE_SUCCESS': '资源创建成功',
+    'RESOURCE_UPDATE_SUCCESS': '资源更新成功',
+    'RESOURCE_DELETE_SUCCESS': '资源删除成功',
+    'RESOURCE_BATCH_DELETE_SUCCESS': '批量删除{count}个资源成功',
     'ADMIN_CREATE_SUCCESS': '管理员创建成功',
     'ADMIN_UPDATE_SUCCESS': '管理员更新成功',
     'ADMIN_DELETE_SUCCESS': '管理员删除成功',
@@ -119,6 +123,15 @@ ERROR_MESSAGES = {
     'PROJECT_STATUS_INVALID': '项目状态无效',
     'PROJECT_STATUS_FORMAT_ERROR': '项目状态格式错误',
     'PROJECT_START_DATE_FORMAT_ERROR': '项目开始日期格式错误，应为 YYYY-MM-DD',
+    
+    # 资源相关错误
+    'RESOURCE_NOT_FOUND': '资源不存在',
+    'RESOURCE_NAME_ZH_REQUIRED': '资源中文名称不能为空',
+    'RESOURCE_CREATE_FAILED': '创建资源失败',
+    'RESOURCE_UPDATE_FAILED': '更新资源失败',
+    'RESOURCE_DELETE_FAILED': '删除资源失败',
+    'RESOURCE_FETCH_FAILED': '获取资源失败',
+    'RESOURCE_BATCH_DELETE_FAILED': '批量删除资源失败',
     
     # 管理员相关错误
     'ADMIN_NOT_FOUND': '管理员不存在',

@@ -7,8 +7,9 @@ from .project import Project
 from .news import News
 from .edit_record import EditRecord
 from .uploaded_image import UploadedImage
+from .resource import Resource
 
 __all__ = [
     'Admin', 'Lab', 'ResearchGroup', 'Member', 
-    'Paper', 'PaperAuthor', 'Project', 'News', 'EditRecord', 'UploadedImage'
+    'Paper', 'PaperAuthor', 'Project', 'News', 'EditRecord', 'UploadedImage', 'Resource'
 ]

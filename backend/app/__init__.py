@@ -114,6 +114,7 @@ def create_app(config_name=None):
     from app.routes.media import bp as media_bp
     from app.routes.image_upload import bp as image_upload_bp
     from app.routes.edit_record import bp as edit_record_bp
+    from app.routes.resource import resource_bp
     # 舊的手工維護 Swagger 系統（1600+ 行代碼）
     # from app.routes.swagger_docs import bp as swagger_bp
     
@@ -131,6 +132,7 @@ def create_app(config_name=None):
     app.register_blueprint(media_bp, url_prefix='/api')
     app.register_blueprint(image_upload_bp, url_prefix='/api')
     app.register_blueprint(edit_record_bp, url_prefix='/api')
+    app.register_blueprint(resource_bp)
     app.register_blueprint(swagger_bp, url_prefix='/api')
     
     # 創建表

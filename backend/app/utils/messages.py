@@ -151,3 +151,13 @@ class Messages:
 
 # 簡化的消息快捷方式
 msg = Messages()
+
+
+def get_message(key, lang=None, **kwargs):
+    """快捷獲取消息的函數"""
+    try:
+        # 先嘗試從成功消息中獲取
+        return Messages.get_success_message(key, lang=lang, **kwargs)
+    except:
+        # 如果找不到，嘗試從錯誤消息中獲取
+        return Messages.get_error_message(key, lang=lang, **kwargs)
