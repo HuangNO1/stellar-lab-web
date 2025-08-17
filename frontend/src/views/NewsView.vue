@@ -1,8 +1,11 @@
 <template>
   <div class="news-view">
-    <div class="news-header">
-      <h1 class="page-title">{{ $t('nav.news') }}</h1>
-      <p class="page-description">{{ $t('news.description') }}</p>
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title">{{ $t('nav.news') }}</h1>
+        <p class="page-description">{{ $t('news.description') }}</p>
+      </div>
     </div>
 
     <!-- 搜索組件 -->
@@ -36,7 +39,12 @@
     <!-- 新聞列表 -->
     <div v-else class="news-content">
       <div v-if="newsList.length > 0" class="news-list">
-        <div v-for="news in newsList" :key="news.news_id" class="news-item" @click="viewNewsDetail(news)">
+        <div 
+          v-for="news in newsList" 
+          :key="news.news_id" 
+          class="news-item"
+          @click="hasNewsContent(news) ? viewNewsDetail(news) : null"
+        >
           <div class="news-meta">
             <n-tag :type="getNewsTypeColor(news.news_type)" size="small">
               {{ getNewsTypeText(news.news_type) }}
@@ -52,8 +60,13 @@
               }}
             </h3>
           </div>
-          <div class="news-actions">
-            <n-button size="small" type="primary" ghost>
+          <div class="news-actions" v-if="hasNewsContent(news)">
+            <n-button 
+              size="small" 
+              type="primary" 
+              ghost
+              @click.stop="viewNewsDetail(news)"
+            >
               {{ $t('common.viewDetails') }}
             </n-button>
           </div>
@@ -248,6 +261,20 @@ const handlePageSizeChange = (pageSize: number) => {
 };
 
 // 查看新聞詳情
+const hasNewsContent = (news: News): boolean => {
+  const currentLang = getCurrentLocale();
+  
+  if (currentLang === 'zh') {
+    // 中文環境：只檢查中文內容是否存在且非空
+    const hasContent = news.news_content_zh && news.news_content_zh.trim();
+    return !!hasContent;
+  } else {
+    // 英文環境：只檢查英文內容是否存在且非空
+    const hasContent = news.news_content_en && news.news_content_en.trim();
+    return !!hasContent;
+  }
+};
+
 const viewNewsDetail = (news: News) => {
   router.push(`/news/${news.news_id}`);
 };
@@ -266,26 +293,32 @@ onMounted(() => {
   margin: 0 auto;
 }
 
-/* 頁面頭部 */
-.news-header {
+/* Page Header */
+.page-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
+  padding: 2rem 0;
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  border-radius: 12px;
+  color: white;
+}
+
+.header-content {
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .page-title {
   font-size: 2.5rem;
   font-weight: 700;
-  margin: 0 0 0.75rem 0;
-  background: linear-gradient(135deg, #1890ff, #722ed1);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  margin: 0 0 1rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .page-description {
   font-size: 1.125rem;
-  color: #666;
   margin: 0;
+  opacity: 0.9;
   line-height: 1.6;
 }
 
@@ -335,8 +368,8 @@ onMounted(() => {
   box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.08);
   border: 0.0625rem solid rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
-  cursor: pointer;
   border-left: 0.25rem solid transparent;
+  cursor: pointer;
 }
 
 .news-item:hover {
@@ -440,10 +473,15 @@ onMounted(() => {
 }
 
 /* 響應式設計 */
-@media (max-width: 48rem) {
+@media (max-width: 768px) {
   .news-view {
     padding: 1rem;
     min-width: unset;
+  }
+  
+  .page-header {
+    margin-bottom: 2rem;
+    padding: 1.5rem 1rem;
   }
   
   .page-title {
@@ -465,6 +503,22 @@ onMounted(() => {
   }
   
   .news-title {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    margin-bottom: 1.5rem;
+    padding: 1rem 0.5rem;
+    border-radius: 8px;
+  }
+  
+  .page-title {
+    font-size: 1.75rem;
+  }
+  
+  .page-description {
     font-size: 1rem;
   }
 }

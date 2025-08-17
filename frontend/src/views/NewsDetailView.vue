@@ -45,6 +45,13 @@
         </n-button>
       </div>
       
+      <!-- 檢查是否有內容 -->
+      <div v-if="!hasNewsContent(news)" class="no-content-notice">
+        <n-alert type="info" :title="$t('news.noContentTitle')" style="margin-bottom: 1rem;">
+          {{ $t('news.noContentMessage') }}
+        </n-alert>
+      </div>
+      
       <div class="news-header">
         <!-- 新聞標題 -->
         <h1 v-if="news.news_title_zh || news.news_title_en" class="news-title">
@@ -66,8 +73,8 @@
         </div>
       </div>
 
-      <!-- 新聞內容 -->
-      <div class="news-content">
+      <!-- 新聞內容 - 只有當有內容時才顯示 -->
+      <div v-if="hasNewsContent(news)" class="news-content">
         <markdown-it :source="getNewsContent()" :plugins="markdownPlugins"></markdown-it>
       </div>
     </div>
@@ -156,6 +163,20 @@ const getNewsTypeText = (type: number) => {
 const formatDate = (dateStr: string) => {
   const date = new Date(dateStr);
   return date.toLocaleDateString(getCurrentLocale() === 'zh' ? 'zh-CN' : 'en-US');
+};
+
+const hasNewsContent = (news: News): boolean => {
+  const currentLang = getCurrentLocale();
+  
+  if (currentLang === 'zh') {
+    // 中文環境：只檢查中文內容是否存在且非空
+    const hasContent = news.news_content_zh && news.news_content_zh.trim();
+    return !!hasContent;
+  } else {
+    // 英文環境：只檢查英文內容是否存在且非空
+    const hasContent = news.news_content_en && news.news_content_en.trim();
+    return !!hasContent;
+  }
 };
 
 const goBack = () => {

@@ -130,7 +130,7 @@
                 v-for="news in latestNews" 
                 :key="news.news_id" 
                 class="news-item-compact" 
-                @click="() => toNewsDetail(news)"
+                @click="hasNewsContent(news) ? toNewsDetail(news) : null"
               >
                 <div class="news-item-header">
                   <n-tag 
@@ -150,6 +150,16 @@
                         : stripMarkdown(getCurrentLocale() === 'zh' ? news.news_content_zh : (news.news_content_en || news.news_content_zh))
                     }}
                   </span>
+                </div>
+                <div class="news-actions" v-if="hasNewsContent(news)">
+                  <n-button 
+                    size="small" 
+                    type="primary" 
+                    ghost
+                    @click.stop="toNewsDetail(news)"
+                  >
+                    {{ $t('common.viewDetails') }}
+                  </n-button>
                 </div>
               </div>
             </div>
@@ -321,9 +331,26 @@ const toNewsPage = () => {
   router.push('/news');
 };
 
+// 檢查新聞是否有內容（根據當前語言環境，只檢查內容不檢查標題）
+const hasNewsContent = (news: News): boolean => {
+  const currentLang = getCurrentLocale();
+  
+  if (currentLang === 'zh') {
+    // 中文環境：只檢查中文內容是否存在且非空
+    const hasContent = news.news_content_zh && news.news_content_zh.trim();
+    return !!hasContent;
+  } else {
+    // 英文環境：只檢查英文內容是否存在且非空
+    const hasContent = news.news_content_en && news.news_content_en.trim();
+    return !!hasContent;
+  }
+};
+
 // 跳轉到新聞詳情頁面
 const toNewsDetail = (news: News) => {
-  router.push(`/news/${news.news_id}`);
+  if (hasNewsContent(news)) {
+    router.push(`/news/${news.news_id}`);
+  }
 };
 
 // 生命週期
@@ -338,13 +365,13 @@ onMounted(() => {
   position: relative;
 }
 
-/* Full Screen Carousel Container - 完全覆蓋包括導覽欄 */
+/* Optimized Carousel Container - 調整後的輪播大小 */
 .carousel-container {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 75vh; /* 減少高度從100vh到75vh */
   z-index: 1;
   overflow: hidden;
 }
@@ -356,7 +383,7 @@ onMounted(() => {
 
 .carousel-img {
   width: 100%;
-  height: 100vh;
+  height: 75vh; /* 對應調整圖片高度 */
   object-fit: cover;
   display: block;
 }
@@ -365,7 +392,7 @@ onMounted(() => {
 .page-content {
   position: relative;
   z-index: 2;
-  margin-top: 100vh; /* 在全屏輪播下方 */
+  margin-top: 75vh; /* 調整為75vh以配合新的輪播高度 */
   padding: 0; /* 移除所有padding */
   width: 100vw; /* 使用viewport width確保全屏寬度 */
   background-color: #fff; /* 預設白色背景 */
@@ -615,6 +642,19 @@ onMounted(() => {
 
 /* 響應式設計 */
 @media (max-width: 1024px) {
+  /* 平板設備上稍微減少輪播高度 */
+  .carousel-container {
+    height: 70vh;
+  }
+  
+  .carousel-img {
+    height: 70vh;
+  }
+  
+  .page-content {
+    margin-top: 70vh;
+  }
+  
   .content-wrapper {
     padding: 2rem 1.25rem 0;
   }
@@ -638,6 +678,19 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  /* 手機設備上進一步減少輪播高度 */
+  .carousel-container {
+    height: 60vh;
+  }
+  
+  .carousel-img {
+    height: 60vh;
+  }
+  
+  .page-content {
+    margin-top: 60vh;
+  }
+  
   .content-wrapper {
     padding: 2rem 1rem 0;
   }
@@ -690,6 +743,19 @@ onMounted(() => {
 }
 
 @media (max-width: 640px) {
+  /* 小螢幕手機設備上再次減少輪播高度 */
+  .carousel-container {
+    height: 55vh;
+  }
+  
+  .carousel-img {
+    height: 55vh;
+  }
+  
+  .page-content {
+    margin-top: 55vh;
+  }
+  
   .content-wrapper {
     padding: 1.5rem 0.75rem 0;
   }
@@ -773,6 +839,19 @@ onMounted(() => {
 }
 
 @media (max-width: 480px) {
+  /* 最小螢幕設備上使用最小輪播高度 */
+  .carousel-container {
+    height: 50vh;
+  }
+  
+  .carousel-img {
+    height: 50vh;
+  }
+  
+  .page-content {
+    margin-top: 50vh;
+  }
+  
   .content-wrapper {
     padding: 1.25rem 0.5rem 0;
   }
@@ -946,9 +1025,9 @@ onMounted(() => {
   gap: 1rem;
   padding: 0.75rem;
   border-radius: 0.5rem;
-  cursor: pointer;
   transition: all 0.2s ease;
   border: 1px solid transparent;
+  cursor: pointer;
 }
 
 .news-item-compact:hover {
@@ -1030,6 +1109,14 @@ onMounted(() => {
   color: #70a1ff;
 }
 
+/* 新聞動作按鈕 */
+.news-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+
 /* 空狀態 */
 .empty-state-compact {
   text-align: center;
@@ -1081,6 +1168,11 @@ onMounted(() => {
   
   .news-content-compact {
     width: 100%;
+  }
+  
+  .news-actions {
+    width: 100%;
+    justify-content: flex-end;
   }
   
   .news-title-compact {
