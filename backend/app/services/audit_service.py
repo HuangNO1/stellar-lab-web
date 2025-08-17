@@ -31,7 +31,8 @@ class AuditService(BaseService):
         'news': 5,
         'project': 6,
         'media': 7,
-        'image_upload': 8
+        'image_upload': 8,
+        'resource': 9
     }
     
     # 操作類型枚舉
