@@ -30,9 +30,22 @@ def validate_date(date_str):
     date_str = sanitize_string(date_str)
     
     try:
+        # 首先嘗試解析時間戳（毫秒級）
+        if date_str.isdigit() and len(date_str) == 13:
+            timestamp_ms = int(date_str)
+            date_obj = datetime.fromtimestamp(timestamp_ms / 1000).date()
+            return True, date_obj
+        
+        # 嘗試解析時間戳（秒級）
+        if date_str.isdigit() and len(date_str) == 10:
+            timestamp_s = int(date_str)
+            date_obj = datetime.fromtimestamp(timestamp_s).date()
+            return True, date_obj
+        
+        # 嘗試解析標準日期格式
         date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
         return True, date_obj
-    except ValueError:
+    except (ValueError, OSError):
         return False, None
 
 def validate_enum(value, valid_values):
