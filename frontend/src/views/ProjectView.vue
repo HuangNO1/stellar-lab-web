@@ -96,15 +96,14 @@
       </div>
 
       <!-- 分頁 -->
-      <div v-if="pagination && pagination.pages > 1" class="pagination-wrapper">
+      <div v-if="pagination.itemCount > pagination.pageSize" class="pagination-wrapper">
         <n-config-provider :locale="naiveLocale" :date-locale="dateLocale">
           <n-pagination
-            v-model:page="currentPage"
-            :page-count="pagination.pages"
-            :page-size="pagination.per_page"
-            :item-count="pagination.total"
-            show-size-picker
-            :page-sizes="[10, 20, 50]"
+            v-model:page="pagination.page"
+            :page-size="pagination.pageSize"
+            :item-count="pagination.itemCount"
+            :show-size-picker="pagination.showSizePicker"
+            :page-sizes="pagination.pageSizes"
             show-quick-jumper
             @update:page="handlePageChange"
             @update:page-size="handlePageSizeChange"
@@ -116,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { NConfigProvider, zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
@@ -142,16 +141,6 @@ const dateLocale = computed(() => {
 const projectList = ref<Project[]>([]);
 const loading = ref(false);
 const error = ref<string | null>(null);
-const currentPage = ref(1);
-const currentPageSize = ref(10);
-const pagination = ref<{
-  total: number;
-  page: number;
-  per_page: number;
-  pages: number;
-  has_prev: boolean;
-  has_next: boolean;
-} | null>(null);
 
 // 搜索配置
 const searchConfig = {
@@ -169,6 +158,15 @@ const currentFilters = ref<SearchFilters>({
   q: '',
   sort_by: 'project_date_start',
   order: 'desc'
+});
+
+// 分頁配置
+const pagination = reactive({
+  page: 1,
+  pageSize: 10,
+  itemCount: 0,
+  showSizePicker: true,
+  pageSizes: [10, 20, 50]
 });
 
 // 獲取當前語言
@@ -200,12 +198,12 @@ const fetchProjects = async (resetPage = false) => {
     error.value = null;
 
     if (resetPage) {
-      currentPage.value = 1;
+      pagination.page = 1;
     }
 
     const params = {
-      page: currentPage.value,
-      per_page: currentPageSize.value,
+      page: pagination.page,
+      per_page: pagination.pageSize,
       q: currentFilters.value.q,
       is_end: currentFilters.value.is_end,
       start_date: currentFilters.value.start_date,
@@ -227,16 +225,11 @@ const fetchProjects = async (resetPage = false) => {
       
       // 處理分頁信息
       if ('total' in response.data) {
-        pagination.value = {
-          total: response.data.total,
-          page: response.data.page || currentPage.value,
-          per_page: response.data.per_page || currentPageSize.value,
-          pages: response.data.pages || Math.ceil(response.data.total / (response.data.per_page || currentPageSize.value)),
-          has_prev: response.data.has_prev || false,
-          has_next: response.data.has_next || false
-        };
+        pagination.page = response.data.page || pagination.page;
+        pagination.pageSize = response.data.per_page || pagination.pageSize;
+        pagination.itemCount = response.data.total;
       } else {
-        pagination.value = null;
+        pagination.itemCount = 0;
       }
     } else {
       error.value = response.message || t('common.fetchError');
@@ -258,14 +251,14 @@ const handleSearch = (filters: SearchFilters) => {
 
 // 頁面變化處理
 const handlePageChange = (page: number) => {
-  currentPage.value = page;
+  pagination.page = page;
   fetchProjects();
 };
 
 // 每頁數量變化處理
 const handlePageSizeChange = (pageSize: number) => {
-  currentPageSize.value = pageSize;
-  currentPage.value = 1;
+  pagination.pageSize = pageSize;
+  pagination.page = 1;
   fetchProjects();
 };
 

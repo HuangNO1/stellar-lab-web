@@ -61,23 +61,26 @@
       </div>
 
       <!-- 分頁 -->
-      <div v-if="pagination.total > 0" class="pagination-section">
-        <n-pagination
-          v-model:page="pagination.page"
-          :page-count="pagination.pages"
-          :page-size="pagination.per_page"
-          :item-count="pagination.total"
-          :show-size-picker="false"
-          :show-quick-jumper="true"
-          @update:page="onPageChange"
-        />
+      <div v-if="pagination.itemCount > pagination.pageSize" class="pagination-section">
+        <n-config-provider :locale="naiveLocale" :date-locale="dateLocale">
+          <n-pagination
+            v-model:page="pagination.page"
+            :page-size="pagination.pageSize"
+            :item-count="pagination.itemCount"
+            :show-size-picker="pagination.showSizePicker"
+            :page-sizes="pagination.pageSizes"
+            show-quick-jumper
+            @update:page="handlePageChange"
+            @update:page-size="handlePageSizeChange"
+          />
+        </n-config-provider>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { NConfigProvider, zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
@@ -91,16 +94,27 @@ import type { Paper, SearchFilters, PaperAuthor, ApiError } from '@/types/api';
 const { t, locale } = useI18n();
 const router = useRouter();
 
+// Naive UI 語言包配置
+const naiveLocale = computed(() => {
+  return locale.value === 'zh' ? zhCN : enUS;
+});
+
+// 日期選擇器的國際化配置
+const dateLocale = computed(() => {
+  return locale.value === 'zh' ? dateZhCN : dateEnUS;
+});
+
 // 響應式數據
 const paperList = ref<Paper[]>([]);
 const loading = ref(false);
 const error = ref<string | null>(null);
 const currentFilters = ref<SearchFilters>({});
-const pagination = ref({
+const pagination = reactive({
   page: 1,
-  per_page: 12,
-  total: 0,
-  pages: 0
+  pageSize: 10,
+  itemCount: 0,
+  showSizePicker: true,
+  pageSizes: [10, 20, 50]
 });
 
 // 搜索配置
@@ -151,8 +165,8 @@ const fetchPapers = async (params: any = {}) => {
     error.value = null;
     
     const queryParams = {
-      page: pagination.value.page,
-      per_page: pagination.value.per_page,
+      page: pagination.page,
+      per_page: pagination.pageSize,
       sort_by: 'paper_date',
       order: 'desc',
       ...params
@@ -161,12 +175,9 @@ const fetchPapers = async (params: any = {}) => {
     const response = await paperApi.getPapers(queryParams);
     if (response.code === 0) {
       paperList.value = response.data.items;
-      pagination.value = {
-        page: response.data.page || 1,
-        per_page: response.data.per_page || 12,
-        total: response.data.total || 0,
-        pages: response.data.pages || 0
-      };
+      pagination.page = response.data.page || 1;
+      pagination.pageSize = response.data.per_page || 12;
+      pagination.itemCount = response.data.total || 0;
     } else {
       error.value = response.message;
     }
@@ -181,12 +192,18 @@ const fetchPapers = async (params: any = {}) => {
 
 const handleSearch = (filters: SearchFilters) => {
   currentFilters.value = filters;
-  pagination.value.page = 1;
+  pagination.page = 1;
   fetchPapers(filters);
 };
 
-const onPageChange = (page: number) => {
-  pagination.value.page = page;
+const handlePageChange = (page: number) => {
+  pagination.page = page;
+  fetchPapers(currentFilters.value);
+};
+
+const handlePageSizeChange = (pageSize: number) => {
+  pagination.pageSize = pageSize;
+  pagination.page = 1;
   fetchPapers(currentFilters.value);
 };
 

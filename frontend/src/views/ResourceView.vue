@@ -112,18 +112,19 @@
     </div>
 
     <!-- Pagination -->
-    <div v-if="!loading && resources.length > 0" class="pagination-section">
-      <n-pagination
-        v-model:page="currentPage"
-        :page-count="totalPages"
-        :page-size="pageSize"
-        :item-count="totalCount"
-        :show-size-picker="true"
-        :show-quick-jumper="true"
-        :page-sizes="[10, 20, 30]"
-        @update:page="handlePageChange"
-        @update:page-size="handlePageSizeChange"
-      />
+    <div v-if="!loading && resources.length > 0 && pagination.itemCount > pagination.pageSize" class="pagination-section">
+      <n-config-provider :locale="naiveLocale" :date-locale="dateLocale">
+        <n-pagination
+          v-model:page="pagination.page"
+          :page-size="pagination.pageSize"
+          :item-count="pagination.itemCount"
+          :show-size-picker="pagination.showSizePicker"
+          :page-sizes="pagination.pageSizes"
+          show-quick-jumper
+          @update:page="handlePageChange"
+          @update:page-size="handlePageSizeChange"
+        />
+      </n-config-provider>
     </div>
   </div>
 </template>
@@ -131,7 +132,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useMessage } from 'naive-ui';
+import { useMessage, NConfigProvider, zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
 import SearchComponent from '@/components/SearchComponent.vue';
 import { resourceApi } from '@/services/api';
 import { getMediaUrl } from '@/utils/media';
@@ -140,13 +141,26 @@ import type { Resource, ApiError, SearchFilters } from '@/types/api';
 const { t, locale } = useI18n();
 const message = useMessage();
 
+// Naive UI 語言包配置
+const naiveLocale = computed(() => {
+  return locale.value === 'zh' ? zhCN : enUS;
+});
+
+// 日期選擇器的國際化配置
+const dateLocale = computed(() => {
+  return locale.value === 'zh' ? dateZhCN : dateEnUS;
+});
+
 // Reactive data
 const resources = ref<Resource[]>([]);
 const loading = ref(false);
-const currentPage = ref(1);
-const pageSize = ref(10);
-const totalCount = ref(0);
-const totalPages = ref(0);
+const pagination = reactive({
+  page: 1,
+  pageSize: 10,
+  itemCount: 0,
+  showSizePicker: true,
+  pageSizes: [10, 20, 50]
+});
 
 // 搜索配置
 const searchConfig = {
@@ -239,8 +253,8 @@ const fetchResources = async () => {
     loading.value = true;
     
     const params = {
-      page: currentPage.value,
-      per_page: pageSize.value,
+      page: pagination.page,
+      per_page: pagination.pageSize,
       q: currentFilters.value.q || undefined,
       resource_type: currentFilters.value.resource_type ?? undefined,
       availability_status: currentFilters.value.availability_status ?? undefined,
@@ -251,8 +265,7 @@ const fetchResources = async () => {
     const response = await resourceApi.getResources(params);
     if (response.code === 0) {
       resources.value = response.data.items;
-      totalCount.value = response.data.total;
-      totalPages.value = Math.ceil(totalCount.value / pageSize.value);
+      pagination.itemCount = response.data.total;
     } else {
       message.error(response.message || t('resources.fetchError'));
     }
@@ -269,12 +282,12 @@ const fetchResources = async () => {
 // 搜索處理
 const handleSearch = (filters: SearchFilters) => {
   currentFilters.value = { ...filters };
-  currentPage.value = 1;
+  pagination.page = 1;
   fetchResources();
 };
 
 const handlePageChange = (page: number) => {
-  currentPage.value = page;
+  pagination.page = page;
   fetchResources();
   
   // 滾動到頁面頂部
@@ -282,8 +295,8 @@ const handlePageChange = (page: number) => {
 };
 
 const handlePageSizeChange = (size: number) => {
-  pageSize.value = size;
-  currentPage.value = 1;
+  pagination.pageSize = size;
+  pagination.page = 1;
   fetchResources();
 };
 
