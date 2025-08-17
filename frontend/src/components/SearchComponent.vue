@@ -92,6 +92,30 @@
             </div>
           </template>
 
+          <!-- 資源特定篩選 -->
+          <template v-if="config.type === 'resources'">
+            <div class="form-row">
+              <n-form-item :label="$t('resources.resourceType')" class="form-item">
+                <n-select
+                  v-model:value="localFilters.resource_type"
+                  :options="resourceTypeOptions"
+                  :placeholder="$t('search.all')"
+                  clearable
+                  @update:value="handleSearch"
+                />
+              </n-form-item>
+              <n-form-item :label="$t('resources.availabilityStatus')" class="form-item">
+                <n-select
+                  v-model:value="localFilters.availability_status"
+                  :options="resourceStatusOptions"
+                  :placeholder="$t('search.all')"
+                  clearable
+                  @update:value="handleSearch"
+                />
+              </n-form-item>
+            </div>
+          </template>
+
           <!-- 項目特定篩選 -->
           <template v-if="config.type === 'projects'">
             <div class="form-row">
@@ -146,7 +170,7 @@ import { zhCN, enUS, dateZhCN, dateEnUS } from 'naive-ui';
 import type { SearchFilters } from '@/types/api';
 
 interface SearchConfig {
-  type: 'papers' | 'news' | 'projects';
+  type: 'papers' | 'news' | 'projects' | 'resources';
   dateRange?: boolean;
   sorting?: boolean;
   sortFields?: { value: string; label: string }[];
@@ -212,6 +236,22 @@ const newsTypeOptions = computed(() => [
   { label: t('news.academic'), value: 2 }
 ]);
 
+// 資源類型選項
+const resourceTypeOptions = computed(() => [
+  { label: t('resources.types.equipment'), value: 0 },
+  { label: t('resources.types.software'), value: 1 },
+  { label: t('resources.types.database'), value: 2 },
+  { label: t('resources.types.dataset'), value: 3 },
+  { label: t('resources.types.other'), value: 4 }
+]);
+
+// 資源狀態選項
+const resourceStatusOptions = computed(() => [
+  { label: t('resources.status.unavailable'), value: 0 },
+  { label: t('resources.status.available'), value: 1 },
+  { label: t('resources.status.maintenance'), value: 2 }
+]);
+
 // 項目狀態選項
 const projectStatusOptions = computed(() => [
   { label: t('projects.ongoing'), value: 0 },
@@ -242,6 +282,12 @@ const sortOptions = computed(() => {
     commonOptions.push(
       { label: t('projects.name'), value: 'name' },
       { label: t('projects.startDate'), value: 'project_date_start' }
+    );
+  } else if (props.config.type === 'resources') {
+    commonOptions.push(
+      { label: t('resources.name'), value: 'resource_name_zh' },
+      { label: t('resources.resourceType'), value: 'resource_type' },
+      { label: t('resources.availabilityStatus'), value: 'availability_status' }
     );
   }
   return commonOptions;
