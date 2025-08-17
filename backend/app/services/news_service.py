@@ -1,7 +1,7 @@
 from typing import Optional, Dict, Any
 from datetime import datetime
 from app.models import News
-from app.utils.validators import validate_string_length
+from app.utils.validators import validate_string_length, validate_date
 from app.utils.helpers import get_pagination_params, paginate_query
 from app.utils.messages import msg
 from .base_service import BaseService, ValidationError, NotFoundError
@@ -44,9 +44,13 @@ class NewsService(BaseService):
             
             # 日期範圍篩選
             if filters.get('start_date'):
-                query = query.filter(News.news_date >= filters['start_date'])
+                valid, date_obj = validate_date(filters['start_date'])
+                if valid and date_obj:
+                    query = query.filter(News.news_date >= date_obj)
             if filters.get('end_date'):
-                query = query.filter(News.news_date <= filters['end_date'])
+                valid, date_obj = validate_date(filters['end_date'])
+                if valid and date_obj:
+                    query = query.filter(News.news_date <= date_obj)
         
         # 按日期倒序排序
         query = query.order_by(News.news_date.desc())
@@ -160,7 +164,7 @@ class NewsService(BaseService):
     def _validate_news_data(self, news_data: Dict[str, Any], is_create: bool = True) -> None:
         """校驗新聞數據"""
         if is_create:
-            required_fields = ['news_type', 'news_content_zh', 'news_date']
+            required_fields = ['news_type', 'news_date']
             self.validate_required_fields(news_data, required_fields)
             
             # 檢查至少有一個標題字段
