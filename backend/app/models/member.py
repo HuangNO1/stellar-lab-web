@@ -15,6 +15,8 @@ class Member(db.Model):
     job_type = db.Column(db.Integer)
     student_type = db.Column(db.Integer)
     student_grade = db.Column(db.Integer)
+    graduation_year = db.Column(db.Integer, nullable=True)  # 畢業年級
+    alumni_identity = db.Column(db.Integer, nullable=True)  # 校友身份類型
     destination_zh = db.Column(db.String(500))
     destination_en = db.Column(db.String(500))
     research_group_id = db.Column(db.Integer, db.ForeignKey('research_groups.research_group_id'), nullable=True)
@@ -27,6 +29,8 @@ class Member(db.Model):
     __table_args__ = (
         db.Index('ix_member_enable_type', 'enable', 'mem_type'),  # 用於篩選啟用的特定類型成員
         db.Index('ix_member_enable_created', 'enable', 'created_at'),  # 用於分頁查詢已啟用成員
+        db.Index('ix_member_alumni_graduation', 'mem_type', 'graduation_year'),  # 用於校友畢業年級排序
+        db.Index('ix_member_alumni_identity', 'mem_type', 'alumni_identity'),  # 用於校友身份篩選
     )
     
     # 關係
@@ -46,6 +50,8 @@ class Member(db.Model):
             'job_type': self.job_type,
             'student_type': self.student_type,
             'student_grade': self.student_grade,
+            'graduation_year': self.graduation_year,
+            'alumni_identity': self.alumni_identity,
             'destination_zh': self.destination_zh,
             'destination_en': self.destination_en,
             'research_group_id': self.research_group_id,

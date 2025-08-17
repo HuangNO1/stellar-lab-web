@@ -507,6 +507,7 @@ class MemberService(BaseService):
         basic_fields = [
             'mem_name_zh', 'mem_name_en', 'mem_email', 'mem_type',
             'job_type', 'student_type', 'student_grade',
+            'graduation_year', 'alumni_identity',
             'mem_desc_zh', 'mem_desc_en', 'destination_zh', 'destination_en'
         ]
         
@@ -519,6 +520,7 @@ class MemberService(BaseService):
         basic_fields = [
             'mem_name_zh', 'mem_name_en', 'mem_email', 'mem_type',
             'job_type', 'student_type', 'student_grade',
+            'graduation_year', 'alumni_identity',
             'mem_desc_zh', 'mem_desc_en', 'destination_zh', 'destination_en'
         ]
         
@@ -601,12 +603,19 @@ class MemberService(BaseService):
         research_group_id = form_data.get('research_group_id')
         
         # 如果research_group_id為空、None或0，則不設置課題組（如校友等）
-        if not research_group_id or research_group_id == 0:
+        if research_group_id is None or research_group_id == 0 or research_group_id == '':
             member.research_group_id = None
             member.lab_id = None
             return
         
-        research_group_id = int(research_group_id)
+        try:
+            research_group_id = int(research_group_id)
+        except (ValueError, TypeError):
+            # 如果無法轉換為整數，則設為None
+            member.research_group_id = None
+            member.lab_id = None
+            return
+            
         research_group = ResearchGroup.query.filter_by(
             research_group_id=research_group_id, 
             enable=1
