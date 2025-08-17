@@ -100,19 +100,60 @@ export function useMembers() {
     // 為每個分組排序
     const sortMembers = (memberList: Member[]) => {
       return memberList.sort((a, b) => {
-        // 教師按職務類型排序：教授(0) > 副教授(1) > 助理教授(3) > 講師(2) > 博士後(4)
+        // 教師按職務類型排序：教授(0) > 副教授(1) > 講師(2) > 助理研究員(3) > 博士後(4)
         if (a.mem_type === 0 && b.mem_type === 0) {
-          const jobOrder = [0, 1, 3, 2, 4];
-          const aOrder = jobOrder.indexOf(a.job_type || 4);
-          const bOrder = jobOrder.indexOf(b.job_type || 4);
-          return aOrder - bOrder;
+          const jobOrder = [0, 1, 2, 3, 4]; // 正確的職務排序
+          const aOrder = jobOrder.indexOf(a.job_type ?? 4);
+          const bOrder = jobOrder.indexOf(b.job_type ?? 4);
+          if (aOrder !== bOrder) {
+            return aOrder - bOrder;
+          }
+          // 同職務類型按姓名排序
+          const aName = locale.value === 'zh' ? a.mem_name_zh : a.mem_name_en;
+          const bName = locale.value === 'zh' ? b.mem_name_zh : b.mem_name_en;
+          return (aName || '').localeCompare(bName || '');
         }
-        // 學生按年級排序（高年級在前）
-        if (a.mem_type === 1 && b.mem_type === 1 && a.student_grade && b.student_grade) {
-          return b.student_grade - a.student_grade;
+        
+        // 學生按年級排序（高年級在前），同年級按姓名排序
+        if (a.mem_type === 1 && b.mem_type === 1) {
+          const aGrade = a.student_grade ?? 0;
+          const bGrade = b.student_grade ?? 0;
+          if (aGrade !== bGrade) {
+            return bGrade - aGrade; // 高年級在前
+          }
+          // 同年級按姓名排序
+          const aName = locale.value === 'zh' ? a.mem_name_zh : a.mem_name_en;
+          const bName = locale.value === 'zh' ? b.mem_name_zh : b.mem_name_en;
+          return (aName || '').localeCompare(bName || '');
         }
-        // 其他按創建時間排序
-        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        
+        // 校友排序：先按畢業年份（近年優先），再按身份類型，最後按姓名
+        if (a.mem_type === 2 && b.mem_type === 2) {
+          // 先按畢業年份排序（近年畢業的在前）
+          const aYear = a.graduation_year ?? 0;
+          const bYear = b.graduation_year ?? 0;
+          if (aYear !== bYear) {
+            return bYear - aYear; // 近年畢業的在前
+          }
+          
+          // 同年畢業按身份類型排序：博士(0) > 碩士(1) > 本科(2) > 教師(3) > 其他(4)
+          const identityOrder = [0, 1, 2, 3, 4];
+          const aIdentity = identityOrder.indexOf(a.alumni_identity ?? 4);
+          const bIdentity = identityOrder.indexOf(b.alumni_identity ?? 4);
+          if (aIdentity !== bIdentity) {
+            return aIdentity - bIdentity;
+          }
+          
+          // 同身份按姓名排序
+          const aName = locale.value === 'zh' ? a.mem_name_zh : a.mem_name_en;
+          const bName = locale.value === 'zh' ? b.mem_name_zh : b.mem_name_en;
+          return (aName || '').localeCompare(bName || '');
+        }
+        
+        // 其他按姓名排序
+        const aName = locale.value === 'zh' ? a.mem_name_zh : a.mem_name_en;
+        const bName = locale.value === 'zh' ? b.mem_name_zh : b.mem_name_en;
+        return (aName || '').localeCompare(bName || '');
       });
     };
 
@@ -142,7 +183,8 @@ export function useMembers() {
       // 學生
       if (member.destination_zh || member.destination_en) {
         // 有去向信息的學生視為校友 - 顯示去向
-        return locale.value === 'zh' ? member.destination_zh : member.destination_en;
+        const destination = locale.value === 'zh' ? member.destination_zh : member.destination_en;
+        return destination || t('members.positions.alumni');
       } else {
         // 在校學生
         const studentTypeKeys = ['phdStudent', 'masterStudent', 'undergraduate'];
@@ -157,12 +199,33 @@ export function useMembers() {
         return type;
       }
     } else if (member.mem_type === 2) {
-      // 校友 - 顯示去向或默認文本
-      if (member.destination_zh || member.destination_en) {
-        return locale.value === 'zh' ? member.destination_zh : member.destination_en;
-      } else {
-        return t('members.positions.alumni');
+      // 校友 - 顯示身份、畢業年份和去向
+      let position = '';
+      
+      // 身份類型
+      if (member.alumni_identity !== undefined) {
+        const identityKeys = ['phdGraduate', 'masterGraduate', 'undergraduateGraduate', 'faculty', 'other'];
+        const identityKey = identityKeys[member.alumni_identity] || 'other';
+        position = t(`members.positions.${identityKey}`);
       }
+      
+      // 畢業年份
+      if (member.graduation_year) {
+        const year = locale.value === 'zh' ? 
+          `${member.graduation_year}${t('members.positions.graduateYear')}` :
+          `${member.graduation_year} ${t('members.positions.graduate')}`;
+        position = position ? `${position} (${year})` : year;
+      }
+      
+      // 去向信息
+      if (member.destination_zh || member.destination_en) {
+        const destination = locale.value === 'zh' ? member.destination_zh : member.destination_en;
+        if (destination) {
+          position = position ? `${position} - ${destination}` : destination;
+        }
+      }
+      
+      return position || t('members.positions.alumni');
     } else {
       // 其他
       return t('members.positions.other');
