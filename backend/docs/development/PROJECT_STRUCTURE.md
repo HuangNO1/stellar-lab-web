@@ -23,6 +23,8 @@ backend/
 │   │   ├── news.py             # 新聞模型
 │   │   ├── project.py          # 項目模型
 │   │   ├── research_group.py   # 課題組模型
+│   │   ├── resource.py         # 實驗室資源模型 🆕
+│   │   ├── uploaded_image.py   # 上傳圖片模型 🆕
 │   │   └── edit_record.py      # 編輯記錄模型
 │   ├── routes/                  # API 路由層
 │   │   ├── admin.py            # 管理員路由
@@ -33,10 +35,12 @@ backend/
 │   │   ├── news.py             # 新聞路由
 │   │   ├── project.py          # 項目路由
 │   │   ├── research_group.py   # 課題組路由
+│   │   ├── resource.py         # 實驗室資源路由 🆕
 │   │   ├── media.py            # 媒體文件路由
+│   │   ├── image_upload.py     # 圖片上傳路由 🆕
 │   │   ├── edit_record.py      # 編輯記錄路由
 │   │   ├── root.py             # 根路由
-│   │   └── swagger_simple.py   # 自動化 Swagger 文檔
+│   │   └── swagger_complete.py # 完整版自動化 Swagger 系統 🆕
 │   ├── services/                # 業務邏輯層 ⭐
 │   │   ├── __init__.py
 │   │   ├── base_service.py     # 基礎服務類
@@ -48,7 +52,9 @@ backend/
 │   │   ├── news_service.py     # 新聞服務
 │   │   ├── project_service.py  # 項目服務
 │   │   ├── research_group_service.py # 課題組服務
+│   │   ├── resource_service.py # 實驗室資源服務 🆕
 │   │   ├── media_service.py    # 媒體服務
+│   │   ├── image_upload_service.py # 圖片上傳服務 🆕
 │   │   └── audit_service.py    # 審計服務
 │   ├── auth/                    # 認證相關
 │   │   ├── __init__.py
@@ -107,8 +113,17 @@ backend/
 - **臨時演示文件**: `demo_swagger_automation.py`, `test_basic.py`, `test_swagger_automation.py` 等
 - **遷移分析文件**: `MIGRATION_ANALYSIS.py`, `MIGRATION_SUCCESS_REPORT.py` 等
 - **備份文件**: `app/__init__.py.backup`, `swagger_docs.py.backup`
-- **冗余 Swagger 文件**: 保留 `swagger_simple.py`，清理其他冗余文件
+- **冗余 Swagger 文件**: 升級到完整版 `swagger_complete.py` 系統
 - **臨時筆記**: `think/` 目錄
+
+### 🆕 新增功能
+- **實驗室資源管理**: 完整的資源CRUD系統，支持設備、軟件、數據庫等資源管理
+- **論文預覽圖片**: 為論文添加預覽圖片功能，提升視覺展示效果
+- **校友管理增強**: 添加畢業年級和身份字段，支持校友排序功能
+- **成員模板系統**: 支持研究領域TAG、個人主頁URL TAG、論文列表TAG等
+- **圖片上傳服務**: 專門的Markdown圖片上傳和管理系統
+- **404頁面**: 完整的前端錯誤處理頁面
+- **菜單智能隱藏**: 根據數據存在性動態隱藏菜單項
 
 ### 📁 新增的目錄結構
 - **`scripts/`**: 按功能分類的腳本（deployment, maintenance, development）
@@ -116,6 +131,7 @@ backend/
 - **`tests/integration/`**: 集成測試
 - **`tests/fixtures/`**: 測試數據
 - **`docs/`**: 按類別組織的文檔
+- **`media/description_image/`**: Markdown描述圖片存儲目錄 🆕
 
 ### 🧪 測試環境準備
 - **`tests/conftest.py`**: pytest 配置，包含應用、數據庫等 fixtures
@@ -166,5 +182,8 @@ pytest --cov=app
 - 🧪 **完整的測試結構**: 專門的服務層測試目錄
 - 📚 **規範的文檔組織**: 按類別分類的文檔結構
 - 🛠️ **整潔的腳本管理**: 按功能分類的腳本目錄
-- ⚡ **零維護 API 文檔**: 自動化 Swagger 系統
+- ⚡ **零維護 API 文檔**: 完整版自動化 Swagger 系統 (48+ 接口)
 - 🚀 **優秀的可維護性**: 每個組件職責清晰
+- 📦 **全面的資源管理**: 支援實驗室各類資源的統一管理
+- 🎨 **增強的用戶體驗**: 預覽圖片、智能菜單、成員模板系統
+- 🔧 **模組化設計**: 新增功能都遵循統一的架構模式

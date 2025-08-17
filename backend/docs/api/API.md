@@ -24,6 +24,8 @@
   - [項目管理](#項目管理)
   - [媒體檔案管理](#媒體檔案管理)
   - [編輯記錄管理](#編輯記錄管理)
+  - [資源管理](#資源管理)
+  - [圖片上傳管理](#圖片上傳管理)
   - [系統介面](#系統介面)
 
 ## 概述
@@ -1563,6 +1565,9 @@ Authorization: Bearer <token>
 | 4 | 論文 |
 | 5 | 新聞 |
 | 6 | 項目 |
+| 7 | 媒體 |
+| 8 | 圖片上傳 |
+| 9 | 資源 |
 
 ### 獲取編輯記錄詳情
 ```
@@ -1658,6 +1663,221 @@ GET /api/swagger.json
 
 返回OpenAPI規範JSON
 
+## 資源管理
+
+### 獲取資源列表
+```
+GET /api/resources
+```
+
+**請求頭**
+無需認證
+
+**查詢參數**
+| 參數 | 類型 | 必填 | 含義 | 範例值 |
+|------|------|------|------|--------|
+| q | string | - | 搜索關鍵字（資源名稱、描述） | 實驗設備 |
+| resource_type | integer | - | 資源類型（0=設備, 1=軟件, 2=數據庫, 3=其他） | 0 |
+| availability_status | integer | - | 可用狀態（0=不可用, 1=可用, 2=維護中） | 1 |
+| sort_by | string | - | 排序欄位（created_time/resource_name_zh） | created_time |
+| order | string | - | 排序順序（asc/desc） | desc |
+| page | integer | - | 頁碼 | 1 |
+| per_page | integer | - | 每頁數量 | 12 |
+| all | string | - | 獲取所有數據（設為 'true' 時忽略分頁參數） | true |
+
+**響應範例**
+```json
+{
+  "code": 0,
+  "message": "OK",
+  "data": {
+    "items": [
+      {
+        "resource_id": 1,
+        "resource_name_zh": "高性能GPU伺服器",
+        "resource_name_en": "High-Performance GPU Server",
+        "resource_description_zh": "用於深度學習訓練的GPU叢集",
+        "resource_description_en": "GPU cluster for deep learning training",
+        "resource_type": 0,
+        "resource_location_zh": "實驗室A區",
+        "resource_location_en": "Lab Area A",
+        "resource_url": "https://gpu-cluster.lab.edu.cn",
+        "resource_file": "/media/resource/gpu_manual.pdf",
+        "resource_image": "/media/resource/gpu_server.jpg",
+        "availability_status": 1,
+        "contact_info": "admin@lab.edu.cn",
+        "created_time": "2024-01-01T00:00:00",
+        "updated_time": "2024-01-01T00:00:00"
+      }
+    ],
+    "total": 1,
+    "page": 1,
+    "per_page": 12,
+    "pages": 1,
+    "has_prev": false,
+    "has_next": false
+  }
+}
+```
+
+### 獲取資源詳情
+```
+GET /api/resources/{resource_id}
+```
+
+**請求頭**
+無需認證
+
+**路徑參數**
+| 參數 | 類型 | 必填 | 含義 | 範例值 |
+|------|------|------|------|--------|
+| resource_id | integer | ✓ | 資源ID | 1 |
+
+### 創建資源（管理員）
+```
+POST /api/admin/resources
+```
+
+**請求頭**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**請求參數**
+| 參數 | 類型 | 必填 | 含義 | 範例值 |
+|------|------|------|------|--------|
+| resource_name_zh | string | ✓ | 資源中文名稱 | 高性能GPU伺服器 |
+| resource_name_en | string | - | 資源英文名稱 | High-Performance GPU Server |
+| resource_description_zh | string | - | 資源中文描述 | 用於深度學習訓練 |
+| resource_description_en | string | - | 資源英文描述 | For deep learning training |
+| resource_type | integer | - | 資源類型（默認0） | 0 |
+| resource_location_zh | string | - | 中文位置 | 實驗室A區 |
+| resource_location_en | string | - | 英文位置 | Lab Area A |
+| resource_url | string | - | 資源URL | https://gpu-cluster.lab.edu.cn |
+| resource_file | string | - | 資源檔案路徑 | /media/resource/manual.pdf |
+| resource_image | string | - | 資源圖片路徑 | /media/resource/image.jpg |
+| availability_status | integer | - | 可用狀態（默認1） | 1 |
+| contact_info | string | - | 聯絡資訊 | admin@lab.edu.cn |
+
+**請求範例**
+```json
+{
+  "resource_name_zh": "高性能GPU伺服器",
+  "resource_name_en": "High-Performance GPU Server",
+  "resource_description_zh": "用於深度學習訓練的GPU叢集",
+  "resource_description_en": "GPU cluster for deep learning training",
+  "resource_type": 0,
+  "resource_location_zh": "實驗室A區",
+  "resource_location_en": "Lab Area A",
+  "resource_url": "https://gpu-cluster.lab.edu.cn",
+  "availability_status": 1,
+  "contact_info": "admin@lab.edu.cn"
+}
+```
+
+### 獲取資源列表（管理員）
+```
+GET /api/admin/resources
+```
+
+**請求頭**
+```
+Authorization: Bearer <token>
+```
+
+**查詢參數**: 與公開接口相同
+
+### 更新資源
+```
+PUT /api/admin/resources/{resource_id}
+```
+
+**請求頭**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**路徑參數**
+| 參數 | 類型 | 必填 | 含義 | 範例值 |
+|------|------|------|------|--------|
+| resource_id | integer | ✓ | 資源ID | 1 |
+
+**請求參數**: 與創建資源相同，但所有欄位均為可選
+
+### 刪除資源
+```
+DELETE /api/admin/resources/{resource_id}
+```
+
+**請求頭**
+```
+Authorization: Bearer <token>
+```
+
+**路徑參數**
+| 參數 | 類型 | 必填 | 含義 | 範例值 |
+|------|------|------|------|--------|
+| resource_id | integer | ✓ | 資源ID | 1 |
+
+### 批次刪除資源
+```
+DELETE /api/admin/resources/batch
+```
+
+**請求頭**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**請求參數**
+| 參數 | 類型 | 必填 | 含義 | 範例值 |
+|------|------|------|------|--------|
+| resource_ids | array | ✓ | 要刪除的資源ID數組 | [1, 2, 3] |
+
+**請求範例**
+```json
+{
+  "resource_ids": [1, 2, 3]
+}
+```
+
+## 圖片上傳管理
+
+### Markdown圖片上傳
+```
+POST /api/image-upload
+```
+
+**請求頭**
+```
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+```
+
+**請求參數**
+| 參數 | 類型 | 必填 | 含義 | 範例值 |
+|------|------|------|------|--------|
+| image | file | ✓ | 要上傳的圖片文件 | image.jpg |
+
+**響應範例**
+```json
+{
+  "code": 0,
+  "message": "圖片上傳成功",
+  "data": {
+    "url": "/media/description_image/202501/abc123def456.jpg"
+  }
+}
+```
+
+**支持的圖片格式**
+- PNG, JPG, JPEG, GIF, WebP
+- 最大檔案大小: 10MB
+- 自動按月份歸檔存儲
+
 ## 附錄
 
 ### 數據類型說明
@@ -1699,6 +1919,17 @@ GET /api/swagger.json
 - 0: 進行中
 - 1: 已完成
 
+**資源類型 (resource_type)**
+- 0: 設備
+- 1: 軟件
+- 2: 數據庫
+- 3: 其他
+
+**資源可用狀態 (availability_status)**
+- 0: 不可用
+- 1: 可用
+- 2: 維護中
+
 ### 軟刪除約束
 
 系統採用軟刪除機制，刪除操作遵循以下約束：
@@ -1722,4 +1953,7 @@ GET /api/swagger.json
 - 輪播圖片: `/media/lab_logo/` （與Logo同目錄）
 - 成員頭像: `/media/member_avatar/`
 - 論文文件: `/media/paper/`
+- 論文預覽圖: `/media/paper_preview/`
+- 資源文件: `/media/resource/`
+- Markdown圖片: `/media/description_image/`
 - 其他文件: `/media/other/`
