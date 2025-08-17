@@ -199,6 +199,7 @@ const activeKey = computed(() => {
   if (path.startsWith('/admin/members')) return 'members';
   if (path.startsWith('/admin/papers')) return 'papers';
   if (path.startsWith('/admin/projects')) return 'projects';
+  if (path.startsWith('/admin/resources')) return 'resources';
   if (path.startsWith('/admin/news')) return 'news';
   if (path.startsWith('/admin/groups')) return 'groups';
   if (path.startsWith('/admin/lab')) return 'lab';
@@ -222,6 +223,8 @@ const breadcrumbs = computed(() => {
       breadcrumbs.push({ title: t('admin.menu.papers'), path: '/admin/papers' });
     } else if (pathSegments.includes('projects')) {
       breadcrumbs.push({ title: t('admin.menu.projects'), path: '/admin/projects' });
+    } else if (pathSegments.includes('resources')) {
+      breadcrumbs.push({ title: t('admin.menu.resources'), path: '/admin/resources' });
     } else if (pathSegments.includes('news')) {
       breadcrumbs.push({ title: t('admin.menu.news'), path: '/admin/news' });
     } else if (pathSegments.includes('groups')) {
@@ -276,6 +279,11 @@ const menuOptions = computed<MenuOption[]>(() => [
         label: t('admin.menu.projects'),
         key: 'projects',
         icon: renderIcon('<svg viewBox="0 0 24 24"><path fill="currentColor" d="M19,3H5C3.9,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.9 20.1,3 19,3M19,19H5V8H19V19M10.5,17L15.5,12L10.5,7V10H6V14H10.5V17Z"/></svg>')
+      },
+      {
+        label: t('admin.menu.resources'),
+        key: 'resources',
+        icon: renderIcon('<svg viewBox="0 0 24 24"><path fill="currentColor" d="M20,6C20,4.89 19.11,4 18,4H12V2A2,2 0 0,0 10,0H4A2,2 0 0,0 2,2V18A2,2 0 0,0 4,20H18A2,2 0 0,0 20,18V6M18,18H4V2H10V6H18V18Z"/></svg>')
       },
       {
         label: t('admin.menu.news'),
@@ -345,7 +353,7 @@ const handleMenuSelect = (key: string) => {
     router.push('/admin/dashboard');
   } else if (key === 'operation-logs') {
     router.push('/admin/operation-logs');
-  } else if (['members', 'papers', 'projects', 'news', 'groups', 'lab', 'admins', 'system'].includes(key)) {
+  } else if (['members', 'papers', 'projects', 'resources', 'news', 'groups', 'lab', 'admins', 'system'].includes(key)) {
     router.push(`/admin/${key}`);
   }
 };
