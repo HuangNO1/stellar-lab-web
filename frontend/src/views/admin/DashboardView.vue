@@ -65,6 +65,38 @@
           </div>
         </div>
       </n-card>
+
+      <n-card class="overview-card">
+        <div class="card-content">
+          <div class="card-icon resources">
+            <n-icon size="24">
+              <svg viewBox="0 0 24 24">
+                <path fill="currentColor" d="M20,6C20,4.89 19.11,4 18,4H12V2A2,2 0 0,0 10,0H4A2,2 0 0,0 2,2V18A2,2 0 0,0 4,20H18A2,2 0 0,0 20,18V6M18,18H4V2H10V6H18V18Z"/>
+              </svg>
+            </n-icon>
+          </div>
+          <div class="card-info">
+            <div class="card-number">{{ stats.resources }}</div>
+            <div class="card-title">{{ $t('admin.dashboard.totalResources') }}</div>
+          </div>
+        </div>
+      </n-card>
+
+      <n-card class="overview-card">
+        <div class="card-content">
+          <div class="card-icon groups">
+            <n-icon size="24">
+              <svg viewBox="0 0 24 24">
+                <path fill="currentColor" d="M12,5.5A3.5,3.5 0 0,1 15.5,9A3.5,3.5 0 0,1 12,12.5A3.5,3.5 0 0,1 8.5,9A3.5,3.5 0 0,1 12,5.5M5,8C5.56,8 6.08,8.15 6.53,8.42C6.38,9.85 6.8,11.27 7.66,12.38C7.16,13.34 6.16,14 5,14A3,3 0 0,1 2,11A3,3 0 0,1 5,8M19,8A3,3 0 0,1 22,11A3,3 0 0,1 19,14C17.84,14 16.84,13.34 16.34,12.38C17.2,11.27 17.62,9.85 17.47,8.42C17.92,8.15 18.44,8 19,8M5.5,18.25C5.5,16.18 8.41,14.5 12,14.5C15.59,14.5 18.5,16.18 18.5,18.25V20H5.5V18.25Z"/>
+              </svg>
+            </n-icon>
+          </div>
+          <div class="card-info">
+            <div class="card-number">{{ stats.researchGroups }}</div>
+            <div class="card-title">{{ $t('admin.dashboard.totalGroups') }}</div>
+          </div>
+        </div>
+      </n-card>
     </div>
 
     <!-- 快速操作和最近活動 -->
@@ -126,6 +158,17 @@
                 </n-icon>
               </template>
               {{ $t('admin.groups.addGroup') }}
+            </n-button>
+
+            <n-button type="tertiary" @click="openModal('resources', 'create')">
+              <template #icon>
+                <n-icon>
+                  <svg viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M20,6C20,4.89 19.11,4 18,4H12V2A2,2 0 0,0 10,0H4A2,2 0 0,0 2,2V18A2,2 0 0,0 4,20H18A2,2 0 0,0 20,18V6M18,18H4V2H10V6H18V18Z"/>
+                  </svg>
+                </n-icon>
+              </template>
+              {{ $t('admin.dashboard.addResource') }}
             </n-button>
           </div>
         </n-card>
@@ -250,7 +293,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, h } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { memberApi, paperApi, projectApi, newsApi, editRecordApi, systemApi } from '@/services/api';
+import { memberApi, paperApi, projectApi, newsApi, editRecordApi, systemApi, resourceApi, researchGroupApi } from '@/services/api';
 import type { EditRecord } from '@/types/api';
 import QuickActionModal from '@/components/QuickActionModal.vue';
 import { useTimeFormatter } from '@/utils/timezone';
@@ -263,7 +306,9 @@ const stats = reactive({
   members: 0,
   papers: 0,
   projects: 0,
-  news: 0
+  news: 0,
+  resources: 0,
+  researchGroups: 0
 });
 
 // 最近活動
@@ -294,7 +339,7 @@ const systemStatus = reactive({
 // Modal 狀態
 const showModal = ref(false);
 const modalConfig = reactive({
-  moduleType: 'members' as 'members' | 'papers' | 'projects' | 'news' | 'research-groups',
+  moduleType: 'members' as 'members' | 'papers' | 'projects' | 'news' | 'research-groups' | 'resources',
   actionType: 'create' as 'create' | 'edit',
   editData: {}
 });
@@ -316,7 +361,8 @@ const fetchRecentActivities = async () => {
           3: t('admin.operationLogs.memberModule'),
           4: t('admin.operationLogs.paperModule'),
           5: t('admin.operationLogs.newsModule'),
-          6: t('admin.operationLogs.projectModule')
+          6: t('admin.operationLogs.projectModule'),
+          7: t('admin.operationLogs.resourceModule')
         };
         
         const actionNames = {
@@ -353,11 +399,13 @@ const fetchRecentActivities = async () => {
 // 獲取統計數據
 const fetchStats = async () => {
   try {
-    const [membersRes, papersRes, projectsRes, newsRes] = await Promise.all([
+    const [membersRes, papersRes, projectsRes, newsRes, resourcesRes, groupsRes] = await Promise.all([
       memberApi.getMembers({ all: 'true' }),
       paperApi.getPapers({ all: 'true' }),
       projectApi.getProjects({ all: 'true' }),
-      newsApi.getNews({ all: 'true' })
+      newsApi.getNews({ all: 'true' }),
+      resourceApi.getAdminResources({ all: 'true' }),
+      researchGroupApi.getResearchGroups({ all: 'true' })
     ]);
 
     if (membersRes.code === 0) {
@@ -371,6 +419,12 @@ const fetchStats = async () => {
     }
     if (newsRes.code === 0) {
       stats.news = newsRes.data.total || newsRes.data.items?.length || 0;
+    }
+    if (resourcesRes.code === 0) {
+      stats.resources = resourcesRes.data.total || resourcesRes.data.items?.length || 0;
+    }
+    if (groupsRes.code === 0) {
+      stats.researchGroups = groupsRes.data.total || groupsRes.data.items?.length || 0;
     }
   } catch (error) {
     console.error('獲取統計數據失敗:', error);
@@ -512,7 +566,7 @@ const getStatusText = (status: string, loading: boolean) => {
 
 // 打開 Modal
 const openModal = (
-  moduleType: 'members' | 'papers' | 'projects' | 'news' | 'research-groups',
+  moduleType: 'members' | 'papers' | 'projects' | 'news' | 'research-groups' | 'resources',
   actionType: 'create' | 'edit',
   editData: Record<string, unknown> = {}
 ) => {
@@ -534,7 +588,8 @@ const handleModalSuccess = () => {
     papers: t('admin.quickAction.activities.moduleNames.papers'),
     projects: t('admin.quickAction.activities.moduleNames.projects'),
     news: t('admin.quickAction.activities.moduleNames.news'),
-    'research-groups': t('admin.quickAction.activities.moduleNames.groups')
+    'research-groups': t('admin.quickAction.activities.moduleNames.groups'),
+    resources: t('admin.quickAction.activities.moduleNames.resources')
   };
   
   const actionNames = {
@@ -631,6 +686,14 @@ onMounted(() => {
   background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
 }
 
+.card-icon.resources {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.card-icon.groups {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+}
+
 .card-info {
   flex: 1;
 }
@@ -665,10 +728,6 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-}
-
-.action-buttons .n-button:nth-child(5) {
-  grid-column: 1 / -1;
 }
 
 .status-items {
