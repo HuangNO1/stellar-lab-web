@@ -2,7 +2,7 @@ from typing import Optional, Dict, Any, List
 from datetime import datetime
 from flask import request
 from app.models import Paper, PaperAuthor, Member, ResearchGroup, Lab
-from app.utils.validators import validate_string_length
+from app.utils.validators import validate_string_length, validate_date
 from app.utils.helpers import get_pagination_params, paginate_query
 from app.utils.file_handler import save_file, delete_file
 from app.utils.messages import msg
@@ -51,9 +51,13 @@ class PaperService(BaseService):
             
             # 日期範圍篩選
             if filters.get('start_date'):
-                query = query.filter(Paper.paper_date >= filters['start_date'])
+                valid, date_obj = validate_date(filters['start_date'])
+                if valid and date_obj:
+                    query = query.filter(Paper.paper_date >= date_obj)
             if filters.get('end_date'):
-                query = query.filter(Paper.paper_date <= filters['end_date'])
+                valid, date_obj = validate_date(filters['end_date'])
+                if valid and date_obj:
+                    query = query.filter(Paper.paper_date <= date_obj)
         
         # 排序
         sort_by = filters.get('sort_by', 'paper_date') if filters else 'paper_date'
@@ -233,38 +237,68 @@ class PaperService(BaseService):
     
     def _handle_file_update(self, paper: 'Paper', files_data: Dict[str, Any] = None, form_data: Dict[str, Any] = None) -> Dict[str, Any]:
         """處理論文文件更新/刪除"""
+        update_result = {}
         
-        # 檢查是否有刪除標記
+        # 處理論文文件刪除
         if form_data and form_data.get('paper_file_delete'):
             old_file_path = paper.paper_file_path
             if old_file_path:
                 delete_file(old_file_path)
                 paper.paper_file_path = None
-                return {'paper_file_deleted': True, 'old_file_path': old_file_path}
-            return {}
+                update_result['paper_file_deleted'] = True
+                update_result['old_file_path'] = old_file_path
         
-        # 檢查是否有新文件上傳
-        if not files_data or 'paper_file' not in files_data:
-            return {}
+        # 處理預覽圖片刪除
+        if form_data and form_data.get('preview_img_delete'):
+            old_preview_img = paper.preview_img
+            if old_preview_img:
+                delete_file(old_preview_img)
+                paper.preview_img = None
+                update_result['preview_img_deleted'] = True
+                update_result['old_preview_img'] = old_preview_img
         
-        file = files_data['paper_file']
-        if not file or not file.filename:
-            return {}
-        
-        old_file_path = paper.paper_file_path
-        
-        try:
-            new_file_path = save_file(file, 'document', max_size=50*1024*1024)
-            paper.paper_file_path = new_file_path
+        if files_data:
+            # 處理新論文文件上傳
+            if 'paper_file' in files_data:
+                file = files_data['paper_file']
+                if file and file.filename:
+                    old_file_path = paper.paper_file_path
+                    
+                    try:
+                        new_file_path = save_file(file, 'document', max_size=50*1024*1024)
+                        paper.paper_file_path = new_file_path
+                        
+                        # 刪除舊文件
+                        if old_file_path and old_file_path != new_file_path:
+                            delete_file(old_file_path)
+                        
+                        update_result['paper_file_updated'] = True
+                        update_result['new_file_path'] = new_file_path
+                        
+                    except Exception as e:
+                        raise ValidationError(msg.format_file_error('PAPER_FILE_UPLOAD_FAILED', error=str(e)))
             
-            # 刪除舊文件
-            if old_file_path and old_file_path != new_file_path:
-                delete_file(old_file_path)
-            
-            return {'paper_file_updated': True, 'new_file_path': new_file_path}
-            
-        except Exception as e:
-            raise ValidationError(msg.format_file_error('PAPER_FILE_UPLOAD_FAILED', error=str(e)))
+            # 處理新預覽圖片上傳
+            if 'preview_img' in files_data:
+                preview_file = files_data['preview_img']
+                if preview_file and preview_file.filename:
+                    old_preview_img = paper.preview_img
+                    
+                    try:
+                        new_preview_path = save_file(preview_file, 'image', max_size=10*1024*1024)
+                        paper.preview_img = new_preview_path
+                        
+                        # 刪除舊預覽圖片
+                        if old_preview_img and old_preview_img != new_preview_path:
+                            delete_file(old_preview_img)
+                        
+                        update_result['preview_img_updated'] = True
+                        update_result['new_preview_path'] = new_preview_path
+                        
+                    except Exception as e:
+                        raise ValidationError(msg.format_file_error('PREVIEW_IMG_UPLOAD_FAILED', error=str(e)))
+        
+        return update_result
     
     def delete_paper(self, paper_id: int) -> None:
         """刪除論文"""
@@ -348,7 +382,8 @@ class PaperService(BaseService):
             'paper_title_zh', 'paper_title_en',
             'paper_desc_zh', 'paper_desc_en',
             'paper_venue', 'paper_url', 'paper_type', 'paper_accept',
-            'all_authors_zh', 'all_authors_en'  # 新增：全部作者字段
+            'all_authors_zh', 'all_authors_en',  # 全部作者字段
+            'preview_img'  # 預覽圖片字段
         ]
         
         for field in fields:

@@ -17,6 +17,7 @@ class Paper(db.Model):
     paper_accept = db.Column(db.Integer, nullable=False, default=0, index=True)  # 添加索引用於接收狀態篩選
     paper_file_path = db.Column(db.String(500))
     paper_url = db.Column(db.String(1000))
+    preview_img = db.Column(db.String(500))  # 論文預覽圖片路徑
     # 全部作者字段（包含非實驗室成員）
     all_authors_zh = db.Column(db.Text)  # 全部作者中文
     all_authors_en = db.Column(db.Text)  # 全部作者英文
@@ -51,6 +52,7 @@ class Paper(db.Model):
             'paper_accept': self.paper_accept,
             'paper_file_path': self.paper_file_path,
             'paper_url': self.paper_url,
+            'preview_img': self.preview_img,
             'all_authors_zh': self.all_authors_zh,
             'all_authors_en': self.all_authors_en,
             'enable': self.enable,
