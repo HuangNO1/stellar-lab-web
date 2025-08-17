@@ -1,6 +1,6 @@
 """Add all_authors fields to papers table
 
-Revision ID: add_all_authors_fields
+Revision ID: 4b24e6aa5243
 Revises: 1681ad61f813
 Create Date: 2025-01-14 03:00:00.000000
 
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'add_all_authors_fields'
+revision = '4b24e6aa5243'
 down_revision = '1681ad61f813'
 branch_labels = None
 depends_on = None

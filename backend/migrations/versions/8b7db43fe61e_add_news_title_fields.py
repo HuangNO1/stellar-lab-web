@@ -1,7 +1,7 @@
 """Add title fields to news table
 
-Revision ID: add_news_title_fields
-Revises: add_all_authors_fields
+Revision ID: 8b7db43fe61e
+Revises: 4b24e6aa5243
 Create Date: 2025-01-14 03:30:00.000000
 
 """
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'add_news_title_fields'
-down_revision = 'add_all_authors_fields'
+revision = '8b7db43fe61e'
+down_revision = '4b24e6aa5243'
 branch_labels = None
 depends_on = None
 
