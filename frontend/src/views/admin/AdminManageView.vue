@@ -66,6 +66,7 @@
       :module-type="'admins'"
       :action-type="modalActionType"
       :edit-data="editData"
+      :reset-password-mode="resetPasswordMode"
       @success="handleModalSuccess"
     />
 
@@ -144,6 +145,7 @@ const deleteTarget = ref<Admin | null>(null);
 const showCreateModal = ref(false);
 const modalActionType = ref<'create' | 'edit'>('create');
 const editData = ref<Partial<Admin>>({});
+const resetPasswordMode = ref(false);
 
 // 搜索
 const searchQuery = ref('');
@@ -183,6 +185,17 @@ const canDeleteAdmin = (targetAdmin: Admin) => {
   if (targetAdmin.admin_id === authStore.admin?.admin_id) return false;
   
   // 不能刪除其他超級管理員
+  return targetAdmin.is_super !== 1;
+};
+
+const canResetAdminPassword = (targetAdmin: Admin) => {
+  // 只有超級管理員可以重置其他管理員的密碼
+  if (!authStore.isSuperAdmin) return false;
+  
+  // 不能重置自己的密碼（應該使用修改密碼功能）
+  if (targetAdmin.admin_id === authStore.admin?.admin_id) return false;
+  
+  // 不能重置其他超級管理員的密碼
   return targetAdmin.is_super !== 1;
 };
 
@@ -230,7 +243,7 @@ const columns: DataTableColumns<Admin> = [
   {
     title: t('admin.common.actions'),
     key: 'actions',
-    width: 180,
+    width: 300,
     render(row) {
       const buttons: VNode[] = [];
       
@@ -242,6 +255,17 @@ const columns: DataTableColumns<Admin> = [
             type: 'primary',
             onClick: () => handleEdit(row)
           }, { default: () => t('admin.common.edit') })
+        );
+      }
+      
+      // 重置密碼按鈕 - 只有權限時才顯示
+      if (canResetAdminPassword(row)) {
+        buttons.push(
+          h(NButton, {
+            size: 'small',
+            type: 'warning',
+            onClick: () => handleResetPassword(row)
+          }, { default: () => t('admin.admins.resetPassword') })
         );
       }
       
@@ -345,11 +369,26 @@ const handleEdit = (admin: Admin) => {
   
   modalActionType.value = 'edit';
   editData.value = { ...admin };
+  resetPasswordMode.value = false;
+  showCreateModal.value = true;
+};
+
+const handleResetPassword = (admin: Admin) => {
+  // 雙重檢查權限
+  if (!canResetAdminPassword(admin)) {
+    message.error(t('admin.admins.noResetPasswordPermission'));
+    return;
+  }
+  
+  modalActionType.value = 'edit';
+  editData.value = { ...admin };
+  resetPasswordMode.value = true;
   showCreateModal.value = true;
 };
 
 const handleModalSuccess = () => {
   fetchAdmins();
+  resetPasswordMode.value = false; // 重置狀態
 };
 
 // 處理刪除

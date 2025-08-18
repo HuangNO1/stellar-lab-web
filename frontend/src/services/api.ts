@@ -503,6 +503,11 @@ export const adminApi = {
   // 刪除管理員
   deleteAdmin(adminId: number): Promise<ApiResponse<null>> {
     return api.delete(`/admins/${adminId}`);
+  },
+
+  // 重置管理員密碼（超級管理員功能）
+  resetAdminPassword(adminId: number, newPassword: string): Promise<ApiResponse<null>> {
+    return api.post(`/admins/${adminId}/reset-password`, { new_password: newPassword });
   }
 };
 

@@ -630,6 +630,26 @@
               />
             </n-form-item>
           </template>
+
+          <!-- 重置密碼模式：只顯示新密碼相關字段（超級管理員功能） -->
+          <template v-else-if="resetPasswordMode">
+            <n-form-item :label="t('admin.admins.form.newPassword')" path="new_password" required>
+              <n-input
+                v-model:value="formData.new_password"
+                type="password"
+                :placeholder="t('admin.admins.form.placeholders.newPassword')"
+                style="width: 100%"
+              />
+            </n-form-item>
+            <n-form-item :label="t('admin.admins.form.confirmPassword')" path="confirm_password" required>
+              <n-input
+                v-model:value="formData.confirm_password"
+                type="password"
+                :placeholder="t('admin.admins.form.placeholders.confirmPassword')"
+                style="width: 100%"
+              />
+            </n-form-item>
+          </template>
           
           <!-- 正常管理員表單模式 -->
           <template v-else>
@@ -822,11 +842,13 @@ interface Props {
   actionType: 'create' | 'edit';
   editData?: Record<string, unknown>;
   passwordOnly?: boolean; // 新增：仅密码修改模式
+  resetPasswordMode?: boolean; // 新增：重置密码模式（超級管理員功能）
 }
 
 const props = withDefaults(defineProps<Props>(), {
   editData: () => ({}),
-  passwordOnly: false
+  passwordOnly: false,
+  resetPasswordMode: false
 });
 
 // Emits
@@ -1041,6 +1063,11 @@ const modalTitle = computed(() => {
   if (props.passwordOnly) {
     return t('admin.user.changePassword');
   }
+  
+  // 如果是重置密碼模式
+  if (props.resetPasswordMode) {
+    return t('admin.admins.resetPassword');
+  }
 
   // Map module types to correct title keys
   const moduleKeyMap: Record<string, string> = {
@@ -1218,6 +1245,25 @@ const formRules = computed(() => {
       ];
       rules.confirm_password = [
         { required: true, message: t('admin.profile.validation.confirmPasswordRequired'), trigger: 'blur' },
+        {
+          message: t('admin.profile.validation.passwordNotMatch'),
+          validator: (rule: unknown, value: unknown) => {
+            if (typeof value === 'string' && value !== (formData as AdminFormData).new_password) {
+              return new Error(t('admin.profile.validation.passwordNotMatch'));
+            }
+            return true;
+          },
+          trigger: ['blur', 'change']
+        }
+      ];
+    } else if (props.resetPasswordMode) {
+      // 重置密碼模式的驗證規則
+      rules.new_password = [
+        { required: true, message: t('admin.admins.form.validation.newPasswordRequired'), trigger: 'blur' },
+        { min: 8, message: t('admin.profile.validation.passwordMinLength'), trigger: 'blur' }
+      ];
+      rules.confirm_password = [
+        { required: true, message: t('admin.admins.form.validation.confirmPasswordRequired'), trigger: 'blur' },
         {
           message: t('admin.profile.validation.passwordNotMatch'),
           validator: (rule: unknown, value: unknown) => {
@@ -1736,8 +1782,30 @@ const handleSubmit = async () => {
       }
     }
 
-    // 對於管理員操作，檢查權限（密碼修改模式除外）
-    if (props.moduleType === 'admins' && !props.passwordOnly) {
+    // 重置密碼模式的特殊處理
+    if (props.resetPasswordMode && props.moduleType === 'admins') {
+      await formRef.value?.validate();
+      submitting.value = true;
+
+      try {
+        const adminId = props.editData?.admin_id as number;
+        await adminApi.resetAdminPassword(adminId, formData.new_password as string);
+        message.success(t('admin.admins.messages.passwordResetSuccess'));
+        emit('success', {} as Record<string, unknown>);
+        show.value = false;
+        return;
+      } catch (error: unknown) {
+        const apiError = error as ApiError;
+        const errorMessage = apiError?.message || t('admin.admins.messages.passwordResetFailed');
+        message.error(errorMessage);
+        return;
+      } finally {
+        submitting.value = false;
+      }
+    }
+
+    // 對於管理員操作，檢查權限（密碼修改和重置模式除外）
+    if (props.moduleType === 'admins' && !props.passwordOnly && !props.resetPasswordMode) {
       // 編輯管理員時，檢查是否為超級管理員且不是編輯其他超級管理員
       if (props.actionType === 'edit') {
         if (!authStore.isSuperAdmin) {

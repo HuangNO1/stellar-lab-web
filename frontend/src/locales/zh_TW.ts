@@ -683,6 +683,7 @@ export default {
         admins: {
             addAdmin: '添加管理員',
             editAdmin: '編輯管理員',
+            resetPassword: '重置密碼',
             searchPlaceholder: '搜索管理員使用者名稱...',
             adminName: '使用者名稱',
             adminType: '類型',
@@ -695,23 +696,34 @@ export default {
             deleteError: '刪除管理員失敗',
             noEditPermission: '無權限編輯此管理員',
             noDeletePermission: '無權限刪除此管理員',
+            noResetPasswordPermission: '無權限重置此管理員密碼',
             noCreatePermission: '無權限創建管理員',
             cannotEditSelf: '不能編輯自己的帳號',
             cannotEditSuperAdmin: '不能編輯超級管理員',
+            messages: {
+                passwordResetSuccess: '密碼重置成功',
+                passwordResetFailed: '密碼重置失敗'
+            },
             form: {
                 adminName: '使用者名稱',
                 adminPass: '密碼',
+                newPassword: '新密碼',
+                confirmPassword: '確認密碼',
                 isSuper: '管理員類型',
                 enable: '狀態',
                 placeholders: {
                     adminName: '請輸入使用者名稱',
                     adminPass: '請輸入密碼',
+                    newPassword: '請輸入新密碼（至少8位字元）',
+                    confirmPassword: '請確認新密碼',
                     isSuper: '請選擇管理員類型',
                     enable: '請選擇狀態'
                 },
                 validation: {
                     adminNameRequired: '使用者名稱必填',
-                    adminPassRequired: '密碼必填'
+                    adminPassRequired: '密碼必填',
+                    newPasswordRequired: '新密碼必填',
+                    confirmPasswordRequired: '確認密碼必填'
                 }
             }
         },

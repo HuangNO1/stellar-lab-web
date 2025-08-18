@@ -161,6 +161,7 @@ export default {
         andOthers: '等',
         authors: '作者',
         allAuthors: '全部作者',
+        noPreview: '无预览图片',
         abstract: '摘要',
         correspondingAuthor: '通讯作者',
         notFound: '未找到该论文',
@@ -903,6 +904,7 @@ export default {
         admins: {
             addAdmin: '添加管理员',
             editAdmin: '编辑管理员',
+            resetPassword: '重置密码',
             searchPlaceholder: '搜索管理员用户名...',
             adminName: '用户名',
             adminType: '类型',
@@ -915,23 +917,34 @@ export default {
             deleteError: '删除管理员失败',
             noEditPermission: '无权限编辑此管理员',
             noDeletePermission: '无权限删除此管理员',
+            noResetPasswordPermission: '无权限重置此管理员密码',
             noCreatePermission: '无权限创建管理员',
             cannotEditSelf: '不能编辑自己的账号',
             cannotEditSuperAdmin: '不能编辑超级管理员',
+            messages: {
+                passwordResetSuccess: '密码重置成功',
+                passwordResetFailed: '密码重置失败'
+            },
             form: {
                 adminName: '用户名',
                 adminPass: '密码',
+                newPassword: '新密码',
+                confirmPassword: '确认密码',
                 isSuper: '管理员类型',
                 enable: '状态',
                 placeholders: {
                     adminName: '请输入用户名',
                     adminPass: '请输入密码',
+                    newPassword: '请输入新密码（至少8位字符）',
+                    confirmPassword: '请确认新密码',
                     isSuper: '请选择管理员类型',
                     enable: '请选择状态'
                 },
                 validation: {
                     adminNameRequired: '用户名必填',
-                    adminPassRequired: '密码必填'
+                    adminPassRequired: '密码必填',
+                    newPasswordRequired: '新密码必填',
+                    confirmPasswordRequired: '确认密码必填'
                 }
             }
         },

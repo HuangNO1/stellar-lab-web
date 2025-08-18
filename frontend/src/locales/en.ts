@@ -161,6 +161,7 @@ export default {
     andOthers: 'et al.',
     authors: 'Authors',
     allAuthors: 'All Authors',
+    noPreview: 'No Preview',
     abstract: 'Abstract',
     correspondingAuthor: 'Corresponding Author',
     notFound: 'Paper not found',
@@ -906,6 +907,7 @@ export default {
     admins: {
       addAdmin: 'Add Admin',
       editAdmin: 'Edit Admin',
+      resetPassword: 'Reset Password',
       searchPlaceholder: 'Search admin username...',
       adminName: 'Username',
       adminType: 'Type',
@@ -918,23 +920,34 @@ export default {
       deleteError: 'Failed to delete admin',
       noEditPermission: 'No permission to edit this admin',
       noDeletePermission: 'No permission to delete this admin',
+      noResetPasswordPermission: 'No permission to reset this admin password',
       noCreatePermission: 'No permission to create admin',
       cannotEditSelf: 'Cannot edit your own account',
       cannotEditSuperAdmin: 'Cannot edit super admin accounts',
+      messages: {
+        passwordResetSuccess: 'Password reset successfully',
+        passwordResetFailed: 'Failed to reset password'
+      },
       form: {
         adminName: 'Username',
         adminPass: 'Password',
+        newPassword: 'New Password',
+        confirmPassword: 'Confirm Password',
         isSuper: 'Admin Type',
         enable: 'Status',
         placeholders: {
           adminName: 'Enter username',
           adminPass: 'Enter password',
+          newPassword: 'Enter new password (at least 8 characters)',
+          confirmPassword: 'Confirm new password',
           isSuper: 'Select admin type',
           enable: 'Select status'
         },
         validation: {
           adminNameRequired: 'Username is required',
-          adminPassRequired: 'Password is required'
+          adminPassRequired: 'Password is required',
+          newPasswordRequired: 'New password is required',
+          confirmPasswordRequired: 'Confirm password is required'
         }
       }
     },
