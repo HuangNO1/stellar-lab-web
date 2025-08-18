@@ -201,8 +201,9 @@ class ResourceService(BaseService):
                         raise ValidationError(msg.get_error_message('IMAGE_UPLOAD_FAILED') + f': {str(e)}')
             
             # 更新其他字段
+            excluded_fields = ['resource_image_delete', 'created_time', 'updated_time', 'resource_id']
             for key, value in resource_data.items():
-                if hasattr(resource, key) and key not in ['resource_image_delete']:
+                if hasattr(resource, key) and key not in excluded_fields:
                     setattr(resource, key, value)
             
             return resource.to_dict()
