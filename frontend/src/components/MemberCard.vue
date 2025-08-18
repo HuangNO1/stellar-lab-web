@@ -22,7 +22,7 @@
             {{ displayPosition }}
           </div>
         </template>
-        {{ displayPosition }}
+        {{ fullPosition }}
       </n-tooltip>
     </div>
   </div>
@@ -64,14 +64,18 @@ const displayName = computed(() => {
   return getCurrentLocale() === 'zh' ? props.member.mem_name_zh : props.member.mem_name_en;
 });
 
-// 顯示的職位信息
+// 顯示的職位信息（校友只顯示去向）
 const displayPosition = computed(() => {
-  if (props.showGraduationInfo && props.member.mem_type === 'alumni') {
-    // 校友需要顯示畢業信息
-    const basePosition = getMemberPosition(props.member);
-    // TODO: 後續添加畢業年級和身份信息的顯示邏輯
-    return basePosition;
+  if (props.member.mem_type === 2 || (props.member.mem_type === 1 && (props.member.destination_zh || props.member.destination_en))) {
+    // 校友类型，只显示去向
+    const destination = getCurrentLocale() === 'zh' ? props.member.destination_zh : props.member.destination_en;
+    return destination || getMemberPosition(props.member);
   }
+  return getMemberPosition(props.member);
+});
+
+// 完整的職位信息（用於tooltip）
+const fullPosition = computed(() => {
   return getMemberPosition(props.member);
 });
 
@@ -81,8 +85,15 @@ const isNameTruncated = computed(() => {
   return getCurrentLocale() === 'zh' ? (name?.length || 0) > 7 : (name?.length || 0) > 15;
 });
 
-// 判斷職位是否被截斷
+// 判斷職位是否需要顯示tooltip
 const isPositionTruncated = computed(() => {
+  // 對於校友，如果完整信息比顯示信息更詳細，就需要顯示 tooltip
+  if (props.member.mem_type === 2 || (props.member.mem_type === 1 && (props.member.destination_zh || props.member.destination_en))) {
+    // 校友總是顯示 tooltip，因為完整信息包含身份、年份等詳細信息
+    return fullPosition.value !== displayPosition.value;
+  }
+  
+  // 對於其他成員，按原邏輯判斷文字是否被截斷
   const position = displayPosition.value;
   return getCurrentLocale() === 'zh' ? (position?.length || 0) > 8 : (position?.length || 0) > 18;
 });
