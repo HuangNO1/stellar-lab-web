@@ -118,7 +118,7 @@
       <!-- 論文描述 -->
       <div class="paper-description" v-if="paper.paper_desc_zh || paper.paper_desc_en">
         <h3>{{ $t('papers.abstract') }}</h3>
-        <markdown-it :source="getPaperDescription()" :plugins="markdownPlugins"></markdown-it>
+        <MarkdownRenderer :source="getPaperDescription()" />
       </div>
 
       <!-- 操作按鈕 -->
@@ -170,9 +170,8 @@ import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { paperApi } from '@/services/api';
 import { getMediaUrl, processMarkdownImageUrls } from '@/utils/media';
-import { createMarkdownPlugins } from '@/utils/markdown';
+import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import type { Paper, ApiError } from '@/types/api';
-import MarkdownIt from 'vue3-markdown-it';
 
 const route = useRoute();
 const router = useRouter();
@@ -222,9 +221,6 @@ const getPaperDescription = () => {
   const desc = getCurrentLocale() === 'zh' ? paper.value.paper_desc_zh : paper.value.paper_desc_en;
   return desc ? processMarkdownImageUrls(desc) : '';
 };
-
-// Markdown插件配置
-const markdownPlugins = createMarkdownPlugins();
 
 // 方法
 const fetchPaperDetail = async () => {

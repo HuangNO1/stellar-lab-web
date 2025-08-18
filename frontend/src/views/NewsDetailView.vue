@@ -75,7 +75,7 @@
 
       <!-- 新聞內容 - 只有當有內容時才顯示 -->
       <div v-if="hasNewsContent(news)" class="news-content">
-        <markdown-it :source="getNewsContent()" :plugins="markdownPlugins"></markdown-it>
+        <MarkdownRenderer :source="getNewsContent()" />
       </div>
     </div>
 
@@ -92,9 +92,8 @@ import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { newsApi } from '@/services/api';
 import { processMarkdownImageUrls } from '@/utils/media';
-import { createMarkdownPlugins } from '@/utils/markdown';
+import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import type { News, ApiError } from '@/types/api';
-import MarkdownIt from 'vue3-markdown-it';
 
 const route = useRoute();
 const router = useRouter();
@@ -115,9 +114,6 @@ const getNewsContent = () => {
   const content = getCurrentLocale() === 'zh' ? news.value.news_content_zh : news.value.news_content_en;
   return content ? processMarkdownImageUrls(content) : '';
 };
-
-// Markdown插件配置
-const markdownPlugins = createMarkdownPlugins();
 
 // 方法
 const fetchNewsDetail = async () => {

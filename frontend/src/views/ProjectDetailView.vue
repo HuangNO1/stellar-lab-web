@@ -68,7 +68,7 @@
 
       <div class="project-description" v-if="project.project_desc_zh || project.project_desc_en">
         <h3>{{ $t('projects.description') }}</h3>
-        <markdown-it :source="getProjectDescription()" :plugins="markdownPlugins"></markdown-it>
+        <MarkdownRenderer :source="getProjectDescription()" />
       </div>
 
       <div class="project-actions">
@@ -103,9 +103,8 @@ import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { projectApi } from '@/services/api';
 import { processMarkdownImageUrls } from '@/utils/media';
-import { createMarkdownPlugins } from '@/utils/markdown';
+import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import type { Project, ApiError } from '@/types/api';
-import MarkdownIt from 'vue3-markdown-it';
 
 const route = useRoute();
 const router = useRouter();
@@ -126,9 +125,6 @@ const getProjectDescription = () => {
   const desc = getCurrentLocale() === 'zh' ? project.value.project_desc_zh : project.value.project_desc_en;
   return desc ? processMarkdownImageUrls(desc) : '';
 };
-
-// Markdown插件配置
-const markdownPlugins = createMarkdownPlugins();
 
 // 方法
 const fetchProjectDetail = async () => {

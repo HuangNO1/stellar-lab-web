@@ -59,7 +59,7 @@
         <!-- 課題組描述 -->
         <div v-if="researchGroup.research_group_desc_zh || researchGroup.research_group_desc_en" class="group-description">
           <h3>{{ $t('groups.description') }}</h3>
-          <markdown-it :source="getGroupDescription()" :plugins="markdownPlugins"></markdown-it>
+          <MarkdownRenderer :source="getGroupDescription()" />
         </div>
       </div>
 
@@ -96,10 +96,9 @@ import { useI18n } from 'vue-i18n';
 import { researchGroupApi, memberApi } from '@/services/api';
 import { useMembers } from '@/composables/useMembers';
 import { processMarkdownImageUrls } from '@/utils/media';
-import { createMarkdownPlugins } from '@/utils/markdown';
 import MemberCard from '@/components/MemberCard.vue';
+import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import type { ResearchGroup, Member, ApiError } from '@/types/api';
-import MarkdownIt from 'vue3-markdown-it';
 
 const route = useRoute();
 const router = useRouter();
@@ -122,9 +121,6 @@ const getGroupDescription = () => {
   const desc = getCurrentLocale() === 'zh' ? researchGroup.value.research_group_desc_zh : researchGroup.value.research_group_desc_en;
   return desc ? processMarkdownImageUrls(desc) : '';
 };
-
-// Markdown插件配置
-const markdownPlugins = createMarkdownPlugins();
 
 // 方法
 const fetchGroupDetail = async () => {
