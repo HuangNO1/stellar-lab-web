@@ -38,7 +38,7 @@ class AuditService(BaseService):
     # 操作類型枚舉
     OPERATION_TYPES = [
         'CREATE', 'UPDATE', 'DELETE',
-        'LOGIN', 'LOGOUT', 'CHANGE_PASSWORD',
+        'LOGIN', 'LOGOUT', 'CHANGE_PASSWORD', 'PASSWORD_RESET',
         'BATCH_CREATE', 'BATCH_UPDATE', 'BATCH_DELETE',
         'UPLOAD', 'DOWNLOAD', 'EXPORT'
     ]
