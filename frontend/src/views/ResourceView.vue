@@ -17,12 +17,41 @@
 
     <!-- Resources Grid -->
     <div class="resources-section">
-      <div v-if="loading" class="loading-container">
-        <n-spin size="large">
-          <template #description>
-            {{ $t('common.loading') }}
-          </template>
-        </n-spin>
+      <!-- 加載狀態 -->
+      <div v-if="loading" class="resource-skeleton">
+        <div v-for="i in 6" :key="i" class="resource-item-skeleton">
+          <div class="card-content">
+            <!-- 圖片骨架 -->
+            <div class="resource-image-skeleton">
+              <n-skeleton height="100px" width="150px" />
+            </div>
+            
+            <!-- 信息骨架 -->
+            <div class="resource-info-skeleton">
+              <div class="skeleton-header">
+                <n-skeleton text height="1.25rem" width="70%" />
+                <n-skeleton text height="0.875rem" width="100%" :repeat="2" style="margin-top: 0.5rem" />
+              </div>
+              <div class="skeleton-meta" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <n-skeleton text height="0.75rem" width="15%" />
+                  <n-skeleton text height="1.5rem" width="20%" />
+                </div>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <n-skeleton text height="0.75rem" width="15%" />
+                  <n-skeleton text height="1.5rem" width="20%" />
+                </div>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <n-skeleton text height="0.75rem" width="15%" />
+                  <n-skeleton text height="0.75rem" width="30%" />
+                </div>
+              </div>
+              <div class="skeleton-actions" style="margin-top: 1rem;">
+                <n-skeleton text height="2rem" width="25%" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       
       <div v-else-if="resources.length === 0" class="empty-container">
@@ -357,11 +386,54 @@ onMounted(() => {
   margin-bottom: 2rem;
 }
 
-.loading-container {
+/* 骨架屏 */
+.resource-skeleton {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 200px;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.resource-item-skeleton {
+  background: var(--n-card-color);
+  border: 1px solid var(--n-border-color);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.08);
+}
+
+/* 暗色主題支持 */
+[data-theme="dark"] .resource-item-skeleton,
+.dark .resource-item-skeleton,
+.dark-mode .resource-item-skeleton {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.2);
+}
+
+.resource-item-skeleton .card-content {
+  padding: 1.5rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.resource-image-skeleton {
+  width: 150px;
+  height: 100px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  order: 1;
+}
+
+.resource-info-skeleton {
+  flex: 1;
+  order: 2;
+}
+
+.skeleton-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .empty-container {
@@ -523,6 +595,18 @@ onMounted(() => {
     gap: 0.75rem;
   }
   
+  .resource-item-skeleton .card-content {
+    padding: 1rem;
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  
+  .resource-image-skeleton {
+    width: 100px;
+    height: 70px;
+    order: 1;
+  }
+  
   .resource-item {
     margin: 0 -0.5rem 0.75rem -0.5rem;
   }
@@ -553,6 +637,15 @@ onMounted(() => {
   
   .page-title {
     font-size: 1.75rem;
+  }
+  
+  .resource-item-skeleton .card-content {
+    padding: 0.75rem;
+  }
+  
+  .resource-image-skeleton {
+    width: 90px;
+    height: 60px;
   }
   
   .resource-item {
