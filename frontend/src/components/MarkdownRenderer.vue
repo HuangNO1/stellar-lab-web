@@ -55,7 +55,7 @@ const md = new MarkdownIt({
 // 应用所有插件
 const plugins = createMarkdownPlugins();
 plugins.forEach(({ plugin }) => {
-  plugin(md as any);
+  plugin(md);
 });
 
 // 解析内容接口

@@ -1,5 +1,5 @@
 // API 響應格式
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   code: number;
   message: string;
   data: T;
@@ -10,11 +10,11 @@ export interface ApiError {
   code?: number;
   message?: string;
   status?: number;
-  data?: any;
+  data?: unknown;
 }
 
 // 分頁響應格式
-export interface PaginatedResponse<T = any> {
+export interface PaginatedResponse<T = unknown> {
   items: T[];
   total: number;
   page?: number;
@@ -246,7 +246,7 @@ export interface EditRecord {
   edit_type: string;
   edit_module: number;
   edit_date: string;
-  edit_content?: Record<string, any>; // 改為對象類型
+  edit_content?: Record<string, unknown>; // 改為對象類型
   admin: {
     admin_id: number;
     admin_name: string;
@@ -279,6 +279,8 @@ export interface SearchFilters {
   paper_accept?: number;
   news_type?: number;
   is_end?: number;
+  resource_type?: number;
+  availability_status?: number;
   sort_by?: string;
   order?: string;
 }

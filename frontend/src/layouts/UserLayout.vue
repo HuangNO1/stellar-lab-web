@@ -161,7 +161,7 @@ import {
 import { setLanguage, getTheme, setTheme } from '@/locales'
 import { useLabWithAutoFetch } from '@/composables/useLab'
 import { getLabLogoUrl } from '@/utils/media'
-import { memberApi, paperApi, projectApi, newsApi, resourceApi } from '@/services/api'
+import { paperApi, projectApi, newsApi, resourceApi } from '@/services/api'
 
 const router = useRouter()
 const { t, locale } = useI18n()

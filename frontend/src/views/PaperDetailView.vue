@@ -211,11 +211,6 @@ const hasAllAuthors = () => {
   return allAuthorsText && allAuthorsText.trim() !== '';
 };
 
-// 檢查是否有任何作者信息
-const hasAnyAuthors = () => {
-  return hasLabAuthors() || hasAllAuthors();
-};
-
 const getPaperDescription = () => {
   if (!paper.value) return '';
   const desc = getCurrentLocale() === 'zh' ? paper.value.paper_desc_zh : paper.value.paper_desc_en;

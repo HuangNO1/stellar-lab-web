@@ -201,19 +201,6 @@ const getResourceTypeText = (type: number) => {
   return typeMap[type] || t('admin.common.resourceTypes.other');
 };
 
-const getResourceStatusText = (status: number) => {
-  const statusMap: Record<number, string> = {
-    0: t('admin.common.resourceStatus.unavailable'),
-    1: t('admin.common.resourceStatus.available'),
-    2: t('admin.common.resourceStatus.maintenance')
-  };
-  return statusMap[status] || t('admin.common.resourceStatus.unavailable');
-};
-
-const formatDate = (dateStr?: string) => {
-  if (!dateStr) return '-';
-  return new Date(dateStr).toLocaleDateString();
-};
 
 // 表格列定義
 const columns: DataTableColumns<Resource> = [

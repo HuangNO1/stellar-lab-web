@@ -88,8 +88,7 @@ import SearchComponent from '@/components/SearchComponent.vue';
 import PaperCard from '@/components/PaperCard.vue';
 import { paperApi } from '@/services/api';
 import { getMediaUrl } from '@/utils/media';
-import { stripMarkdown } from '@/utils/text';
-import type { Paper, SearchFilters, PaperAuthor, ApiError } from '@/types/api';
+import type { Paper, SearchFilters, ApiError } from '@/types/api';
 
 const { t, locale } = useI18n();
 const router = useRouter();
@@ -153,13 +152,8 @@ const searchConfig = computed(() => ({
   ]
 }));
 
-// 獲取當前語言
-const getCurrentLocale = () => {
-  return locale.value as 'zh' | 'en';
-};
-
 // 方法
-const fetchPapers = async (params: any = {}) => {
+const fetchPapers = async (params: Record<string, unknown> = {}) => {
   try {
     loading.value = true;
     error.value = null;

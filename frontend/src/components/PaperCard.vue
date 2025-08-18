@@ -157,11 +157,6 @@ const displayDescription = computed(() => {
     (props.paper.paper_desc_en || props.paper.paper_desc_zh);
 });
 
-// 檢查是否有任何作者信息
-const hasAnyAuthors = computed(() => {
-  return hasLabAuthors.value || hasAllAuthors.value;
-});
-
 // 檢查是否有實驗室作者
 const hasLabAuthors = computed(() => {
   return props.paper.authors && props.paper.authors.length > 0;
@@ -267,7 +262,7 @@ const getPaperStatusText = (accept: number) => {
 };
 
 // 獲取作者文本
-const getAuthorsText = (authors: any[]) => {
+const getAuthorsText = (authors: { member?: { mem_name_zh?: string; mem_name_en?: string } }[]) => {
   if (!authors || authors.length === 0) return '';
   const locale = getCurrentLocale();
   const authorNames = authors.map(author => 

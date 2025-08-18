@@ -125,13 +125,10 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
 import { useMembersWithAutoFetch } from '@/composables/useMembers';
 import MemberCard from '@/components/MemberCard.vue';
-import type { Member } from '@/types/api';
 
-const { locale } = useI18n();
 const router = useRouter();
 const route = useRoute();
 

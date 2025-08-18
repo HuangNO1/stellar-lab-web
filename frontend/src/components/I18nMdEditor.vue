@@ -13,27 +13,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, inject, watch, ref } from 'vue';
+import { computed, inject } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { MdEditor, config } from 'md-editor-v3';
+import { MdEditor } from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
 import { getTheme } from '@/locales';
 import { useMessage } from 'naive-ui';
 import { imageApi } from '@/services/api';
-import { createMarkdownPlugins } from '@/utils/markdown';
 import type { ApiError } from '@/types/api';
-
-// 定義 MarkdownIt 類型
-interface MarkdownIt {
-  use(plugin: (...args: any[]) => void): MarkdownIt;
-}
 
 // Props
 const props = defineProps<{
   modelValue?: string;
   placeholder?: string;
   preview?: boolean;
-  toolbars?: any[];
+  toolbars?: string[];
   style?: string | Record<string, unknown>;
   entityType?: string;
   entityId?: number;
@@ -118,202 +112,6 @@ const handleUploadImg = async (files: File[], callback: (urls: string[]) => void
   }
 };
 
-// 配置國際化和主題
-onMounted(() => {
-  config({
-    editorConfig: {
-      markdownItConfig: (md: MarkdownIt) => {
-        const customPlugins = createMarkdownPlugins();
-        customPlugins.forEach(pluginConfig => {
-          md.use(pluginConfig.plugin);
-        });
-        return md;
-      },
-      languageUserDefined: {
-        'zh-CN': {
-          toolbarTips: {
-            bold: '粗體',
-            underline: '底線',
-            italic: '斜體',
-            strikeThrough: '刪除線',
-            title: '標題',
-            sub: '下標',
-            sup: '上標',
-            quote: '引用',
-            unorderedList: '無序列表',
-            orderedList: '有序列表',
-            task: '任務列表',
-            codeRow: '行內代碼',
-            code: '代碼塊',
-            link: '連結',
-            image: '圖片',
-            table: '表格',
-            mermaid: 'Mermaid圖表',
-            katex: 'KaTeX公式',
-            revoke: '撤銷',
-            next: '重做',
-            save: '保存',
-            prettier: '格式化',
-            pageFullscreen: '頁面全屏',
-            fullscreen: '全屏',
-            preview: '預覽',
-            htmlPreview: 'HTML預覽',
-            catalog: '目錄',
-            github: '源代碼',
-          },
-          titleItem: {
-            h1: '一級標題',
-            h2: '二級標題',
-            h3: '三級標題',
-            h4: '四級標題',
-            h5: '五級標題',
-            h6: '六級標題',
-          },
-          imgTitleItem: {
-            link: '添加連結',
-            upload: '上傳圖片',
-            clip2upload: '裁剪上傳',
-          },
-          linkModalTips: {
-            linkTitle: '添加連結',
-            imageTitle: '添加圖片',
-            descLabel: '連結描述：',
-            descLabelPlaceHolder: '請輸入描述...',
-            urlLabel: '連結地址：',
-            urlLabelPlaceHolder: '請輸入連結...',
-            buttonOK: '確定',
-          },
-          clipModalTips: {
-            title: '裁剪圖片上傳',
-            buttonUpload: '上傳',
-          },
-          copyCode: {
-            text: '複製代碼',
-            successTips: '已複製！',
-            failTips: '複製失敗！',
-          },
-          mermaid: {
-            flow: '流程圖',
-            sequence: '時序圖',
-            gantt: '甘特圖',
-            class: '類圖',
-            state: '狀態圖',
-            pie: '餅圖',
-            relationship: '關係圖',
-            journey: '旅程圖',
-          },
-          katex: {
-            inline: '行內公式',
-            block: '塊級公式',
-          },
-          footer: {
-            markdownTotal: '字數',
-            scrollAuto: '同步滾動',
-          },
-        },
-        'en-US': {
-          toolbarTips: {
-            bold: 'Bold',
-            underline: 'Underline',
-            italic: 'Italic',
-            strikeThrough: 'Strike Through',
-            title: 'Title',
-            sub: 'Subscript',
-            sup: 'Superscript',
-            quote: 'Quote',
-            unorderedList: 'Unordered List',
-            orderedList: 'Ordered List',
-            task: 'Task List',
-            codeRow: 'Inline Code',
-            code: 'Code Block',
-            link: 'Link',
-            image: 'Image',
-            table: 'Table',
-            mermaid: 'Mermaid Chart',
-            katex: 'KaTeX Formula',
-            revoke: 'Undo',
-            next: 'Redo',
-            save: 'Save',
-            prettier: 'Format',
-            pageFullscreen: 'Page Fullscreen',
-            fullscreen: 'Fullscreen',
-            preview: 'Preview',
-            htmlPreview: 'HTML Preview',
-            catalog: 'Catalog',
-            github: 'Source Code',
-          },
-          titleItem: {
-            h1: 'Heading 1',
-            h2: 'Heading 2',
-            h3: 'Heading 3',
-            h4: 'Heading 4',
-            h5: 'Heading 5',
-            h6: 'Heading 6',
-          },
-          imgTitleItem: {
-            link: 'Add Link',
-            upload: 'Upload Image',
-            clip2upload: 'Clip & Upload',
-          },
-          linkModalTips: {
-            linkTitle: 'Add Link',
-            imageTitle: 'Add Image',
-            descLabel: 'Description:',
-            descLabelPlaceHolder: 'Enter description...',
-            urlLabel: 'URL:',
-            urlLabelPlaceHolder: 'Enter URL...',
-            buttonOK: 'OK',
-          },
-          clipModalTips: {
-            title: 'Clip Image Upload',
-            buttonUpload: 'Upload',
-          },
-          copyCode: {
-            text: 'Copy Code',
-            successTips: 'Copied!',
-            failTips: 'Copy failed!',
-          },
-          mermaid: {
-            flow: 'Flowchart',
-            sequence: 'Sequence Diagram',
-            gantt: 'Gantt Chart',
-            class: 'Class Diagram',
-            state: 'State Diagram',
-            pie: 'Pie Chart',
-            relationship: 'Relationship Diagram',
-            journey: 'Journey Diagram',
-          },
-          katex: {
-            inline: 'Inline Formula',
-            block: 'Block Formula',
-          },
-          footer: {
-            markdownTotal: 'Word Count',
-            scrollAuto: 'Sync Scroll',
-          },
-        },
-      },
-    },
-    editorExtensions: {
-      highlight: {
-        css: {
-          atom: {
-            light: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-light.min.css',
-            dark: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css',
-          },
-          github: {
-            light: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css',
-            dark: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css',
-          },
-          vscode: {
-            light: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/vs.min.css',
-            dark: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/vs2015.min.css',
-          },
-        },
-      },
-    },
-  });
-});
 </script>
 
 <style scoped>

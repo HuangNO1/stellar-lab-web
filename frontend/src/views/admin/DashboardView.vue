@@ -298,7 +298,7 @@ import type { EditRecord } from '@/types/api';
 import QuickActionModal from '@/components/QuickActionModal.vue';
 import { useTimeFormatter } from '@/utils/timezone';
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
 const { formatRelativeTime } = useTimeFormatter();
 
 // 統計數據
