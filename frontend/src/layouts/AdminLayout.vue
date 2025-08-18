@@ -310,7 +310,7 @@ const menuOptions = computed<MenuOption[]>(() => [
       {
         label: t('admin.operationLogs.title'),
         key: 'operation-logs',
-        icon: renderIcon('<svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>')
+        icon: renderIcon('<svg viewBox="0 0 24 24"><path fill="currentColor" d="M9,10H7V12H9V10M13,10H11V12H13V10M17,10H15V12H17V10M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5A2,2 0 0,1 5,3H6V1H8V3H16V1H18V3H19M19,19V8H5V19H19M9,14H7V16H9V14M13,14H11V16H13V14M17,14H15V16H17V14M9,18H7V20H9V18M13,18H11V20H13V18M17,18H15V20H17V18Z"/></svg>')
       }
     ]
   }] : [])
