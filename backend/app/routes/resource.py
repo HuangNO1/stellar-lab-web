@@ -44,11 +44,9 @@ def get_resources():
 
     except Exception as e:
         logger.error(f"獲取資源列表失敗: {str(e)}")
-        return jsonify({
-            'code': 1,
-            'message': '獲取資源列表失敗',
-            'data': None
-        }), 500
+        from app.utils.helpers import error_response
+        from app.utils.messages import msg
+        return jsonify(error_response(1, msg.get_error_message('RESOURCE_FETCH_FAILED'))), 500
 
 @resource_bp.route('/api/resources/<int:resource_id>', methods=['GET'])
 def get_resource(resource_id):
@@ -146,11 +144,9 @@ def get_admin_resources():
 
     except Exception as e:
         logger.error(f"獲取資源列表失敗: {str(e)}")
-        return jsonify({
-            'code': 1,
-            'message': '獲取資源列表失敗',
-            'data': None
-        }), 500
+        from app.utils.helpers import error_response
+        from app.utils.messages import msg
+        return jsonify(error_response(1, msg.get_error_message('RESOURCE_FETCH_FAILED'))), 500
 
 @resource_bp.route('/api/admin/resources/batch', methods=['DELETE'])
 @admin_required
@@ -164,7 +160,8 @@ def batch_delete_resources():
         resource_ids = data.get('resource_ids', [])
         
         if not resource_ids:
-            return jsonify(error_response(1, '請選擇要刪除的資源')), 400
+            from app.utils.messages import msg
+            return jsonify(error_response(1, msg.get_error_message('RESOURCE_SELECT_REQUIRED'))), 400
         
         result = resource_service.batch_delete_resources(resource_ids, g.current_admin.admin_id)
         return jsonify(success_response(result))

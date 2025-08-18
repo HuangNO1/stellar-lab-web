@@ -721,6 +721,7 @@ import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/auth';
 import { memberApi, paperApi, projectApi, newsApi, researchGroupApi, adminApi, authApi, resourceApi } from '@/services/api';
 import { getMediaUrl } from '@/utils/media';
+import { memberDescriptionTemplates } from '@/utils/memberTemplates';
 import I18nMdEditor from '@/components/I18nMdEditor.vue';
 import ImageCropperModal from '@/components/ImageCropperModal.vue';
 import type { ApiResponse, Member, ResearchGroup, ApiError } from '@/types/api';
@@ -1415,14 +1416,7 @@ onUnmounted(() => {
 
 // Methods
 const getMemberDescriptionTemplate = (language: 'zh' | 'en') => {
-  let template;
-  if (language === 'zh') {
-    template = t('admin.members.form.descriptionTemplate');
-  } else {
-    template = t('admin.members.form.descriptionTemplateEn');
-  }
-  // 將轉義的 @{ 替換回 {{ 以支持 TAG 語法
-  return template.replace(/@\{/g, '{{');
+  return memberDescriptionTemplates[language] || memberDescriptionTemplates.zh;
 };
 
 const resetForm = () => {

@@ -197,7 +197,8 @@ class ResourceService(BaseService):
                         
                     except Exception as e:
                         logger.error(f"資源圖片上傳失敗: {str(e)}")
-                        raise ValidationError(f'圖片上傳失敗: {str(e)}')
+                        from app.utils.messages import msg
+                        raise ValidationError(msg.get_error_message('IMAGE_UPLOAD_FAILED') + f': {str(e)}')
             
             # 更新其他字段
             for key, value in resource_data.items():

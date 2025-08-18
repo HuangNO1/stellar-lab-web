@@ -41,6 +41,12 @@ SUCCESS_MESSAGES = {
     'PASSWORD_RESET_SUCCESS': 'Password reset successfully',
     'FILE_UPLOAD_SUCCESS': 'File uploaded successfully',
     
+    # Resource related success messages
+    'RESOURCE_CREATE_SUCCESS': 'Resource created successfully',
+    'RESOURCE_UPDATE_SUCCESS': 'Resource updated successfully', 
+    'RESOURCE_DELETE_SUCCESS': 'Resource deleted successfully',
+    'RESOURCE_BATCH_DELETE_SUCCESS': 'Successfully deleted {count} resources',
+    
     # System related
     'HEALTH_CHECK': 'Laboratory web framework backend service is running normally',
 }
@@ -157,6 +163,17 @@ ERROR_MESSAGES = {
     'DATE_FORMAT_ERROR': 'Date format error, should be YYYY-MM-DD',
     'SOFT_DELETE_NOT_SUPPORTED': '{resource} does not support soft delete',
     'RESOURCE_NOT_FOUND_OR_DELETED': '{resource} not found or has been deleted',
+    
+    # Resource related errors  
+    'RESOURCE_NOT_FOUND': 'Resource not found',
+    'RESOURCE_NAME_ZH_REQUIRED': 'Resource Chinese name cannot be empty',
+    'RESOURCE_CREATE_FAILED': 'Failed to create resource',
+    'RESOURCE_UPDATE_FAILED': 'Failed to update resource', 
+    'RESOURCE_DELETE_FAILED': 'Failed to delete resource',
+    'RESOURCE_FETCH_FAILED': 'Failed to fetch resource',
+    'RESOURCE_BATCH_DELETE_FAILED': 'Failed to batch delete resources',
+    'RESOURCE_SELECT_REQUIRED': 'Please select resources to delete',
+    'IMAGE_UPLOAD_FAILED': 'Image upload failed',
     
     # System errors
     'UNKNOWN_MODULE': 'Unknown module name: {module_name}',

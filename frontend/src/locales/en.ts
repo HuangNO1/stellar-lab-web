@@ -483,70 +483,7 @@ export default {
         description: 'Description (Chinese)',
         descriptionEn: 'Description (English)',
         avatar: 'Avatar Upload',
-        descriptionTemplate: `## Profile
-
-[Introduce your research background and academic experience here]
-
-## Research Areas
-
-@{research: Machine Learning, Deep Learning, Computer Vision, Natural Language Processing}
-
-## Homepage
-
-@{github: https://github.com/your-username}
-@{scholar: https://scholar.google.com/citations?user=YOUR_ID}
-@{linkedin: https://linkedin.com/in/your-profile}
-@{researchgate: https://researchgate.net/profile/your-profile}
-@{website: https://your-personal-website.com}
-
-## Education
-
-- **Year-Year**: Degree, Institution Name
-- **Year-Year**: Degree, Institution Name
-
-## Representative Achievements
-
-### Lab Publications
-@{papers: 1,2,3}
-
-### Other Publications
-- [Paper Title], [Journal/Conference Name], [Publication Year]
-- [Paper Title], [Journal/Conference Name], [Publication Year]
-
-### Project Experience
-- **Project Name**: [Project Description] ([Start Year-End Year])
-
----
-
-### 📝 Markdown Syntax Guide:
-
-**🏷️ Research Area Tags**:
-\`@{research: Area1, Area2, Area3}\`
-- Automatically cycles through different colors (blue, info blue, green, orange, red)
-- Supports custom colors: \`@{research: Machine Learning#3b82f6, Deep Learning#8b5cf6, Computer Vision#10b981}\`
-- Custom color format: AreaName#6-digit HEX color code (e.g., #ff0000 for red)
-- Supports container background: \`@{research: Machine Learning, Deep Learning[bg:#f0f9ff]}\`
-- Background format: Add [bg:#6-digit HEX color code] at the end of tag list
-
-**🔗 Homepage Links**:
-- \`@{github: https://github.com/username}\` - GitHub page (default gray)
-- \`@{scholar: https://scholar.google.com/citations?user=ID}\` - Google Scholar (info blue)
-- \`@{linkedin: https://linkedin.com/in/profile}\` - LinkedIn (primary blue)
-- \`@{researchgate: https://researchgate.net/profile/name}\` - ResearchGate (success green)
-- \`@{website: https://your-site.com}\` - Personal website (primary theme)
-- \`@{any-label: https://your-link.com}\` - Generic link (e.g., \`@{personal-blog: https://blog.example.com}\`)
-
-**📚 Paper Lists**:
-\`@{papers: 1,2,3}\`
-- Enter lab paper ID numbers (comma-separated)
-
-## Honors & Awards
-
-- [Award Name], [Awarding Institution], [Year]
-
-## Contact
-
-- **Email**: [Your Email]`,
+        descriptionTemplate: 'Member description template (supports Markdown syntax and TAG labels)',
         placeholders: {
           nameZh: 'Enter Chinese name',
           nameEn: 'Enter English name',

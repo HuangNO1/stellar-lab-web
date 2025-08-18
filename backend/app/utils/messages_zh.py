@@ -133,6 +133,8 @@ ERROR_MESSAGES = {
     'RESOURCE_DELETE_FAILED': '删除资源失败',
     'RESOURCE_FETCH_FAILED': '获取资源失败',
     'RESOURCE_BATCH_DELETE_FAILED': '批量删除资源失败',
+    'RESOURCE_SELECT_REQUIRED': '请选择要删除的资源',
+    'IMAGE_UPLOAD_FAILED': '图片上传失败',
     
     # 管理员相关错误
     'ADMIN_NOT_FOUND': '管理员不存在',
