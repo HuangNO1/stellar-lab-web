@@ -1415,11 +1415,14 @@ onUnmounted(() => {
 
 // Methods
 const getMemberDescriptionTemplate = (language: 'zh' | 'en') => {
+  let template;
   if (language === 'zh') {
-    return t('admin.members.form.descriptionTemplate');
+    template = t('admin.members.form.descriptionTemplate');
   } else {
-    return t('admin.members.form.descriptionTemplateEn');
+    template = t('admin.members.form.descriptionTemplateEn');
   }
+  // 將轉義的 @{ 替換回 {{ 以支持 TAG 語法
+  return template.replace(/@\{/g, '{{');
 };
 
 const resetForm = () => {

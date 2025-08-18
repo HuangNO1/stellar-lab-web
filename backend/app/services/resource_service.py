@@ -23,17 +23,15 @@ class ResourceService(BaseService):
     def get_module_name(self) -> str:
         return 'resource'
         
-    def create_resource(self, resource_data: Dict[str, Any]) -> Dict[str, Any]:
+    def create_resource(self, resource_data: Dict[str, Any], admin_id: int) -> Dict[str, Any]:
         """創建資源"""
-        try:
-            # 驗證必填字段
-            if not resource_data.get('resource_name_zh'):
-                return {
-                    'code': 1,
-                    'message': get_message('RESOURCE_NAME_ZH_REQUIRED'),
-                    'data': None
-                }
-            
+        from app.services.base_service import ValidationError
+        
+        # 驗證必填字段
+        if not resource_data.get('resource_name_zh'):
+            raise ValidationError(get_message('RESOURCE_NAME_ZH_REQUIRED'))
+        
+        def _create_operation():
             # 創建資源實例
             resource = Resource(
                 resource_name_zh=resource_data.get('resource_name_zh'),
@@ -51,22 +49,16 @@ class ResourceService(BaseService):
             )
             
             db.session.add(resource)
-            db.session.commit()
-            
-            return {
-                'code': 0,
-                'message': get_message('RESOURCE_CREATE_SUCCESS'),
-                'data': resource.to_dict()
-            }
-            
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f"創建資源失敗: {str(e)}")
-            return {
-                'code': 1,
-                'message': get_message('RESOURCE_CREATE_FAILED'),
-                'data': None
-            }
+            db.session.flush()
+            return resource.to_dict()
+        
+        # 執行操作並記錄審計
+        return self.execute_with_audit(
+            operation_func=_create_operation,
+            operation_type='CREATE',
+            content=dict(resource_data),
+            admin_id=admin_id
+        )
     
     def get_resource(self, resource_id: int) -> Dict[str, Any]:
         """根據ID獲取資源"""
@@ -169,25 +161,19 @@ class ResourceService(BaseService):
                 'data': None
             }
     
-    def update_resource(self, resource_id: int, resource_data: Dict[str, Any], files_data: Dict[str, Any] = None) -> Dict[str, Any]:
+    def update_resource(self, resource_id: int, resource_data: Dict[str, Any], admin_id: int, files_data: Dict[str, Any] = None) -> Dict[str, Any]:
         """更新資源"""
-        try:
-            resource = Resource.query.get(resource_id)
-            if not resource:
-                return {
-                    'code': 1,
-                    'message': get_message('RESOURCE_NOT_FOUND'),
-                    'data': None
-                }
-            
-            # 驗證必填字段
-            if not resource_data.get('resource_name_zh'):
-                return {
-                    'code': 1,
-                    'message': get_message('RESOURCE_NAME_ZH_REQUIRED'),
-                    'data': None
-                }
-            
+        from app.services.base_service import ValidationError, NotFoundError
+        
+        # 驗證必填字段
+        if not resource_data.get('resource_name_zh'):
+            raise ValidationError(get_message('RESOURCE_NAME_ZH_REQUIRED'))
+        
+        resource = Resource.query.get(resource_id)
+        if not resource:
+            raise NotFoundError(get_message('RESOURCE_NOT_FOUND'))
+        
+        def _update_operation():
             # 處理圖片刪除
             if resource_data.get('resource_image_delete'):
                 old_image_path = resource.resource_image
@@ -211,86 +197,71 @@ class ResourceService(BaseService):
                         
                     except Exception as e:
                         logger.error(f"資源圖片上傳失敗: {str(e)}")
-                        return {
-                            'code': 1,
-                            'message': f'圖片上傳失敗: {str(e)}',
-                            'data': None
-                        }
+                        raise ValidationError(f'圖片上傳失敗: {str(e)}')
             
             # 更新其他字段
             for key, value in resource_data.items():
                 if hasattr(resource, key) and key not in ['resource_image_delete']:
                     setattr(resource, key, value)
             
-            db.session.commit()
-            
-            return {
-                'code': 0,
-                'message': get_message('RESOURCE_UPDATE_SUCCESS'),
-                'data': resource.to_dict()
-            }
-            
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f"更新資源失敗: {str(e)}")
-            return {
-                'code': 1,
-                'message': get_message('RESOURCE_UPDATE_FAILED'),
-                'data': None
-            }
+            return resource.to_dict()
+        
+        # 執行操作並記錄審計
+        return self.execute_with_audit(
+            operation_func=_update_operation,
+            operation_type='UPDATE',
+            content={},
+            admin_id=admin_id
+        )
     
-    def delete_resource(self, resource_id: int) -> Dict[str, Any]:
+    def delete_resource(self, resource_id: int, admin_id: int) -> Dict[str, Any]:
         """刪除資源"""
-        try:
-            resource = Resource.query.get(resource_id)
-            if not resource:
-                return {
-                    'code': 1,
-                    'message': get_message('RESOURCE_NOT_FOUND'),
-                    'data': None
-                }
-            
+        from app.services.base_service import NotFoundError
+        
+        resource = Resource.query.get(resource_id)
+        if not resource:
+            raise NotFoundError(get_message('RESOURCE_NOT_FOUND'))
+        
+        def _delete_operation():
             db.session.delete(resource)
-            db.session.commit()
-            
-            return {
-                'code': 0,
-                'message': get_message('RESOURCE_DELETE_SUCCESS'),
-                'data': None
-            }
-            
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f"刪除資源失敗: {str(e)}")
-            return {
-                'code': 1,
-                'message': get_message('RESOURCE_DELETE_FAILED'),
-                'data': None
-            }
+            return {'deleted_resource_id': resource_id}
+        
+        # 執行操作並記錄審計
+        return self.execute_with_audit(
+            operation_func=_delete_operation,
+            operation_type='DELETE',
+            content={'deleted_resource_id': resource_id},
+            admin_id=admin_id
+        )
     
-    def batch_delete_resources(self, resource_ids: List[int]) -> Dict[str, Any]:
+    def batch_delete_resources(self, resource_ids: List[int], admin_id: int) -> Dict[str, Any]:
         """批量刪除資源"""
-        try:
+        def _batch_delete_operation():
             deleted_count = 0
+            deleted_resources = []
+            
             for resource_id in resource_ids:
                 resource = Resource.query.get(resource_id)
                 if resource:
+                    deleted_resources.append({
+                        'resource_id': resource_id,
+                        'resource_name_zh': resource.resource_name_zh
+                    })
                     db.session.delete(resource)
                     deleted_count += 1
             
-            db.session.commit()
-            
             return {
-                'code': 0,
-                'message': get_message('RESOURCE_BATCH_DELETE_SUCCESS').format(count=deleted_count),
-                'data': {'deleted_count': deleted_count}
+                'deleted_count': deleted_count,
+                'deleted_resources': deleted_resources
             }
-            
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f"批量刪除資源失敗: {str(e)}")
-            return {
-                'code': 1,
-                'message': get_message('RESOURCE_BATCH_DELETE_FAILED'),
-                'data': None
-            }
+        
+        # 執行操作並記錄審計
+        return self.execute_with_audit(
+            operation_func=_batch_delete_operation,
+            operation_type='BATCH_DELETE',
+            content={
+                'resource_ids': resource_ids,
+                'operation': 'batch_delete_resources'
+            },
+            admin_id=admin_id
+        )

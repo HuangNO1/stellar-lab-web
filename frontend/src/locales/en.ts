@@ -489,15 +489,15 @@ export default {
 
 ## Research Areas
 
-{{research: Machine Learning, Deep Learning, Computer Vision, Natural Language Processing}}
+@{research: Machine Learning, Deep Learning, Computer Vision, Natural Language Processing}
 
 ## Homepage
 
-{{github: https://github.com/your-username}}
-{{scholar: https://scholar.google.com/citations?user=YOUR_ID}}
-{{linkedin: https://linkedin.com/in/your-profile}}
-{{researchgate: https://researchgate.net/profile/your-profile}}
-{{website: https://your-personal-website.com}}
+@{github: https://github.com/your-username}
+@{scholar: https://scholar.google.com/citations?user=YOUR_ID}
+@{linkedin: https://linkedin.com/in/your-profile}
+@{researchgate: https://researchgate.net/profile/your-profile}
+@{website: https://your-personal-website.com}
 
 ## Education
 
@@ -507,7 +507,7 @@ export default {
 ## Representative Achievements
 
 ### Lab Publications
-{{papers: 1,2,3}}
+@{papers: 1,2,3}
 
 ### Other Publications
 - [Paper Title], [Journal/Conference Name], [Publication Year]
@@ -521,23 +521,23 @@ export default {
 ### 📝 Markdown Syntax Guide:
 
 **🏷️ Research Area Tags**:
-\`{{research: Area1, Area2, Area3}}\`
+\`@{research: Area1, Area2, Area3}\`
 - Automatically cycles through different colors (blue, info blue, green, orange, red)
-- Supports custom colors: \`{{research: Machine Learning#3b82f6, Deep Learning#8b5cf6, Computer Vision#10b981}}\`
+- Supports custom colors: \`@{research: Machine Learning#3b82f6, Deep Learning#8b5cf6, Computer Vision#10b981}\`
 - Custom color format: AreaName#6-digit HEX color code (e.g., #ff0000 for red)
-- Supports container background: \`{{research: Machine Learning, Deep Learning[bg:#f0f9ff]}}\`
+- Supports container background: \`@{research: Machine Learning, Deep Learning[bg:#f0f9ff]}\`
 - Background format: Add [bg:#6-digit HEX color code] at the end of tag list
 
 **🔗 Homepage Links**:
-- \`{{github: https://github.com/username}}\` - GitHub page (default gray)
-- \`{{scholar: https://scholar.google.com/citations?user=ID}}\` - Google Scholar (info blue)
-- \`{{linkedin: https://linkedin.com/in/profile}}\` - LinkedIn (primary blue)
-- \`{{researchgate: https://researchgate.net/profile/name}}\` - ResearchGate (success green)
-- \`{{website: https://your-site.com}}\` - Personal website (primary theme)
-- \`{{any-label: https://your-link.com}}\` - Generic link (e.g., \`{{personal-blog: https://blog.example.com}}\`)
+- \`@{github: https://github.com/username}\` - GitHub page (default gray)
+- \`@{scholar: https://scholar.google.com/citations?user=ID}\` - Google Scholar (info blue)
+- \`@{linkedin: https://linkedin.com/in/profile}\` - LinkedIn (primary blue)
+- \`@{researchgate: https://researchgate.net/profile/name}\` - ResearchGate (success green)
+- \`@{website: https://your-site.com}\` - Personal website (primary theme)
+- \`@{any-label: https://your-link.com}\` - Generic link (e.g., \`@{personal-blog: https://blog.example.com}\`)
 
 **📚 Paper Lists**:
-\`{{papers: 1,2,3}}\`
+\`@{papers: 1,2,3}\`
 - Enter lab paper ID numbers (comma-separated)
 
 ## Honors & Awards
@@ -973,9 +973,13 @@ export default {
       login: 'Login',
       logout: 'Logout',
       changePassword: 'Change Password',
-      batchDelete: 'Batch Delete',
+      passwordReset: 'Password Reset',
+      batchCreate: 'Batch Create',
       batchUpdate: 'Batch Update',
+      batchDelete: 'Batch Delete',
       upload: 'Upload',
+      download: 'Download',
+      export: 'Export',
       adminModule: 'Admin/Auth',
       labModule: 'Lab',
       groupModule: 'Group',

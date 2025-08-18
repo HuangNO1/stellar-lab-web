@@ -191,9 +191,13 @@ const editTypeOptions = computed(() => [
   { label: t('admin.operationLogs.login'), value: 'LOGIN' },
   { label: t('admin.operationLogs.logout'), value: 'LOGOUT' },
   { label: t('admin.operationLogs.changePassword'), value: 'CHANGE_PASSWORD' },
-  { label: t('admin.operationLogs.batchDelete'), value: 'BATCH_DELETE' },
+  { label: t('admin.operationLogs.passwordReset'), value: 'PASSWORD_RESET' },
+  { label: t('admin.operationLogs.batchCreate'), value: 'BATCH_CREATE' },
   { label: t('admin.operationLogs.batchUpdate'), value: 'BATCH_UPDATE' },
-  { label: t('admin.operationLogs.upload'), value: 'UPLOAD' }
+  { label: t('admin.operationLogs.batchDelete'), value: 'BATCH_DELETE' },
+  { label: t('admin.operationLogs.upload'), value: 'UPLOAD' },
+  { label: t('admin.operationLogs.download'), value: 'DOWNLOAD' },
+  { label: t('admin.operationLogs.export'), value: 'EXPORT' }
 ]);
 
 // 模組選項
@@ -207,7 +211,8 @@ const moduleOptions = computed(() => [
   { label: t('admin.operationLogs.newsModule'), value: 5 },
   { label: t('admin.operationLogs.projectModule'), value: 6 },
   { label: t('admin.operationLogs.mediaModule'), value: 7 },
-  { label: t('admin.operationLogs.imageUploadModule'), value: 8 }
+  { label: t('admin.operationLogs.imageUploadModule'), value: 8 },
+  { label: t('admin.operationLogs.resourceModule'), value: 9 }
 ]);
 
 // 顯示 JSON 詳情
@@ -230,7 +235,8 @@ const formatModuleName = (moduleId: number): string => {
     t('admin.operationLogs.newsModule'),       // 5
     t('admin.operationLogs.projectModule'),    // 6
     t('admin.operationLogs.mediaModule'),      // 7
-    t('admin.operationLogs.imageUploadModule') // 8
+    t('admin.operationLogs.imageUploadModule'), // 8
+    t('admin.operationLogs.resourceModule')    // 9
   ];
   return moduleNames[moduleId] || `模組 ${moduleId}`;
 };
@@ -244,9 +250,13 @@ const formatEditType = (type: string): string => {
     LOGIN: t('admin.operationLogs.login'),
     LOGOUT: t('admin.operationLogs.logout'),
     CHANGE_PASSWORD: t('admin.operationLogs.changePassword'),
-    BATCH_DELETE: t('admin.operationLogs.batchDelete'),
+    PASSWORD_RESET: t('admin.operationLogs.passwordReset'),
+    BATCH_CREATE: t('admin.operationLogs.batchCreate'),
     BATCH_UPDATE: t('admin.operationLogs.batchUpdate'),
-    UPLOAD: t('admin.operationLogs.upload')
+    BATCH_DELETE: t('admin.operationLogs.batchDelete'),
+    UPLOAD: t('admin.operationLogs.upload'),
+    DOWNLOAD: t('admin.operationLogs.download'),
+    EXPORT: t('admin.operationLogs.export')
   };
   return typeMap[type] || type;
 };
