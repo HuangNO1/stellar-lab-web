@@ -12,10 +12,10 @@
       <div class="error-code">404</div>
       
       <!-- 錯誤標題 -->
-      <h1 class="error-title">{{ $t('error.pageNotFound') }}</h1>
+      <h1 class="error-title">{{ $t('admin.error.pageNotFound') }}</h1>
       
       <!-- 錯誤描述 -->
-      <p class="error-description">{{ $t('error.pageNotFoundDescription') }}</p>
+      <p class="error-description">{{ $t('admin.error.pageNotFoundDescription') }}</p>
       
       <!-- 操作按鈕 -->
       <div class="error-actions">
@@ -32,7 +32,7 @@
               </svg>
             </n-icon>
           </template>
-          {{ $t('error.backToHome') }}
+          {{ $t('admin.error.backToHome') }}
         </n-button>
         
         <n-button 
@@ -96,10 +96,10 @@ const goBack = () => {
 
 .not-found-container {
   text-align: center;
-  max-width: 600px;
+  max-width: 70rem;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 20px;
-  padding: 3rem 2rem;
+  padding: 3rem 5rem;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
   position: relative;

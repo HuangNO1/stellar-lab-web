@@ -220,6 +220,7 @@ export default {
             papers: '論文管理',
             projects: '項目管理',
             news: '新聞管理',
+            resources: '資源管理',
             lab: '實驗室管理',
             admins: '管理員管理',
             system: '系統管理'
@@ -807,6 +808,19 @@ export default {
             backupDesc: '備份和還原系統數據',
             settings: '系統設置',
             settingsDesc: '配置系統參數和選項'
+        },
+        // 錯誤頁面翻譯
+        error: {
+            pageNotFound: '頁面未找到',
+            pageNotFoundDescription: '抱歉，您訪問的頁面不存在或已被移動。',
+            adminPageNotFoundDescription: '抱歉，您訪問的管理頁面不存在。請檢查URL是否正確。',
+            backToHome: '返回首頁',
+            backToDashboard: '返回儀錶板',
+            quickNavigation: '快速導航',
+            serverError: '服務器錯誤',
+            serverErrorDescription: '服務器發生錯誤，請稍後再試。',
+            networkError: '網絡錯誤',
+            networkErrorDescription: '網絡連接失敗，請檢查您的網絡設置。'
         },
         // 圖片裁切翻譯
         imageCropper: {

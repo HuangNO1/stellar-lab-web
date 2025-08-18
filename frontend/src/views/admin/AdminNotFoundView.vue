@@ -12,10 +12,10 @@
       <div class="error-code">404</div>
       
       <!-- 錯誤標題 -->
-      <h1 class="error-title">{{ $t('error.pageNotFound') }}</h1>
+      <h1 class="error-title">{{ $t('admin.error.pageNotFound') }}</h1>
       
       <!-- 錯誤描述 -->
-      <p class="error-description">{{ $t('error.adminPageNotFoundDescription') }}</p>
+      <p class="error-description">{{ $t('admin.error.adminPageNotFoundDescription') }}</p>
       
       <!-- 操作按鈕 -->
       <div class="error-actions">
@@ -32,7 +32,7 @@
               </svg>
             </n-icon>
           </template>
-          {{ $t('error.backToDashboard') }}
+          {{ $t('admin.error.backToDashboard') }}
         </n-button>
         
         <n-button 
@@ -53,10 +53,11 @@
       
       <!-- 快速導航 -->
       <div class="quick-nav">
-        <h3 class="quick-nav-title">{{ $t('error.quickNavigation') }}</h3>
+        <h3 class="quick-nav-title">{{ $t('admin.error.quickNavigation') }}</h3>
         <div class="quick-nav-buttons">
           <n-button 
-            text 
+            type="info" 
+            dashed
             size="small"
             @click="$router.push('/admin/members')"
             class="quick-nav-button"
@@ -64,7 +65,17 @@
             {{ $t('admin.menu.members') }}
           </n-button>
           <n-button 
-            text 
+            type="info" 
+            dashed
+            size="small"
+            @click="$router.push('/admin/groups')"
+            class="quick-nav-button"
+          >
+            {{ $t('admin.menu.groups') }}
+          </n-button>
+          <n-button 
+            type="info" 
+            dashed
             size="small"
             @click="$router.push('/admin/papers')"
             class="quick-nav-button"
@@ -72,7 +83,17 @@
             {{ $t('admin.menu.papers') }}
           </n-button>
           <n-button 
-            text 
+            type="info" 
+            dashed
+            size="small"
+            @click="$router.push('/admin/projects')"
+            class="quick-nav-button"
+          >
+            {{ $t('admin.menu.projects') }}
+          </n-button>
+          <n-button 
+            type="info" 
+            dashed
             size="small"
             @click="$router.push('/admin/news')"
             class="quick-nav-button"
@@ -80,12 +101,32 @@
             {{ $t('admin.menu.news') }}
           </n-button>
           <n-button 
-            text 
+            type="info" 
+            dashed
             size="small"
-            @click="$router.push('/admin/projects')"
+            @click="$router.push('/admin/resources')"
             class="quick-nav-button"
           >
-            {{ $t('admin.menu.projects') }}
+            {{ $t('admin.menu.resources') }}
+          </n-button>
+          <n-button 
+            type="info" 
+            dashed
+            size="small"
+            @click="$router.push('/admin/lab')"
+            class="quick-nav-button"
+          >
+            {{ $t('admin.menu.lab') }}
+          </n-button>
+          <n-button 
+            v-if="authStore.isSuperAdmin"
+            type="info" 
+            dashed
+            size="small"
+            @click="$router.push('/admin/admins')"
+            class="quick-nav-button"
+          >
+            {{ $t('admin.menu.admins') }}
           </n-button>
         </div>
       </div>
@@ -95,10 +136,10 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
+import { useAuthStore } from '@/stores/auth';
 
 const router = useRouter();
-const { t } = useI18n();
+const authStore = useAuthStore();
 
 const goToDashboard = () => {
   router.push('/admin/dashboard');
