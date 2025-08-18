@@ -24,6 +24,7 @@ export default {
     retry: 'Retry',
     viewDetails: 'View Details',
     fetchError: 'Failed to fetch data',
+    loadError: 'Failed to load data',
     goBack: 'Go Back',
     back: 'Back',
     page: 'Page',

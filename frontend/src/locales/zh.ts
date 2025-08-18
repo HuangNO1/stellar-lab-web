@@ -24,6 +24,7 @@ export default {
         retry: '重试',
         viewDetails: '查看详情',
         fetchError: '获取数据失败',
+        loadError: '加载数据失败',
         goBack: '返回',
         back: '返回',
         page: '页',
