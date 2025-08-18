@@ -127,21 +127,21 @@ export function useMembers() {
           return (aName || '').localeCompare(bName || '');
         }
         
-        // 校友排序：先按畢業年份（近年優先），再按身份類型，最後按姓名
+        // 校友排序：先按身份類型（博士>碩士>本科），再按畢業年份（早年優先），最後按姓名
         if (a.mem_type === 2 && b.mem_type === 2) {
-          // 先按畢業年份排序（近年畢業的在前）
-          const aYear = a.graduation_year ?? 0;
-          const bYear = b.graduation_year ?? 0;
-          if (aYear !== bYear) {
-            return bYear - aYear; // 近年畢業的在前
-          }
-          
-          // 同年畢業按身份類型排序：博士(0) > 碩士(1) > 本科(2) > 教師(3) > 其他(4)
+          // 先按身份類型排序：博士(0) > 碩士(1) > 本科(2) > 教師(3) > 其他(4)
           const identityOrder = [0, 1, 2, 3, 4];
           const aIdentity = identityOrder.indexOf(a.alumni_identity ?? 4);
           const bIdentity = identityOrder.indexOf(b.alumni_identity ?? 4);
           if (aIdentity !== bIdentity) {
             return aIdentity - bIdentity;
+          }
+          
+          // 同身份類型按畢業年份排序（早年畢業的在前）
+          const aYear = a.graduation_year ?? 0;
+          const bYear = b.graduation_year ?? 0;
+          if (aYear !== bYear) {
+            return aYear - bYear; // 早年畢業的在前
           }
           
           // 同身份按姓名排序
