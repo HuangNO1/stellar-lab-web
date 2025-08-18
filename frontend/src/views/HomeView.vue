@@ -75,8 +75,11 @@
                 class="research-card"
               >
                 <template #header-extra>
-                  <n-tag size="small" type="info">
-                    {{ getCurrentLocale() === 'zh' ? group.leader?.mem_name_zh : group.leader?.mem_name_en }}
+                  <n-tag v-if="group.leader" size="small" type="info">
+                    {{ getCurrentLocale() === 'zh' ? group.leader.mem_name_zh : group.leader.mem_name_en }}
+                  </n-tag>
+                  <n-tag v-else size="small" type="default">
+                    {{ $t('admin.members.form.group.none') }}
                   </n-tag>
                 </template>
                 <div class="card-description">
