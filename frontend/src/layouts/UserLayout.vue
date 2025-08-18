@@ -474,7 +474,7 @@ html:has(#user-app.dark-mode) {
 /* iPhone-like notch design */
 .nav-container {
   position: relative;
-  width: 70vw;
+  width: 80vw;
   margin: 0 auto;
   height: 4.5rem;
   background: rgba(255, 255, 255, 0.95);
