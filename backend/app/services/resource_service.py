@@ -173,13 +173,20 @@ class ResourceService(BaseService):
         if not resource:
             raise NotFoundError(get_message('RESOURCE_NOT_FOUND'))
         
+        # 記錄更新前的值
+        old_values = {}
+        excluded_fields = ['resource_image_delete', 'created_time', 'updated_time', 'resource_id']
+        
         def _update_operation():
+            changes = {}
+            
             # 處理圖片刪除
             if resource_data.get('resource_image_delete'):
                 old_image_path = resource.resource_image
                 if old_image_path:
                     delete_file(old_image_path)
                     resource.resource_image = None
+                    changes['resource_image'] = {'old': old_image_path, 'new': None}
             
             # 處理新圖片上傳
             if files_data and 'resource_image' in files_data:
@@ -189,6 +196,7 @@ class ResourceService(BaseService):
                     
                     try:
                         new_image_path = save_file(image_file, 'image', max_size=10*1024*1024)
+                        changes['resource_image'] = {'old': old_image_path, 'new': new_image_path}
                         resource.resource_image = new_image_path
                         
                         # 刪除舊圖片
@@ -200,21 +208,28 @@ class ResourceService(BaseService):
                         from app.utils.messages import msg
                         raise ValidationError(msg.get_error_message('IMAGE_UPLOAD_FAILED') + f': {str(e)}')
             
-            # 更新其他字段
-            excluded_fields = ['resource_image_delete', 'created_time', 'updated_time', 'resource_id']
+            # 更新其他字段並記錄變更
             for key, value in resource_data.items():
                 if hasattr(resource, key) and key not in excluded_fields:
-                    setattr(resource, key, value)
+                    old_value = getattr(resource, key)
+                    if old_value != value:
+                        changes[key] = {'old': old_value, 'new': value}
+                        setattr(resource, key, value)
             
-            return resource.to_dict()
+            return resource.to_dict(), changes
         
         # 執行操作並記錄審計
-        return self.execute_with_audit(
+        result, changes = self.execute_with_audit(
             operation_func=_update_operation,
             operation_type='UPDATE',
-            content={},
+            content={
+                'resource_id': resource_id,
+                'resource_name': resource_data.get('resource_name_zh', '')
+            },
             admin_id=admin_id
         )
+        
+        return result
     
     def delete_resource(self, resource_id: int, admin_id: int) -> Dict[str, Any]:
         """刪除資源"""

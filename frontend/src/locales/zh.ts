@@ -92,7 +92,8 @@ export default {
             graduate: '毕业'
         },
         // 研究领域相关
-        researchAreas: '研究領域'
+        researchAreas: '研究領域',
+        noPapersAvailable: '無可用論文資訊'
     },
     research: {
         title: '研究领域',

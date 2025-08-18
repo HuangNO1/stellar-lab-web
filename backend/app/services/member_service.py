@@ -179,7 +179,10 @@ class MemberService(BaseService):
         result, update_data = self.execute_with_audit(
             operation_func=_update_operation,
             operation_type='UPDATE',
-            content={}
+            content={
+                'member_id': member.mem_id,
+                'member_name': member.mem_name_zh
+            }
         )
         
         return result

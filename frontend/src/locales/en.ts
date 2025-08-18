@@ -92,7 +92,8 @@ export default {
       graduate: 'Graduate'
     },
     // Research areas
-    researchAreas: 'Research Areas'
+    researchAreas: 'Research Areas',
+    noPapersAvailable: 'No papers available'
   },
   research: {
     title: 'Research Areas',
