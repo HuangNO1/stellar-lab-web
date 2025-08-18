@@ -86,6 +86,13 @@ def create_member():
             form_data = dict(request.form)
             files_data = dict(request.files) if request.files else None
             
+        # 處理 research_group_id = -1 的情況，轉換為 None
+        if 'research_group_id' in form_data:
+            if form_data['research_group_id'] == '-1' or form_data['research_group_id'] == -1:
+                form_data['research_group_id'] = None
+            elif form_data['research_group_id'] == '':
+                form_data['research_group_id'] = None
+                
         member_data = member_service.create_member(
             form_data=form_data,
             files_data=files_data
@@ -121,6 +128,13 @@ def update_member(mem_id):
             form_data = dict(request.form)
             files_data = dict(request.files) if request.files else None
             
+        # 處理 research_group_id = -1 的情況，轉換為 None
+        if 'research_group_id' in form_data:
+            if form_data['research_group_id'] == '-1' or form_data['research_group_id'] == -1:
+                form_data['research_group_id'] = None
+            elif form_data['research_group_id'] == '':
+                form_data['research_group_id'] = None
+                
         member_data = member_service.update_member(
             mem_id=mem_id,
             form_data=form_data,

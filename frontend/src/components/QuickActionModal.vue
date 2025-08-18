@@ -1001,7 +1001,7 @@ const memberOptions = ref<SelectOption[]>([]);
 const researchGroupOptionsWithNone = computed(() => {
   const noneOption: SelectOption = {
     label: t('admin.members.form.group.none'),
-    value: null
+    value: -1
   };
   return [noneOption, ...researchGroupOptions.value];
 });
@@ -1293,6 +1293,11 @@ watch(
           if (props.moduleType === 'papers' && editDataCopy.authors && Array.isArray(editDataCopy.authors)) {
             editDataCopy.authors = editDataCopy.authors.map((author: { mem_id: number }) => author.mem_id);
             console.log('轉換後的作者ID數組:', editDataCopy.authors);
+          }
+          
+          // 處理成員課題組字段：將 null 值轉換為 -1 以便在下拉框中正確顯示
+          if (props.moduleType === 'members' && editDataCopy.research_group_id === null) {
+            editDataCopy.research_group_id = -1;
           }
           
           Object.assign(formData, editDataCopy);
@@ -1798,6 +1803,10 @@ const handleSubmit = async () => {
       )) {
         // 特殊處理：這些字段的 null 值是有效的（代表選擇了「無」或未設置）
         isValidValue = true;
+      } else if (value === -1 && key === 'research_group_id') {
+        // 特殊處理：research_group_id 為 -1 時轉換為 null（代表選擇了「無」）
+        acc[key] = null;
+        return acc; // 直接返回，避免後續處理
       } else if (value === undefined || value === null || typeof value === 'function') {
         // undefined、null（除了特殊字段）、function 等都是無效的
         isValidValue = false;
