@@ -540,6 +540,52 @@ Authorization: Bearer <token> (需要超級管理員權限)
 |------|------|------|------|--------|
 | admin_id | integer | ✓ | 要刪除的管理員ID | 2 |
 
+### 重置管理員密碼
+```
+POST /api/admins/{admin_id}/reset-password
+```
+
+**請求頭**
+```
+Authorization: Bearer <token> (需要超級管理員權限)
+Content-Type: application/json
+```
+
+**路徑參數**
+| 參數 | 類型 | 必填 | 含義 | 範例值 |
+|------|------|------|------|--------|
+| admin_id | integer | ✓ | 要重置密碼的管理員ID | 2 |
+
+**請求參數**
+| 參數 | 類型 | 必填 | 含義 | 範例值 |
+|------|------|------|------|--------|
+| new_password | string | ✓ | 新密碼（至少6位字符） | newpass123 |
+
+**請求範例**
+```json
+{
+  "new_password": "newpass123"
+}
+```
+
+**響應範例**
+```json
+{
+  "code": 0,
+  "message": "管理員密碼重置成功",
+  "data": {
+    "admin_id": 2,
+    "message": "密碼已重置"
+  }
+}
+```
+
+**注意事項**
+- 僅超級管理員可以重置其他管理員的密碼
+- 不能重置自己的密碼（請使用修改密碼接口）
+- 新密碼會自動加密存儲
+- 重置操作會自動記錄到操作日誌中
+
 ## 實驗室管理
 
 ### 獲取實驗室資訊
@@ -1848,7 +1894,7 @@ Content-Type: application/json
 
 ### Markdown圖片上傳
 ```
-POST /api/image-upload
+POST /api/images/upload
 ```
 
 **請求頭**
@@ -1860,7 +1906,10 @@ Content-Type: multipart/form-data
 **請求參數**
 | 參數 | 類型 | 必填 | 含義 | 範例值 |
 |------|------|------|------|--------|
-| image | file | ✓ | 要上傳的圖片文件 | image.jpg |
+| file | file | ✓ | 要上傳的圖片文件 | image.jpg |
+| entity_type | string | - | 實體類型 | member |
+| entity_id | integer | - | 實體ID | 1 |
+| field_name | string | - | 字段名稱 | mem_desc_zh |
 
 **響應範例**
 ```json
@@ -1869,6 +1918,90 @@ Content-Type: multipart/form-data
   "message": "圖片上傳成功",
   "data": {
     "url": "/media/description_image/202501/abc123def456.jpg"
+  }
+}
+```
+
+### 獲取實體圖片列表
+```
+GET /api/images/entity/{entity_type}/{entity_id}
+```
+
+**請求頭**
+```
+Authorization: Bearer <token>
+```
+
+**路徑參數**
+| 參數 | 類型 | 必填 | 含義 | 範例值 |
+|------|------|------|------|--------|
+| entity_type | string | ✓ | 實體類型 | member |
+| entity_id | integer | ✓ | 實體ID | 1 |
+
+**查詢參數**
+| 參數 | 類型 | 必填 | 含義 | 範例值 |
+|------|------|------|------|--------|
+| field_name | string | - | 字段名稱過濾 | mem_desc_zh |
+
+**響應範例**
+```json
+{
+  "code": 0,
+  "message": "OK",
+  "data": [
+    {
+      "image_id": 1,
+      "image_url": "/media/description_image/202501/abc123.jpg",
+      "created_at": "2024-01-01T00:00:00"
+    }
+  ]
+}
+```
+
+### 刪除圖片
+```
+DELETE /api/images/{image_id}
+```
+
+**請求頭**
+```
+Authorization: Bearer <token>
+```
+
+**路徑參數**
+| 參數 | 類型 | 必填 | 含義 | 範例值 |
+|------|------|------|------|--------|
+| image_id | integer | ✓ | 圖片ID | 1 |
+
+**響應範例**
+```json
+{
+  "code": 0,
+  "message": "圖片刪除成功"
+}
+```
+
+### 清理未使用圖片
+```
+POST /api/images/cleanup
+```
+
+**請求頭**
+```
+Authorization: Bearer <token>
+```
+
+**請求參數**
+無
+
+**響應範例**
+```json
+{
+  "code": 0,
+  "message": "圖片清理完成",
+  "data": {
+    "deleted_count": 5,
+    "freed_space": "2.5MB"
   }
 }
 ```

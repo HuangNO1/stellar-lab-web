@@ -193,6 +193,22 @@ admin_model = api.model('Admin', {
     'admin_type': fields.Integer(description='管理员类型', example=1)
 })
 
+# 资源模型
+resource_model = api.model('Resource', {
+    'resource_name_zh': fields.String(required=True, description='资源中文名称'),
+    'resource_name_en': fields.String(description='资源英文名称'),
+    'resource_description_zh': fields.String(description='资源中文描述'),
+    'resource_description_en': fields.String(description='资源英文描述'),
+    'resource_type': fields.Integer(description='资源类型', example=0),
+    'resource_location_zh': fields.String(description='资源中文位置'),
+    'resource_location_en': fields.String(description='资源英文位置'),
+    'resource_url': fields.String(description='资源URL'),
+    'resource_file': fields.String(description='资源文件路径'),
+    'resource_image': fields.String(description='资源图片路径'),
+    'availability_status': fields.Integer(description='可用状态', example=1),
+    'contact_info': fields.String(description='联系信息')
+})
+
 # ==================== 命名空间定义 ====================
 
 ns_auth = api.namespace('认证管理', description='管理员认证相关接口', path='/admin')
@@ -205,6 +221,8 @@ ns_news = api.namespace('新闻管理', description='实验室新闻管理', pat
 ns_project = api.namespace('项目管理', description='研究项目管理', path='/projects')
 ns_media = api.namespace('媒体管理', description='文件上传管理', path='/media')
 ns_edit_record = api.namespace('操作审计', description='编辑记录查询', path='/edit-records')
+ns_resource = api.namespace('资源管理', description='实验室资源管理', path='/resources')
+ns_image_upload = api.namespace('图片上传', description='Markdown图片上传管理', path='/images')
 ns_system = api.namespace('系统接口', description='健康检查等系统接口', path='/')
 
 # ==================== 认证管理接口 ====================
@@ -344,6 +362,20 @@ class Admin(Resource):
     @ns_admin.response(409, '不能删除自己或超级管理员')
     def delete(self, admin_id):
         """删除管理员（软删除）"""
+        pass
+
+@ns_admin.route('/<int:admin_id>/reset-password')
+class AdminResetPassword(Resource):
+    @ns_admin.doc('重置管理员密码', security='Bearer')
+    @ns_admin.expect(api.model('ResetPasswordRequest', {
+        'new_password': fields.String(required=True, description='新密码', example='newpass123')
+    }))
+    @ns_admin.marshal_with(base_response)
+    @ns_admin.response(401, '未认证')
+    @ns_admin.response(403, '权限不足')
+    @ns_admin.response(404, '管理员不存在')
+    def post(self, admin_id):
+        """重置指定管理员的密码（仅超级管理员）"""
         pass
 
 # ==================== 实验室管理接口 ====================
@@ -827,6 +859,173 @@ class EditRecord(Resource):
         """获取指定编辑记录的详细信息"""
         pass
 
+# ==================== 资源管理接口 ====================
+
+@ns_resource.route('/')
+class ResourceList(Resource):
+    @ns_resource.doc('获取资源列表')
+    @ns_resource.param('page', '页码', type='int', default=1)
+    @ns_resource.param('per_page', '每页数量', type='int', default=20)
+    @ns_resource.param('all', '获取全部数据', type='string', enum=['true', 'false'])
+    @ns_resource.param('q', '搜索关键词（资源名称、描述）', type='string')
+    @ns_resource.param('resource_type', '资源类型过滤', type='int')
+    @ns_resource.param('availability_status', '可用状态过滤', type='int')
+    @ns_resource.param('sort_by', '排序字段', type='string', default='created_time')
+    @ns_resource.param('order', '排序顺序', type='string', enum=['asc', 'desc'], default='desc')
+    @ns_resource.marshal_with(pagination_response)
+    def get(self):
+        """获取资源列表（公开接口，支持分页和搜索）"""
+        pass
+
+@ns_resource.route('/<int:resource_id>')
+class Resource(Resource):
+    @ns_resource.doc('获取资源详情')
+    @ns_resource.marshal_with(base_response)
+    @ns_resource.response(404, '资源不存在')
+    def get(self, resource_id):
+        """获取指定资源的详细信息"""
+        pass
+
+@ns_resource.route('/admin')
+class AdminResourceList(Resource):
+    @ns_resource.doc('管理员获取资源列表', security='Bearer')
+    @ns_resource.param('page', '页码', type='int', default=1)
+    @ns_resource.param('per_page', '每页数量', type='int', default=20)
+    @ns_resource.param('all', '获取全部数据', type='string', enum=['true', 'false'])
+    @ns_resource.param('q', '搜索关键词', type='string')
+    @ns_resource.param('resource_type', '资源类型过滤', type='int')
+    @ns_resource.param('availability_status', '可用状态过滤', type='int')
+    @ns_resource.marshal_with(pagination_response)
+    @ns_resource.response(401, '未认证')
+    def get(self):
+        """管理员获取资源列表（包含所有状态）"""
+        pass
+    
+    @ns_resource.doc('创建资源', security='Bearer')
+    @ns_resource.expect(resource_model, validate=True)
+    @ns_resource.marshal_with(base_response)
+    @ns_resource.response(401, '未认证')
+    @ns_resource.response(403, '权限不足')
+    def post(self):
+        """创建新的资源"""
+        pass
+
+@ns_resource.route('/admin/<int:resource_id>')
+class AdminResource(Resource):
+    @ns_resource.doc('更新资源', security='Bearer')
+    @ns_resource.expect(resource_model)
+    @ns_resource.marshal_with(base_response)
+    @ns_resource.response(401, '未认证')
+    @ns_resource.response(403, '权限不足')
+    @ns_resource.response(404, '资源不存在')
+    def put(self, resource_id):
+        """更新资源信息"""
+        pass
+    
+    @ns_resource.doc('删除资源', security='Bearer')
+    @ns_resource.marshal_with(base_response)
+    @ns_resource.response(401, '未认证')
+    @ns_resource.response(403, '权限不足')
+    @ns_resource.response(404, '资源不存在')
+    def delete(self, resource_id):
+        """删除资源（软删除）"""
+        pass
+
+@ns_resource.route('/admin/batch')
+class AdminResourceBatch(Resource):
+    @ns_resource.doc('批量删除资源', security='Bearer')
+    @ns_resource.expect(api.model('BatchDeleteResourceRequest', {
+        'resource_ids': fields.List(fields.Integer, required=True, description='资源ID列表', example=[1, 2, 3])
+    }), validate=True)
+    @ns_resource.marshal_with(base_response)
+    @ns_resource.response(401, '未认证')
+    @ns_resource.response(403, '权限不足')
+    def delete(self):
+        """批量删除资源"""
+        pass
+
+# ==================== 图片上传接口 ====================
+
+@ns_image_upload.route('/upload')
+class ImageUpload(Resource):
+    @ns_image_upload.doc('Markdown图片上传', security='Bearer')
+    @ns_image_upload.expect(api.parser().add_argument(
+        'file', 
+        location='files',
+        type='file',
+        required=True,
+        help='要上传的图片文件'
+    ).add_argument(
+        'entity_type',
+        location='form',
+        type='string',
+        help='实体类型'
+    ).add_argument(
+        'entity_id',
+        location='form',
+        type='int',
+        help='实体ID'
+    ).add_argument(
+        'field_name',
+        location='form',
+        type='string',
+        help='字段名称'
+    ))
+    @ns_image_upload.marshal_with(base_response)
+    @ns_image_upload.response(401, '未认证')
+    @ns_image_upload.response(413, '文件太大')
+    @ns_image_upload.response(415, '不支持的文件类型')
+    def post(self):
+        """
+        上传Markdown描述字段中使用的图片
+        
+        **支持的图片格式**:
+        - PNG, JPG, JPEG, GIF, WebP
+        - 最大文件大小: 10MB
+        - 按月份自动归档存储
+        
+        **响应示例**:
+        ```json
+        {
+          "code": 0,
+          "message": "图片上传成功",
+          "data": {
+            "url": "/media/description_image/202501/abc123def456.jpg"
+          }
+        }
+        ```
+        """
+        pass
+
+@ns_image_upload.route('/entity/<entity_type>/<int:entity_id>')
+class EntityImages(Resource):
+    @ns_image_upload.doc('获取实体图片列表', security='Bearer')
+    @ns_image_upload.param('field_name', '字段名称过滤', type='string')
+    @ns_image_upload.marshal_with(base_response)
+    @ns_image_upload.response(401, '未认证')
+    def get(self, entity_type, entity_id):
+        """获取指定实体相关的图片列表"""
+        pass
+
+@ns_image_upload.route('/<int:image_id>')
+class ImageDelete(Resource):
+    @ns_image_upload.doc('删除图片', security='Bearer')
+    @ns_image_upload.marshal_with(base_response)
+    @ns_image_upload.response(401, '未认证')
+    @ns_image_upload.response(404, '图片不存在')
+    def delete(self, image_id):
+        """删除指定图片"""
+        pass
+
+@ns_image_upload.route('/cleanup')
+class ImageCleanup(Resource):
+    @ns_image_upload.doc('清理未使用图片', security='Bearer')
+    @ns_image_upload.marshal_with(base_response)
+    @ns_image_upload.response(401, '未认证')
+    def post(self):
+        """清理系统中未被使用的图片文件"""
+        pass
+
 # ==================== 系统接口 ====================
 
 @ns_system.route('/health')
@@ -868,7 +1067,7 @@ class SystemSwaggerJson(Resource):
         pass
 
 print("✅ 完整版自动化 Swagger 系统已加载")
-print("📊 包含接口数量: 48+")
+print("📊 包含接口数量: 60+")
 print("🔗 文档地址: /api/docs")
-print("📋 支持模块: 认证、管理员、实验室、课题组、成员、论文、新闻、项目、媒体、审计、系统")
+print("📋 支持模块: 认证、管理员、实验室、课题组、成员、论文、新闻、项目、媒体、审计、资源管理、图片上传、系统")
 print("🎯 所有接口已自动生成文档，支持在线测试")

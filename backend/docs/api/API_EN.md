@@ -466,6 +466,46 @@ Content-Type: application/json
 }
 ```
 
+### Reset Administrator Password
+```
+POST /api/admins/{admin_id}/reset-password
+```
+
+**Request Headers**
+```
+Authorization: Bearer <token> (Super administrator permission required)
+Content-Type: application/json
+```
+
+**Path Parameters**
+| Parameter | Type | Required | Description | Example |
+|-----------|------|----------|-------------|---------|
+| admin_id | integer | ✓ | Administrator ID to reset password | 2 |
+
+**Request Parameters**
+| Parameter | Type | Required | Description | Example |
+|-----------|------|----------|-------------|---------|
+| new_password | string | ✓ | New password (at least 6 characters) | newpass123 |
+
+**Request Example**
+```json
+{
+  "new_password": "newpass123"
+}
+```
+
+**Response Example**
+```json
+{
+  "code": 0,
+  "message": "Administrator password reset successfully",
+  "data": {
+    "admin_id": 2,
+    "message": "Password has been reset"
+  }
+}
+```
+
 ## Laboratory Management
 
 ### Get Laboratory Information

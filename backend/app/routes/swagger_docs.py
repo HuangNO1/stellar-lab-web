@@ -1598,6 +1598,269 @@ def swagger_json():
                         "401": {"description": "未認證"}
                     }
                 }
+            },
+            "/admins/{admin_id}/reset-password": {
+                "post": {
+                    "tags": ["管理員"],
+                    "summary": "重置管理員密碼",
+                    "description": "超級管理員重置指定管理員的密碼",
+                    "security": [{"Bearer": []}],
+                    "parameters": [
+                        {
+                            "name": "admin_id",
+                            "in": "path",
+                            "type": "integer",
+                            "required": true,
+                            "description": "管理員ID"
+                        },
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "required": true,
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "new_password": {
+                                        "type": "string",
+                                        "description": "新密碼",
+                                        "example": "newpass123"
+                                    }
+                                },
+                                "required": ["new_password"]
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {"description": "重置密碼成功"},
+                        "401": {"description": "未認證"},
+                        "403": {"description": "權限不足"},
+                        "404": {"description": "管理員不存在"}
+                    }
+                }
+            },
+            "/resources": {
+                "get": {
+                    "tags": ["資源"],
+                    "summary": "獲取資源列表",
+                    "parameters": [
+                        {
+                            "name": "page",
+                            "in": "query",
+                            "type": "integer",
+                            "description": "頁碼",
+                            "default": 1
+                        },
+                        {
+                            "name": "per_page",
+                            "in": "query",
+                            "type": "integer",
+                            "description": "每頁數量",
+                            "default": 20
+                        },
+                        {
+                            "name": "all",
+                            "in": "query",
+                            "type": "string",
+                            "description": "獲取全部數據",
+                            "enum": ["true", "false"]
+                        },
+                        {
+                            "name": "q",
+                            "in": "query",
+                            "type": "string",
+                            "description": "搜索關鍵詞"
+                        },
+                        {
+                            "name": "resource_type",
+                            "in": "query",
+                            "type": "integer",
+                            "description": "資源類型"
+                        },
+                        {
+                            "name": "availability_status",
+                            "in": "query",
+                            "type": "integer",
+                            "description": "可用狀態"
+                        }
+                    ],
+                    "responses": {
+                        "200": {"description": "成功獲取資源列表"}
+                    }
+                }
+            },
+            "/resources/{resource_id}": {
+                "get": {
+                    "tags": ["資源"],
+                    "summary": "獲取資源詳情",
+                    "parameters": [
+                        {
+                            "name": "resource_id",
+                            "in": "path",
+                            "type": "integer",
+                            "required": true,
+                            "description": "資源ID"
+                        }
+                    ],
+                    "responses": {
+                        "200": {"description": "成功獲取資源詳情"},
+                        "404": {"description": "資源不存在"}
+                    }
+                }
+            },
+            "/admin/resources": {
+                "get": {
+                    "tags": ["資源"],
+                    "summary": "管理員獲取資源列表",
+                    "security": [{"Bearer": []}],
+                    "parameters": [
+                        {
+                            "name": "page",
+                            "in": "query",
+                            "type": "integer",
+                            "description": "頁碼",
+                            "default": 1
+                        },
+                        {
+                            "name": "per_page",
+                            "in": "query",
+                            "type": "integer",
+                            "description": "每頁數量",
+                            "default": 20
+                        }
+                    ],
+                    "responses": {
+                        "200": {"description": "成功獲取資源列表"},
+                        "401": {"description": "未認證"}
+                    }
+                },
+                "post": {
+                    "tags": ["資源"],
+                    "summary": "創建資源",
+                    "security": [{"Bearer": []}],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "required": true,
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "resource_name_zh": {"type": "string"},
+                                    "resource_name_en": {"type": "string"},
+                                    "resource_description_zh": {"type": "string"},
+                                    "resource_description_en": {"type": "string"},
+                                    "resource_type": {"type": "integer"},
+                                    "resource_location_zh": {"type": "string"},
+                                    "resource_location_en": {"type": "string"},
+                                    "resource_url": {"type": "string"},
+                                    "availability_status": {"type": "integer"},
+                                    "contact_info": {"type": "string"}
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "201": {"description": "創建成功"},
+                        "401": {"description": "未認證"}
+                    }
+                }
+            },
+            "/admin/resources/{resource_id}": {
+                "put": {
+                    "tags": ["資源"],
+                    "summary": "更新資源",
+                    "security": [{"Bearer": []}],
+                    "parameters": [
+                        {
+                            "name": "resource_id",
+                            "in": "path",
+                            "type": "integer",
+                            "required": true,
+                            "description": "資源ID"
+                        }
+                    ],
+                    "responses": {
+                        "200": {"description": "更新成功"},
+                        "401": {"description": "未認證"}
+                    }
+                },
+                "delete": {
+                    "tags": ["資源"],
+                    "summary": "刪除資源",
+                    "security": [{"Bearer": []}],
+                    "parameters": [
+                        {
+                            "name": "resource_id",
+                            "in": "path",
+                            "type": "integer",
+                            "required": true,
+                            "description": "資源ID"
+                        }
+                    ],
+                    "responses": {
+                        "200": {"description": "刪除成功"},
+                        "401": {"description": "未認證"}
+                    }
+                }
+            },
+            "/images/upload": {
+                "post": {
+                    "tags": ["圖片上傳"],
+                    "summary": "Markdown圖片上傳",
+                    "security": [{"Bearer": []}],
+                    "consumes": ["multipart/form-data"],
+                    "parameters": [
+                        {
+                            "name": "file",
+                            "in": "formData",
+                            "type": "file",
+                            "required": true,
+                            "description": "圖片文件"
+                        },
+                        {
+                            "name": "entity_type",
+                            "in": "formData",
+                            "type": "string",
+                            "description": "實體類型"
+                        },
+                        {
+                            "name": "entity_id",
+                            "in": "formData",
+                            "type": "integer",
+                            "description": "實體ID"
+                        },
+                        {
+                            "name": "field_name",
+                            "in": "formData",
+                            "type": "string",
+                            "description": "字段名稱"
+                        }
+                    ],
+                    "responses": {
+                        "200": {"description": "上傳成功"},
+                        "401": {"description": "未認證"}
+                    }
+                }
+            },
+            "/images/{image_id}": {
+                "delete": {
+                    "tags": ["圖片上傳"],
+                    "summary": "刪除圖片",
+                    "security": [{"Bearer": []}],
+                    "parameters": [
+                        {
+                            "name": "image_id",
+                            "in": "path",
+                            "type": "integer",
+                            "required": true,
+                            "description": "圖片ID"
+                        }
+                    ],
+                    "responses": {
+                        "200": {"description": "刪除成功"},
+                        "401": {"description": "未認證"}
+                    }
+                }
             }
         },
         "definitions": {
