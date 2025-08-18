@@ -77,11 +77,11 @@
       </div>
 
       <!-- 作者信息 -->
-      <div v-if="(paper.authors && paper.authors.length > 0) || paper.all_authors_zh || paper.all_authors_en" class="paper-authors">
+      <div class="paper-authors">
         <h3>{{ $t('papers.authors') }}</h3>
         
         <!-- 實驗室作者 -->
-        <div v-if="paper.authors && paper.authors.length > 0" class="authors-section">
+        <div v-if="hasLabAuthors()" class="authors-section">
           <h4 class="authors-subtitle">{{ $t('admin.papers.form.labAuthors') }}</h4>
           <div class="authors-list">
             <span 
@@ -102,11 +102,16 @@
         </div>
 
         <!-- 全部作者 -->
-        <div v-if="paper.all_authors_zh || paper.all_authors_en" class="authors-section">
+        <div v-if="hasAllAuthors()" class="authors-section">
           <h4 class="authors-subtitle">{{ $t('admin.papers.form.allAuthors') }}</h4>
           <div class="authors-text">
             {{ getCurrentLocale() === 'zh' ? (paper.all_authors_zh || paper.all_authors_en) : (paper.all_authors_en || paper.all_authors_zh) }}
           </div>
+        </div>
+        
+        <!-- 無作者信息時顯示 -->
+        <div v-if="!hasLabAuthors() && !hasAllAuthors()" class="authors-section">
+          <div class="no-authors">{{ $t('common.none') }}</div>
         </div>
       </div>
 
@@ -181,6 +186,35 @@ const error = ref<string | null>(null);
 // 計算屬性
 const getCurrentLocale = () => {
   return locale.value as 'zh' | 'en';
+};
+
+// 檢查是否有實驗室作者
+const hasLabAuthors = () => {
+  return paper.value?.authors && paper.value.authors.length > 0;
+};
+
+// 檢查是否有全部作者文本（非空）
+const hasAllAuthors = () => {
+  if (!paper.value) return false;
+  
+  // 檢查兩個字段是否都為 null 或 undefined
+  const allAuthorsZh = paper.value.all_authors_zh;
+  const allAuthorsEn = paper.value.all_authors_en;
+  
+  if (!allAuthorsZh && !allAuthorsEn) return false;
+  
+  // 選擇當前語言對應的文本
+  const currentText = getCurrentLocale() === 'zh' ? allAuthorsZh : allAuthorsEn;
+  const fallbackText = getCurrentLocale() === 'zh' ? allAuthorsEn : allAuthorsZh;
+  const allAuthorsText = currentText || fallbackText;
+  
+  // 檢查文本是否存在且不為空
+  return allAuthorsText && allAuthorsText.trim() !== '';
+};
+
+// 檢查是否有任何作者信息
+const hasAnyAuthors = () => {
+  return hasLabAuthors() || hasAllAuthors();
 };
 
 const getPaperDescription = () => {
@@ -401,6 +435,14 @@ onMounted(() => {
   font-style: italic;
 }
 
+.no-authors {
+  font-size: 1.1rem;
+  color: #999;
+  font-style: italic;
+  text-align: center;
+  padding: 1rem;
+}
+
 .paper-description {
   margin-bottom: 2rem;
   padding: 1.5rem;
@@ -491,6 +533,12 @@ onMounted(() => {
 .dark .corresponding-note,
 .dark-mode .corresponding-note {
   color: #ccc;
+}
+
+[data-theme="dark"] .no-authors,
+.dark .no-authors,
+.dark-mode .no-authors {
+  color: #aaa;
 }
 
 /* 響應式設計 */

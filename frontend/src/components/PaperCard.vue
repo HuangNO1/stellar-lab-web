@@ -51,27 +51,16 @@
         </div>
         
         <!-- 作者信息 -->
-        <div v-if="hasAnyAuthors" class="paper-authors-section">
-          <!-- 實驗室作者 -->
-          <div v-if="hasLabAuthors" class="paper-authors lab-authors">
+        <div class="paper-authors-section">
+          <!-- 統一的作者顯示 -->
+          <div class="paper-authors">
             <n-icon size="14" class="detail-icon">
               <svg viewBox="0 0 24 24">
                 <path fill="currentColor" d="M16,4C16.88,4 17.67,4.39 18.11,5.17L20.83,10.83C20.94,11.06 21,11.32 21,11.58V13A2,2 0 0,1 19,15H18V19A2,2 0 0,1 16,21H8A2,2 0 0,1 6,19V15H5A2,2 0 0,1 3,13V11.58C3,11.32 3.06,11.06 3.17,10.83L5.89,5.17C6.33,4.39 7.12,4 8,4H16M16,6H8L5.5,11H8.5V13H15.5V11H18.5L16,6M8,15V19H16V15H8Z"/>
               </svg>
             </n-icon>
-            <span class="author-label">{{ $t('papers.authors') }}:</span>
-            <span class="author-names">{{ getAuthorsText(paper.authors) }}</span>
-          </div>
-          
-          <!-- 全部作者（只在與實驗室作者不同時顯示） -->
-          <div v-if="hasAllAuthors" class="paper-authors all-authors">
-            <n-icon size="14" class="detail-icon">
-              <svg viewBox="0 0 24 24">
-                <path fill="currentColor" d="M12,5.5A3.5,3.5 0 0,1 15.5,9A3.5,3.5 0 0,1 12,12.5A3.5,3.5 0 0,1 8.5,9A3.5,3.5 0 0,1 12,5.5M5,8C5.56,8 6.08,8.15 6.53,8.42C6.38,9.85 6.8,11.27 7.66,12.38C7.16,13.34 6.16,14 5,14A3,3 0 0,1 2,11A3,3 0 0,1 5,8M19,8A3,3 0 0,1 22,11A3,3 0 0,1 19,14C17.84,14 16.84,13.34 16.34,12.38C17.2,11.27 17.62,9.85 17.47,8.42C17.92,8.15 18.44,8 19,8M5.5,18.25C5.5,16.18 8.41,14.5 12,14.5C15.59,14.5 18.5,16.18 18.5,18.25V20H5.5V18.25Z"/>
-              </svg>
-            </n-icon>
-            <span class="author-label">{{ $t('papers.allAuthors') }}:</span>
-            <span class="author-names">{{ getAllAuthorsText() }}</span>
+            <span class="author-label">{{ getAuthorLabel() }}:</span>
+            <span class="author-names">{{ getAuthorContent() }}</span>
           </div>
         </div>
         
@@ -169,20 +158,41 @@ const hasLabAuthors = computed(() => {
   return props.paper.authors && props.paper.authors.length > 0;
 });
 
-// 檢查是否有全部作者（且與實驗室作者不同）
+// 檢查是否有全部作者文本（非空）
 const hasAllAuthors = computed(() => {
-  const hasAllAuthorsText = props.paper.all_authors_zh || props.paper.all_authors_en;
-  if (!hasAllAuthorsText) return false;
+  const allAuthorsZh = props.paper.all_authors_zh;
+  const allAuthorsEn = props.paper.all_authors_en;
   
-  // 如果沒有實驗室作者，直接顯示全部作者
-  if (!hasLabAuthors.value) return true;
+  if (!allAuthorsZh && !allAuthorsEn) return false;
   
-  // 如果有實驗室作者，檢查全部作者文本是否與實驗室作者文本不同
-  const labAuthorsText = getAuthorsText(props.paper.authors);
-  const allAuthorsText = getAllAuthorsText();
+  const currentText = getCurrentLocale() === 'zh' ? allAuthorsZh : allAuthorsEn;
+  const fallbackText = getCurrentLocale() === 'zh' ? allAuthorsEn : allAuthorsZh;
+  const hasAllAuthorsText = currentText || fallbackText;
   
-  return labAuthorsText !== allAuthorsText;
+  return hasAllAuthorsText && hasAllAuthorsText.trim() !== '';
 });
+
+// 獲取作者標籤
+const getAuthorLabel = () => {
+  if (hasAllAuthors.value) {
+    return t('papers.allAuthors');
+  } else if (hasLabAuthors.value) {
+    return t('papers.authors');
+  } else {
+    return t('papers.authors');
+  }
+};
+
+// 獲取作者內容
+const getAuthorContent = () => {
+  if (hasAllAuthors.value) {
+    return getAllAuthorsText();
+  } else if (hasLabAuthors.value) {
+    return getAuthorsText(props.paper.authors || []);
+  } else {
+    return t('common.none');
+  }
+};
 
 // 獲取預覽圖片URL
 const getPreviewImageUrl = (imagePath: string) => {
@@ -252,7 +262,7 @@ const getAuthorsText = (authors: any[]) => {
   if (!authors || authors.length === 0) return '';
   const locale = getCurrentLocale();
   const authorNames = authors.map(author => 
-    locale === 'zh' ? author.mem_name_zh : author.mem_name_en
+    locale === 'zh' ? author.member?.mem_name_zh : author.member?.mem_name_en
   ).filter(Boolean);
   
   if (authorNames.length <= 3) {
