@@ -1,14 +1,23 @@
 <template>
   <div class="paper-card" :class="{ compact }" @click="onCardClick">
     <div class="paper-content">
-      <!-- 預覽圖片（左側顯示，如果有的話） -->
-      <div v-if="showPreviewImage && paper.preview_img && !compact" class="paper-preview">
+      <!-- 預覽圖片（左側顯示） -->
+      <div v-if="showPreviewImage && !compact" class="paper-preview">
         <img 
+          v-if="paper.preview_img && !imageError"
           :src="getPreviewImageUrl(paper.preview_img)" 
           :alt="displayTitle"
           class="preview-image"
           @error="onImageError"
         />
+        <div v-else class="preview-placeholder">
+          <n-icon size="48" color="#ccc">
+            <svg viewBox="0 0 24 24">
+              <path fill="currentColor" d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+            </svg>
+          </n-icon>
+          <span class="placeholder-text">{{ $t('papers.noPreview') }}</span>
+        </div>
       </div>
       
       <!-- 論文信息區域 -->
@@ -534,6 +543,46 @@ const downloadPaper = (paper: Paper) => {
 .dark .paper-actions,
 .dark-mode .paper-actions {
   border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 預設圖片樣式 */
+.preview-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
+              linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
+              linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
+              linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  gap: 0.5rem;
+}
+
+.placeholder-text {
+  font-size: 0.75rem;
+  color: #999;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* 暗色主題下的預設圖片 */
+[data-theme="dark"] .preview-placeholder,
+.dark .preview-placeholder,
+.dark-mode .preview-placeholder {
+  background: linear-gradient(45deg, #333 25%, transparent 25%), 
+              linear-gradient(-45deg, #333 25%, transparent 25%), 
+              linear-gradient(45deg, transparent 75%, #333 75%), 
+              linear-gradient(-45deg, transparent 75%, #333 75%);
+}
+
+[data-theme="dark"] .placeholder-text,
+.dark .placeholder-text,
+.dark-mode .placeholder-text {
+  color: #aaa;
 }
 
 /* 響應式設計 */
