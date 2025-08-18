@@ -314,7 +314,7 @@ const stats = reactive({
 // 最近活動
 const recentActivities = ref<Array<{
   id: string;
-  type: 'create' | 'update' | 'delete' | 'login' | 'logout' | 'change_password' | 'batch_delete' | 'batch_update' | 'upload';
+  type: 'create' | 'update' | 'delete' | 'login' | 'logout' | 'change_password' | 'password_reset' | 'batch_create' | 'batch_update' | 'batch_delete' | 'upload' | 'download' | 'export';
   title: string;
   time: string; // 改為字符串類型存儲 UTC 時間
   admin: string;
@@ -362,7 +362,9 @@ const fetchRecentActivities = async () => {
           4: t('admin.operationLogs.paperModule'),
           5: t('admin.operationLogs.newsModule'),
           6: t('admin.operationLogs.projectModule'),
-          7: t('admin.operationLogs.resourceModule')
+          7: t('admin.operationLogs.mediaModule'),
+          8: t('admin.operationLogs.imageUploadModule'),
+          9: t('admin.operationLogs.resourceModule')
         };
         
         const actionNames = {
@@ -372,18 +374,26 @@ const fetchRecentActivities = async () => {
           'LOGIN': t('admin.operationLogs.login'),
           'LOGOUT': t('admin.operationLogs.logout'),
           'CHANGE_PASSWORD': t('admin.operationLogs.changePassword'),
-          'BATCH_DELETE': t('admin.operationLogs.batchDelete'),
+          'PASSWORD_RESET': t('admin.operationLogs.passwordReset'),
+          'BATCH_CREATE': t('admin.operationLogs.batchCreate'),
           'BATCH_UPDATE': t('admin.operationLogs.batchUpdate'),
-          'UPLOAD': t('admin.operationLogs.upload')
+          'BATCH_DELETE': t('admin.operationLogs.batchDelete'),
+          'UPLOAD': t('admin.operationLogs.upload'),
+          'DOWNLOAD': t('admin.operationLogs.download'),
+          'EXPORT': t('admin.operationLogs.export')
         };
         
-        const moduleName = moduleNames[log.edit_module as keyof typeof moduleNames] || `模組 ${log.edit_module}`;
+        const moduleName = moduleNames[log.edit_module as keyof typeof moduleNames] || t('admin.operationLogs.unknownModule', { id: log.edit_module });
         const actionName = actionNames[log.edit_type as keyof typeof actionNames] || log.edit_type;
         
         return {
           id: log.edit_id.toString(),
-          type: log.edit_type.toLowerCase().replace('_', '_') as 'create' | 'update' | 'delete' | 'login' | 'logout' | 'change_password' | 'batch_delete' | 'batch_update' | 'upload',
-          title: `${log.admin?.admin_name || 'Unknown'} ${actionName}了${moduleName}`,
+          type: log.edit_type.toLowerCase().replace('_', '_') as 'create' | 'update' | 'delete' | 'login' | 'logout' | 'change_password' | 'password_reset' | 'batch_create' | 'batch_update' | 'batch_delete' | 'upload' | 'download' | 'export',
+          title: t('admin.dashboard.activityTemplate', {
+            admin: log.admin?.admin_name || 'Unknown',
+            action: actionName,
+            module: moduleName
+          }),
           time: log.edit_date, // 保持原始 UTC 時間字符串
           admin: log.admin?.admin_name || 'Unknown'
         };
@@ -487,9 +497,13 @@ const getActivityColor = (type: string) => {
     login: '#722ed1',
     logout: '#fa8c16',
     change_password: '#eb2f96',
-    batch_delete: '#f5222d',
+    password_reset: '#eb2f96',
+    batch_create: '#52c41a',
     batch_update: '#13c2c2',
-    upload: '#52c41a'
+    batch_delete: '#f5222d',
+    upload: '#52c41a',
+    download: '#1890ff',
+    export: '#13c2c2'
   };
   return colors[type as keyof typeof colors] || '#666';
 };
@@ -515,14 +529,26 @@ const getActivityIcon = (type: string) => {
     change_password: () => h('svg', { viewBox: '0 0 24 24' }, [
       h('path', { fill: 'currentColor', d: 'M6,14A3,3 0 0,1 9,11A3,3 0 0,1 12,14A3,3 0 0,1 9,17A3,3 0 0,1 6,14M12,20H2V18C2,15.79 4.69,14 8,14H10C13.31,14 16,15.79 16,18V20H14M22,15V9H20L19,10H17V15A2,2 0 0,0 19,17H21A2,2 0 0,0 23,15M19,15V10H21V15H19Z' })
     ]),
-    batch_delete: () => h('svg', { viewBox: '0 0 24 24' }, [
-      h('path', { fill: 'currentColor', d: 'M20.37,8.91L19.37,10.64L7.24,3.64L8.24,1.91L11.28,3.66L12.64,3.29L16.97,5.79L17.34,7.16L20.37,8.91M6,19V7H11.07L18,11V19A2,2 0 0,1 16,21H8A2,2 0 0,1 6,19Z' })
+    password_reset: () => h('svg', { viewBox: '0 0 24 24' }, [
+      h('path', { fill: 'currentColor', d: 'M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z' })
+    ]),
+    batch_create: () => h('svg', { viewBox: '0 0 24 24' }, [
+      h('path', { fill: 'currentColor', d: 'M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z' })
     ]),
     batch_update: () => h('svg', { viewBox: '0 0 24 24' }, [
       h('path', { fill: 'currentColor', d: 'M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z' })
     ]),
+    batch_delete: () => h('svg', { viewBox: '0 0 24 24' }, [
+      h('path', { fill: 'currentColor', d: 'M20.37,8.91L19.37,10.64L7.24,3.64L8.24,1.91L11.28,3.66L12.64,3.29L16.97,5.79L17.34,7.16L20.37,8.91M6,19V7H11.07L18,11V19A2,2 0 0,1 16,21H8A2,2 0 0,1 6,19Z' })
+    ]),
     upload: () => h('svg', { viewBox: '0 0 24 24' }, [
       h('path', { fill: 'currentColor', d: 'M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z' })
+    ]),
+    download: () => h('svg', { viewBox: '0 0 24 24' }, [
+      h('path', { fill: 'currentColor', d: 'M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z' })
+    ]),
+    export: () => h('svg', { viewBox: '0 0 24 24' }, [
+      h('path', { fill: 'currentColor', d: 'M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z' })
     ])
   };
   return icons[type as keyof typeof icons] || icons.create;
