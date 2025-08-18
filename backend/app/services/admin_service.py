@@ -208,3 +208,36 @@ class AdminService(BaseService):
                 admin_data['enable'] = enable_value
             except (ValueError, TypeError):
                 raise ValidationError(msg.get_error_message('ENABLE_FORMAT_ERROR'))
+    
+    def reset_admin_password(self, admin_id: int, new_password: str, current_admin_id: int) -> Dict[str, Any]:
+        """重置管理員密碼（超級管理員功能）"""
+        # 密碼長度檢查
+        if len(new_password) < 8:
+            raise ValidationError(msg.get_error_message('PASSWORD_LENGTH_INVALID'))
+        
+        admin = Admin.query.get(admin_id)
+        if not admin:
+            raise NotFoundError(msg.get_error_message('ADMIN_NOT_FOUND'))
+        
+        # 不能重置自己的密碼（應使用change_password接口）
+        if admin_id == current_admin_id:
+            raise BusinessLogicError(msg.get_error_message('CANNOT_RESET_OWN_PASSWORD'))
+        
+        # 不能重置其他超級管理員的密碼
+        if admin.is_super == 1:
+            raise BusinessLogicError(msg.get_error_message('CANNOT_RESET_SUPER_ADMIN_PASSWORD'))
+        
+        def _reset_operation():
+            # 設置新密碼
+            admin.set_password(new_password)
+            return {'admin_id': admin_id, 'admin_name': admin.admin_name}
+        
+        # 執行操作並記錄審計
+        result = self.execute_with_audit(
+            operation_func=_reset_operation,
+            operation_type='PASSWORD_RESET',
+            content={'target_admin_id': admin_id, 'target_admin_name': admin.admin_name},
+            admin_id=current_admin_id
+        )
+        
+        return result

@@ -38,6 +38,7 @@ SUCCESS_MESSAGES = {
     'ADMIN_CREATE_SUCCESS': '管理員創建成功',
     'ADMIN_UPDATE_SUCCESS': '管理員更新成功',
     'ADMIN_DELETE_SUCCESS': '管理員刪除成功',
+    'PASSWORD_RESET_SUCCESS': '密碼重置成功',
     'FILE_UPLOAD_SUCCESS': '文件上傳成功',
     
     # 系統相關
@@ -125,6 +126,8 @@ ERROR_MESSAGES = {
     'CANNOT_MODIFY_SUPER_ADMIN': '不能修改其他超級管理員的賬戶',
     'CANNOT_DELETE_SELF': '不能刪除自己的賬戶',
     'CANNOT_DELETE_SUPER_ADMIN': '不能刪除其他超級管理員的賬戶',
+    'CANNOT_RESET_OWN_PASSWORD': '不能重置自己的密碼，請使用修改密碼功能',
+    'CANNOT_RESET_SUPER_ADMIN_PASSWORD': '不能重置其他超級管理員的密碼',
     'IS_SUPER_PARAM_ERROR': 'is_super參數錯誤',
     'IS_SUPER_FORMAT_ERROR': 'is_super參數格式錯誤',
     'ENABLE_PARAM_ERROR': 'enable參數錯誤',

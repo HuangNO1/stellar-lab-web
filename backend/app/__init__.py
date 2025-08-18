@@ -84,6 +84,10 @@ def create_app(config_name=None):
         # 跳過敏感路由，避免影響密碼等關鍵數據
         skip_paths = ['/api/admin/login', '/api/admin/change-password']
         
+        # 跳過重置密碼路由
+        if request.path.startswith('/api/admins/') and request.path.endswith('/reset-password'):
+            return
+            
         if request.path in skip_paths:
             return
             

@@ -38,6 +38,7 @@ SUCCESS_MESSAGES = {
     'ADMIN_CREATE_SUCCESS': 'Administrator created successfully',
     'ADMIN_UPDATE_SUCCESS': 'Administrator updated successfully',
     'ADMIN_DELETE_SUCCESS': 'Administrator deleted successfully',
+    'PASSWORD_RESET_SUCCESS': 'Password reset successfully',
     'FILE_UPLOAD_SUCCESS': 'File uploaded successfully',
     
     # System related
@@ -126,6 +127,8 @@ ERROR_MESSAGES = {
     'CANNOT_MODIFY_SUPER_ADMIN': 'Cannot modify other super administrator accounts',
     'CANNOT_DELETE_SELF': 'Cannot delete your own account',
     'CANNOT_DELETE_SUPER_ADMIN': 'Cannot delete other super administrator accounts',
+    'CANNOT_RESET_OWN_PASSWORD': 'Cannot reset your own password, please use change password feature',
+    'CANNOT_RESET_SUPER_ADMIN_PASSWORD': 'Cannot reset other super administrator passwords',
     'IS_SUPER_PARAM_ERROR': 'is_super parameter error',
     'IS_SUPER_FORMAT_ERROR': 'is_super parameter format error',
     'ENABLE_PARAM_ERROR': 'enable parameter error',

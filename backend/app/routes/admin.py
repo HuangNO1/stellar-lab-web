@@ -62,3 +62,20 @@ def delete_admin(admin_id):
         error_data = admin_service.format_error_response(e)
         status_code = 404 if 'NotFoundError' in str(type(e)) else 400
         return jsonify(error_response(error_data['code'], error_data['message'])), status_code
+
+@bp.route('/admins/<int:admin_id>/reset-password', methods=['POST'])
+@super_admin_required
+def reset_admin_password(admin_id):
+    """重置管理員密碼"""
+    try:
+        data = request.get_json()
+        if not data or 'new_password' not in data:
+            return jsonify(error_response(2000, msg.get_error_message('MISSING_REQUIRED_FIELDS'))), 400
+        
+        new_password = data.get('new_password', '')
+        admin_service.reset_admin_password(admin_id, new_password, g.current_admin.admin_id)
+        return jsonify(success_response(message=msg.get_success_message('PASSWORD_RESET_SUCCESS')))
+    except ServiceException as e:
+        error_data = admin_service.format_error_response(e)
+        status_code = 404 if 'NotFoundError' in str(type(e)) else 400
+        return jsonify(error_response(error_data['code'], error_data['message'])), status_code

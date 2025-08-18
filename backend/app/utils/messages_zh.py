@@ -42,6 +42,7 @@ SUCCESS_MESSAGES = {
     'ADMIN_CREATE_SUCCESS': '管理员创建成功',
     'ADMIN_UPDATE_SUCCESS': '管理员更新成功',
     'ADMIN_DELETE_SUCCESS': '管理员删除成功',
+    'PASSWORD_RESET_SUCCESS': '密码重置成功',
     'FILE_UPLOAD_SUCCESS': '文件上传成功',
     
     # 系统相关
@@ -139,6 +140,8 @@ ERROR_MESSAGES = {
     'CANNOT_MODIFY_SUPER_ADMIN': '不能修改其他超级管理员的账户',
     'CANNOT_DELETE_SELF': '不能删除自己的账户',
     'CANNOT_DELETE_SUPER_ADMIN': '不能删除其他超级管理员的账户',
+    'CANNOT_RESET_OWN_PASSWORD': '不能重置自己的密码，请使用修改密码功能',
+    'CANNOT_RESET_SUPER_ADMIN_PASSWORD': '不能重置其他超级管理员的密码',
     'IS_SUPER_PARAM_ERROR': 'is_super参数错误',
     'IS_SUPER_FORMAT_ERROR': 'is_super参数格式错误',
     'ENABLE_PARAM_ERROR': 'enable参数错误',
