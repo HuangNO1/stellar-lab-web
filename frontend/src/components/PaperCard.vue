@@ -353,7 +353,8 @@ const downloadPaper = (paper: Paper) => {
   height: auto;
   border-radius: 0.5rem;
   overflow: hidden;
-  background: #f5f5f5;
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
   flex-shrink: 0;
 }
 
@@ -540,6 +541,13 @@ const downloadPaper = (paper: Paper) => {
   border-top-color: rgba(255, 255, 255, 0.1);
 }
 
+/* 暗色主題下的預覽區域 */
+[data-theme="dark"] .paper-preview,
+.dark .paper-preview,
+.dark-mode .paper-preview {
+  background: rgba(255, 255, 255, 0.05);
+}
+
 /* 預設圖片樣式 */
 .preview-placeholder {
   width: 100%;
@@ -548,30 +556,53 @@ const downloadPaper = (paper: Paper) => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
-              linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
-              linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
-              linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
-  background-size: 20px 20px;
-  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   gap: 0.5rem;
+  position: relative;
+}
+
+.preview-placeholder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.03) 10px,
+    rgba(0, 0, 0, 0.03) 20px
+  );
 }
 
 .placeholder-text {
   font-size: 0.75rem;
-  color: #999;
+  color: #6c757d;
   text-align: center;
   font-weight: 500;
+  position: relative;
+  z-index: 1;
 }
 
 /* 暗色主題下的預設圖片 */
 [data-theme="dark"] .preview-placeholder,
 .dark .preview-placeholder,
 .dark-mode .preview-placeholder {
-  background: linear-gradient(45deg, #333 25%, transparent 25%), 
-              linear-gradient(-45deg, #333 25%, transparent 25%), 
-              linear-gradient(45deg, transparent 75%, #333 75%), 
-              linear-gradient(-45deg, transparent 75%, #333 75%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+}
+
+[data-theme="dark"] .preview-placeholder::before,
+.dark .preview-placeholder::before,
+.dark-mode .preview-placeholder::before {
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(255, 255, 255, 0.05) 10px,
+    rgba(255, 255, 255, 0.05) 20px
+  );
 }
 
 [data-theme="dark"] .placeholder-text,

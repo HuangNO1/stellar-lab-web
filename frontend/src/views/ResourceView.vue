@@ -410,6 +410,32 @@ onMounted(() => {
   box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.2);
 }
 
+/* 暗色主題下的資源圖片區域 */
+[data-theme="dark"] .resource-image,
+.dark .resource-image,
+.dark-mode .resource-image {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* 暗色主題下的預設圖片 */
+[data-theme="dark"] .resource-placeholder,
+.dark .resource-placeholder,
+.dark-mode .resource-placeholder {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+}
+
+[data-theme="dark"] .resource-placeholder::before,
+.dark .resource-placeholder::before,
+.dark-mode .resource-placeholder::before {
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(255, 255, 255, 0.05) 10px,
+    rgba(255, 255, 255, 0.05) 20px
+  );
+}
+
 .resource-item-skeleton .card-content {
   padding: 1.5rem;
   display: flex;
@@ -482,7 +508,8 @@ onMounted(() => {
   margin-bottom: 0;
   border-radius: 8px;
   overflow: hidden;
-  background: var(--n-color-neutral);
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -502,12 +529,29 @@ onMounted(() => {
   justify-content: center;
   width: 100%;
   height: 100%;
-  background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
-              linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
-              linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
-              linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
-  background-size: 20px 20px;
-  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  position: relative;
+}
+
+.resource-placeholder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.03) 10px,
+    rgba(0, 0, 0, 0.03) 20px
+  );
+}
+
+.resource-placeholder > * {
+  position: relative;
+  z-index: 1;
 }
 
 .resource-info {
