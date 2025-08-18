@@ -129,6 +129,16 @@ class ResearchGroupService(BaseService):
         # 數據校驗
         self._validate_group_data(group_data, is_create=False)
         
+        # 儲存變更內容的容器，使用外部變數
+        audit_content = {
+            'group_id': group_id,
+            'group_name': group_data.get('research_group_name_zh', group.research_group_name_zh),
+            'changes': {},
+            'changed_fields': [],
+            'change_count': 0,
+            'operation_details': {}
+        }
+        
         def _update_operation():
             update_data = {}
             
@@ -161,13 +171,22 @@ class ResearchGroupService(BaseService):
             association_updates = self._update_group_associations(group, group_data)
             update_data.update(association_updates)
             
-            return group.to_dict(), update_data
+            # 更新外部的審計內容
+            audit_content['changes'] = update_data
+            audit_content['changed_fields'] = list(update_data.keys())
+            audit_content['change_count'] = len(update_data)
+            audit_content['operation_details'] = {
+                'before_update': {k: v['old'] for k, v in update_data.items() if isinstance(v, dict) and 'old' in v},
+                'after_update': {k: v['new'] for k, v in update_data.items() if isinstance(v, dict) and 'new' in v}
+            } if update_data else {}
+            
+            return group.to_dict()
         
         # 執行操作並記錄審計
-        result, update_data = self.execute_with_audit(
+        result = self.execute_with_audit(
             operation_func=_update_operation,
             operation_type='UPDATE',
-            content={}
+            content=audit_content
         )
         
         return result

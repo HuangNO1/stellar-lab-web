@@ -126,6 +126,16 @@ class ProjectService(BaseService):
         # 數據校驗
         self._validate_project_data(project_data, is_create=False)
         
+        # 儲存變更內容的容器，使用外部變數
+        audit_content = {
+            'project_id': project_id,
+            'project_name': project_data.get('project_name_zh', project.project_name_zh),
+            'changes': {},
+            'changed_fields': [],
+            'change_count': 0,
+            'operation_details': {}
+        }
+        
         def _update_operation():
             update_data = {}
             
@@ -158,13 +168,22 @@ class ProjectService(BaseService):
                                 field_name=field
                             )
             
-            return project.to_dict(), update_data
+            # 更新外部的審計內容
+            audit_content['changes'] = update_data
+            audit_content['changed_fields'] = list(update_data.keys())
+            audit_content['change_count'] = len(update_data)
+            audit_content['operation_details'] = {
+                'before_update': {k: v['old'] for k, v in update_data.items() if isinstance(v, dict) and 'old' in v},
+                'after_update': {k: v['new'] for k, v in update_data.items() if isinstance(v, dict) and 'new' in v}
+            } if update_data else {}
+            
+            return project.to_dict()
         
         # 執行操作並記錄審計
-        result, update_data = self.execute_with_audit(
+        result = self.execute_with_audit(
             operation_func=_update_operation,
             operation_type='UPDATE',
-            content={}
+            content=audit_content
         )
         
         return result

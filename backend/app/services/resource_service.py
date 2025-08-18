@@ -174,8 +174,17 @@ class ResourceService(BaseService):
             raise NotFoundError(get_message('RESOURCE_NOT_FOUND'))
         
         # 記錄更新前的值
-        old_values = {}
         excluded_fields = ['resource_image_delete', 'created_time', 'updated_time', 'resource_id']
+        
+        # 儲存變更內容的容器，使用外部變數
+        audit_content = {
+            'resource_id': resource_id,
+            'resource_name': resource_data.get('resource_name_zh', resource.resource_name_zh),
+            'changes': {},
+            'changed_fields': [],
+            'change_count': 0,
+            'operation_details': {}
+        }
         
         def _update_operation():
             changes = {}
@@ -216,16 +225,22 @@ class ResourceService(BaseService):
                         changes[key] = {'old': old_value, 'new': value}
                         setattr(resource, key, value)
             
-            return resource.to_dict(), changes
+            # 更新外部的審計內容
+            audit_content['changes'] = changes
+            audit_content['changed_fields'] = list(changes.keys())
+            audit_content['change_count'] = len(changes)
+            audit_content['operation_details'] = {
+                'before_update': {k: v['old'] for k, v in changes.items()},
+                'after_update': {k: v['new'] for k, v in changes.items()}
+            } if changes else {}
+            
+            return resource.to_dict()
         
         # 執行操作並記錄審計
-        result, changes = self.execute_with_audit(
+        result = self.execute_with_audit(
             operation_func=_update_operation,
             operation_type='UPDATE',
-            content={
-                'resource_id': resource_id,
-                'resource_name': resource_data.get('resource_name_zh', '')
-            },
+            content=audit_content,
             admin_id=admin_id
         )
         
