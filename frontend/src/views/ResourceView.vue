@@ -410,6 +410,23 @@ onMounted(() => {
   box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.2);
 }
 
+/* 暗色主題下的資源卡片 */
+[data-theme="dark"] .resource-item,
+.dark .resource-item,
+.dark-mode .resource-item {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .resource-item:hover,
+.dark .resource-item:hover,
+.dark-mode .resource-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-left-color: #70a1ff;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.3);
+}
+
 /* 暗色主題下的資源圖片區域 */
 [data-theme="dark"] .resource-image,
 .dark .resource-image,
@@ -434,6 +451,28 @@ onMounted(() => {
     rgba(255, 255, 255, 0.05) 10px,
     rgba(255, 255, 255, 0.05) 20px
   );
+}
+
+/* 暗色主題下的文字顏色 */
+[data-theme="dark"] .resource-name,
+.dark .resource-name,
+.dark-mode .resource-name {
+  color: #fff;
+}
+
+[data-theme="dark"] .resource-description,
+[data-theme="dark"] .meta-value,
+.dark .resource-description,
+.dark .meta-value,
+.dark-mode .resource-description,
+.dark-mode .meta-value {
+  color: #ccc;
+}
+
+[data-theme="dark"] .meta-label,
+.dark .meta-label,
+.dark-mode .meta-label {
+  color: #fff;
 }
 
 .resource-item-skeleton .card-content {
@@ -477,13 +516,14 @@ onMounted(() => {
 
 /* Resource Item */
 .resource-item {
-  background: var(--n-card-color);
-  border: 1px solid var(--n-border-color);
+  background: #fff;
   border-radius: 0.75rem;
-  overflow: hidden;
-  transition: all 0.3s ease;
   box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.08);
-  margin-bottom: 1rem;
+  border: 0.0625rem solid rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  border-left: 0.25rem solid transparent;
 }
 
 .resource-item:last-child {
@@ -492,8 +532,8 @@ onMounted(() => {
 
 .resource-item:hover {
   transform: translateY(-0.125rem);
-  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.12);
-  border-color: var(--n-color-target);
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.12);
+  border-left-color: #1890ff;
 }
 
 .card-content {
@@ -503,8 +543,8 @@ onMounted(() => {
 }
 
 .resource-image {
-  width: 150px;
-  height: 100px;
+  width: 15rem;
+  height: auto;
   margin-bottom: 0;
   border-radius: 8px;
   overflow: hidden;
@@ -562,45 +602,66 @@ onMounted(() => {
 .resource-name {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--n-text-color);
+  color: #333;
   margin: 0 0 0.75rem 0;
-  line-height: 1.3;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .resource-description {
-  color: var(--n-text-color-placeholder);
+  color: #666;
   font-size: 0.875rem;
-  line-height: 1.5;
+  line-height: 1.6;
   margin: 0 0 1rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .resource-meta {
   margin-bottom: 1rem;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .meta-row {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
   font-size: 0.875rem;
   margin-bottom: 0;
+  line-height: 1.5;
 }
 
 .meta-label {
   font-weight: 500;
-  color: var(--n-text-color);
+  color: #333;
   margin-right: 0.5rem;
   flex-shrink: 0;
 }
 
 .meta-value {
-  color: var(--n-text-color-placeholder);
+  color: #666;
 }
 
 .resource-actions {
-  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-top: 1rem;
+  border-top: 0.0625rem solid #f0f0f0;
+}
+
+/* 暗色主題下的操作區域 */
+[data-theme="dark"] .resource-actions,
+.dark .resource-actions,
+.dark-mode .resource-actions {
+  border-top-color: rgba(255, 255, 255, 0.1);
 }
 
 .action-btn {
@@ -613,7 +674,14 @@ onMounted(() => {
   justify-content: center;
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid var(--n-border-color);
+  border-top: 0.0625rem solid #f0f0f0;
+}
+
+/* 暗色主題下的分頁 */
+[data-theme="dark"] .pagination-section,
+.dark .pagination-section,
+.dark-mode .pagination-section {
+  border-top-color: rgba(255, 255, 255, 0.1);
 }
 
 /* 響應式設計 */
