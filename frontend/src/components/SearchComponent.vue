@@ -37,7 +37,7 @@
     <!-- 高級搜索 -->
     <n-collapse-transition :show="showAdvanced">
       <div class="advanced-search">
-        <n-form label-placement="left" label-width="6.25rem" label-align="left">
+        <n-form label-placement="left" label-width="auto" label-align="left">
           <div class="form-row">
             <!-- 日期範圍 -->
             <n-form-item :label="$t('search.dateRange')" v-if="config.dateRange" class="form-item-wide">
@@ -49,6 +49,7 @@
                 :format="currentLocale === 'zh' ? 'yyyy年MM月dd日' : 'yyyy-MM-dd'"
                 value-format="yyyy-MM-dd"
                 clearable
+                class="date-picker-full"
               />
             </n-form-item>
           </div>
@@ -385,9 +386,9 @@ if (localFilters.value.start_date && localFilters.value.end_date) {
 /* 统一网格布局 */
 .form-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
   align-items: start;
 }
 
@@ -407,28 +408,27 @@ if (localFilters.value.start_date && localFilters.value.end_date) {
 
 /* 统一所有输入控件宽度 */
 :deep(.form-row .n-select),
-:deep(.form-row .n-date-picker) {
+:deep(.form-row .n-date-picker),
+.date-picker-full {
   width: 100% !important;
   max-width: none !important;
 }
 
-/* 排序控件特殊布局 */
-.sort-controls {
-  display: flex;
-  gap: 1rem;
+/* 優化標籤寬度 */
+:deep(.n-form-item-label) {
+  color: #666;
+  font-weight: 500;
+  white-space: nowrap;
+  padding-right: 0.75rem !important;
+  min-width: fit-content;
+  flex-shrink: 0;
 }
 
-.sort-field {
-  flex: 2;
-}
-
-.sort-order {
-  flex: 1;
-  min-width: 7rem;
-}
-
-/* 表單項樣式 */
+/* 確保表單項標籤不會被壓縮 */
 :deep(.n-form-item) {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
@@ -436,10 +436,26 @@ if (localFilters.value.start_date && localFilters.value.end_date) {
   margin-bottom: 0;
 }
 
-:deep(.n-form-item-label) {
-  color: #666;
-  font-weight: 500;
-  padding-right: 0.75rem !important;
+:deep(.n-form-item-blank) {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 排序控件特殊布局 */
+.sort-controls {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  width: 100%;
+}
+
+.sort-field,
+.sort-order {
+  min-width: 0;
+}
+
+.sort-order {
+  min-width: 8rem;
 }
 
 /* 暗色主題下的標籤顏色 */
@@ -449,6 +465,13 @@ if (localFilters.value.start_date && localFilters.value.end_date) {
 }
 
 /* 響應式設計 */
+@media (max-width: 64rem) {
+  .form-row {
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 1rem;
+  }
+}
+
 @media (max-width: 48rem) {
   .advanced-search {
     padding: 1rem;
@@ -457,45 +480,70 @@ if (localFilters.value.start_date && localFilters.value.end_date) {
   .form-row {
     grid-template-columns: 1fr;
     gap: 1rem;
+    margin-bottom: 1rem;
   }
 
   .sort-controls {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: 0.75rem;
   }
 
-  .sort-field,
   .sort-order {
-    flex: none;
     min-width: unset;
-  }
-
-  :deep(.n-form) {
-    --n-label-width: 4.375rem; /* 70px */
   }
 
   :deep(.n-form-item-label) {
     font-size: 0.875rem;
+    min-width: 5rem;
   }
 }
 
 @media (max-width: 36rem) {
-  :deep(.n-form) {
-    --n-label-placement: top;
+  :deep(.n-form-item) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
   }
 
   :deep(.n-form-item-label) {
-    padding-bottom: 0.5rem !important;
+    padding-bottom: 0.25rem !important;
     padding-right: 0 !important;
+    min-width: unset;
   }
 
   /* 移動端日期選擇器調整 */
-  :deep(.n-date-picker) {
+  :deep(.n-date-picker),
+  .date-picker-full {
     width: 100% !important;
   }
 
   .advanced-search {
     padding: 0.75rem;
+  }
+
+  .form-row {
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+}
+
+@media (max-width: 30rem) {
+  .advanced-search {
+    padding: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .form-row {
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  :deep(.n-form-item) {
+    gap: 0.25rem;
+  }
+
+  :deep(.n-form-item-label) {
+    font-size: 0.8rem;
   }
 }
 </style>
