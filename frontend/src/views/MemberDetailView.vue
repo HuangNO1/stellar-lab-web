@@ -57,22 +57,38 @@
         </n-button>
       </div>
       
-      <div class="member-layout">
-        <!-- 左側：頭像 -->
-        <div class="avatar-section">
-          <div class="member-avatar-container">
-            <n-avatar
-              :size="200"
-              :src="getMemberAvatar(member) || '/default-avatar.svg'"
-              :fallback-src="'/default-avatar.svg'"
-              class="member-avatar"
-            />
+      <div class="member-layout-container">
+        <div ref="memberLayoutRef" class="member-layout">
+          <!-- 左側：頭像 -->
+          <div class="avatar-section">
+            <n-affix
+              v-if="!isMobile"
+              :trigger-top="50"
+              position="absolute"
+              :listen-to="() => memberLayoutRef"
+            >
+              <div class="member-avatar-container">
+                <n-avatar
+                  :size="200"
+                  :src="getMemberAvatar(member) || '/default-avatar.svg'"
+                  :fallback-src="'/default-avatar.svg'"
+                  class="member-avatar"
+                />
+              </div>
+            </n-affix>
+            <div v-else class="member-avatar-container">
+              <n-avatar
+                :size="200"
+                :src="getMemberAvatar(member) || '/default-avatar.svg'"
+                :fallback-src="'/default-avatar.svg'"
+                class="member-avatar"
+              />
+            </div>
           </div>
-        </div>
 
-        <!-- 右側：詳細信息 -->
-        <div class="info-section">
-          <div class="member-info-container">
+          <!-- 右側：詳細信息 -->
+          <div class="info-section">
+            <div class="member-info-container">
             <!-- 姓名和職位 -->
             <h1 class="member-name">
               {{ getCurrentLocale() === 'zh' ? member.mem_name_zh : member.mem_name_en }}
@@ -93,13 +109,13 @@
           </div>
 
           <!-- 所屬課題組 -->
-          <div v-if="researchGroup" class="research-group" @click="toResearchGroup">
+          <div v-if="researchGroup" class="research-group">
             <n-icon size="16" class="contact-icon">
               <svg viewBox="0 0 24 24">
-                <path fill="currentColor" d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2M4 1v6h6V5.5l6 6v-2.84c-.94-.18-2-.76-2-1.66s1.06-1.48 2-1.66V1H4zm14.5 17.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5"/>
+                <path fill="currentColor" d="M12 2L2 7v10c0 5.55 3.84 9.739 9 11 5.16-1.261 9-5.45 9-11V7L12 2z"/>
               </svg>
             </n-icon>
-            <span class="group-link">{{ getResearchGroupName() }}</span>
+            <span class="group-link" @click="toResearchGroup">{{ getResearchGroupName() }}</span>
           </div>
 
           <!-- 個人描述 -->
@@ -109,6 +125,7 @@
           </div>
           </div>
         </div>
+      </div>
       </div>
 
       <!-- 相關論文 -->
@@ -137,7 +154,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { memberApi, researchGroupApi, paperApi } from '@/services/api';
@@ -158,6 +175,25 @@ const researchGroup = ref<ResearchGroup | null>(null);
 const relatedPapers = ref<Paper[]>([]);
 const loading = ref(false);
 const error = ref<string | null>(null);
+const memberLayoutRef = ref<HTMLElement | undefined>(undefined);
+
+// 檢測是否為移動設備（簡單的窗口寬度檢測）
+const isMobile = ref(false);
+
+// 檢測窗口大小
+const updateIsMobile = () => {
+  isMobile.value = window.innerWidth <= 768;
+};
+
+onMounted(() => {
+  updateIsMobile();
+  window.addEventListener('resize', updateIsMobile);
+});
+
+// 清理事件監聽器
+const cleanup = () => {
+  window.removeEventListener('resize', updateIsMobile);
+};
 
 // 計算屬性
 const getCurrentLocale = () => {
@@ -266,7 +302,14 @@ const goBack = () => {
 
 // 生命週期
 onMounted(() => {
+  updateIsMobile();
+  window.addEventListener('resize', updateIsMobile);
   fetchMemberDetail();
+});
+
+// 組件卸載時清理
+onBeforeUnmount(() => {
+  cleanup();
 });
 
 // 監聽路由參數變化
@@ -303,11 +346,18 @@ watch(() => route.params.id, () => {
 }
 
 /* Flex 布局容器 */
+.member-layout-container {
+  position: relative;
+  width: 100%;
+  min-height: 600px;
+}
+
 .member-layout {
   display: flex;
   gap: 3rem;
   align-items: flex-start;
   min-height: 25rem;
+  position: relative;
 }
 
 /* 頭像區域 */
@@ -321,8 +371,6 @@ watch(() => route.params.id, () => {
 
 .member-avatar-container {
   text-align: center;
-  position: sticky;
-  top: 1.5rem;
 }
 
 .member-avatar {
@@ -382,17 +430,23 @@ watch(() => route.params.id, () => {
 }
 
 .research-group {
-  cursor: pointer;
-  transition: color 0.3s ease;
+  cursor: default;
 }
 
-.research-group:hover {
-  color: #1890ff;
+.group-text {
+  margin-right: 0.25rem;
+  color: #666;
 }
 
 .group-link {
   color: #1890ff;
   text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.group-link:hover {
+  color: #40a9ff;
 }
 
 .member-description {
@@ -528,6 +582,24 @@ watch(() => route.params.id, () => {
   color: #ccc;
 }
 
+[data-theme="dark"] .group-text,
+.dark .group-text,
+.dark-mode .group-text {
+  color: #ccc;
+}
+
+[data-theme="dark"] .group-link,
+.dark .group-link,
+.dark-mode .group-link {
+  color: #70a1ff;
+}
+
+[data-theme="dark"] .group-link:hover,
+.dark .group-link:hover,
+.dark-mode .group-link:hover {
+  color: #91d5ff;
+}
+
 [data-theme="dark"] .member-description h3,
 .dark .member-description h3,
 .dark-mode .member-description h3 {
@@ -592,6 +664,10 @@ watch(() => route.params.id, () => {
   .member-detail-view {
     padding: 1rem;
     min-width: auto;
+  }
+  
+  .member-layout-container {
+    position: static;
   }
   
   .member-layout {

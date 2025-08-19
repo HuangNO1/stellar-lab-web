@@ -34,6 +34,20 @@
 
     <!-- 課題組詳情 -->
     <div v-else-if="researchGroup" class="group-content">
+      <!-- 返回按鈕 -->
+      <div class="back-button-section">
+        <n-button @click="goBack" ghost size="large">
+          <template #icon>
+            <n-icon>
+              <svg viewBox="0 0 24 24">
+                <path fill="currentColor" d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+              </svg>
+            </n-icon>
+          </template>
+          {{ $t('common.back') }}
+        </n-button>
+      </div>
+      
       <!-- 課題組信息 -->
       <div class="group-header">
         <h1 class="group-name">
@@ -171,6 +185,10 @@ const toMember = (memberId: number) => {
   router.push(`/member/${memberId}`);
 };
 
+const goBack = () => {
+  router.back();
+};
+
 // 生命週期
 onMounted(() => {
   fetchGroupDetail();
@@ -199,6 +217,13 @@ watch(() => route.params.id, () => {
 .not-found-state {
   text-align: center;
   padding: 5rem 1.25rem;
+}
+
+/* 返回按鈕區域 */
+.back-button-section {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 /* 課題組頭部 */
@@ -348,6 +373,11 @@ watch(() => route.params.id, () => {
 }
 
 /* 暗色主題支持 */
+[data-theme="dark"] .back-button-section,
+.dark .back-button-section {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
 [data-theme="dark"] .group-view,
 .dark .group-view,
 .dark-mode .group-view {
