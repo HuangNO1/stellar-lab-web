@@ -5,6 +5,7 @@ export default {
         research: '研究',
         projects: '項目',
         papers: '論文',
+        resources: '資源',
         news: '新聞',
         about: '關於',
         menu: '導航菜單'
@@ -23,6 +24,7 @@ export default {
         retry: '重試',
         viewDetails: '查看詳情',
         fetchError: '獲取數據失敗',
+        loadError: '載入數據失敗',
         goBack: '返回',
         back: '返回',
         page: '頁',
@@ -59,6 +61,7 @@ export default {
     },
     members: {
         title: '團隊成員',
+        description: '認識我們的研究團隊成員',
         teachers: '教師',
         professor: '教授',
         postdoc: '博士後',
@@ -67,7 +70,7 @@ export default {
         undergraduate: '大學生',
         alumni: '校友',
         others: '其他成員',
-        description: '個人簡介',
+        profile: '個人簡介',
         relatedPapers: '相關論文',
         positions: {
             professor: '教授',
@@ -80,8 +83,18 @@ export default {
             undergraduate: '大學生',
             alumni: '校友',
             other: '其他',
-            year: '年級'
-        }
+            year: '年級',
+            // 校友身份類型
+            phdGraduate: '博士畢業生',
+            masterGraduate: '碩士畢業生',
+            undergraduateGraduate: '本科畢業生',
+            faculty: '教職員工',
+            graduateYear: '年畢業',
+            graduate: '畢業'
+        },
+        // 研究領域相關
+        researchAreas: '研究領域',
+        noPapersAvailable: '無可用論文資訊'
     },
     research: {
         title: '研究領域',
@@ -105,6 +118,9 @@ export default {
         notFound: '未找到該新聞',
         invalidId: '無效的新聞ID',
         fetchError: '獲取新聞詳情失敗',
+        noContent: '無內容',
+        noContentTitle: '新聞內容為空',
+        noContentMessage: '這條新聞暫時沒有可顯示的內容。',
         types: {
             publication: '論文發表',
             award: '獲獎消息',
@@ -129,6 +145,9 @@ export default {
         accepted: '已接收',
         submitted: '投稿中',
         description: '查看實驗室發表的學術論文',
+        searchPlaceholder: '搜尋論文...',
+        filterByType: '按類型篩選',
+        filterByStatus: '按狀態篩選',
         type: '論文類型',
         status: '狀態',
         viewOnline: '線上查看',
@@ -143,6 +162,8 @@ export default {
         venue: '發表期刊/會議',
         andOthers: '等',
         authors: '作者',
+        allAuthors: '全部作者',
+        noPreview: '無預覽圖片',
         abstract: '摘要',
         correspondingAuthor: '通訊作者',
         notFound: '未找到該論文',
@@ -169,6 +190,31 @@ export default {
         notFound: '未找到該項目',
         invalidId: '無效的項目ID',
         fetchError: '獲取項目詳情失敗'
+    },
+    resources: {
+        title: '實驗室資源',
+        description: '管理實驗室設備、軟體和資料庫資源',
+        name: '資源名稱',
+        resourceType: '資源類型',
+        availabilityStatus: '可用狀態',
+        location: '位置',
+        contact: '聯絡方式',
+        url: '訪問連結',
+        empty: '暫無資源數據',
+        notFound: '未找到該資源',
+        fetchError: '獲取資源詳情失敗',
+        types: {
+            equipment: '設備',
+            software: '軟體',
+            database: '資料庫',
+            dataset: '數據集',
+            other: '其他'
+        },
+        status: {
+            unavailable: '不可用',
+            available: '可用',
+            maintenance: '維護中'
+        }
     },
     groups: {
         title: '研究課題組',
@@ -248,11 +294,14 @@ export default {
             totalPapers: '總論文數',
             totalProjects: '總項目數',
             totalNews: '總新聞數',
+            totalResources: '總資源數',
+            totalGroups: '總課題組數',
             quickActions: '快速操作',
             addMember: '添加成員',
             addPaper: '添加論文',
             addProject: '添加項目',
             addNews: '添加新聞',
+            addResource: '添加資源',
             systemStatus: '系統狀態',
             apiStatus: 'API服務',
             databaseStatus: '資料庫',
@@ -265,6 +314,7 @@ export default {
             checking: '檢查中...',
             recentActivities: '最近活動',
             noActivities: '暫無活動記錄',
+            activityTemplate: '{admin} {action} {module}',
             todoList: '待辦事項',
             reviewPapers: '審核新提交的論文',
             updateLabInfo: '更新實驗室基本資訊',
@@ -308,6 +358,13 @@ export default {
                 master: '碩士生',
                 undergraduate: '大學生'
             },
+            alumniIdentity: {
+                phd: '博士畢業生',
+                master: '碩士畢業生',
+                undergraduate: '本科畢業生',
+                teacher: '教職員工',
+                other: '其他'
+            },
             paperTypes: {
                 conference: '會議',
                 journal: '期刊',
@@ -327,6 +384,18 @@ export default {
                 publication: '論文發表',
                 award: '獲獎消息',
                 activity: '學術活動'
+            },
+            resourceTypes: {
+                equipment: '設備',
+                software: '軟體',
+                database: '資料庫',
+                dataset: '數據集',
+                other: '其他'
+            },
+            resourceStatus: {
+                unavailable: '不可用',
+                available: '可用',
+                maintenance: '維護中'
             },
             validationMessages: {
                 required: '此欄位為必填項',
@@ -399,6 +468,8 @@ export default {
                 jobType: '職務類型',
                 studentType: '學生類型',
                 studentGrade: '年級',
+                graduationYear: '畢業年份',
+                alumniIdentity: '校友身份',
                 destinationZh: '去向（中文）',
                 destinationEn: '去向（英文）',
                 group: {
@@ -408,6 +479,8 @@ export default {
                 description: '成員描述（中文）',
                 descriptionEn: '成員描述（英文）',
                 avatar: '頭像上傳',
+                descriptionTemplate: '成員描述模板（支持 Markdown 語法和 TAG 標籤）',
+                descriptionTemplateEn: '成員描述模板（支持 Markdown 語法和 TAG 標籤）',
                 placeholders: {
                     nameZh: '請輸入中文姓名',
                     nameEn: '請輸入英文姓名',
@@ -416,6 +489,8 @@ export default {
                     jobType: '請選擇職務類型',
                     studentType: '請選擇學生類型',
                     studentGrade: '請輸入年級（1-10）',
+                    graduationYear: '請輸入畢業年份',
+                    alumniIdentity: '請選擇校友身份',
                     destinationZh: '請輸進去向（中文）',
                     destinationEn: '請輸進去向（英文）',
                     group: '請選擇課題組',
@@ -455,6 +530,8 @@ export default {
                 status: '接收狀態',
                 url: '論文連結',
                 file: '論文文件',
+                previewImg: '預覽圖片',
+                previewImgAlt: '論文預覽圖片',
                 authors: '作者',
                 labAuthors: '實驗室作者',
                 allAuthors: '全部作者',
@@ -513,6 +590,49 @@ export default {
                 }
             }
         },
+        resources: {
+            addResource: '添加資源',
+            editResource: '編輯資源',
+            searchPlaceholder: '搜索資源名稱...',
+            filterByType: '按類型篩選',
+            filterByStatus: '按狀態篩選',
+            fetchError: '獲取資源列表失敗',
+            deleteConfirmText: '確定要刪除這個資源嗎？此操作不可撤銷。',
+            deleteSuccess: '資源刪除成功',
+            deleteError: '刪除資源失敗',
+            form: {
+                nameZh: '中文名稱',
+                nameEn: '英文名稱',
+                descriptionZh: '中文描述',
+                descriptionEn: '英文描述',
+                type: '資源類型',
+                locationZh: '中文位置',
+                locationEn: '英文位置',
+                url: '資源連結',
+                file: '資源文件',
+                image: '資源圖片',
+                imageAlt: '資源圖片預覽',
+                availabilityStatus: '可用狀態',
+                contactInfo: '聯絡方式',
+                placeholders: {
+                    nameZh: '請輸入資源中文名稱',
+                    nameEn: '請輸入資源英文名稱',
+                    descriptionZh: '請輸入資源中文描述',
+                    descriptionEn: '請輸入資源英文描述',
+                    type: '請選擇資源類型',
+                    locationZh: '請輸入中文位置',
+                    locationEn: '請輸入英文位置',
+                    url: '請輸入資源連結',
+                    availabilityStatus: '請選擇可用狀態',
+                    contactInfo: '請輸入聯絡方式'
+                },
+                validation: {
+                    nameZhRequired: '請輸入中文名稱',
+                    typeRequired: '請選擇資源類型',
+                    availabilityStatusRequired: '請選擇可用狀態'
+                }
+            }
+        },
         news: {
             addNews: '添加新聞',
             editNews: '編輯新聞',
@@ -539,7 +659,7 @@ export default {
                 },
                 validation: {
                     typeRequired: '請選擇新聞類型',
-                    contentZhRequired: '請輸入新聞中文內容',
+                    titleRequired: '請至少輸入中文或英文標題之一',
                     dateRequired: '請選擇新聞日期'
                 }
             }
@@ -610,7 +730,9 @@ export default {
                 createGroup: '新增課題組',
                 editGroup: '編輯課題組',
                 createAdmin: '新增管理員',
-                editAdmin: '編輯管理員'
+                editAdmin: '編輯管理員',
+                createResource: '新增資源',
+                editResource: '編輯資源'
             },
             messages: {
                 createSuccess: '創建成功',
@@ -638,7 +760,8 @@ export default {
                     papers: '論文',
                     projects: '項目',
                     news: '新聞',
-                    groups: '課題組'
+                    groups: '課題組',
+                    resources: '資源'
                 }
             }
         },
@@ -684,7 +807,7 @@ export default {
         admins: {
             addAdmin: '添加管理員',
             editAdmin: '編輯管理員',
-            resetPassword: '重置密碼',
+            resetPassword: '重設密碼',
             searchPlaceholder: '搜索管理員使用者名稱...',
             adminName: '使用者名稱',
             adminType: '類型',
@@ -697,13 +820,13 @@ export default {
             deleteError: '刪除管理員失敗',
             noEditPermission: '無權限編輯此管理員',
             noDeletePermission: '無權限刪除此管理員',
-            noResetPasswordPermission: '無權限重置此管理員密碼',
+            noResetPasswordPermission: '無權限重設此管理員密碼',
             noCreatePermission: '無權限創建管理員',
             cannotEditSelf: '不能編輯自己的帳號',
             cannotEditSuperAdmin: '不能編輯超級管理員',
             messages: {
-                passwordResetSuccess: '密碼重置成功',
-                passwordResetFailed: '密碼重置失敗'
+                passwordResetSuccess: '密碼重設成功',
+                passwordResetFailed: '密碼重設失敗'
             },
             form: {
                 adminName: '使用者名稱',
@@ -750,13 +873,14 @@ export default {
             login: '登錄',
             logout: '登出',
             changePassword: '修改密碼',
-            passwordReset: '重置密碼',
+            passwordReset: '重設密碼',
             batchCreate: '批次創建',
             batchUpdate: '批次更新',
             batchDelete: '批次刪除',
             upload: '文件上傳',
             download: '文件下載',
-            export: '數據匯出',
+            export: '數據導出',
+            unknownModule: '模組 {id}',
             adminModule: '管理員/認證',
             labModule: '實驗室',
             groupModule: '課題組',
@@ -817,10 +941,10 @@ export default {
             backToHome: '返回首頁',
             backToDashboard: '返回儀錶板',
             quickNavigation: '快速導航',
-            serverError: '服務器錯誤',
-            serverErrorDescription: '服務器發生錯誤，請稍後再試。',
-            networkError: '網絡錯誤',
-            networkErrorDescription: '網絡連接失敗，請檢查您的網絡設置。'
+            serverError: '伺服器錯誤',
+            serverErrorDescription: '伺服器發生錯誤，請稍後再試。',
+            networkError: '網路錯誤',
+            networkErrorDescription: '網路連接失敗，請檢查您的網路設定。'
         },
         // 圖片裁切翻譯
         imageCropper: {
@@ -829,6 +953,7 @@ export default {
             cropAvatar: '裁切頭像',
             cropLogo: '裁切Logo',
             cropCarousel: '裁切輪播圖',
+            cropImage: '裁切圖片',
             avatarHint: '頭像將被裁切為正方形',
             logoHint: 'Logo 可保持原始比例',
             carouselHint: '請選擇適合的寬高比例',

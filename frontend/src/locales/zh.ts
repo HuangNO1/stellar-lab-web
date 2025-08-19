@@ -93,8 +93,8 @@ export default {
             graduate: '毕业'
         },
         // 研究领域相关
-        researchAreas: '研究領域',
-        noPapersAvailable: '無可用論文資訊'
+        researchAreas: '研究领域',
+        noPapersAvailable: '无可用论文资讯'
     },
     research: {
         title: '研究领域',
@@ -479,8 +479,8 @@ export default {
                 description: '成员描述（中文）',
                 descriptionEn: '成员描述（英文）',
                 avatar: '头像上传',
-                descriptionTemplate: '成員描述模板（支持 Markdown 語法和 TAG 標籤）',
-                descriptionTemplateEn: '成員描述模板（支持 Markdown 語法和 TAG 標籤）',
+                descriptionTemplate: '成员描述模板（支持 Markdown 语法和 TAG 标签）',
+                descriptionTemplateEn: '成员描述模板（支持 Markdown 语法和 TAG 标签）',
                 placeholders: {
                     nameZh: '请输入中文姓名',
                     nameEn: '请输入英文姓名',
@@ -533,7 +533,7 @@ export default {
                 previewImg: '预览图片',
                 previewImgAlt: '论文预览图片',
                 authors: '作者',
-                labAuthors: '實驗室作者',
+                labAuthors: '实验室作者',
                 allAuthors: '全部作者',
                 allAuthorsZh: '全部作者（中文）',
                 allAuthorsEn: '全部作者（英文）',
@@ -933,18 +933,18 @@ export default {
             settings: '系统设置',
             settingsDesc: '配置系统参数和选项'
         },
-        // 錯誤頁面翻譯
+        // 错误页面翻译
         error: {
-            pageNotFound: '頁面未找到',
-            pageNotFoundDescription: '抱歉，您訪問的頁面不存在或已被移動。',
-            adminPageNotFoundDescription: '抱歉，您訪問的管理頁面不存在。請檢查URL是否正確。',
-            backToHome: '返回首頁',
-            backToDashboard: '返回儀表板',
-            quickNavigation: '快速導航',
-            serverError: '服務器錯誤',
-            serverErrorDescription: '服務器發生錯誤，請稍後再試。',
-            networkError: '網絡錯誤',
-            networkErrorDescription: '網絡連接失敗，請檢查您的網絡設置。'
+            pageNotFound: '页面未找到',
+            pageNotFoundDescription: '抱歉，您访问的页面不存在或已被移动。',
+            adminPageNotFoundDescription: '抱歉，您访问的管理页面不存在。请检查URL是否正确。',
+            backToHome: '返回首页',
+            backToDashboard: '返回仪表板',
+            quickNavigation: '快速导航',
+            serverError: '服务器错误',
+            serverErrorDescription: '服务器发生错误，请稍后再试。',
+            networkError: '网络错误',
+            networkErrorDescription: '网络连接失败，请检查您的网络设置。'
         },
         // 图片裁切翻译
         imageCropper: {
