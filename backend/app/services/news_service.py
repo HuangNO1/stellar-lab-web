@@ -1,10 +1,13 @@
 from typing import Optional, Dict, Any
 from datetime import datetime
+import logging
 from app.models import News
 from app.utils.validators import validate_string_length, validate_date
 from app.utils.helpers import get_pagination_params, paginate_query
 from app.utils.messages import msg
 from .base_service import BaseService, ValidationError, NotFoundError
+
+logger = logging.getLogger(__name__)
 
 
 class NewsService(BaseService):
@@ -52,8 +55,19 @@ class NewsService(BaseService):
                 if valid and date_obj:
                     query = query.filter(News.news_date <= date_obj)
         
-        # 按日期倒序排序
-        query = query.order_by(News.news_date.desc())
+        # 應用排序
+        sort_by = filters.get('sort_by', 'news_date') if filters else 'news_date'
+        order = filters.get('order', 'desc') if filters else 'desc'
+        
+        # 根據排序字段和順序進行排序
+        if sort_by == 'news_date':
+            if order == 'asc':
+                query = query.order_by(News.news_date.asc())
+            else:
+                query = query.order_by(News.news_date.desc())
+        else:
+            # 默認按日期倒序排序
+            query = query.order_by(News.news_date.desc())
         
         # 分頁
         page, per_page = get_pagination_params()

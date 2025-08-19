@@ -17,10 +17,12 @@ def get_news():
             'news_type': request.args.get('news_type', type=int),
             'start_date': request.args.get('start_date'),
             'end_date': request.args.get('end_date'),
-            'show_all': request.args.get('show_all', 'false').lower() == 'true'
+            'show_all': request.args.get('show_all', 'false').lower() == 'true',
+            'sort_by': request.args.get('sort_by', 'news_date'),
+            'order': request.args.get('order', 'desc')
         }
-        # 移除空值
-        filters = {k: v for k, v in filters.items() if v is not None and v != ''}
+        # 移除空值，但保留 sort_by 和 order
+        filters = {k: v for k, v in filters.items() if (k in ['sort_by', 'order']) or (v is not None and v != '')}
         
         result = news_service.get_news_list(filters)
         return jsonify(success_response(result))
