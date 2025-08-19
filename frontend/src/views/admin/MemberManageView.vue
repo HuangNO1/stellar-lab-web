@@ -330,7 +330,7 @@ const groupOptions = ref<Array<{ label: string; value: number; nameEn?: string }
 const groupOptionsWithNone = computed(() => {
   const noneOption = {
     label: t('admin.members.form.group.none'),
-    value: null
+    value: -1
   };
   return [noneOption, ...groupOptions.value];
 });
@@ -649,7 +649,14 @@ const handleBatchUpdate = async () => {
         return true;
       })
       .reduce((acc, key) => {
-        acc[key] = batchFormData[key];
+        let value = batchFormData[key];
+        
+        // 特殊處理：research_group_id 為 -1 時轉換為 null（代表選擇了「無」）
+        if (key === 'research_group_id' && value === -1) {
+          value = null;
+        }
+        
+        acc[key] = value;
         return acc;
       }, {} as Record<string, unknown>);
     
