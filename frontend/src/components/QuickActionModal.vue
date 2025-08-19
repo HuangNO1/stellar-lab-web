@@ -1101,13 +1101,22 @@ const formRules = computed(() => {
     rules.mem_type = [{
       required: false,
       validator: (rule: unknown, value: unknown) => {
+        // 檢查值是否存在且為有效的成員類型
         if (value === null || value === undefined || value === '') {
           return new Error(t('admin.members.form.validation.typeRequired'));
         }
-        // 檢查成員類型是否為有效值 (0, 1, 2)
-        if (![0, 1, 2].includes(value as number)) {
+        
+        // 轉換為數字並檢查是否為有效值
+        const numValue = Number(value);
+        if (isNaN(numValue) || ![0, 1, 2].includes(numValue)) {
           return new Error(t('admin.members.form.validation.typeRequired'));
         }
+        
+        // 確保 formData 中存儲的是數字類型
+        if (typeof value !== 'number') {
+          (formData as MemberFormData).mem_type = numValue;
+        }
+        
         return true;
       },
       trigger: 'change'
@@ -1161,6 +1170,18 @@ const formRules = computed(() => {
         if (value === null || value === undefined || value === '') {
           return new Error(t('admin.papers.form.validation.typeRequired'));
         }
+        
+        // 轉換為數字並檢查是否為有效值
+        const numValue = Number(value);
+        if (isNaN(numValue) || ![0, 1, 2, 3, 4].includes(numValue)) {
+          return new Error(t('admin.papers.form.validation.typeRequired'));
+        }
+        
+        // 確保 formData 中存儲的是數字類型
+        if (typeof value !== 'number') {
+          (formData as PaperFormData).paper_type = numValue;
+        }
+        
         return true;
       },
       trigger: 'change'
@@ -1171,6 +1192,18 @@ const formRules = computed(() => {
         if (value === null || value === undefined || value === '') {
           return new Error(t('admin.papers.form.validation.statusRequired'));
         }
+        
+        // 轉換為數字並檢查是否為有效值
+        const numValue = Number(value);
+        if (isNaN(numValue) || ![0, 1].includes(numValue)) {
+          return new Error(t('admin.papers.form.validation.statusRequired'));
+        }
+        
+        // 確保 formData 中存儲的是數字類型
+        if (typeof value !== 'number') {
+          (formData as PaperFormData).paper_accept = numValue;
+        }
+        
         return true;
       },
       trigger: 'change'
@@ -1194,6 +1227,18 @@ const formRules = computed(() => {
         if (value === null || value === undefined || value === '') {
           return new Error(t('admin.news.form.validation.typeRequired'));
         }
+        
+        // 轉換為數字並檢查是否為有效值
+        const numValue = Number(value);
+        if (isNaN(numValue) || ![0, 1, 2].includes(numValue)) {
+          return new Error(t('admin.news.form.validation.typeRequired'));
+        }
+        
+        // 確保 formData 中存儲的是數字類型
+        if (typeof value !== 'number') {
+          (formData as NewsFormData).news_type = numValue;
+        }
+        
         return true;
       },
       trigger: 'change'
@@ -1294,6 +1339,18 @@ const formRules = computed(() => {
         if (value === null || value === undefined || value === '') {
           return new Error(t('admin.resources.form.validation.typeRequired'));
         }
+        
+        // 轉換為數字並檢查是否為有效值
+        const numValue = Number(value);
+        if (isNaN(numValue) || ![0, 1, 2, 3, 4].includes(numValue)) {
+          return new Error(t('admin.resources.form.validation.typeRequired'));
+        }
+        
+        // 確保 formData 中存儲的是數字類型
+        if (typeof value !== 'number') {
+          (formData as ResourceFormData).resource_type = numValue;
+        }
+        
         return true;
       },
       trigger: 'change'
@@ -1304,6 +1361,18 @@ const formRules = computed(() => {
         if (value === null || value === undefined || value === '') {
           return new Error(t('admin.resources.form.validation.availabilityStatusRequired'));
         }
+        
+        // 轉換為數字並檢查是否為有效值
+        const numValue = Number(value);
+        if (isNaN(numValue) || ![0, 1, 2].includes(numValue)) {
+          return new Error(t('admin.resources.form.validation.availabilityStatusRequired'));
+        }
+        
+        // 確保 formData 中存儲的是數字類型
+        if (typeof value !== 'number') {
+          (formData as ResourceFormData).availability_status = numValue;
+        }
+        
         return true;
       },
       trigger: 'change'
@@ -1345,6 +1414,67 @@ watch(
           // 處理成員課題組字段：將 null 值轉換為 -1 以便在下拉框中正確顯示
           if (props.moduleType === 'members' && editDataCopy.research_group_id === null) {
             editDataCopy.research_group_id = -1;
+          }
+          
+          // 確保各模塊的關鍵數值字段為正確的數字類型
+          if (props.moduleType === 'members') {
+            // 確保成員類型為數字
+            if (editDataCopy.mem_type !== undefined) {
+              editDataCopy.mem_type = Number(editDataCopy.mem_type);
+            }
+            // 確保職務類型為數字
+            if (editDataCopy.job_type !== undefined && editDataCopy.job_type !== null) {
+              editDataCopy.job_type = Number(editDataCopy.job_type);
+            }
+            // 確保學生類型為數字
+            if (editDataCopy.student_type !== undefined && editDataCopy.student_type !== null) {
+              editDataCopy.student_type = Number(editDataCopy.student_type);
+            }
+            // 確保學生年級為數字
+            if (editDataCopy.student_grade !== undefined && editDataCopy.student_grade !== null) {
+              editDataCopy.student_grade = Number(editDataCopy.student_grade);
+            }
+            // 確保校友身份為數字
+            if (editDataCopy.alumni_identity !== undefined && editDataCopy.alumni_identity !== null) {
+              editDataCopy.alumni_identity = Number(editDataCopy.alumni_identity);
+            }
+          } else if (props.moduleType === 'papers') {
+            // 確保論文類型為數字
+            if (editDataCopy.paper_type !== undefined && editDataCopy.paper_type !== null) {
+              editDataCopy.paper_type = Number(editDataCopy.paper_type);
+            }
+            // 確保論文狀態為數字
+            if (editDataCopy.paper_accept !== undefined && editDataCopy.paper_accept !== null) {
+              editDataCopy.paper_accept = Number(editDataCopy.paper_accept);
+            }
+          } else if (props.moduleType === 'projects') {
+            // 確保項目狀態為數字
+            if (editDataCopy.is_end !== undefined && editDataCopy.is_end !== null) {
+              editDataCopy.is_end = Number(editDataCopy.is_end);
+            }
+          } else if (props.moduleType === 'news') {
+            // 確保新聞類型為數字
+            if (editDataCopy.news_type !== undefined && editDataCopy.news_type !== null) {
+              editDataCopy.news_type = Number(editDataCopy.news_type);
+            }
+          } else if (props.moduleType === 'admins') {
+            // 確保管理員類型為數字
+            if (editDataCopy.is_super !== undefined && editDataCopy.is_super !== null) {
+              editDataCopy.is_super = Number(editDataCopy.is_super);
+            }
+            // 確保啟用狀態為數字
+            if (editDataCopy.enable !== undefined && editDataCopy.enable !== null) {
+              editDataCopy.enable = Number(editDataCopy.enable);
+            }
+          } else if (props.moduleType === 'resources') {
+            // 確保資源類型為數字
+            if (editDataCopy.resource_type !== undefined && editDataCopy.resource_type !== null) {
+              editDataCopy.resource_type = Number(editDataCopy.resource_type);
+            }
+            // 確保可用狀態為數字
+            if (editDataCopy.availability_status !== undefined && editDataCopy.availability_status !== null) {
+              editDataCopy.availability_status = Number(editDataCopy.availability_status);
+            }
           }
           
           Object.assign(formData, editDataCopy);
@@ -1842,6 +1972,13 @@ const handleSubmit = async () => {
     // 过滤并清理表单数据，确保不包含函数或无效值
     const cleanFormData = Object.keys(formData).reduce((acc: Record<string, unknown>, key) => {
       const value = formData[key];
+      
+      // 排除特定的無效字段
+      const excludeFields = ['research_group']; // 這個字段是意外包含的對象
+      if (excludeFields.includes(key)) {
+        return acc;
+      }
+      
       // 檢查是否為有效值 - 明確處理各種數據類型
       let isValidValue = false;
       
@@ -1849,8 +1986,42 @@ const handleSubmit = async () => {
         // 數值類型（包括 0）都是有效的
         isValidValue = true;
       } else if (typeof value === 'string') {
-        // 字符串類型（包括空字符串）都是有效的，空字符串在某些字段中是合法值
-        isValidValue = true;
+        // 對於關鍵的數值字段，嘗試轉換字符串數字為數字
+        const numericFields = [
+          // 成員相關
+          'mem_type', 'job_type', 'student_type', 'student_grade', 'graduation_year', 'alumni_identity',
+          // 論文相關
+          'paper_type', 'paper_accept',
+          // 項目相關
+          'is_end',
+          // 新聞相關
+          'news_type',
+          // 管理員相關
+          'is_super', 'enable',
+          // 資源相關
+          'resource_type', 'availability_status'
+        ];
+        
+        if (numericFields.includes(key)) {
+          // 對於數值字段，空字符串應該被跳過（不提交）
+          if (value === '') {
+            return acc;
+          }
+          const numValue = Number(value);
+          if (!isNaN(numValue)) {
+            acc[key] = numValue;
+            return acc;
+          }
+        }
+        
+        // 對於條件性字段，空字符串應該被跳過
+        const conditionalFields = ['job_type', 'student_type', 'student_grade', 'graduation_year', 'alumni_identity', 'destination_zh', 'destination_en'];
+        if (conditionalFields.includes(key) && value === '') {
+          return acc;
+        }
+        
+        // 其他字符串字段，非空才有效
+        isValidValue = value.trim() !== '';
       } else if (typeof value === 'boolean') {
         // 布爾值都是有效的
         isValidValue = true;
@@ -1861,13 +2032,40 @@ const handleSubmit = async () => {
         // 日期對象都是有效的
         isValidValue = true;
       } else if (value === null && (
-        key === 'research_group_id' || 
-        key === 'job_type' || 
-        key === 'student_type' || 
-        key === 'student_grade'
+        key === 'research_group_id'
       )) {
-        // 特殊處理：這些字段的 null 值是有效的（代表選擇了「無」或未設置）
+        // 特殊處理：只有 research_group_id 的 null 值是有效的（代表選擇了「無」）
         isValidValue = true;
+      } else if (value === null) {
+        // 對於各模塊的條件性字段的 null 值，根據模塊類型和具體情況決定是否排除
+        const conditionalNullFields = ['job_type', 'student_type', 'student_grade', 'graduation_year', 'alumni_identity', 'destination_zh', 'destination_en'];
+        
+        if (conditionalNullFields.includes(key)) {
+          // 成員模塊的條件性字段處理
+          const memberType = formData.mem_type as number;
+          if (memberType === 0 && ['job_type'].includes(key)) {
+            // 教師類型：job_type 是有效的
+            isValidValue = true;
+          } else if (memberType === 1 && ['student_type', 'student_grade'].includes(key)) {
+            // 學生類型：student_type 和 student_grade 是有效的
+            isValidValue = true;
+          } else if (memberType === 2 && ['graduation_year', 'alumni_identity', 'destination_zh', 'destination_en'].includes(key)) {
+            // 校友類型：校友相關字段是有效的
+            isValidValue = true;
+          } else {
+            // 其他情況下，null 值的條件性字段應該被排除
+            isValidValue = false;
+          }
+        } else if (key === 'research_group_id') {
+          // research_group_id 的 null 值是有效的（代表選擇了「無」）
+          isValidValue = true;
+        } else if (key === 'admin_pass' && props.actionType === 'edit') {
+          // 管理員模塊：編輯時密碼為 null 是有效的（代表不更改密碼）
+          isValidValue = true;
+        } else {
+          // 其他 null 值一般不有效
+          isValidValue = false;
+        }
       } else if (value === -1 && key === 'research_group_id') {
         // 特殊處理：research_group_id 為 -1 時轉換為 null（代表選擇了「無」）
         acc[key] = null;
@@ -1876,8 +2074,8 @@ const handleSubmit = async () => {
         // undefined、null（除了特殊字段）、function 等都是無效的
         isValidValue = false;
       } else {
-        // 其他類型（如對象）需要進一步檢查
-        isValidValue = value != null;
+        // 其他類型（如對象）都視為無效
+        isValidValue = false;
       }
       
       if (isValidValue) {
@@ -1931,6 +2129,15 @@ const handleSubmit = async () => {
           // null 值特殊处理：用空字符串表示
           formDataObj.append(key, '');
         } else {
+          // 在添加到FormData前再次檢查條件性字段和數值字段的空字符串
+          const conditionalFields = ['job_type', 'student_type', 'student_grade', 'graduation_year', 'alumni_identity', 'destination_zh', 'destination_en'];
+          const numericFields = ['mem_type', 'job_type', 'student_type', 'student_grade', 'graduation_year', 'alumni_identity', 'paper_type', 'paper_accept', 'is_end', 'news_type', 'is_super', 'enable', 'resource_type', 'availability_status'];
+          
+          // 如果是條件性字段或數值字段且為空字符串，跳過
+          if ((conditionalFields.includes(key) || numericFields.includes(key)) && value === '') {
+            return; // 跳過這個字段
+          }
+          
           formDataObj.append(key, String(value));
         }
       });
