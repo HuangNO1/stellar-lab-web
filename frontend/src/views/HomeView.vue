@@ -34,7 +34,7 @@
         
         <!-- 加載狀態 -->
         <div v-if="loading" class="research-groups-section">
-          <div class="research-groups-grid">
+          <div class="research-groups-grid-default">
             <div v-for="i in 6" :key="i" class="research-card-skeleton">
               <n-card class="research-card">
                 <template #header>
@@ -66,31 +66,37 @@
         
         <!-- 課題組列表 -->
         <div v-else class="research-groups-section">
-          <div class="research-groups-grid">
-            <div v-for="group in researchGroups" :key="group.research_group_id" class="card-container">
-              <n-card 
-                :title="getCurrentLocale() === 'zh' ? group.research_group_name_zh : group.research_group_name_en" 
-                @click="() => toResearchGroup(group)" 
-                hoverable
-                class="research-card"
-              >
-                <template #header-extra>
-                  <n-tag v-if="group.leader" size="small" type="info">
-                    {{ getCurrentLocale() === 'zh' ? group.leader.mem_name_zh : group.leader.mem_name_en }}
-                  </n-tag>
-                  <n-tag v-else size="small" type="default">
-                    {{ $t('admin.members.form.group.none') }}
-                  </n-tag>
-                </template>
-                <div class="card-description">
-                  {{ stripMarkdown(getCurrentLocale() === 'zh' ? group.research_group_desc_zh : group.research_group_desc_en) }}
-                </div>
-                <template #action>
-                  <n-button size="small" type="primary" ghost>
-                    {{ $t('researchGroups.viewDetails') }}
-                  </n-button>
-                </template>
-              </n-card>
+          <div :class="groupLayout.gridClass">
+            <div 
+              v-for="(row, rowIndex) in groupLayout.rows" 
+              :key="`row-${rowIndex}`" 
+              class="research-groups-row"
+            >
+              <div v-for="group in row" :key="group.research_group_id" class="card-container">
+                <n-card 
+                  :title="getCurrentLocale() === 'zh' ? group.research_group_name_zh : group.research_group_name_en" 
+                  @click="() => toResearchGroup(group)" 
+                  hoverable
+                  class="research-card"
+                >
+                  <template #header-extra>
+                    <n-tag v-if="group.leader" size="small" type="info">
+                      {{ getCurrentLocale() === 'zh' ? group.leader.mem_name_zh : group.leader.mem_name_en }}
+                    </n-tag>
+                    <n-tag v-else size="small" type="default">
+                      {{ $t('admin.members.form.group.none') }}
+                    </n-tag>
+                  </template>
+                  <div class="card-description">
+                    {{ stripMarkdown(getCurrentLocale() === 'zh' ? group.research_group_desc_zh : group.research_group_desc_en) }}
+                  </div>
+                  <template #action>
+                    <n-button size="small" type="primary" ghost>
+                      {{ $t('researchGroups.viewDetails') }}
+                    </n-button>
+                  </template>
+                </n-card>
+              </div>
             </div>
           </div>
         </div>
@@ -231,6 +237,56 @@ const lab = computed(() => labRef && typeof labRef === 'object' && 'value' in la
 
 // 使用 composable 獲取課題組數據
 const { researchGroups, loading, error, fetchResearchGroups } = useResearchGroupsWithAutoFetch();
+
+// 智能課題組排版邏輯
+const groupLayout = computed(() => {
+  const totalGroups = researchGroups.value.length;
+  
+  // 3個或以下，使用單行居中布局
+  if (totalGroups <= 3) {
+    return {
+      rows: [researchGroups.value],
+      gridClass: 'research-groups-grid-default'
+    };
+  }
+  
+  // 智能分排算法
+  const getOptimalLayout = (count: number): number[] => {
+    if (count === 4) return [2, 2]; // 2+2
+    if (count === 5) return [3, 2]; // 3+2
+    if (count === 6) return [3, 3]; // 3+3
+    if (count === 7) return [4, 3]; // 4+3
+    if (count === 8) return [4, 4]; // 4+4
+    
+    // 大於8個的情況，盡量平均分配，每行最多4個
+    const maxPerRow = 4;
+    const numRows = Math.ceil(count / maxPerRow);
+    const basePerRow = Math.floor(count / numRows);
+    const remainder = count % numRows;
+    
+    const rows: number[] = [];
+    for (let i = 0; i < numRows; i++) {
+      // 前remainder行多分配一個
+      rows.push(basePerRow + (i < remainder ? 1 : 0));
+    }
+    
+    return rows;
+  };
+  
+  const rowCounts = getOptimalLayout(totalGroups);
+  const rows: typeof researchGroups.value[] = [];
+  let startIndex = 0;
+  
+  for (const count of rowCounts) {
+    rows.push(researchGroups.value.slice(startIndex, startIndex + count));
+    startIndex += count;
+  }
+  
+  return {
+    rows,
+    gridClass: 'research-groups-grid-smart'
+  };
+});
 
 // 新聞相關狀態
 const latestNews = ref<News[]>([]);
@@ -426,19 +482,48 @@ onMounted(() => {
   margin-bottom: 3rem;
 }
 
-.research-groups-grid {
+/* 默認布局 (≤3個卡片) */
+.research-groups-grid-default {
   display: flex;
   flex-wrap: wrap;
   gap: 1.5rem;
   justify-content: center;
 }
 
+/* 智能排版布局 (>3個卡片) */
+.research-groups-grid-smart {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.research-groups-row {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  /* 防止 flex 調整寬度 */
+  align-items: flex-start;
+}
+
 /* 卡片容器 - 統一高度 */
 .card-container {
-  flex: 0 0 auto;
-  width: 100%;
-  max-width: 22rem;
-  min-width: 18rem;
+  flex: none; /* 完全禁用flex調整 */
+  max-width: 24rem;
+  min-width: 24rem;
+  width: 24rem; /* 固定寬度 */
+  box-sizing: border-box; /* 確保一致的盒模型 */
+}
+
+/* 桌面端確保多列布局 */
+@media (min-width: 769px) {
+  .card-container {
+    flex: none; /* 完全禁用flex調整 */
+    max-width: 24rem;
+    min-width: 24rem;
+    width: 24rem; /* 桌面端也使用固定寬度 */
+  }
 }
 
 /* 研究組卡片樣式 */
@@ -466,8 +551,8 @@ onMounted(() => {
 .research-card-skeleton {
   flex: 0 0 auto;
   width: 100%;
-  max-width: 22rem;
-  min-width: 18rem;
+  max-width: 26rem; /* 與主卡片保持一致 */
+  min-width: 20rem; /* 與主卡片保持一致 */
 }
 
 :deep(.research-card .n-card__content) {
@@ -670,13 +755,20 @@ onMounted(() => {
     font-size: 1.125rem;
   }
   
-  .research-groups-grid {
+  .research-groups-grid-default,
+  .research-groups-grid-smart {
+    gap: 1.25rem;
+  }
+  
+  .research-groups-row {
     gap: 1.25rem;
   }
   
   .card-container {
-    max-width: 20rem;
-    min-width: 16rem;
+    flex: none; /* 禁用flex調整 */
+    max-width: 22rem; /* 平板端適中寬度 */
+    min-width: 22rem;
+    width: 22rem; /* 平板端固定寬度 */
   }
 }
 
@@ -713,17 +805,24 @@ onMounted(() => {
     text-align: center;
   }
   
-  .research-groups-grid {
+  .research-groups-grid-default {
     flex-direction: column;
     align-items: center;
     gap: 1rem;
   }
   
+  .research-groups-grid-smart {
+    gap: 1rem;
+  }
+  
+  .research-groups-row {
+    gap: 1rem;
+  }
+  
   .card-container,
   .research-card-skeleton {
-    max-width: none;
-    width: 100%;
-    max-width: 28rem;
+    max-width: 32rem; /* 增加手機端橫屏時的寬度 */
+    width: 100%; /* 手機端保持單列 */
   }
   
   /* 卡片內字體調整 */
@@ -772,7 +871,7 @@ onMounted(() => {
   }
   
   .card-container {
-    max-width: 24rem;
+    max-width: 28rem; /* 增加小屏幕寬度 */
   }
   
   /* 進一步縮小卡片字體 */
@@ -814,15 +913,20 @@ onMounted(() => {
     text-align: center;
   }
   
-  .research-groups-grid {
+  .research-groups-grid-default {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .research-groups-grid-smart .research-groups-row {
     flex-direction: column;
     align-items: center;
   }
   
   .card-container,
   .research-card-skeleton {
-    max-width: none;
-    width: 100%;
+    max-width: 100%;
+    width: 100%; /* 手機端保持單列 */
   }
   
   .contact-wrapper {
@@ -868,7 +972,7 @@ onMounted(() => {
   }
   
   .card-container {
-    max-width: 20rem;
+    max-width: 24rem; /* 增加最小屏幕寬度 */
   }
   
   /* 最小屏幕的卡片字體 */
