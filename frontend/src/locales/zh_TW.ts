@@ -77,6 +77,7 @@ export default {
             associateProfessor: '副教授',
             lecturer: '講師',
             assistantProfessor: '助理教授',
+            assistantResearcher: '助理研究員',
             postdoc: '博士後',
             phdStudent: '博士生',
             masterStudent: '碩士生',

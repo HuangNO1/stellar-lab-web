@@ -177,7 +177,7 @@ export function useMembers() {
     if (member.mem_type === 0) {
       // 教師
       const jobTypeKeys = ['professor', 'associateProfessor', 'lecturer', 'assistantProfessor', 'postdoc'];
-      const jobTypeKey = jobTypeKeys[member.job_type || 4];
+      const jobTypeKey = jobTypeKeys[member.job_type ?? 4];
       return t(`members.positions.${jobTypeKey}`);
     } else if (member.mem_type === 1) {
       // 學生

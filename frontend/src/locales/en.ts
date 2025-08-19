@@ -77,6 +77,7 @@ export default {
       associateProfessor: 'Associate Professor',
       lecturer: 'Lecturer',
       assistantProfessor: 'Assistant Professor',
+      assistantResearcher: 'Assistant Researcher',
       postdoc: 'Postdoc',
       phdStudent: 'PhD Student',
       masterStudent: 'Master Student',
