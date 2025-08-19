@@ -64,13 +64,42 @@ const displayName = computed(() => {
   return getCurrentLocale() === 'zh' ? props.member.mem_name_zh : props.member.mem_name_en;
 });
 
-// 顯示的職位信息（校友只顯示去向）
+// 顯示的職位信息（校友優化顯示）
 const displayPosition = computed(() => {
-  if (props.member.mem_type === 2 || (props.member.mem_type === 1 && (props.member.destination_zh || props.member.destination_en))) {
-    // 校友类型，只显示去向
+  if (props.member.mem_type === 2) {
+    // 校友類型 - 優化顯示邏輯
+    const destination = getCurrentLocale() === 'zh' ? props.member.destination_zh : props.member.destination_en;
+    
+    if (destination) {
+      // 有去向信息：優先顯示去向
+      return destination;
+    } else {
+      // 沒有去向信息：顯示身份+年份的簡化版本
+      let position = '';
+      
+      // 身份類型簡化顯示
+      if (props.member.alumni_identity !== undefined && props.member.alumni_identity !== null) {
+        const identityLabels = getCurrentLocale() === 'zh' 
+          ? ['博士', '碩士', '本科', '教師', '校友']
+          : ['PhD', 'Master', 'Bachelor', 'Faculty', 'Alumni'];
+        position = identityLabels[props.member.alumni_identity] || identityLabels[4];
+      }
+      
+      // 畢業年份
+      if (props.member.graduation_year) {
+        const yearSuffix = getCurrentLocale() === 'zh' ? '屆' : '';
+        const yearText = `${props.member.graduation_year}${yearSuffix}`;
+        position = position ? `${yearText}${position}` : yearText;
+      }
+      
+      return position || (getCurrentLocale() === 'zh' ? '校友' : 'Alumni');
+    }
+  } else if (props.member.mem_type === 1 && (props.member.destination_zh || props.member.destination_en)) {
+    // 有去向的學生視為校友，顯示去向
     const destination = getCurrentLocale() === 'zh' ? props.member.destination_zh : props.member.destination_en;
     return destination || getMemberPosition(props.member);
   }
+  
   return getMemberPosition(props.member);
 });
 
@@ -87,9 +116,14 @@ const isNameTruncated = computed(() => {
 
 // 判斷職位是否需要顯示tooltip
 const isPositionTruncated = computed(() => {
-  // 對於校友，如果完整信息比顯示信息更詳細，就需要顯示 tooltip
-  if (props.member.mem_type === 2 || (props.member.mem_type === 1 && (props.member.destination_zh || props.member.destination_en))) {
-    // 校友總是顯示 tooltip，因為完整信息包含身份、年份等詳細信息
+  // 對於校友，如果顯示信息比完整信息簡化，就顯示 tooltip
+  if (props.member.mem_type === 2) {
+    // 校友總是顯示 tooltip，提供詳細信息
+    return fullPosition.value !== displayPosition.value || fullPosition.value.length > 15;
+  }
+  
+  // 對於有去向的學生（視為校友），如果有詳細信息，顯示 tooltip  
+  if (props.member.mem_type === 1 && (props.member.destination_zh || props.member.destination_en)) {
     return fullPosition.value !== displayPosition.value;
   }
   
