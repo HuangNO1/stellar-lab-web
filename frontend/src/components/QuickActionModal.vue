@@ -2014,14 +2014,15 @@ const handleSubmit = async () => {
           }
         }
         
-        // 對於條件性字段，空字符串應該被跳過
-        const conditionalFields = ['job_type', 'student_type', 'student_grade', 'graduation_year', 'alumni_identity', 'destination_zh', 'destination_en'];
-        if (conditionalFields.includes(key) && value === '') {
+        // 只有成員模塊的條件性字段的空字符串應該被跳過（不屬於當前模塊狀態）
+        // 其他所有模塊的所有字段（包括內容字段）都允許空字符串
+        const memberConditionalFields = ['job_type', 'student_type', 'student_grade', 'graduation_year', 'alumni_identity', 'destination_zh', 'destination_en'];
+        if (props.moduleType === 'members' && memberConditionalFields.includes(key) && value === '') {
           return acc;
         }
         
-        // 其他字符串字段，非空才有效
-        isValidValue = value.trim() !== '';
+        // 其他字符串字段（包括內容字段），空字符串也是有效的（代表用戶主動清空）
+        isValidValue = true;
       } else if (typeof value === 'boolean') {
         // 布爾值都是有效的
         isValidValue = true;
@@ -2038,9 +2039,9 @@ const handleSubmit = async () => {
         isValidValue = true;
       } else if (value === null) {
         // 對於各模塊的條件性字段的 null 值，根據模塊類型和具體情況決定是否排除
-        const conditionalNullFields = ['job_type', 'student_type', 'student_grade', 'graduation_year', 'alumni_identity', 'destination_zh', 'destination_en'];
+        const memberConditionalNullFields = ['job_type', 'student_type', 'student_grade', 'graduation_year', 'alumni_identity', 'destination_zh', 'destination_en'];
         
-        if (conditionalNullFields.includes(key)) {
+        if (props.moduleType === 'members' && memberConditionalNullFields.includes(key)) {
           // 成員模塊的條件性字段處理
           const memberType = formData.mem_type as number;
           if (memberType === 0 && ['job_type'].includes(key)) {
@@ -2129,12 +2130,11 @@ const handleSubmit = async () => {
           // null 值特殊处理：用空字符串表示
           formDataObj.append(key, '');
         } else {
-          // 在添加到FormData前再次檢查條件性字段和數值字段的空字符串
-          const conditionalFields = ['job_type', 'student_type', 'student_grade', 'graduation_year', 'alumni_identity', 'destination_zh', 'destination_en'];
-          const numericFields = ['mem_type', 'job_type', 'student_type', 'student_grade', 'graduation_year', 'alumni_identity', 'paper_type', 'paper_accept', 'is_end', 'news_type', 'is_super', 'enable', 'resource_type', 'availability_status'];
+          // 在添加到FormData前再次檢查成員模塊的條件性字段空字符串（數值字段在前面已處理）
+          const memberConditionalFields = ['job_type', 'student_type', 'student_grade', 'graduation_year', 'alumni_identity', 'destination_zh', 'destination_en'];
           
-          // 如果是條件性字段或數值字段且為空字符串，跳過
-          if ((conditionalFields.includes(key) || numericFields.includes(key)) && value === '') {
+          // 只有成員模塊的條件性字段的空字符串才跳過，其他所有內容字段的空字符串都應該被提交
+          if (props.moduleType === 'members' && memberConditionalFields.includes(key) && value === '') {
             return; // 跳過這個字段
           }
           
