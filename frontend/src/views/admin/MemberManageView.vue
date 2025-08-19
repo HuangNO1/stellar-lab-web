@@ -616,12 +616,37 @@ const handleBatchUpdate = async () => {
   try {
     batchLoading.value = true;
     
-    // 過濾掉空值 - 注意：數字0是有效值，空字符串在某些情況下也可能是有效值
+    // 過濾掉空值和不適用的條件性字段
     const updates = Object.keys(batchFormData)
       .filter(key => {
         const value = batchFormData[key];
-        // 排除 null, undefined，但保留數字0、空字符串、布爾值false等
-        return value !== null && value !== undefined;
+        // 排除 null, undefined
+        if (value === null || value === undefined) {
+          return false;
+        }
+        
+        // 對批量更新的條件性字段進行檢查
+        // 如果選擇了特定成員類型，只包含適用於該類型的字段
+        if (batchFormData.mem_type !== null && batchFormData.mem_type !== undefined) {
+          const memberType = batchFormData.mem_type as number;
+          
+          // 教師類型：排除學生和校友字段
+          if (memberType === 0 && ['student_type', 'student_grade', 'graduation_year', 'alumni_identity'].includes(key)) {
+            return false;
+          }
+          
+          // 學生類型：排除教師和校友字段  
+          if (memberType === 1 && ['job_type', 'graduation_year', 'alumni_identity'].includes(key)) {
+            return false;
+          }
+          
+          // 校友類型：排除教師和學生字段
+          if (memberType === 2 && ['job_type', 'student_type', 'student_grade'].includes(key)) {
+            return false;
+          }
+        }
+        
+        return true;
       })
       .reduce((acc, key) => {
         acc[key] = batchFormData[key];
@@ -632,6 +657,8 @@ const handleBatchUpdate = async () => {
       message.warning(t('admin.members.noUpdatesSelected'));
       return;
     }
+    
+    console.log('批量更新數據:', { member_ids: selectedRowKeys.value, updates });
     
     const response = await memberApi.updateMembersBatch(selectedRowKeys.value, updates);
     if (response.code === 0) {

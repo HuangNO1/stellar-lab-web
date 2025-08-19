@@ -467,7 +467,12 @@ class MemberService(BaseService):
     
     def _validate_batch_update_fields(self, update_fields: Dict[str, Any]) -> None:
         """校驗批量更新字段"""
-        allowed_batch_fields = ['enable', 'mem_type', 'research_group_id', 'job_type', 'student_type']
+        allowed_batch_fields = [
+            'enable', 'mem_type', 'research_group_id', 
+            'job_type', 'student_type', 'student_grade',
+            'graduation_year', 'alumni_identity', 
+            'destination_zh', 'destination_en'
+        ]
         
         for field in update_fields:
             if field not in allowed_batch_fields:
@@ -520,6 +525,38 @@ class MemberService(BaseService):
                     update_fields['research_group_id'] = research_group_id
                 except (ValueError, TypeError):
                     raise ValidationError(msg.get_error_message('RESEARCH_GROUP_ID_FORMAT_ERROR'))
+        
+        if 'student_grade' in update_fields:
+            if update_fields['student_grade'] is not None:
+                try:
+                    student_grade = int(update_fields['student_grade'])
+                    if student_grade < 1 or student_grade > 10:
+                        raise ValidationError(msg.get_error_message('STUDENT_GRADE_INVALID'))
+                    update_fields['student_grade'] = student_grade
+                except (ValueError, TypeError):
+                    raise ValidationError(msg.get_error_message('STUDENT_GRADE_FORMAT_ERROR'))
+        
+        if 'graduation_year' in update_fields:
+            if update_fields['graduation_year'] is not None:
+                try:
+                    graduation_year = int(update_fields['graduation_year'])
+                    import datetime
+                    current_year = datetime.datetime.now().year
+                    if graduation_year < 1900 or graduation_year > current_year:
+                        raise ValidationError(msg.get_error_message('GRADUATION_YEAR_INVALID'))
+                    update_fields['graduation_year'] = graduation_year
+                except (ValueError, TypeError):
+                    raise ValidationError(msg.get_error_message('GRADUATION_YEAR_FORMAT_ERROR'))
+        
+        if 'alumni_identity' in update_fields:
+            if update_fields['alumni_identity'] is not None:
+                try:
+                    alumni_identity = int(update_fields['alumni_identity'])
+                    if alumni_identity not in [0, 1, 2, 3, 4]:  # 0=博士, 1=碩士, 2=大學生, 3=教師, 4=其他
+                        raise ValidationError(msg.get_error_message('ALUMNI_IDENTITY_INVALID'))
+                    update_fields['alumni_identity'] = alumni_identity
+                except (ValueError, TypeError):
+                    raise ValidationError(msg.get_error_message('ALUMNI_IDENTITY_FORMAT_ERROR'))
     
     def _set_member_basic_info(self, member: Member, form_data: Dict[str, Any]) -> None:
         """設置成員基本信息"""
