@@ -1977,6 +1977,27 @@ const handleSubmit = async () => {
       
       // 排除特定的無效字段
       const excludeFields = ['research_group']; // 這個字段是意外包含的對象
+      
+      // 對於成員模塊，根據成員類型排除不適用的條件性字段
+      if (props.moduleType === 'members') {
+        const memberType = formData.mem_type as number;
+        const conditionalFields = {
+          job_type: [0], // 只有教師(0)需要職務類型
+          student_type: [1], // 只有學生(1)需要學生類型 
+          student_grade: [1], // 只有學生(1)需要年級
+          graduation_year: [2], // 只有校友(2)需要畢業年份
+          alumni_identity: [2], // 只有校友(2)需要校友身份
+          destination_zh: [2], // 只有校友(2)需要去向
+          destination_en: [2], // 只有校友(2)需要去向
+        };
+        
+        // 檢查當前字段是否為條件性字段，且不適用於當前成員類型
+        const allowedMemberTypes = conditionalFields[key as keyof typeof conditionalFields];
+        if (allowedMemberTypes && !allowedMemberTypes.includes(memberType)) {
+          return acc; // 排除不適用的字段
+        }
+      }
+      
       if (excludeFields.includes(key)) {
         return acc;
       }
@@ -2055,6 +2076,9 @@ const handleSubmit = async () => {
           } else if (memberType === 2 && ['graduation_year', 'alumni_identity', 'destination_zh', 'destination_en'].includes(key)) {
             // 校友類型：校友相關字段是有效的
             isValidValue = true;
+          } else if (memberType === 3) {
+            // 實習生類型：不需要任何條件性字段，都應該被排除
+            isValidValue = false;
           } else {
             // 其他情況下，null 值的條件性字段應該被排除
             isValidValue = false;
