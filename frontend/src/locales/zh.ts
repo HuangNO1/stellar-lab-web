@@ -529,7 +529,7 @@ export default {
                 type: '论文类型',
                 date: '发表日期',
                 status: '接收状态',
-                url: '论文连结',
+                url: '论文链接',
                 file: '论文文件',
                 previewImg: '预览图片',
                 previewImgAlt: '论文预览图片',
@@ -547,7 +547,7 @@ export default {
                     type: '请选择论文类型',
                     date: '请选择发表日期',
                     status: '请选择接收状态',
-                    url: '请输入论文连结URL',
+                    url: '请输入论文链接URL',
                     authors: '请选择论文作者',
                     allAuthorsZh: '请输入全部作者中文名称（例如：张三, 李四, 王五）',
                     allAuthorsEn: '请输入全部作者英文名称（例如：John Smith, Jane Doe）'
