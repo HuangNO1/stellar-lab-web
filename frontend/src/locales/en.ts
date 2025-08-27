@@ -68,6 +68,7 @@ export default {
     phd: 'PhD Student',
     master: 'Master Student',
     undergraduate: 'Undergraduate',
+    intern: 'Intern',
     alumni: 'Alumni',
     others: 'Others',
     biography: 'Biography',
@@ -82,6 +83,7 @@ export default {
       phdStudent: 'PhD Student',
       masterStudent: 'Master Student',
       undergraduate: 'Undergraduate',
+      intern: 'Intern',
       alumni: 'Alumni',
       other: 'Other',
       year: 'Year',
@@ -352,6 +354,7 @@ export default {
       memberTypes: {
         teacher: 'Teacher',
         student: 'Student',
+        intern: 'Intern',
         alumni: 'Alumni'
       },
       jobTypes: {

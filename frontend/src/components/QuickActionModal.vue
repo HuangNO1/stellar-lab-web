@@ -941,7 +941,8 @@ const currentImageField = ref<string>('');
 const memberTypeOptions = computed(() => [
   { label: t('admin.common.memberTypes.teacher'), value: 0 },
   { label: t('admin.common.memberTypes.student'), value: 1 },
-  { label: t('admin.common.memberTypes.alumni'), value: 2 }
+  { label: t('admin.common.memberTypes.alumni'), value: 2 },
+  { label: t('admin.common.memberTypes.intern'), value: 3 }
 ]);
 
 // 教師職務類型選項
@@ -1108,7 +1109,7 @@ const formRules = computed(() => {
         
         // 轉換為數字並檢查是否為有效值
         const numValue = Number(value);
-        if (isNaN(numValue) || ![0, 1, 2].includes(numValue)) {
+        if (isNaN(numValue) || ![0, 1, 2, 3].includes(numValue)) {
           return new Error(t('admin.members.form.validation.typeRequired'));
         }
         
@@ -1652,7 +1653,8 @@ const loadMembers = async () => {
         const memberTypeLabels = {
           0: t('admin.common.memberTypes.teacher'),
           1: t('admin.common.memberTypes.student'),
-          2: t('admin.common.memberTypes.alumni')
+          2: t('admin.common.memberTypes.alumni'),
+          3: t('admin.common.memberTypes.intern')
         };
         const typeLabel = memberTypeLabels[member.mem_type as keyof typeof memberTypeLabels] || '';
         

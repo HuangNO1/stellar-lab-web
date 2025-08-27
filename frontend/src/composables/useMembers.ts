@@ -59,6 +59,7 @@ export function useMembers() {
       phd: [] as Member[],      // 博士生
       master: [] as Member[],   // 碩士生
       undergraduate: [] as Member[], // 本科生
+      intern: [] as Member[],   // 實習生
       alumni: [] as Member[],   // 校友（已畢業的學生）
       others: [] as Member[]    // 其他
     };
@@ -91,6 +92,9 @@ export function useMembers() {
       } else if (member.mem_type === 2) {
         // 校友
         groups.alumni.push(member);
+      } else if (member.mem_type === 3) {
+        // 實習生
+        groups.intern.push(member);
       } else {
         // 其他類型
         groups.others.push(member);
@@ -122,6 +126,13 @@ export function useMembers() {
             return bGrade - aGrade; // 高年級在前
           }
           // 同年級按姓名排序
+          const aName = locale.value === 'zh' ? a.mem_name_zh : a.mem_name_en;
+          const bName = locale.value === 'zh' ? b.mem_name_zh : b.mem_name_en;
+          return (aName || '').localeCompare(bName || '');
+        }
+        
+        // 實習生按姓名排序
+        if (a.mem_type === 3 && b.mem_type === 3) {
           const aName = locale.value === 'zh' ? a.mem_name_zh : a.mem_name_en;
           const bName = locale.value === 'zh' ? b.mem_name_zh : b.mem_name_en;
           return (aName || '').localeCompare(bName || '');
@@ -162,6 +173,7 @@ export function useMembers() {
       phd: sortMembers(groups.phd),
       master: sortMembers(groups.master),
       undergraduate: sortMembers(groups.undergraduate),
+      intern: sortMembers(groups.intern),
       alumni: sortMembers(groups.alumni),
       others: sortMembers(groups.others)
     };
@@ -226,6 +238,9 @@ export function useMembers() {
       }
       
       return position || t('members.positions.alumni');
+    } else if (member.mem_type === 3) {
+      // 實習生
+      return t('members.positions.intern');
     } else {
       // 其他
       return t('members.positions.other');

@@ -90,6 +90,19 @@
         </div>
       </div>
 
+      <!-- 實習生 -->
+      <div v-if="groupedMembers.intern.length > 0" class="member-section">
+        <h2 class="section-title">{{ $t('members.intern') }}</h2>
+        <div class="members-grid">
+          <MemberCard 
+            v-for="member in groupedMembers.intern" 
+            :key="member.mem_id"
+            :member="member"
+            @click="toMember"
+          />
+        </div>
+      </div>
+
       <!-- 校友 -->
       <div v-if="groupedMembers.alumni.length > 0" class="member-section">
         <h2 class="section-title">{{ $t('members.alumni') }}</h2>

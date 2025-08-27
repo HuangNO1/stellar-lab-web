@@ -339,7 +339,8 @@ const groupOptionsWithNone = computed(() => {
 const typeOptions = computed(() => [
   { label: t('admin.common.memberTypes.teacher'), value: 0 },
   { label: t('admin.common.memberTypes.student'), value: 1 },
-  { label: t('admin.common.memberTypes.alumni'), value: 2 }
+  { label: t('admin.common.memberTypes.alumni'), value: 2 },
+  { label: t('admin.common.memberTypes.intern'), value: 3 }
 ]);
 
 const jobTypeOptions = computed(() => [
@@ -409,7 +410,8 @@ const columns: DataTableColumns<Member> = [
       const typeMap = {
         0: { text: t('admin.common.memberTypes.teacher'), type: 'success' as const },
         1: { text: t('admin.common.memberTypes.student'), type: 'info' as const },
-        2: { text: t('admin.common.memberTypes.alumni'), type: 'warning' as const }
+        2: { text: t('admin.common.memberTypes.alumni'), type: 'warning' as const },
+        3: { text: t('admin.common.memberTypes.intern'), type: 'primary' as const }
       };
       const config = typeMap[row.mem_type as keyof typeof typeMap];
       return h(NTag, { type: config.type }, { default: () => config.text });

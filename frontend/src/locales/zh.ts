@@ -68,6 +68,7 @@ export default {
         phd: '博士生',
         master: '硕士生',
         undergraduate: '本科生',
+        intern: '实习生',
         alumni: '校友',
         others: '其他成员',
         profile: '个人简介',
@@ -82,6 +83,7 @@ export default {
             phdStudent: '博士生',
             masterStudent: '硕士生',
             undergraduate: '本科生',
+            intern: '实习生',
             alumni: '校友',
             other: '其他',
             year: '年级',
@@ -345,6 +347,7 @@ export default {
             memberTypes: {
                 teacher: '教师',
                 student: '学生',
+                intern: '实习生',
                 alumni: '校友'
             },
             jobTypes: {
