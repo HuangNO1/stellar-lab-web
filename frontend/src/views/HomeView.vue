@@ -242,8 +242,8 @@ const { researchGroups, loading, error, fetchResearchGroups } = useResearchGroup
 const groupLayout = computed(() => {
   const totalGroups = researchGroups.value.length;
   
-  // 3個或以下，使用單行居中布局
-  if (totalGroups <= 3) {
+  // 4個或以下，使用單行居中布局
+  if (totalGroups <= 4) {
     return {
       rows: [researchGroups.value],
       gridClass: 'research-groups-grid-default'
@@ -467,7 +467,7 @@ onMounted(() => {
 /* 內容包裝器 - 控制內容間距 */
 .content-wrapper {
   padding: 2.5rem 1.5rem 0;
-  max-width: 75rem;
+  max-width: 75rem; /* 恢復原始寬度 */
   margin: 0 auto;
   text-align: center;
 }
@@ -480,14 +480,25 @@ onMounted(() => {
 /* Flex 網格布局 - 課題組卡片 */
 .research-groups-section {
   margin-bottom: 3rem;
+  /* 為課題組區域單獨設置更寬的容器 */
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  padding: 0 2rem; /* 添加左右內邊距 */
 }
 
-/* 默認布局 (≤3個卡片) */
+/* 默認布局 (≤4個卡片) */
 .research-groups-grid-default {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* 防止換行 */
   gap: 1.5rem;
   justify-content: center;
+  overflow-x: auto; /* 如果太寬則允許水平滾動 */
+  max-width: 100rem; /* 為四個卡片設置足夠的最大寬度 */
+  margin: 0 auto; /* 居中對齊 */
 }
 
 /* 智能排版布局 (>3個卡片) */
@@ -507,13 +518,20 @@ onMounted(() => {
   align-items: flex-start;
 }
 
-/* 卡片容器 - 統一高度 */
+/* 卡片容器 - 統一高度，根據卡片數量調整寬度 */
 .card-container {
   flex: none; /* 完全禁用flex調整 */
   max-width: 24rem;
-  min-width: 24rem;
-  width: 24rem; /* 固定寬度 */
+  min-width: 20rem; /* 減少最小寬度 */
+  width: 24rem; /* 默認寬度 */
   box-sizing: border-box; /* 確保一致的盒模型 */
+}
+
+/* 當使用默認布局時（4個以內）調整寬度 */
+.research-groups-grid-default .card-container {
+  max-width: 22rem; /* 稍微減少寬度以容納四個卡片 */
+  min-width: 18rem;
+  width: 22rem;
 }
 
 /* 桌面端確保多列布局 */
