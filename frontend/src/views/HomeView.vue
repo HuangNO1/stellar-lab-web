@@ -618,7 +618,7 @@ onMounted(() => {
   text-align: left;
   margin-bottom: 2.5rem;
   padding: 2rem 0;
-  max-width: 50rem;
+  max-width: 70rem;
   margin-left: auto;
   margin-right: auto;
 }
