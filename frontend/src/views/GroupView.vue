@@ -78,11 +78,11 @@
       </div>
 
       <!-- 課題組成員 -->
-      <div v-if="groupMembers.length > 0" class="group-members-section">
-        <h2 class="section-title">{{ $t('groups.members') }} ({{ groupMembers.length }})</h2>
+      <div v-if="sortedGroupMembers.length > 0" class="group-members-section">
+        <h2 class="section-title">{{ $t('groups.members') }} ({{ sortedGroupMembers.length }})</h2>
         <div class="members-grid">
           <MemberCard 
-            v-for="member in groupMembers" 
+            v-for="member in sortedGroupMembers" 
             :key="member.mem_id"
             :member="member"
             @click="toMember"
@@ -104,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { researchGroupApi, memberApi } from '@/services/api';
@@ -124,6 +124,79 @@ const researchGroup = ref<ResearchGroup | null>(null);
 const groupMembers = ref<Member[]>([]);
 const loading = ref(false);
 const error = ref<string | null>(null);
+
+// 排序後的課題組成員 - 使用與 MemberView.vue 相同的排序邏輯
+const sortedGroupMembers = computed(() => {
+  if (!groupMembers.value || groupMembers.value.length === 0) {
+    return [];
+  }
+
+  return [...groupMembers.value].sort((a, b) => {
+    // 教師按職務類型排序：教授(0) > 副教授(1) > 講師(2) > 助理研究員(3) > 博士後(4)
+    if (a.mem_type === 0 && b.mem_type === 0) {
+      const jobOrder = [0, 1, 2, 3, 4];
+      const aOrder = jobOrder.indexOf(a.job_type ?? 4);
+      const bOrder = jobOrder.indexOf(b.job_type ?? 4);
+      if (aOrder !== bOrder) {
+        return aOrder - bOrder;
+      }
+      // 同職務類型按姓名排序
+      const aName = getCurrentLocale() === 'zh' ? a.mem_name_zh : a.mem_name_en;
+      const bName = getCurrentLocale() === 'zh' ? b.mem_name_zh : b.mem_name_en;
+      return (aName || '').localeCompare(bName || '');
+    }
+
+    // 不同類型按優先級排序：教師 > 博士生 > 碩士生 > 本科生 > 實習生 > 校友 > 其他
+    const typeOrder = { 0: 0, 1: 1, 3: 4, 2: 5 }; // 教師=0, 學生=1, 實習生=4, 校友=5
+    const getTypePriority = (member: Member) => {
+      if (member.mem_type === 1) {
+        // 學生按類型細分：博士生(0) > 碩士生(1) > 本科生(2)
+        const studentOrder = { 0: 1, 1: 2, 2: 3 };
+        return studentOrder[member.student_type as keyof typeof studentOrder] ?? 6;
+      }
+      return typeOrder[member.mem_type as keyof typeof typeOrder] ?? 6;
+    };
+
+    const aPriority = getTypePriority(a);
+    const bPriority = getTypePriority(b);
+    
+    if (aPriority !== bPriority) {
+      return aPriority - bPriority;
+    }
+
+    // 同類型內部排序
+    if (a.mem_type === 1 && b.mem_type === 1) {
+      // 學生按年級排序（高年級在前），同年級按姓名排序
+      const aGrade = a.student_grade ?? 0;
+      const bGrade = b.student_grade ?? 0;
+      if (aGrade !== bGrade) {
+        return bGrade - aGrade; // 高年級在前
+      }
+    }
+
+    if (a.mem_type === 2 && b.mem_type === 2) {
+      // 校友排序：先按身份類型（博士>碩士>本科），再按畢業年份（早年優先），最後按姓名
+      const identityOrder = [0, 1, 2, 3, 4];
+      const aIdentity = identityOrder.indexOf(a.alumni_identity ?? 4);
+      const bIdentity = identityOrder.indexOf(b.alumni_identity ?? 4);
+      if (aIdentity !== bIdentity) {
+        return aIdentity - bIdentity;
+      }
+      
+      // 同身份類型按畢業年份排序（早年畢業的在前）
+      const aYear = a.graduation_year ?? 0;
+      const bYear = b.graduation_year ?? 0;
+      if (aYear !== bYear) {
+        return aYear - bYear;
+      }
+    }
+
+    // 最後按姓名排序
+    const aName = getCurrentLocale() === 'zh' ? a.mem_name_zh : a.mem_name_en;
+    const bName = getCurrentLocale() === 'zh' ? b.mem_name_zh : b.mem_name_en;
+    return (aName || '').localeCompare(bName || '');
+  });
+});
 
 // 獲取當前語言
 const getCurrentLocale = () => {
@@ -153,13 +226,12 @@ const fetchGroupDetail = async () => {
     if (groupResponse.code === 0) {
       researchGroup.value = groupResponse.data;
       
-      // 獲取課題組成員
+      // 獲取課題組成員 - 不使用後端排序，讓前端完全控制排序
       try {
         const membersResponse = await memberApi.getMembers({ 
           all: 'true',
-          research_group_id: groupId,
-          sort_by: 'name',
-          order: 'asc'
+          research_group_id: groupId
+          // 移除 sort_by 和 order 參數，讓前端處理排序
         });
         if (membersResponse.code === 0) {
           groupMembers.value = membersResponse.data.items;
