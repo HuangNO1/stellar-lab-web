@@ -420,7 +420,7 @@ class MemberService(BaseService):
         if 'mem_type' in form_data:
             try:
                 mem_type = int(form_data['mem_type'])
-                if mem_type not in [0, 1, 2]:  # 0=教師, 1=學生, 2=校友
+                if mem_type not in [0, 1, 2, 3]:  # 0=教師, 1=學生, 2=校友, 3=實習生
                     raise ValidationError(msg.get_error_message('MEMBER_TYPE_INVALID'))
                 form_data['mem_type'] = mem_type  # 確保後續使用整數類型
             except (ValueError, TypeError):
@@ -482,7 +482,7 @@ class MemberService(BaseService):
         if 'mem_type' in update_fields:
             try:
                 mem_type = int(update_fields['mem_type'])
-                if mem_type not in [0, 1, 2]:  # 0=教師, 1=學生, 2=校友
+                if mem_type not in [0, 1, 2, 3]:  # 0=教師, 1=學生, 2=校友, 3=實習生
                     raise ValidationError(msg.get_error_message('MEMBER_TYPE_INVALID'))
                 update_fields['mem_type'] = mem_type
             except (ValueError, TypeError):
