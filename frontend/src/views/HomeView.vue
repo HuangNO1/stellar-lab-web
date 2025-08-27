@@ -516,6 +516,8 @@ onMounted(() => {
   flex-wrap: wrap;
   /* 防止 flex 調整寬度 */
   align-items: flex-start;
+  margin-top: 2em;
+  margin-bottom: 2em;
 }
 
 /* 卡片容器 - 統一高度，根據卡片數量調整寬度 */
